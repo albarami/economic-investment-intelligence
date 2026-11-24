@@ -1,0 +1,309 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/component/mounted-opening-review.test.tsx (6 tests | 2 failed) 190ms
+   × replaces the selected area without retaining the previous story cards (en) 108ms
+   × replaces the selected area without retaining the previous story cards (ar) 16ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/component/mounted-opening-review.test.tsx > replaces the selected area without retaining the previous story cards (en)
+AssertionError: expected <article …(4)>…(5)</article> to be null
+
+- Expected:
+null
+
++ Received:
+<article
+  class="public-context-card"
+  data-context-family="night_lights"
+  dir="ltr"
+  lang="en"
+>
+  <h2>
+    <bdi>
+      Night-time radiance
+    </bdi>
+  </h2>
+  <section
+    data-context-level="answer"
+  >
+    <button
+      aria-controls="_r_0_-content"
+      aria-expanded="true"
+      id="_r_0_-control"
+      type="button"
+    >
+      Answer
+    </button>
+    <div
+      aria-labelledby="_r_0_-control"
+      class="context-level-body"
+      data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+      id="_r_0_-content"
+      role="region"
+    >
+      <button
+        aria-label="7 nanowatts per square centimetre per steradian Open the source chain"
+        class="chip"
+        data-fact-chip="value"
+        data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+        data-size="large"
+        data-state="ready"
+        type="button"
+      >
+        <bdi
+          class="chip-root"
+        >
+          <span
+            class="chip-figure"
+          >
+            <bdi
+              class="chip-num"
+              dir="ltr"
+              lang="en"
+            >
+              7
+            </bdi>
+            <span
+              class="chip-unit"
+            >
+              nanowatts per square centimetre per steradian
+            </span>
+          </span>
+        </bdi>
+      </button>
+      <span
+        class="chip"
+        data-fact-chip="reference"
+        data-kind="calendar_month"
+        data-record="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+        data-state="ready"
+      >
+        <bdi
+          class="chip-num"
+          dir="auto"
+          lang="en"
+        >
+          January 2024
+        </bdi>
+      </span>
+      <button
+        type="button"
+      >
+        Source chain and attribution
+      </button>
+    </div>
+  </section>
+  <section
+    data-context-level="comparison"
+  >
+    <button
+      aria-controls="_r_1_-content"
+      aria-expanded="false"
+      id="_r_1_-control"
+      type="button"
+    >
+      Comparison
+    </button>
+    <div
+      aria-labelledby="_r_1_-control"
+      class="context-level-body"
+      data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+      hidden=""
+      id="_r_1_-content"
+      role="region"
+    />
+  </section>
+  <section
+    data-context-level="evidence"
+  >
+    <button
+      aria-controls="_r_2_-content"
+      aria-expanded="false"
+      id="_r_2_-control"
+      type="button"
+    >
+      Evidence and method
+    </button>
+    <div
+      aria-labelledby="_r_2_-control"
+      class="context-level-body"
+      data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+      hidden=""
+      id="_r_2_-content"
+      role="region"
+    />
+  </section>
+  <p
+    data-caveat="night_lights_not_activity"
+  >
+    <bdi>
+      NASA Black Marble. Night-time light is not a measure of business activity.
+    </bdi>
+  </p>
+</article>
+
+ ❯ tests/component/mounted-opening-review.test.tsx:151:67
+    149|     expect(api.story).toHaveBeenCalledTimes(1);
+    150|     await act(async () => submitPlaceArea('INVENTED-b', 'walk-a'));
+    151|     expect(view.container.querySelector('[data-context-family]')).toBe…
+       |                                                                   ^
+    152|     expect(api.story).toHaveBeenCalledTimes(1);
+    153|     await act(async () =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/component/mounted-opening-review.test.tsx > replaces the selected area without retaining the previous story cards (ar)
+AssertionError: expected <article …(4)>…(5)</article> to be null
+
+- Expected:
+null
+
++ Received:
+<article
+  class="public-context-card"
+  data-context-family="night_lights"
+  dir="rtl"
+  lang="ar"
+>
+  <h2>
+    <bdi>
+      الإشعاع الضوئي الليلي
+    </bdi>
+  </h2>
+  <section
+    data-context-level="answer"
+  >
+    <button
+      aria-controls="_r_3_-content"
+      aria-expanded="true"
+      id="_r_3_-control"
+      type="button"
+    >
+      الإجابة
+    </button>
+    <div
+      aria-labelledby="_r_3_-control"
+      class="context-level-body"
+      data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+      id="_r_3_-content"
+      role="region"
+    >
+      <button
+        aria-label="7 نانوواط لكل سنتيمتر مربع لكل ستيراديان، فتح سلسلة المصدر"
+        class="chip"
+        data-fact-chip="value"
+        data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+        data-size="large"
+        data-state="ready"
+        type="button"
+      >
+        <bdi
+          class="chip-root"
+        >
+          <span
+            class="chip-figure"
+          >
+            <bdi
+              class="chip-num"
+              dir="ltr"
+              lang="en"
+            >
+              7
+            </bdi>
+            <span
+              class="chip-unit"
+            >
+              نانوواط لكل سنتيمتر مربع لكل ستيراديان
+            </span>
+          </span>
+        </bdi>
+      </button>
+      <span
+        class="chip"
+        data-fact-chip="reference"
+        data-kind="calendar_month"
+        data-record="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+        data-state="ready"
+      >
+        <bdi
+          class="chip-num"
+          dir="auto"
+          lang="ar"
+        >
+          يناير 2024
+        </bdi>
+      </span>
+      <button
+        type="button"
+      >
+        سلسلة المصدر والإسناد
+      </button>
+    </div>
+  </section>
+  <section
+    data-context-level="comparison"
+  >
+    <button
+      aria-controls="_r_4_-content"
+      aria-expanded="false"
+      id="_r_4_-control"
+      type="button"
+    >
+      المقارنة
+    </button>
+    <div
+      aria-labelledby="_r_4_-control"
+      class="context-level-body"
+      data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+      hidden=""
+      id="_r_4_-content"
+      role="region"
+    />
+  </section>
+  <section
+    data-context-level="evidence"
+  >
+    <button
+      aria-controls="_r_5_-content"
+      aria-expanded="false"
+      id="_r_5_-control"
+      type="button"
+    >
+      الأدلة والمنهج
+    </button>
+    <div
+      aria-labelledby="_r_5_-control"
+      class="context-level-body"
+      data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+      hidden=""
+      id="_r_5_-content"
+      role="region"
+    />
+  </section>
+  <p
+    data-caveat="night_lights_not_activity"
+  >
+    <bdi>
+      الضوء الليلي من NASA Black Marble ليس مقياسًا للنشاط التجاري.
+    </bdi>
+  </p>
+</article>
+
+ ❯ tests/component/mounted-opening-review.test.tsx:151:67
+    149|     expect(api.story).toHaveBeenCalledTimes(1);
+    150|     await act(async () => submitPlaceArea('INVENTED-b', 'walk-a'));
+    151|     expect(view.container.querySelector('[data-context-family]')).toBe…
+       |                                                                   ^
+    152|     expect(api.story).toHaveBeenCalledTimes(1);
+    153|     await act(async () =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  12:10:39
+   Duration  619ms (environment 41%, tests 34%, transform 14%, import 11%)
+

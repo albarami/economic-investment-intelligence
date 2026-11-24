@@ -195,7 +195,7 @@ def foundation_mode(environ: Mapping[str, str]) -> bool:
 
 
 def release_rows(environ: Mapping[str, str]) -> dict[str, store.Line]:
-    """Return release-related row lines."""
+    """Return release-related row lines. A set directory is probed, not built."""
     if foundation_mode(environ):
         return {
             "release": store.Line("WARN", "release", NOT_CONFIGURED),
@@ -203,12 +203,75 @@ def release_rows(environ: Mapping[str, str]) -> dict[str, store.Line]:
             "embedded-reader": store.Line("WARN", "embedded-reader", NOT_CONFIGURED),
             "recorded-replays": store.Line("WARN", "recorded-replays", NOT_CONFIGURED),
         }
+    folder = Path(environ["EII_RELEASE_DIR"])
+    identity, release_reason = _release_identity(folder)
     return {
-        "release": store.Line("FAIL", "release", NOT_BUILT),
-        "load-receipt": store.Line("FAIL", "load-receipt", NOT_BUILT),
-        "embedded-reader": store.Line("FAIL", "embedded-reader", NOT_BUILT),
+        "release": store.Line(
+            "PASS" if identity is not None else "FAIL",
+            "release",
+            release_reason,
+        ),
+        "load-receipt": _receipt_line(folder, identity),
+        "embedded-reader": _reader_line(folder, identity),
         "recorded-replays": store.Line("WARN", "recorded-replays", NOT_BUILT),
     }
+
+
+def _release_identity(folder: Path) -> tuple[str | None, str]:
+    from eii_product.store.release_check import ReleaseRefusal, check_release
+
+    try:
+        checked = check_release(folder)
+    except ReleaseRefusal as refusal:
+        return None, refusal.reason
+    identity = checked.document.get("release_id")
+    if type(identity) is not str:
+        return None, "digest_mismatch"
+    return identity, "release_id matches"
+
+
+def _receipt_line(folder: Path, identity: str | None) -> store.Line:
+    from eii_product.store.receipt import ReceiptRefusal, read_receipt
+
+    try:
+        read_receipt(folder, "" if identity is None else identity)
+    except ReceiptRefusal as refusal:
+        return store.Line("FAIL", "load-receipt", refusal.reason)
+    return store.Line("PASS", "load-receipt", "state complete")
+
+
+def _reader_line(folder: Path, identity: str | None) -> store.Line:
+    path = folder / "release.duckdb"
+    if not path.is_file():
+        return store.Line("FAIL", "embedded-reader", "reader_missing")
+    if identity is None:
+        return store.Line("FAIL", "embedded-reader", "reader_unverified")
+    found = _reader_identity(path)
+    if found is None:
+        return store.Line("FAIL", "embedded-reader", "reader_unreadable")
+    if found != identity:
+        return store.Line("FAIL", "embedded-reader", "reader_release_mismatch")
+    return store.Line("PASS", "embedded-reader", "release_id matches")
+
+
+def _reader_identity(path: Path) -> str | None:
+    import duckdb
+
+    try:
+        connection = duckdb.connect(str(path), read_only=True)
+    except duckdb.Error:
+        return None
+    try:
+        row = connection.execute(
+            "SELECT release_id FROM release_manifest LIMIT 1"
+        ).fetchone()
+    except duckdb.Error:
+        return None
+    finally:
+        connection.close()
+    if row is None or type(row[0]) is not str:
+        return None
+    return row[0]
 
 
 def freeze_bundle_count(root: Path) -> int:

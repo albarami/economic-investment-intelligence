@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { scanTags, scanText } from './host-scan-rules.mjs';
+import { acceptedLicence, scanTags, scanText } from './host-scan-rules.mjs';
 
 const BINARY_EXTENSIONS = [
   '.woff',
@@ -143,13 +143,15 @@ function scanFile(root, full, failures, built) {
   const rel = relativePath(root, full);
   const ext = extensionOf(full);
   if (BINARY_EXTENSIONS.includes(ext)) return;
-  let text;
+  let bytes;
   try {
-    text = fs.readFileSync(full, 'utf8');
+    bytes = fs.readFileSync(full);
   } catch (error) {
     failures.push(`FAIL unreadable-file: ${rel}: ${error.code || error.name}`);
     return;
   }
+  if (acceptedLicence(rel, bytes)) return;
+  const text = bytes.toString('utf8');
   const builtScript = built && BUILT_SCRIPT_EXTENSIONS.includes(ext);
   for (const hit of scanText(text, { builtScript })) {
     failures.push(`FAIL ${hit.rule}: ${rel}:${hit.line}: ${hit.detail}`);

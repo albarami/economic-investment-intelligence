@@ -1,0 +1,106 @@
+[
+  {
+    "name": "thin exterior",
+    "accepted": true,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [0, 0],
+          [1.0000000000000002, 1.0000000000000004],
+          [1, 1.0000000000000002],
+          [0, 0]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "reversed thin exterior",
+    "accepted": false,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [0, 0],
+          [1, 1.0000000000000002],
+          [1.0000000000000002, 1.0000000000000004],
+          [0, 0]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "thin clockwise hole",
+    "accepted": true,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [-2, -2],
+          [3, -2],
+          [3, 3],
+          [-2, 3],
+          [-2, -2]
+        ],
+        [
+          [0, 0],
+          [1, 1.0000000000000002],
+          [1.0000000000000002, 1.0000000000000004],
+          [0, 0]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "reversed thin hole",
+    "accepted": false,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [-2, -2],
+          [3, -2],
+          [3, 3],
+          [-2, 3],
+          [-2, -2]
+        ],
+        [
+          [0, 0],
+          [1.0000000000000002, 1.0000000000000004],
+          [1, 1.0000000000000002],
+          [0, 0]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "subnormal exterior",
+    "accepted": true,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [0, 0],
+          [5e-324, 0],
+          [0, 5e-324],
+          [0, 0]
+        ]
+      ]
+    }
+  },
+  {
+    "name": "zero area exterior",
+    "accepted": false,
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [0, 0],
+          [1, 1],
+          [2, 2],
+          [0, 0]
+        ]
+      ]
+    }
+  }
+]

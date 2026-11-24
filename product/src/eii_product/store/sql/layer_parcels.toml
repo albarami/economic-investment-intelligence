@@ -1,0 +1,34 @@
+[[tables]]
+name = "pub_parcel"
+anchor = "7.3 Columns"
+key = ["feature_key"]
+
+[[tables.columns]]
+name = "feature_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "area_m2"
+type = "decimal(14,2)"
+nullable = false
+
+[[tables.columns]]
+name = "start_date"
+type = "date"
+nullable = true
+
+[[tables.columns]]
+name = "end_date"
+type = "date"
+nullable = true
+
+[[tables.columns]]
+name = "geometry"
+type = "geometry"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

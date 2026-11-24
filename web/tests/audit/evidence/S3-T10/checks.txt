@@ -1,0 +1,801 @@
+S3-T10 command and negative-proof ledger
+Maker/model: OpenAI / Codex, GPT-6 family.
+Base: d3803d6d17e214de45a2e3774e30ac0a7f869e5f; uncommitted workspace changes.
+Environment: Linux; Node v22.22.3; npm 10.9.8; uv 0.11.31; Python 3.14.4.
+Provider none; no key; local invented release seed 15; installed headless browser.
+The loader uses the real embedded store and a recording second-store fixture.
+No live two-store parity, preflight, native or independent approval is claimed.
+No whole eii test, public cache read, live database start/stop, push or merge.
+Recorded UTC: 2026-11-20T10:35:52.470756+00:00
+
+OBSERVED RUNS (earlier failures retained; expected plants are named)
+
+Run browser-post-quiet
+cwd=web | npx --no-install playwright test --config playwright.opening.config.ts --output ../.overnight/tmp/S3-T10-post-quiet-browser
+exit=0
+68 passed (5.1m)
+
+Run checks-final-head
+cwd=web | npm run test:checks
+exit=0
+# tests 1158
+# pass 1158
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+
+Run checks-final
+cwd=web | npm run test:checks
+exit=1
+2 failed
+66 passed (4.9m)
+# tests 1158
+# pass 1156
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+
+Run checks
+cwd=web | npm run test:checks
+exit=1
+33 failed
+80 passed (1.4m)
+8 failed
+55 passed (10.5m)
+# tests 1158
+# pass 1153
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+
+Run pytest-final-head
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=0
+67 passed in 50.23s
+
+Run pytest-final
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=0
+67 passed in 46.43s
+
+Run pytest-post-quiet
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=0
+67 passed in 66.16s (0:01:06)
+
+Run pytest
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=1
+1 failed, 66 passed in 46.04s
+
+Run root-final-head
+cwd=. | uv run --locked ruff check .
+exit=0
+All checks passed!
+cwd=. | uv run --locked ruff format --check .
+exit=0
+1050 files already formatted
+cwd=. | uv run --locked mypy
+exit=0
+Success: no issues found in 539 source files
+cwd=. | python3 scripts/check_docs.py
+exit=0
+checked 1706 text files, 127 Markdown files: OK
+cwd=. | python3 scripts/check_tree.py
+exit=0
+checked 8 rules: OK
+cwd=. | cmp AGENTS.md CLAUDE.md
+exit=0
+cwd=. | uv run --locked python scripts/export_web_catalogue.py --check
+exit=0
+cwd=. | uv run --locked python scripts/check_reference_notes.py
+exit=0
+checked 2 files, 6 libraries, 428 rows: OK
+cwd=. | uv run --locked python scripts/check_audience_origin.py --tree .
+exit=0
+scanned items: 807
+
+Run root-final
+cwd=. | uv run --locked ruff check .
+exit=0
+All checks passed!
+cwd=. | uv run --locked ruff format --check .
+exit=0
+1050 files already formatted
+cwd=. | uv run --locked mypy
+exit=0
+Success: no issues found in 539 source files
+cwd=. | python3 scripts/check_docs.py
+exit=0
+checked 1705 text files, 127 Markdown files: OK
+cwd=. | python3 scripts/check_tree.py
+exit=0
+checked 8 rules: OK
+cwd=. | cmp AGENTS.md CLAUDE.md
+exit=0
+cwd=. | uv run --locked python scripts/export_web_catalogue.py --check
+exit=0
+cwd=. | uv run --locked python scripts/check_reference_notes.py
+exit=0
+checked 2 files, 6 libraries, 428 rows: OK
+cwd=. | uv run --locked python scripts/check_audience_origin.py --tree .
+exit=0
+scanned items: 807
+
+Run root
+cwd=. | uv run --locked ruff check .
+exit=0
+All checks passed!
+cwd=. | uv run --locked ruff format --check .
+exit=0
+1050 files already formatted
+cwd=. | uv run --locked mypy
+exit=1
+Found 84 errors in 5 files (checked 539 source files)
+cwd=. | python3 scripts/check_docs.py
+exit=0
+checked 1704 text files, 127 Markdown files: OK
+cwd=. | python3 scripts/check_tree.py
+exit=0
+checked 8 rules: OK
+cwd=. | cmp AGENTS.md CLAUDE.md
+exit=0
+cwd=. | uv run --locked python scripts/export_web_catalogue.py --check
+exit=0
+cwd=. | uv run --locked python scripts/check_reference_notes.py
+exit=1
+checked 2 files, 6 libraries, 201 rows: 1 failure(s)
+cwd=. | uv run --locked python scripts/check_audience_origin.py --tree .
+exit=0
+scanned items: 792
+
+Run unit-final-head
+cwd=web | npx --no-install vitest run
+exit=0
+Test Files  77 passed (77)
+Tests  1127 passed (1127)
+
+Run unit-final
+cwd=web | npx --no-install vitest run
+exit=0
+Test Files  76 passed (76)
+Tests  1126 passed (1126)
+
+Run unit-post-quiet
+cwd=web | npx --no-install vitest run
+exit=0
+Test Files  77 passed (77)
+Tests  1128 passed (1128)
+
+Run web-final-head
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 974 references in 189 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web-final
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 967 references in 188 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web-handoff
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 974 references in 189 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web-post-quiet
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 976 references in 189 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web
+cwd=web | npm run lint
+exit=1
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=1
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 959 references in 187 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+S3-T10-extra-evidence
+npm run build
+exit=0
+counts: 1829 modules; existing large-chunk warning retained
+npx --no-install playwright test --config playwright.opening.config.ts tests/e2e/opening.spec.ts
+exit=0
+counts: 16 passed
+node --test scripts/tests/shell-document.node-test.mjs
+exit=0
+counts: 3 passed; missing-root throw plant retained and strengthened
+npx --no-install vitest run tests/component/public-opening.test.tsx tests/component/opening-reset.test.tsx tests/component/plate-port.test.tsx
+exit=0
+counts: 5 passed in 3 files
+npx --no-install playwright test --config playwright.opening.config.ts tests/audit/opening.spec.ts --grep 'overflow, numeral'
+exit=0
+counts: 1 passed; accessible numeral, viewport, target size and overflow plants included
+npx --no-install playwright test --config playwright.answer.config.ts tests/audit/answer.spec.ts --grep 'S3-T10 negative context' --output ../.overnight/tmp/S3-T10-withheld-red
+exit=1
+counts: 1 failed as expected: withheld negative fixture not provided yet
+npx --no-install playwright test --config playwright.answer.config.ts tests/audit/answer.spec.ts --grep 'S3-T10 negative context' --output ../.overnight/tmp/S3-T10-withheld-green
+exit=1
+counts: 1 failed: new test incorrectly counted the legitimate reference-period chip as a hidden value
+npx --no-install playwright test --config playwright.answer.config.ts tests/audit/answer.spec.ts --grep 'S3-T10 negative context' --output ../.overnight/tmp/S3-T10-withheld-final
+exit=0
+counts: 1 passed across 8 fixture variants; hidden value and zero absent, reference period required
+git switch -c feat/s3-t10-public-opening
+exit=128
+counts: read-only Git metadata; no branch created
+git add -- TASKS.md docs/10_FRONTEND.md docs/14_IMPLEMENTATION_PLAN.md product/src/eii_product/assistant/catalogue/assets/fragments.yaml product/tests/public_opening_server.py product/tests/test_catalogue_foundations.py scripts/tests/test_public_opening_e2e.py web
+exit=128
+counts: read-only index; no commit or push
+npx --no-install vitest run tests/component/opening-reset.test.tsx
+exit=1
+counts: quiet-overlay plant: 1 failed and 1 passed; selected overlay mounted while quiet
+npx --no-install vitest run tests/component/opening-reset.test.tsx
+exit=0
+counts: 2 passed after the Stage overlay respects quiet; area scene still mounts it on the same map
+npm run build
+exit=0
+counts: post-quiet build: 1829 modules; existing chunk warning retained
+capture manifest verification
+exit=0
+counts: 298 image hashes, byte sizes and unique paths verified; AGENTS and CLAUDE bytes match
+
+S3-T10-artifact-proof
+python3 scripts/check_docs.py
+exit=1
+state: original PNG compressed bytes
+detail: Email-shaped matches in compressed PNG bytes, not text metadata. Matched byte strings are omitted.
+findings: 4
+python3 scripts/check_docs.py
+exit=0
+state: losslessly recompressed PNG containers; unchanged guard
+detail: checked 1708 text files, 128 Markdown files: OK
+
+TERMINAL RED/GREEN PROOFS (reported from the actual earlier executions)
+Opening/string tests: exit 1, 2 failed and 2 passed before implementation; final suite green.
+Exact selected-area membership after layer change: exit 1, 1 failed before rebinding; green after fix.
+First-font-frame: exit 1, 1 failed before the readiness gate; both font browser cases then passed.
+Contrast and map-cover plants: each first exit 1, 1 failed; each passed after its guard existed.
+Reset mode/clock/land-use: exit 1, 1 failed; subsequent focused group exit 0, 20 passed in 3 files.
+Drawing-controls stage placement: exit 1, 1 failed and 2 passed; final component group exit 0, 5 passed.
+EII_WITHHELD_PLANT=zero: disclosure unit file exit 1, 6 failed and 27 passed.
+EII_WITHHELD_PLANT=empty: disclosure unit file exit 1, 6 failed and 27 passed.
+Normal disclosure unit file: exit 0, 33 passed.
+Full early unit run: exit 1, 8 failed and 1114 passed; later unit run exit 0, 1127 passed in 77 files; post-quiet full suite exit 0, 1128 passed in 77 files.
+
+CAUSAL CORRECTIONS AND LIMITS
+Early mypy exit 1: 84 errors in 5 files from new untyped fixtures and eager old test-helper imports. New fixtures were typed and old untyped helpers loaded only at the test boundary; no exclusion or ignore added.
+Early reference-note check exit 1: an unknown section; moved the official references into the existing closed note schema.
+Early lint exit 1: 4 errors in the new fixture/plant test; corrected types, fixture callback name and browser-evaluated plant. No rule disabled.
+Early format exit 1: 3 files; applied the existing formatter.
+Early Python exit 1: 1 failed and 66 passed; exact expected catalogue tuple gained the one new unavailable fragment.
+First aggregate exit 1: 1153 passed, 5 failed. Production controls intercepted phone-sheet clicks; the new runner inherited too much environment; the legacy look commands inherited a wrong browser location. Controls were disclosed and stacked within the production stage, the runner now uses an explicit environment allowlist, and the installed browser path is selected in the command environment.
+Second aggregate exit 1: 1156 passed, 2 failed. The layer source test inspected a closed newly mounted disclosure; it now opens the returned layer and retains the visibility assertion. The missing-root plant accepted an unrelated new font error; its guard now requires the throw in the actual missing-root branch.
+A build-and-ledger shell invocation exited 1 only after the build succeeded: the task-local ledger driver was invoked from web instead of repository root. The corrected root invocation is recorded above; this setup mistake is not acceptance-red evidence.
+The new negative browser test initially counted all chip numerals, including the valid reference period. It now independently requires a reference-period chip and forbids a value numeral, the planted hidden value and a standalone zero. No privacy control changed.
+Four new PNG containers triggered email-pattern matches in compressed bytes. The unchanged scanner fails the original-container plant with exit 1 and passes the delivered lossless encoding with exit 0. Decompressed scanlines and all non-IDAT chunks were verified identical; original and stored hashes are in matrix.json. No exception, ignore, baseline or guard was changed.
+Additional accessibility and withheld-fixture assertions were added after the earlier aggregate had loaded its browser files. The final handoff aggregate is the run with those additions present.
+The handoff aggregate began before the final quiet-overlay repair. After that repair the full unit suite, targeted Python suite, web static checks and complete rebuilt opening browser suite were run again. The aggregate and bounded post-repair evidence are recorded separately; no exact merge-result gate is claimed.
+No random failure is closed by a green observation alone. No timeout, retry, skip, security rule, assertion tolerance or existing baseline was relaxed.
+
+WAITING
+Approved dated Scene 0 electricity fact/period/wording; successful firms-chain fixture through the special route; native Arabic/map-label approval; independent maker audit; live release/two-store/merge-result gate evidence; writable Git metadata.
+
+
+LATER VERIFICATION AND CORRECTIONS
+S3-T10 command and negative-proof ledger
+Maker/model: OpenAI / Codex, GPT-6 family.
+Base: d3803d6d17e214de45a2e3774e30ac0a7f869e5f; uncommitted workspace changes.
+Environment: Linux; Node v22.22.3; npm 10.9.8; uv 0.11.31; Python 3.14.4.
+Provider none; no key; local invented release seed 15; installed headless browser.
+The loader uses the real embedded store and a recording second-store fixture.
+No live two-store parity, preflight, native or independent approval is claimed.
+No whole eii test, public cache read, live database start/stop, push or merge.
+Recorded UTC: 2026-11-20T10:50:55.278918+00:00
+
+OBSERVED RUNS (earlier failures retained; expected plants are named)
+
+Run browser-final-boundary
+cwd=web | npx --no-install playwright test --config playwright.opening.config.ts --output ../.overnight/tmp/S3-T10-final-boundary-browser
+exit=0
+68 passed (3.9m)
+
+Run browser-final-drawer
+cwd=web | npx --no-install playwright test --config playwright.opening.config.ts --output ../.overnight/tmp/S3-T10-post-quiet-browser
+exit=0
+68 passed (4.8m)
+
+Run browser-post-quiet
+cwd=web | npx --no-install playwright test --config playwright.opening.config.ts --output ../.overnight/tmp/S3-T10-post-quiet-browser
+exit=0
+68 passed (5.1m)
+
+Run checks-final-head
+cwd=web | npm run test:checks
+exit=0
+# tests 1158
+# pass 1158
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+
+Run checks-final
+cwd=web | npm run test:checks
+exit=1
+2 failed
+66 passed (4.9m)
+# tests 1158
+# pass 1156
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+
+Run checks-handoff
+cwd=web | npm run test:checks
+exit=0
+# tests 1158
+# pass 1158
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+
+Run checks
+cwd=web | npm run test:checks
+exit=1
+33 failed
+80 passed (1.4m)
+8 failed
+55 passed (10.5m)
+# tests 1158
+# pass 1153
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+
+Run pytest-final-drawer
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=0
+67 passed in 55.26s
+
+Run pytest-final-head
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=0
+67 passed in 50.23s
+
+Run pytest-final
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=0
+68 passed in 75.81s (0:01:15)
+
+Run pytest-post-quiet
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=0
+67 passed in 66.16s (0:01:06)
+
+Run pytest
+cwd=. | uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py product/tests/test_mounted_browser.py product/tests/test_catalogue_foundations.py scripts/tests/test_web_catalogue.py
+exit=1
+1 failed, 66 passed in 46.04s
+
+Run root-final-head
+cwd=. | uv run --locked ruff check .
+exit=0
+All checks passed!
+cwd=. | uv run --locked ruff format --check .
+exit=0
+1050 files already formatted
+cwd=. | uv run --locked mypy
+exit=0
+Success: no issues found in 539 source files
+cwd=. | python3 scripts/check_docs.py
+exit=0
+checked 1706 text files, 127 Markdown files: OK
+cwd=. | python3 scripts/check_tree.py
+exit=0
+checked 8 rules: OK
+cwd=. | cmp AGENTS.md CLAUDE.md
+exit=0
+cwd=. | uv run --locked python scripts/export_web_catalogue.py --check
+exit=0
+cwd=. | uv run --locked python scripts/check_reference_notes.py
+exit=0
+checked 2 files, 6 libraries, 428 rows: OK
+cwd=. | uv run --locked python scripts/check_audience_origin.py --tree .
+exit=0
+scanned items: 807
+
+Run root-final
+cwd=. | uv run --locked ruff check .
+exit=0
+All checks passed!
+cwd=. | uv run --locked ruff format --check .
+exit=0
+1050 files already formatted
+cwd=. | uv run --locked mypy
+exit=0
+Success: no issues found in 539 source files
+cwd=. | python3 scripts/check_docs.py
+exit=0
+checked 1709 text files, 128 Markdown files: OK
+cwd=. | python3 scripts/check_tree.py
+exit=0
+checked 8 rules: OK
+cwd=. | cmp AGENTS.md CLAUDE.md
+exit=0
+cwd=. | uv run --locked python scripts/export_web_catalogue.py --check
+exit=0
+cwd=. | uv run --locked python scripts/check_reference_notes.py
+exit=0
+checked 2 files, 6 libraries, 428 rows: OK
+cwd=. | uv run --locked python scripts/check_audience_origin.py --tree .
+exit=0
+scanned items: 807
+
+Run root-post-quiet
+cwd=. | uv run --locked ruff check .
+exit=0
+All checks passed!
+cwd=. | uv run --locked ruff format --check .
+exit=0
+1050 files already formatted
+cwd=. | uv run --locked mypy
+exit=0
+Success: no issues found in 539 source files
+cwd=. | python3 scripts/check_docs.py
+exit=0
+checked 1709 text files, 128 Markdown files: OK
+cwd=. | python3 scripts/check_tree.py
+exit=0
+checked 8 rules: OK
+cwd=. | cmp AGENTS.md CLAUDE.md
+exit=0
+cwd=. | uv run --locked python scripts/export_web_catalogue.py --check
+exit=0
+cwd=. | uv run --locked python scripts/check_reference_notes.py
+exit=0
+checked 2 files, 6 libraries, 428 rows: OK
+cwd=. | uv run --locked python scripts/check_audience_origin.py --tree .
+exit=0
+scanned items: 807
+
+Run root
+cwd=. | uv run --locked ruff check .
+exit=0
+All checks passed!
+cwd=. | uv run --locked ruff format --check .
+exit=0
+1050 files already formatted
+cwd=. | uv run --locked mypy
+exit=1
+Found 84 errors in 5 files (checked 539 source files)
+cwd=. | python3 scripts/check_docs.py
+exit=0
+checked 1704 text files, 127 Markdown files: OK
+cwd=. | python3 scripts/check_tree.py
+exit=0
+checked 8 rules: OK
+cwd=. | cmp AGENTS.md CLAUDE.md
+exit=0
+cwd=. | uv run --locked python scripts/export_web_catalogue.py --check
+exit=0
+cwd=. | uv run --locked python scripts/check_reference_notes.py
+exit=1
+checked 2 files, 6 libraries, 201 rows: 1 failure(s)
+cwd=. | uv run --locked python scripts/check_audience_origin.py --tree .
+exit=0
+scanned items: 792
+
+Run unit-final-drawer
+cwd=web | npx --no-install vitest run
+exit=1
+Test Files  1 failed | 76 passed (77)
+Tests  2 failed | 1128 passed (1130)
+
+Run unit-final-head
+cwd=web | npx --no-install vitest run
+exit=0
+Test Files  77 passed (77)
+Tests  1127 passed (1127)
+
+Run unit-final
+cwd=web | npx --no-install vitest run
+exit=0
+Test Files  77 passed (77)
+Tests  1130 passed (1130)
+
+Run unit-post-quiet
+cwd=web | npx --no-install vitest run
+exit=0
+Test Files  77 passed (77)
+Tests  1128 passed (1128)
+
+Run web-final-drawer
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 976 references in 189 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web-final-head
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 974 references in 189 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web-final
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 967 references in 188 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web-handoff-final
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 976 references in 189 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web-handoff
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 974 references in 189 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web-post-quiet
+cwd=web | npm run lint
+exit=0
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=0
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 976 references in 189 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+Run web
+cwd=web | npm run lint
+exit=1
+cwd=web | npm run typecheck
+exit=0
+cwd=web | npm run format:check
+exit=1
+cwd=web | npm run check
+exit=0
+checked 32 entries: OK
+checked 42 specifiers: OK
+checked 959 references in 187 files: OK
+checked 96 files: OK
+cwd=web | npm run check:hosts:dist
+exit=0
+checked 168 files: OK
+
+S3-T10-extra-evidence
+npm run build
+exit=0
+counts: 1829 modules; existing large-chunk warning retained
+npx --no-install playwright test --config playwright.opening.config.ts tests/e2e/opening.spec.ts
+exit=0
+counts: 16 passed
+node --test scripts/tests/shell-document.node-test.mjs
+exit=0
+counts: 3 passed; missing-root throw plant retained and strengthened
+npx --no-install vitest run tests/component/public-opening.test.tsx tests/component/opening-reset.test.tsx tests/component/plate-port.test.tsx
+exit=0
+counts: 5 passed in 3 files
+npx --no-install playwright test --config playwright.opening.config.ts tests/audit/opening.spec.ts --grep 'overflow, numeral'
+exit=0
+counts: 1 passed; accessible numeral, viewport, target size and overflow plants included
+npx --no-install playwright test --config playwright.answer.config.ts tests/audit/answer.spec.ts --grep 'S3-T10 negative context' --output ../.overnight/tmp/S3-T10-withheld-red
+exit=1
+counts: 1 failed as expected: withheld negative fixture not provided yet
+npx --no-install playwright test --config playwright.answer.config.ts tests/audit/answer.spec.ts --grep 'S3-T10 negative context' --output ../.overnight/tmp/S3-T10-withheld-green
+exit=1
+counts: 1 failed: new test incorrectly counted the legitimate reference-period chip as a hidden value
+npx --no-install playwright test --config playwright.answer.config.ts tests/audit/answer.spec.ts --grep 'S3-T10 negative context' --output ../.overnight/tmp/S3-T10-withheld-final
+exit=0
+counts: 1 passed across 8 fixture variants; hidden value and zero absent, reference period required
+git switch -c feat/s3-t10-public-opening
+exit=128
+counts: read-only Git metadata; no branch created
+git add -- TASKS.md docs/10_FRONTEND.md docs/14_IMPLEMENTATION_PLAN.md product/src/eii_product/assistant/catalogue/assets/fragments.yaml product/tests/public_opening_server.py product/tests/test_catalogue_foundations.py scripts/tests/test_public_opening_e2e.py web
+exit=128
+counts: read-only index; no commit or push
+npx --no-install vitest run tests/component/opening-reset.test.tsx
+exit=1
+counts: quiet-overlay plant: 1 failed and 1 passed; selected overlay mounted while quiet
+npx --no-install vitest run tests/component/opening-reset.test.tsx
+exit=0
+counts: 2 passed after the Stage overlay respects quiet; area scene still mounts it on the same map
+npm run build
+exit=0
+counts: post-quiet build: 1829 modules; existing chunk warning retained
+capture manifest verification
+exit=0
+counts: 298 image hashes, byte sizes and unique paths verified; AGENTS and CLAUDE bytes match
+npx --no-install vitest run tests/component/chain.test.tsx
+exit=1
+counts: numeric-source-metadata plant: 2 failed and 38 passed across EN/AR
+npx --no-install vitest run tests/component/chain.test.tsx
+exit=0
+counts: 40 passed after routing every returned method/source text field through a reference chip
+uv run --locked python -m pytest -q -p no:cacheprovider scripts/tests/test_public_opening_e2e.py::test_opening_fixture_keeps_budget_inside_work
+exit=1
+counts: 1 failed before explicitly scoping the test budget path; the corrected test passes in the final 68-test Python suite
+
+S3-T10-artifact-proof
+python3 scripts/check_docs.py
+exit=1
+state: original PNG compressed bytes
+detail: Email-shaped matches in compressed PNG bytes, not text metadata. Matched byte strings are omitted.
+findings: 4
+python3 scripts/check_docs.py
+exit=0
+state: losslessly recompressed PNG containers; unchanged guard
+detail: checked 1708 text files, 128 Markdown files: OK
+
+TERMINAL RED/GREEN PROOFS (reported from the actual earlier executions)
+Opening/string tests: exit 1, 2 failed and 2 passed before implementation; final suite green.
+Exact selected-area membership after layer change: exit 1, 1 failed before rebinding; green after fix.
+First-font-frame: exit 1, 1 failed before the readiness gate; both font browser cases then passed.
+Contrast and map-cover plants: each first exit 1, 1 failed; each passed after its guard existed.
+Reset mode/clock/land-use: exit 1, 1 failed; subsequent focused group exit 0, 20 passed in 3 files.
+Drawing-controls stage placement: exit 1, 1 failed and 2 passed; final component group exit 0, 5 passed.
+EII_WITHHELD_PLANT=zero: disclosure unit file exit 1, 6 failed and 27 passed.
+EII_WITHHELD_PLANT=empty: disclosure unit file exit 1, 6 failed and 27 passed.
+Normal disclosure unit file: exit 0, 33 passed.
+Full early unit run: exit 1, 8 failed and 1114 passed; later unit run exit 0, 1127 passed in 77 files; post-quiet full suite exit 0, 1128 passed in 77 files.
+
+CAUSAL CORRECTIONS AND LIMITS
+Early mypy exit 1: 84 errors in 5 files from new untyped fixtures and eager old test-helper imports. New fixtures were typed and old untyped helpers loaded only at the test boundary; no exclusion or ignore added.
+Early reference-note check exit 1: an unknown section; moved the official references into the existing closed note schema.
+Early lint exit 1: 4 errors in the new fixture/plant test; corrected types, fixture callback name and browser-evaluated plant. No rule disabled.
+Early format exit 1: 3 files; applied the existing formatter.
+Early Python exit 1: 1 failed and 66 passed; exact expected catalogue tuple gained the one new unavailable fragment.
+First aggregate exit 1: 1153 passed, 5 failed. Production controls intercepted phone-sheet clicks; the new runner inherited too much environment; the legacy look commands inherited a wrong browser location. Controls were disclosed and stacked within the production stage, the runner now uses an explicit environment allowlist, and the installed browser path is selected in the command environment.
+Second aggregate exit 1: 1156 passed, 2 failed. The layer source test inspected a closed newly mounted disclosure; it now opens the returned layer and retains the visibility assertion. The missing-root plant accepted an unrelated new font error; its guard now requires the throw in the actual missing-root branch.
+A build-and-ledger shell invocation exited 1 only after the build succeeded: the task-local ledger driver was invoked from web instead of repository root. The corrected root invocation is recorded above; this setup mistake is not acceptance-red evidence.
+The new negative browser test initially counted all chip numerals, including the valid reference period. It now independently requires a reference-period chip and forbids a value numeral, the planted hidden value and a standalone zero. No privacy control changed.
+Four new PNG containers triggered email-pattern matches in compressed bytes. The unchanged scanner fails the original-container plant with exit 1 and passes the delivered lossless encoding with exit 0. Decompressed scanlines and all non-IDAT chunks were verified identical; original and stored hashes are in matrix.json. No exception, ignore, baseline or guard was changed.
+Additional accessibility and withheld-fixture assertions were added after the earlier aggregate had loaded its browser files. The final handoff aggregate is the run with those additions present.
+The handoff aggregate began before the final quiet-overlay and source-metadata repairs. The full unit suite, targeted Python suite, web static checks and complete rebuilt opening browser suite were run again. The final fixture also explicitly scopes its budget journal to its temporary work directory. The aggregate and bounded post-repair evidence are recorded separately; no exact merge-result gate is claimed.
+No random failure is closed by a green observation alone. No timeout, retry, skip, security rule, assertion tolerance or existing baseline was relaxed.
+
+WAITING
+Approved dated Scene 0 electricity fact/period/wording; successful firms-chain fixture through the special route; native Arabic/map-label approval; independent maker audit; live release/two-store/merge-result gate evidence; writable Git metadata.
+
+POST-RECORD VERIFICATION
+python3 scripts/check_docs.py
+exit=0
+checked 1709 text files, 128 Markdown files: OK
+python3 scripts/check_tree.py
+exit=0
+checked 8 rules: OK
+cmp AGENTS.md CLAUDE.md
+exit=0
+
+git diff --check
+exit=0
+
+Capture index: 298 hashes, byte sizes and unique paths verified; Stage and drawer source fingerprints match. Historical progress prefix preserved; exactly one new block. TASKS changes one delivery line. Pins, locks and instruction files unchanged. Return marker and authored report/progress patterns verified.

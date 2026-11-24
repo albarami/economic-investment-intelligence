@@ -19,7 +19,7 @@ WORKFLOW_DIR = ROOT / ".github/workflows"
 WORKFLOW_NAMES = frozenset({"ci.yml", "docs.yml", "sandbox.yml"})
 # A workflow file change changes its pin in the same commit, so it is seen in review.
 PINNED_SHA256 = {
-    "ci.yml": "3830016a025b55bda738c344a611c566dff9d4cbdcde3f3a371fdbf84d6d29b4",
+    "ci.yml": "cfe647f03fc4081ca5817992a55830b7491e1218ed057e724d9de48f64a4b3f1",
     "docs.yml": "9c3ed0f74b8106e6797d5d010f9da20d4166d52a6f693d195a9920d0e95727a6",
     "sandbox.yml": "e33d0f21d42874da8d944d65b3824fff44ceaba4f17a538e06df9d8c087852e3",
 }
@@ -54,7 +54,7 @@ FORBIDDEN_TOKENS = (
 )
 RUN_WEAKENERS = ("|| true", "set +e", "||true")
 SCANNER_FETCH = "uv run --locked python scripts/hooks_gitleaks.py fetch"
-# The one admitted condition: the final `tests` job waits for every shard and
+# The final `tests` job waits for every shard and
 # always runs, so a failed, cancelled or skipped shard reaches its verdict.
 AGGREGATE_LINES = "    needs: [suite, web-spikes]\n    if: ${{ always() }}\n"
 AGGREGATE_RUN = ci_aggregate.AGGREGATE_RUN
@@ -349,6 +349,11 @@ def check_no_weakeners(raw_texts: dict[str, str]) -> list[str]:
     for name, text in raw_texts.items():
         if name == "ci.yml":
             text = text.replace(AGGREGATE_LINES, "", 1)
+            # Only the four declared S3 proof steps may select the guards leg.
+            # The aggregate shape check also pins their job, order and bodies.
+            for step in ci_aggregate.DATABASE_STEPS:
+                header = f"      - name: {step['name']}\n"
+                text = text.replace(header + f"        if: {step['if']}\n", header, 1)
         for token in FORBIDDEN_TOKENS:
             if token in text:
                 problems.append(f"{name}: forbidden token {token!r}")

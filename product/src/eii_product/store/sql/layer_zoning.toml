@@ -1,0 +1,44 @@
+[[tables]]
+name = "pub_zoning"
+anchor = "7.3 Columns"
+key = ["feature_key"]
+
+[[tables.columns]]
+name = "feature_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "zoning_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_layer"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "permitted_uses"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "height_rule"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "setback_rule"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "geometry"
+type = "geometry"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

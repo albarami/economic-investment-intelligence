@@ -1,0 +1,39 @@
+[[tables]]
+name = "pub_property_sale"
+anchor = "7.3 Columns"
+key = ["district_key", "period", "property_type"]
+
+[[tables.columns]]
+name = "district_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "municipality_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "property_type"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "deal_count"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "median_price_per_m2"
+type = "decimal(12,2)"
+nullable = true
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

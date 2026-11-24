@@ -271,18 +271,139 @@ class Preflight(unittest.TestCase):
         self.assertEqual(ran, labels)
 
     def test_configured_release_mode(self) -> None:
-        """U03: configured release dir yields not_built FAIL rows."""
+        """U03: a set release that is not a release fails the three rows."""
         not_built = "not_built (EII_RELEASE_DIR is set, and this check is not built in slice S0)"
         with tempfile.TemporaryDirectory() as tmp:
             env, root, api_port, _ = _env0(Path(tmp))
             env["EII_RELEASE_DIR"] = "data/releases/x"
             report = preflight_mod.run_preflight(root, env, api_port=api_port)
             texts = report.text_lines()
-            self.assertEqual(texts[5], f"FAIL release: {not_built}")
-            self.assertEqual(texts[6], f"FAIL load-receipt: {not_built}")
-            self.assertEqual(texts[7], f"FAIL embedded-reader: {not_built}")
+            self.assertEqual(texts[5], "FAIL release: release_missing")
+            self.assertEqual(texts[6], "FAIL load-receipt: receipt_missing")
+            self.assertEqual(texts[7], "FAIL embedded-reader: reader_missing")
             self.assertEqual(texts[9], f"WARN recorded-replays: {not_built}")
             self.assertEqual(report.status, 1)
+
+    def test_configured_preflight_passes(self) -> None:
+        """The rows of a built release. This proves the probe, not a load."""
+        import public_release_fixture as fixture
+
+        from eii_product.store.loader import READER_NAME, build_reader
+        from eii_product.store.receipt import RECEIPT_NAME, write_receipt
+        from eii_product.store.release_check import check_release
+
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / "release"
+            folder.mkdir()
+            fixture.build_fixture(folder)
+            checked = check_release(folder)
+            identity = checked.document["release_id"]
+            assert type(identity) is str
+            build_reader(checked, folder / READER_NAME)
+            write_receipt(
+                folder,
+                identity,
+                {"pub_place": (None,)},
+                {"pub_place": "cd" * 32},
+                {"embedded": 1, "postgres": 1},
+            )
+            self._assert_rows(
+                folder,
+                "PASS release: release_id matches",
+                "PASS load-receipt: state complete",
+                "PASS embedded-reader: release_id matches",
+                zero=True,
+            )
+            receipt = folder / RECEIPT_NAME
+            saved_receipt = receipt.read_bytes()
+            receipt.unlink()
+            self._assert_rows(
+                folder,
+                "PASS release: release_id matches",
+                "FAIL load-receipt: receipt_missing",
+                "PASS embedded-reader: release_id matches",
+            )
+            parsed = json.loads(saved_receipt)
+            parsed["state"] = "pending"
+            receipt.write_text(json.dumps(parsed), encoding="utf-8")
+            self._assert_rows(
+                folder,
+                "PASS release: release_id matches",
+                "FAIL load-receipt: receipt_not_complete",
+                "PASS embedded-reader: release_id matches",
+            )
+            parsed["state"] = "complete"
+            parsed["release_id"] = "cd" * 32
+            receipt.write_text(json.dumps(parsed), encoding="utf-8")
+            self._assert_rows(
+                folder,
+                "PASS release: release_id matches",
+                "FAIL load-receipt: receipt_release_mismatch",
+                "PASS embedded-reader: release_id matches",
+            )
+            receipt.write_bytes(saved_receipt)
+            reader = folder / READER_NAME
+            saved_reader = reader.read_bytes()
+            self._rewrite_reader(reader, "cd" * 32)
+            self._assert_rows(
+                folder,
+                "PASS release: release_id matches",
+                "PASS load-receipt: state complete",
+                "FAIL embedded-reader: reader_release_mismatch",
+            )
+            reader.unlink()
+            self._assert_rows(
+                folder,
+                "PASS release: release_id matches",
+                "PASS load-receipt: state complete",
+                "FAIL embedded-reader: reader_missing",
+            )
+            reader.write_bytes(saved_reader)
+            manifest = folder / "manifest.json"
+            text = manifest.read_text(encoding="utf-8")
+            flipped = ("d" if text[0] == "c" else "c") + text[1:]
+            manifest.write_text(flipped, encoding="utf-8")
+            got = rows.release_rows({"EII_RELEASE_DIR": str(folder)})
+            self.assertTrue(got["release"].text().startswith("FAIL release:"))
+            self.assertNotEqual(self._status(folder), 0)
+
+    def _assert_rows(
+        self,
+        folder: Path,
+        release: str,
+        receipt: str,
+        reader: str,
+        *,
+        zero: bool = False,
+    ) -> None:
+        got = rows.release_rows({"EII_RELEASE_DIR": str(folder)})
+        self.assertEqual(got["release"].text(), release)
+        self.assertEqual(got["load-receipt"].text(), receipt)
+        self.assertEqual(got["embedded-reader"].text(), reader)
+        self.assertTrue(
+            got["recorded-replays"].text().startswith("WARN recorded-replays:")
+        )
+        status = self._status(folder)
+        if zero:
+            self.assertEqual(status, 0)
+        else:
+            self.assertNotEqual(status, 0)
+
+    def _status(self, folder: Path) -> int:
+        with tempfile.TemporaryDirectory() as tmp:
+            env, root, api_port, _ = _env0(Path(tmp))
+            env["EII_RELEASE_DIR"] = str(folder)
+            report = preflight_mod.run_preflight(root, env, api_port=api_port)
+        return report.status
+
+    def _rewrite_reader(self, path: Path, identity: str) -> None:
+        import duckdb
+
+        connection = duckdb.connect(str(path))
+        try:
+            connection.execute("UPDATE release_manifest SET release_id = ?", [identity])
+        finally:
+            connection.close()
 
     def test_unknown_traffic_provider_keeps_failure_in_foundation(self) -> None:
         """R3: the planted invalid switch fails even without a release."""

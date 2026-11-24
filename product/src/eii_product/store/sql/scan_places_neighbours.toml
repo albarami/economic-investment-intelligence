@@ -1,0 +1,54 @@
+[[tables]]
+name = "graph_edge"
+anchor = "10. The economic graph"
+key = ["edge_id"]
+
+[[tables.columns]]
+name = "edge_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "edge_type"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "from_node_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "to_node_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "provenance"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "basis"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "attr_value"
+type = "decimal(18,4)"
+nullable = true
+
+[[tables.columns]]
+name = "attr_unit"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

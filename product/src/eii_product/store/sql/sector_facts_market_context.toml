@@ -1,0 +1,34 @@
+[[tables]]
+name = "pub_trade_wr"
+anchor = "7.3 Columns"
+key = ["trade_type", "period", "indicator"]
+
+[[tables.columns]]
+name = "trade_type"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "indicator"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "value"
+type = "decimal(18,2)"
+nullable = false
+
+[[tables.columns]]
+name = "unit"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

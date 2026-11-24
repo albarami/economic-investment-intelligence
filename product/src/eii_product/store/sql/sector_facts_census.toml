@@ -1,0 +1,34 @@
+[[tables]]
+name = "pub_census_2015_municipality"
+anchor = "7.3 Columns"
+key = ["municipality_code", "period", "indicator"]
+
+[[tables.columns]]
+name = "municipality_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "indicator"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "value"
+type = "decimal(18,4)"
+nullable = false
+
+[[tables.columns]]
+name = "unit"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

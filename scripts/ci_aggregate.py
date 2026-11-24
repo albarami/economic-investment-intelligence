@@ -13,7 +13,9 @@ table, under ``fail-fast: false`` alone; job ``tests`` needs exactly ``suite``
 and ``web-spikes`` and always runs. So no inherited variable such as
 ``SHELLOPTS: noexec``, added step, key or changed setup step can stop a suite
 from running while the check stays green. A suite dropped or excused fails here and not
-only in the guard tests that suite runs. With WORKFLOW alone, only the shape is
+only in the guard tests that suite runs. Four live database proof steps select
+only ``python-guards``; the suite command itself remains unconditional.
+With WORKFLOW alone, only the shape is
 judged: job ``static-checks`` runs that form, needs no job and so is never
 skipped by a failed suite. A matrix job's result is ``success`` only when every
 leg succeeded; a failed, cancelled or skipped job, a missing job or an extra job
@@ -111,6 +113,87 @@ AGGREGATE_STEP = {
     **run(AGGREGATE_NAME, AGGREGATE_RUN),
     "env": {"NEEDS": "${{ toJSON(needs) }}"},
 }
+# S3 live proofs run once, beside their offline guard tests.
+DATABASE_CONDITION = "${{ matrix.suite == 'python-guards' }}"
+DATABASE_STEPS: tuple[Step, ...] = (
+    {
+        **run(
+            "Start the database service",
+            """\
+set -euo pipefail
+umask 077
+install -m 600 /dev/null "$RUNNER_TEMP/pg-super"
+openssl rand -hex 24 > "$RUNNER_TEMP/pg-super"
+echo "::add-mask::$(cat "$RUNNER_TEMP/pg-super")"
+docker run --detach --name eii-ci-db \\
+  --publish 127.0.0.1:55440:5432 \\
+  --env POSTGRES_PASSWORD_FILE=/run/secrets/pg-super \\
+  --volume "$RUNNER_TEMP/pg-super:/run/secrets/pg-super:ro" \\
+  postgis/postgis@sha256:4a43e3c3e5d55b9208240fc71db543b79c638766280c625a425bd0a2390989c4
+ready=0
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
+  if docker exec eii-ci-db pg_isready -h 127.0.0.1 -p 5432; then
+    ready=1
+    break
+  fi
+  sleep 2
+done
+test "$ready" -eq 1
+""",
+        ),
+        "if": DATABASE_CONDITION,
+    },
+    {
+        **run(
+            "Create the owner role",
+            """\
+set -euo pipefail
+umask 077
+install -m 600 /dev/null "$RUNNER_TEMP/pg-owner"
+openssl rand -hex 24 > "$RUNNER_TEMP/pg-owner"
+echo "::add-mask::$(cat "$RUNNER_TEMP/pg-owner")"
+{
+  printf '%s' "CREATE ROLE eii_owner LOGIN PASSWORD '"
+  tr -d '\\n' < "$RUNNER_TEMP/pg-owner"
+  printf '%s\\n' "';"
+} | docker exec -i eii-ci-db psql -U postgres -v ON_ERROR_STOP=1
+install -m 600 /dev/null "$RUNNER_TEMP/pgpass"
+{
+  printf '%s' "127.0.0.1:55440:*:eii_owner:"
+  tr -d '\\n' < "$RUNNER_TEMP/pg-owner"
+  printf '\\n'
+} > "$RUNNER_TEMP/pgpass"
+""",
+        ),
+        "if": DATABASE_CONDITION,
+    },
+    {
+        **run(
+            "Load the public release",
+            """\
+set -euo pipefail
+export PGPASSFILE="$RUNNER_TEMP/pgpass"
+export EII_DATABASE_URL="postgresql://postgres:$(cat "$RUNNER_TEMP/pg-super")@127.0.0.1:55440/postgres"
+uv run --locked python scripts/tests/live_public_release_load.py
+""",
+        ),
+        "if": DATABASE_CONDITION,
+    },
+    {
+        **run(
+            "Load the public release with a planted difference",
+            """\
+set -euo pipefail
+export PGPASSFILE="$RUNNER_TEMP/pgpass"
+export EII_DATABASE_URL="postgresql://postgres:$(cat "$RUNNER_TEMP/pg-super")@127.0.0.1:55440/postgres"
+code=0
+uv run --locked python scripts/tests/live_public_release_load.py --diverge || code=$?
+test "$code" -eq 3
+""",
+        ),
+        "if": DATABASE_CONDITION,
+    },
+)
 # The declared step sequence of each protected job, every key and value.
 JOB_STEPS: dict[str, tuple[Step, ...]] = {
     "static-checks": (
@@ -133,7 +216,7 @@ JOB_STEPS: dict[str, tuple[Step, ...]] = {
         run("Check web format", "npm run format:check", "web"),
         run("Check web types", "npm run typecheck", "web"),
     ),
-    "suite": (*SETUP, *SANDBOX, BROWSER, SUITE_STEP),
+    "suite": (*SETUP, *SANDBOX, BROWSER, SUITE_STEP, *DATABASE_STEPS),
     "web-spikes": (
         *SETUP,
         *SANDBOX,

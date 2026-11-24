@@ -13,6 +13,7 @@ import preflight_database as database
 import preflight_proc as proc
 import preflight_rows as rows
 import preflight_store as store
+from eii_core.reasons import reason
 
 CHECKS = (
     "python",
@@ -67,6 +68,21 @@ def run_preflight(
     tools: rows.ToolChecks | None = None,
 ) -> Report:
     """Run every preflight row inside a temporary scratch folder."""
+    from operations.common import Refusal
+    from operations.config import DEFAULT_PORTS
+    from operations.config import api_port as configured_port
+
+    port_reason = None
+    try:
+        api_port = configured_port(
+            environ.get("EII_API_PORT", ""),
+            DEFAULT_PORTS.get(environ.get("EII_ENVIRONMENT", ""), api_port),
+        )
+    except Refusal as error:
+        port_reason = error.reason
+    operational = environ.get("EII_ENVIRONMENT") in {"live", "staging"}
+    if operational:
+        docker = False
     with tempfile.TemporaryDirectory(prefix="eii-preflight-") as scratch_name:
         scratch = Path(scratch_name)
         out_lines: list[store.Line] = []
@@ -98,17 +114,93 @@ def run_preflight(
             )
         if sel.line is not None:
             out_lines.append(sel.line)
+        database_conflict = (
+            sel.line is not None and sel.line.reason == "environment_database_conflict"
+        )
+        if (
+            operational
+            and (embedded or sel.store != "postgres")
+            and not database_conflict
+        ):
+            sel = store.Selection(
+                store.Line("FAIL", "postgresql", "postgres_required"), "none"
+            )
+            out_lines = [line for line in out_lines if line.check != "postgresql"]
+            out_lines.append(store.Line("FAIL", "postgresql", "postgres_required"))
 
-        rel = rows.release_rows(environ)
+        rel = (
+            {
+                name: store.Line("FAIL", name, "environment_database_conflict")
+                for name in (*rows.RELEASE_ROWS, rows.REPLAY_ROW)
+            }
+            if database_conflict
+            else rows.release_rows(environ)
+        )
+        tile_line = (
+            store.Line("FAIL", "tiles-glyphs-fonts", "application_not_verified")
+            if operational
+            else rows.tiles_row(root)
+        )
+        if operational:
+            from eii_product.api.health import asset_reason, local_assets
+            from operations.config import read_environment
+            from operations.deploy import request_for
+            from operations.runtime import check_stores, installed, verify_peers
+
+            try:
+                env = read_environment(environ)
+                verify_peers(env)
+                request = request_for(env, environ)
+                api_port = request["backend_port"]
+                application, _ = installed(env, request)
+                assets = local_assets(env.release, application / "web/dist")
+                tile_line = store.Line(
+                    "PASS" if assets == ("ok", "ok", "ok") else "FAIL",
+                    "tiles-glyphs-fonts",
+                    "installed_local_assets"
+                    if assets == ("ok", "ok", "ok")
+                    else asset_reason(assets),
+                )
+                check_stores(env, environ, embedded=embedded)
+            except Exception as error:
+                rel["release"] = store.Line("FAIL", "release", reason(error))
         out_lines.append(rel["release"])
         out_lines.append(rel["load-receipt"])
         out_lines.append(rel["embedded-reader"])
-        out_lines.append(rows.tiles_row(root))
+        out_lines.append(tile_line)
         out_lines.append(rel["recorded-replays"])
         out_lines.append(tool_checks.bubblewrap())
-        out_lines.append(rows.api_port_row(api_port))
+        port_line = (
+            rows.api_port_row(api_port)
+            if port_reason is None
+            else store.Line("FAIL", "api-port", port_reason)
+        )
+        if operational and port_line.severity == "FAIL" and port_reason is None:
+            from operations.common import read_json
+            from operations.config import read_environment
+            from operations.process import process_record, require_owned
+
+            try:
+                env = read_environment(environ)
+                record = read_json(
+                    process_record(env.state, api_port), "process_identity_mismatch"
+                )
+                require_owned(record, env.name)
+                if record["release_id"] != env.release.name and env.name != "staging":
+                    raise Refusal("process_identity_mismatch")
+                port_line = store.Line(
+                    "PASS", "api-port", "verified owned application process"
+                )
+            except Exception as error:
+                port_line = store.Line("FAIL", "api-port", reason(error))
+        out_lines.append(port_line)
         out_lines.append(rows.model_key_row(environ))
-        out_lines.append(rows.traffic_provider_key_row(environ))
+        traffic = rows.traffic_provider_key_row(environ)
+        if traffic.severity == "PASS" and environ.get(
+            "EII_TRAFFIC_PROVIDER", ""
+        ) not in {"", "simulated"}:
+            traffic = store.Line("FAIL", "traffic-provider-key", "traffic_mode_refused")
+        out_lines.append(traffic)
         out_lines.append(rows.night_lights_key_row(environ))
         out_lines.append(rows.cdse_client_id_row(environ))
         out_lines.append(rows.cdse_client_secret_row(environ))

@@ -54,6 +54,10 @@ ALLOWED_IMPORTS = {
     "public_methods",
     "sector_economics",
 }
+REVIEWED_IMPORTS = {
+    "eii_core.calc.firms_per_tower": {"CLASS_KEYS"},
+    "itertools": {"pairwise"},
+}
 FORBIDDEN_CALLS = {
     "open",
     "read_text",
@@ -118,8 +122,15 @@ def assert_pure(source, *, allow_datetime=False):
         if isinstance(node, ast.Import):
             assert all(alias.name in ALLOWED_IMPORTS for alias in node.names)
         if isinstance(node, ast.ImportFrom):
-            assert node.module in ALLOWED_IMPORTS
-            assert node.module != "datetime" or allow_datetime
+            if node.module in REVIEWED_IMPORTS:
+                assert all(
+                    alias.name in REVIEWED_IMPORTS[node.module] for alias in node.names
+                )
+            else:
+                assert node.module in ALLOWED_IMPORTS
+            if node.module == "datetime":
+                assert allow_datetime
+                assert all(alias.name == "date" for alias in node.names)
         if isinstance(node, ast.Call):
             names = _call_names(node.func)
             assert not names & FORBIDDEN_CALLS
@@ -127,7 +138,15 @@ def assert_pure(source, *, allow_datetime=False):
 
 def assert_calculation_directory(folder):
     for path in sorted(folder.rglob("*.py")):
-        assert_pure(path.read_text(), allow_datetime=path == folder / "facts.py")
+        assert_pure(
+            path.read_text(),
+            allow_datetime=path
+            in {
+                folder / "facts.py",
+                folder / "public_context.py",
+                folder / "scan_places.py",
+            },
+        )
 
 
 @pytest.mark.parametrize(
@@ -135,6 +154,10 @@ def assert_calculation_directory(folder):
     [
         ("new_calculation.py", 'def helper(): return open("invented")'),
         ("nested/facts.py", "from datetime import datetime"),
+        ("new_calculation.py", "from datetime import date"),
+        ("nested/facts.py", "from datetime import date"),
+        ("nested/public_context.py", "from datetime import date"),
+        ("nested/scan_places.py", "from datetime import date"),
     ],
 )
 def test_unlisted_calculation_module_is_checked(tmp_path, name, source):
@@ -151,6 +174,10 @@ def test_purity_guard_and_planted_io_helper():
     for plant in [
         'def helper():\n return open("invented")',
         "import os",
+        "from itertools import count",
+        "from eii_core.calc.firms_per_tower import unreviewed_helper",
+        "from datetime import datetime",
+        "from datetime import date; date.today()",
         "def helper():\n return getattr(clock, 'utc' + 'now')()",
         "def helper():\n return __builtins__['open']('invented')",
         "def helper():\n return clock.now()",
@@ -160,7 +187,7 @@ def test_purity_guard_and_planted_io_helper():
         "def helper():\n return NormalDist().samples(1)",
     ]:
         with pytest.raises(AssertionError):
-            assert_pure(plant)
+            assert_pure(plant, allow_datetime=True)
 
 
 def test_calls_and_imports_need_no_io_clock_or_random(monkeypatch):

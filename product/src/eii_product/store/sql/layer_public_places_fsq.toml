@@ -1,0 +1,74 @@
+[[tables]]
+name = "pub_place_fsq"
+anchor = "7.3 Columns"
+key = ["fsq_place_id"]
+
+[[tables.columns]]
+name = "fsq_place_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "category_ids"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "category_labels"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "lon"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "lat"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "cell"
+type = "cell"
+nullable = false
+
+[[tables.columns]]
+name = "source_release"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "licence"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "date_created"
+type = "date"
+nullable = true
+
+[[tables.columns]]
+name = "date_refreshed"
+type = "date"
+nullable = true
+
+[[tables.columns]]
+name = "date_closed"
+type = "date"
+nullable = true
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

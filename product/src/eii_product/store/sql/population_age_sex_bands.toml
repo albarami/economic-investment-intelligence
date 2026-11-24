@@ -1,0 +1,44 @@
+[[tables]]
+name = "pub_pop_agesex_grid"
+anchor = "7.3 Columns"
+key = ["grid_key", "age_band", "sex", "period"]
+
+[[tables.columns]]
+name = "grid_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "lon"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "lat"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "age_band"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "sex"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "people"
+type = "decimal(18,4)"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

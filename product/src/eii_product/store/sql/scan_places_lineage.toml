@@ -1,0 +1,29 @@
+[[tables]]
+name = "fact_lineage"
+anchor = "7.3 Columns"
+key = ["lineage_id", "source_id"]
+
+[[tables.columns]]
+name = "lineage_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "table_name"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "input_class"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "transform"
+type = "string"
+nullable = false

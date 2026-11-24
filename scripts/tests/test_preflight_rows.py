@@ -258,8 +258,17 @@ class Rows(unittest.TestCase):
                     ):
                         self.assertEqual(got[key].text(), f"WARN {key}: {not_cfg}")
                 else:
-                    for key in ("release", "load-receipt", "embedded-reader"):
-                        self.assertEqual(got[key].text(), f"FAIL {key}: {not_built}")
+                    self.assertEqual(
+                        got["release"].text(), "FAIL release: release_missing"
+                    )
+                    self.assertEqual(
+                        got["load-receipt"].text(),
+                        "FAIL load-receipt: receipt_missing",
+                    )
+                    self.assertEqual(
+                        got["embedded-reader"].text(),
+                        "FAIL embedded-reader: reader_missing",
+                    )
                     self.assertEqual(
                         got["recorded-replays"].text(),
                         f"WARN recorded-replays: {not_built}",

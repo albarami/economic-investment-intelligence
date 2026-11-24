@@ -1,0 +1,30 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/unit/opening-copy.test.ts (2 tests | 1 failed) 5ms
+   × keeps the unavailable opening figure and radiance caveat in the closed bilingual catalogue 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/opening-copy.test.ts > keeps the unavailable opening figure and radiance caveat in the closed bilingual catalogue
+AssertionError: expected 'NASA Black Marble. الضوء الليلي ليس م…' to be 'الضوء الليلي من NASA Black Marble ليس…' // Object.is equality
+
+Expected: "الضوء الليلي من NASA Black Marble ليس مقياسًا للنشاط التجاري."
+Received: "NASA Black Marble. الضوء الليلي ليس مقياسا للنشاط التجاري."
+
+ ❯ tests/unit/opening-copy.test.ts:26:69
+     24|     'The electricity figure for the opening screen is unavailable in t…
+     25|   );
+     26|   expect(fragmentField('night_lights_not_activity', 'template_ar')).to…
+       |                                                                     ^
+     27|     'الضوء الليلي من NASA Black Marble ليس مقياسًا للنشاط التجاري.',
+     28|   );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  12:15:11
+   Duration  97ms (transform 59%, import 23%, tests 13%, worker 5%)
+

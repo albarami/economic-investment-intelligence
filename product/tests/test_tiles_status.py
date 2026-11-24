@@ -23,3 +23,16 @@ def test_tile_status_rule() -> None:
 
         (root / "folder.tile").mkdir()
         assert tile_status(root, "folder.tile") == "invalid"
+
+
+def test_tile_status_accepts_closed_pmtiles_names() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        archive = root / "basemap.pmtiles"
+        archive.write_bytes(b"x")
+        assert tile_status(root, "basemap.pmtiles") == "ok"
+        assert tile_status(root, "absent.pmtiles") == "missing"
+        (root / "folder.pmtiles").mkdir()
+        assert tile_status(root, "folder.pmtiles") == "invalid"
+        for bad in ("Upper.pmtiles", "x.pmtilesx", "other.txt", ".pmtiles"):
+            assert tile_status(root, bad) == "missing", bad

@@ -1,0 +1,36 @@
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+____________________ test_opening_fixture_pins_no_provider _____________________
+
+tmp_path = PosixPath('[workspace]/.overnight[local-path]')
+
+    def test_opening_fixture_pins_no_provider(tmp_path: Path) -> None:
+        with patch.object(public_opening_server, "create_app") as create:
+            _app, store, ledger = build_fixture_app(tmp_path, Path("web/dist"))
+        try:
+            pins = create.call_args.kwargs
+            assert {
+                "key_reader",
+                "offline_reader",
+                "transport_factory",
+                "opener",
+            } <= pins.keys()
+            assert pins["key_reader"]() is None
+            assert pins["offline_reader"]() is True
+            assert pins["transport_factory"] is pins["opener"]
+            marker = tmp_path / "egress-attempts.txt"
+            assert not marker.exists()
+            for callback in (pins["transport_factory"], pins["opener"]):
+                with pytest.raises(AssertionError, match=r"^provider_attempt$"):
+                    callback()
+                assert marker.exists()
+>           assert marker.read_text() == "provider_attempt\nprovider_attempt\n"
+E           AssertionError: assert '' == 'provider_att...der_attempt\n'
+E             
+E             - provider_attempt
+E             - provider_attempt
+
+scripts/tests/test_public_opening_e2e.py:54: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_pins_no_provider
+1 failed, 2 passed, 9 deselected in 12.83s

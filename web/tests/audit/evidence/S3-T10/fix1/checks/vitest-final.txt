@@ -1,0 +1,9 @@
+
+ RUN  v5.1.0 [workspace]/web
+
+
+ Test Files  80 passed (80)
+      Tests  1163 passed (1163)
+   Start at  12:41:33
+   Duration  18.69s (tests 39%, environment 32%, import 21%, transform 8%)
+

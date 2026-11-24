@@ -1,0 +1,32 @@
+[WebServer] (node:29) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:42) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:114) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/audit/answer.spec.ts:10:1 › S3-T10 negative context keeps its withheld reason in both languages and themes (1.7s)
+
+
+  1) [chromium] › tests/audit/answer.spec.ts:10:1 › S3-T10 negative context keeps its withheld reason in both languages and themes 
+
+    Error: expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 24
+    Received:    48
+
+      37 |             };
+      38 |           });
+    > 39 |         expect(marker.wordHeight).toBeLessThanOrEqual(marker.lineHeight);
+         |                                   ^
+      40 |         expect(marker.markerHeight).toBeGreaterThanOrEqual(marker.wordHeight);
+      41 |         await expect(
+      42 |           card.locator('[data-fact-chip="value"] .chip-num'),
+        at [workspace]/web/tests/audit/answer.spec.ts:39:35
+
+    Error Context: test-results/audit-answer-S3-T10-negati-796d1-n-both-languages-and-themes-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/audit/answer.spec.ts:10:1 › S3-T10 negative context keeps its withheld reason in both languages and themes 

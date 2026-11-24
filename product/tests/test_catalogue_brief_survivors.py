@@ -62,8 +62,8 @@ def test_a_simulated_fact_on_a_place_claim_refuses_by_subject(
                 subject="place_public",
                 slots=_slot(
                     name="busyness",
-                    metric="venue_busyness_index",
-                    unit="relative_index",
+                    metric="price_deal_value",
+                    unit="qar",
                     geo="public",
                 ),
                 en="The reading is {busyness}.",
@@ -74,8 +74,8 @@ def test_a_simulated_fact_on_a_place_claim_refuses_by_subject(
     )
     fact = _fact(
         module,
-        metric_key="venue_busyness_index",
-        unit="relative_index",
+        metric_key="price_deal_value",
+        unit="qar",
         geography_kind="public",
         provenance="simulated",
         lineage_ref="lin_busyness",

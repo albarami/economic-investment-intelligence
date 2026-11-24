@@ -3,7 +3,7 @@ name = "eii-custodian"
 version = "0.0.0"
 description = "Build plane of the EII working-title project (package skeleton only)."
 requires-python = ">=3.14"
-dependencies = ["eii-core"]
+dependencies = ["eii-core", "duckdb==2.0.0"]
 
 [tool.uv.sources]
 eii-core = { workspace = true }

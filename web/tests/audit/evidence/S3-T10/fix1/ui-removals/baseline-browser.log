@@ -1,0 +1,12 @@
+
+Running 2 tests using 1 worker
+
+(node:28) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+attribution contrast [{"selector":".stage-credits","foreground":"rgb(230, 234, 235)","background":"rgb(43, 55, 71)","ratio":9.960669285697975}]
+  ✓  1 [chromium] › tests/audit/opening.spec.ts:24:7 › opening audit 1440x900 ar dark (2.8s)
+attribution contrast dark [{"selector":".stage-credits","foreground":"rgb(230, 234, 235)","background":"rgb(43, 55, 71)","ratio":9.960669285697975}]
+attribution contrast light [{"selector":".stage-credits","foreground":"rgb(20, 24, 29)","background":"rgb(235, 233, 228)","ratio":14.691199565465228}]
+  ✓  2 [chromium] › tests/audit/opening.spec.ts:245:1 › map attribution has its own measured plate and a transparent plant is refused (441ms)
+
+  2 passed (22.4s)

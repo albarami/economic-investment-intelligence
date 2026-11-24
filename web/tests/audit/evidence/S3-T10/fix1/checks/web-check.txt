@@ -1,0 +1,25 @@
+
+> [email-shaped-token] check
+> npm run check:layout && npm run check:versions && npm run check:boundary && npm run check:hosts && node scripts/check-answer.mjs
+
+
+> [email-shaped-token] check:layout
+> node scripts/check-layout.mjs
+
+checked 32 entries: OK
+
+> [email-shaped-token] check:versions
+> node scripts/check-exact-versions.mjs
+
+NOTE scripts are not judged beyond the five lifecycle keys
+checked 42 specifiers: OK
+
+> [email-shaped-token] check:boundary
+> node scripts/check-import-boundary.mjs
+
+checked 1002 references in 193 files: OK
+
+> [email-shaped-token] check:hosts
+> node scripts/check-no-third-party-hosts.mjs
+
+checked 96 files: OK

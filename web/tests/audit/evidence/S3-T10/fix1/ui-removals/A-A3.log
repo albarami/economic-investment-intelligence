@@ -1,0 +1,30 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/unit/opening-copy.test.ts (2 tests | 1 failed) 5ms
+   × keeps the unavailable opening figure and radiance caveat in the closed bilingual catalogue 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/opening-copy.test.ts > keeps the unavailable opening figure and radiance caveat in the closed bilingual catalogue
+AssertionError: expected 'قيمة الكهرباء الافتتاحية غير متاحة في…' to be 'مؤشر الكهرباء في شاشة البداية غير متا…' // Object.is equality
+
+Expected: "مؤشر الكهرباء في شاشة البداية غير متاح في هذا الإصدار."
+Received: "قيمة الكهرباء الافتتاحية غير متاحة في هذا الإصدار."
+
+ ❯ tests/unit/opening-copy.test.ts:20:75
+     18| });
+     19| it('keeps the unavailable opening figure and radiance caveat in the cl…
+     20|   expect(fragmentField('opening_electricity_unavailable', 'template_ar…
+       |                                                                           ^
+     21|     'مؤشر الكهرباء في شاشة البداية غير متاح في هذا الإصدار.',
+     22|   );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  12:15:11
+   Duration  94ms (transform 58%, import 24%, tests 13%, worker 5%)
+

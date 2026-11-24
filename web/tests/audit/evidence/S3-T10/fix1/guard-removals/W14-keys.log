@@ -1,0 +1,126 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/unit/public-opening.test.ts (39 tests | 1 failed) 39ms
+   ❯ runPublicStory refusals (12)
+     × refuses a planted start extra-key 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a planted start extra-key
+AssertionError: promise resolved "{ input: { …(5) }, …(2) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "accountingPassed": true,
++   "cards": [
++     {
++       "factId": "f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5",
++       "family": "night_lights",
++       "state": "ready",
++     },
++   ],
++   "input": {
++     "facts": [
++       {
++         "fact": {
++           "caveat_keys": [
++             "night_lights_not_activity",
++           ],
++           "coverage_keys": [
++             "rows_kept",
++           ],
++           "evidence_status": "observed",
++           "fact_id": "f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5",
++           "geography": {
++             "area_id": "fixture_area",
++             "kind": "area_shape",
++           },
++           "input_classes": [
++             "public",
++           ],
++           "label_ar": "الإشعاع الضوئي الليلي",
++           "label_en": "Night-time radiance",
++           "lineage_ref": "lin_pub_night_lights",
++           "period": "2024-01",
++           "provenance": "public",
++           "release_id": "a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8",
++           "reliability": "standard",
++           "unit": "radiance_nw_cm2_sr",
++           "value": 7,
++         },
++         "metricKey": "night_lights_radiance",
++         "presentation": "ordinary",
++         "qualifiers": {},
++       },
++     ],
++     "lineages": [
++       {
++         "factId": "f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5",
++         "inputClasses": [
++           "public",
++         ],
++         "lineageId": "lin_pub_night_lights",
++         "method": "sample_method",
++         "methodVersion": "v1",
++         "releaseId": "a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8",
++         "sourceIds": [
++           "src_alpha",
++         ],
++         "tableName": "pub_night_lights",
++       },
++     ],
++     "releases": [
++       {
++         "releaseId": "a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8",
++       },
++     ],
++     "sources": [
++       {
++         "datasetOrPage": "Sample page of counts",
++         "inputClass": "public",
++         "kind": "public_dataset",
++         "licenceOrTerms": "Terms recorded for this sample",
++         "publisher": "Sample Publisher",
++         "retrievalDate": "2024-03-14",
++         "sha256": "abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5f6a7b8c3d4e5f6a7b8c3d4e5f6",
++         "sourceId": "src_alpha",
++       },
++     ],
++     "tables": [
++       {
++         "releaseId": "a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8",
++         "tableName": "pub_night_lights",
++       },
++       {
++         "releaseId": "a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8",
++         "tableName": "pub_venue_busyness",
++       },
++       {
++         "releaseId": "a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8",
++         "tableName": "pub_pop_agesex_grid",
++       },
++     ],
++   },
+  }
+
+ ❯ tests/unit/public-opening.test.ts:269:8
+    267|       await expect(
+    268|         runPublicStory('INVENTED-activity', 'en', selected),
+    269|       ).rejects.toThrow('story_refused');
+       |        ^
+    270|     },
+    271|   );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 38 passed (39)
+   Start at  12:10:33
+   Duration  184ms (transform 46%, tests 32%, import 20%, worker 2%)
+

@@ -346,6 +346,19 @@ def check_postgres(
     docker: bool = True,
 ) -> store.Selection:
     """Run PostgreSQL (and optionally Docker) probes and select a store."""
+    from operations.common import Refusal
+    from operations.config import require_database_environment
+
+    target = parse_database_url(environ.get("EII_DATABASE_URL", ""))
+    if isinstance(target, DbTarget):
+        try:
+            require_database_environment(
+                environ.get("EII_ENVIRONMENT") or "development", target.database
+            )
+        except Refusal as error:
+            return store.Selection(
+                store.Line("FAIL", "postgresql", error.reason), "none"
+            )
     if embedded:
         return store.select_store(None, None)
     pg = probe_postgres(environ, scratch, limit)

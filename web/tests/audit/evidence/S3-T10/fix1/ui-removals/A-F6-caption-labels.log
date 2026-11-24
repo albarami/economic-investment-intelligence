@@ -1,0 +1,53 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/component/mounted-opening-review.test.tsx (6 tests | 2 failed) 269ms
+   × labels the layer picker, selected activity and place, and scopes the boundary message (en) 32ms
+   × labels the layer picker, selected activity and place, and scopes the boundary message (ar) 17ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (en)
+AssertionError: expected undefined to be 'Activity' // Object.is equality
+
+- Expected:
+"Activity"
+
++ Received:
+undefined
+
+ ❯ tests/component/mounted-opening-review.test.tsx:205:7
+    203|         '[data-part="activity-selected"] .selection-caption',
+    204|       )?.textContent,
+    205|     ).toBe(language === 'ar' ? 'النشاط' : 'Activity');
+       |       ^
+    206|     expect(
+    207|       view.container.querySelector(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (ar)
+AssertionError: expected undefined to be 'النشاط' // Object.is equality
+
+- Expected:
+"النشاط"
+
++ Received:
+undefined
+
+ ❯ tests/component/mounted-opening-review.test.tsx:205:7
+    203|         '[data-part="activity-selected"] .selection-caption',
+    204|       )?.textContent,
+    205|     ).toBe(language === 'ar' ? 'النشاط' : 'Activity');
+       |       ^
+    206|     expect(
+    207|       view.container.querySelector(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  12:16:13
+   Duration  779ms (environment 40%, tests 38%, transform 12%, import 11%)
+

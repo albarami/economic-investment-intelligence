@@ -1,0 +1,466 @@
+[
+  {
+    "id": "baseline-browser",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "map attribution has its own|opening audit 1440x900 ar dark"
+    ],
+    "cwd": "web",
+    "exit": 0,
+    "summary": ["2 passed (22.4s)"],
+    "log": "ui-removals/baseline-browser.log"
+  },
+  {
+    "id": "baseline-unit",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts",
+      "tests/component/mounted-opening-review.test.tsx",
+      "tests/component/context-deck.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 0,
+    "summary": ["Test Files  3 passed (3)", "Tests  11 passed (11)"],
+    "log": "ui-removals/baseline-unit.log"
+  },
+  {
+    "id": "A-F1-plate-guard",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "map attribution has its own"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/tests/audit/opening-audit.ts",
+    "removed": "problems.push('attribution-plate')",
+    "replacement": "void 0",
+    "verdict": "KILLED",
+    "summary": ["1 failed"],
+    "log": "ui-removals/A-F1-plate-guard.log"
+  },
+  {
+    "id": "A-F1-measurement",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "map attribution has its own"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/tests/audit/opening-audit.ts",
+    "removed": ",.stage-credits'",
+    "replacement": "'",
+    "verdict": "KILLED",
+    "summary": ["1 failed"],
+    "log": "ui-removals/A-F1-measurement.log"
+  },
+  {
+    "id": "A-F2-direction-guard",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "opening audit 1440x900 ar dark"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/tests/audit/opening-audit.ts",
+    "removed": "problems.push('wrong-caveat-direction')",
+    "replacement": "void 0",
+    "verdict": "KILLED",
+    "summary": ["1 failed"],
+    "log": "ui-removals/A-F2-direction-guard.log"
+  },
+  {
+    "id": "A-F3-alignment",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "opening audit 1440x900 ar dark"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/styles/answer.css",
+    "removed": ".chain-pair {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;",
+    "replacement": ".chain-pair {\n  display: flex;\n  flex-direction: column;",
+    "verdict": "KILLED",
+    "summary": ["1 failed"],
+    "log": "ui-removals/A-F3-alignment.log"
+  },
+  {
+    "id": "A-F4-picker-name",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/mounted-opening-review.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/app/MountedPublicShell.tsx",
+    "removed": "{text(language, 'layers.select')}",
+    "replacement": "{text(language, 'layers.choose')}",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (en)",
+      "FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (ar)",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 4 passed (6)"
+    ],
+    "log": "ui-removals/A-F4-picker-name.log"
+  },
+  {
+    "id": "A-F5-empty-box",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/context-deck.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/cards/PublicContextCard.tsx",
+    "removed": "/** C36-C38, application-owned text and one isolated display fact per card. */\nimport { useId, useState, type ReactElement } from 'react';\nimport { fragmentField } from '../brief/catalogue';\nimport { FactChip } from '../facts/FactChip';\nimport { WithheldMark } from '../facts/ProvenanceMark';\nimport type { FactRegistry } from '../facts/registry';\nimport type { Resolution } from '../facts/types';\nimport type { Language } from '../i18n';\nimport { text } from '../i18n';\nimport { formatFactValue } from '../facts/formatters';\nimport { contextFamilies, type ContextFamily } from './public-context-contract';\nimport './public-context.css';\n\ntype Day =\n  | 'monday'\n  | 'tuesday'\n  | 'wednesday'\n  | 'thursday'\n  | 'friday'\n  | 'saturday'\n  | 'sunday';\ntype Ready = { state: 'ready'; factId: string };\nexport type ContextPayload =\n  | (Ready & { family: 'night_lights' })\n  | (Ready & {\n      family: 'venue_busyness';\n      retrievedOn: string;\n      providerUpdatedOn: string | null;\n      day: Day;\n      hour: string;\n    })\n  | (Ready & {\n      family: 'population_age_sex';\n      ageBand: string | null;\n      sex: 'female' | 'male' | 'none';\n    })\n  | {\n      family: ContextFamily;\n      state: 'no_data';\n      reason: 'missing_input' | 'no_forecast';\n    };\n\nfunction words(key: string, language: Language): string {\n  return (\n    fragmentField(key, language === 'ar' ? 'template_ar' : 'template_en') ?? ''\n  );\n}\n\nfunction dateAccepted(value: unknown): value is string {\n  return (\n    typeof value === 'string' &&\n    formatFactValue(value, 'calendar_date', 'en', 'reference').ok\n  );\n}\n\nexport function contextAccepted(\n  payload: unknown,\n  registry: FactRegistry,\n): payload is ContextPayload {\n  if (!payload || typeof payload !== 'object') return false;\n  const item = payload as Record<string, unknown>;\n  if (\n    typeof item.family !== 'string' ||\n    !Object.hasOwn(contextFamilies, item.family)\n  )\n    return false;\n  const family = item.family as ContextFamily;\n  if (item.state === 'no_data') {\n    return (\n      Object.keys(item).length === 3 &&\n      (item.reason === 'missing_input' ||\n        (family === 'venue_busyness' && item.reason === 'no_forecast'))\n    );\n  }\n  if (item.state !== 'ready' || typeof item.factId !== 'string') return false;\n  const keys = ['family', 'state', 'factId'];\n  if (family === 'venue_busyness') {\n    keys.push('retrievedOn', 'providerUpdatedOn', 'day', 'hour');\n    if (\n      !dateAccepted(item.retrievedOn) ||\n      (item.providerUpdatedOn !== null && !dateAccepted(item.providerUpdatedOn))\n    )\n      return false;\n    if (\n      ![\n        'monday',\n        'tuesday',\n        'wednesday',\n        'thursday',\n        'friday',\n        'saturday',\n        'sunday',\n      ].includes(String(item.day))\n    )\n      return false;\n    if (\n      typeof item.hour !== 'string' ||\n      !/^(?:[0-9]|1[0-9]|2[0-3])$/.test(item.hour)\n    )\n      return false;\n  }\n  if (family === 'population_age_sex') {\n    keys.push('ageBand', 'sex');\n    if (\n      item.ageBand !== null &&\n      (typeof item.ageBand !== 'string' ||\n        !formatFactValue(item.ageBand, 'published_text', 'en', 'reference').ok)\n    )\n      return false;\n    if (!['female', 'male', 'none'].includes(String(item.sex))) return false;\n  }\n  if (\n    Object.keys(item).length !== keys.length ||\n    Object.keys(item).some((key) => !keys.includes(key))\n  )\n    return false;\n  const resolved = registry.resolve(item.factId);\n  if (resolved.status !== 'ready') return false;\n  const { binding, table } = resolved;\n  const fact = binding.fact;\n  const spec = contextFamilies[family];\n  if (\n    binding.metricKey !== spec.metric ||\n    fact.unit !== spec.unit ||\n    table.tableName !== spec.table ||\n    fact.label_en !== spec.label\n  )\n    return false;\n  if (\n    (fact.provenance !== 'public' && fact.provenance !== 'suppressed') ||\n    fact.evidence_status !== 'observed' ||\n    binding.presentation !== 'ordinary'\n  )\n    return false;\n  if (fact.input_classes.length !== 1 || fact.input_classes[0] !== 'public')\n    return false;\n  if (\n    !fact.caveat_keys.includes(spec.caveat) ||\n    fact.geography.kind !== spec.geography ||\n    fact.geography.apportioned_from !== undefined\n  )\n    return false;\n  if (\n    family === 'night_lights' &&\n    fact.caveat_keys.includes('grid_cells_summed')\n  )\n    return false;\n  if (\n    family === 'venue_busyness' &&\n    (fact.period !== item.retrievedOn ||\n      resolved.lineage.rowRetrievalDate !== item.retrievedOn ||\n      resolved.lineage.providerUpdatedOn !== item.providerUpdatedOn ||\n      binding.qualifiers?.day_of_week !== item.day ||\n      binding.qualifiers?.hour !== item.hour)\n  )\n    return false;\n  if (\n    family === 'population_age_sex' &&\n    (binding.qualifiers?.age_band !== (item.ageBand ?? 'all') ||\n      binding.qualifiers?.sex !== item.sex)\n  )\n    return false;\n  return true;\n}\n\ntype Level = 'answer' | 'comparison' | 'evidence';\n\n/** Native buttons supply Enter, Space and pointer activation without dragging. */\nfunction ContextLevel({\n  level,\n  language,\n  factId,\n  children,\n}: {\n  level: Level;\n  language: Language;\n  factId?: string;\n  children: ReactElement;\n}) {\n  const id = useId();\n  const [open, setOpen] = useState(level === 'answer');\n  return (\n    <section data-context-level={level}>\n      <button\n        type=\"button\"\n        id={`${id}-control`}\n        aria-expanded={open}\n        aria-controls={`${id}-content`}\n        onClick={() => setOpen(!open)}\n      >\n        {words(`context_level_${level}`, language)}\n      </button>\n      <div\n        id={`${id}-content`}\n        role=\"region\"\n        aria-labelledby={`${id}-control`}\n        hidden={!open}\n        data-fact-id={factId}\n        className=\"context-level-body\"\n      >\n        {open ? children : null}\n      </div>\n    </section>\n  );\n}\n\n/** Read the same resolved chain as the answer; citation text may contain digits. */\nfunction ContextEvidence({\n  resolved,\n  language,\n}: {\n  resolved: Extract<Resolution, { status: 'ready' }>;\n  language: Language;\n}) {\n  const fields = [\n    ['drawer.release', resolved.table.tableName, resolved.binding.fact.fact_id],\n    ['drawer.method', resolved.lineage.method, resolved.lineage.lineageId],\n  ] as const;\n  return (\n    <dl className=\"context-chain\">\n      {fields.map(([label, value, recordId]) => (\n        <div key={label}>\n          <dt>{text(language, label)}</dt>\n          <dd>\n            <FactChip\n              variant=\"reference\"\n              kind=\"published_text\"\n              value={value}\n              recordId={recordId}\n              language={language}\n            />\n            {label === 'drawer.method' ? (\n              <FactChip\n                variant=\"reference\"\n                kind=\"published_text\"\n                value={resolved.lineage.methodVersion}\n                recordId={resolved.lineage.lineageId}\n                language={language}\n              />\n            ) : null}\n          </dd>\n        </div>\n      ))}\n      {resolved.sources.flatMap((source) =>\n        (\n          [\n            ['drawer.publisher', source.publisher, 'published_text'],\n            ['drawer.dataset', source.datasetOrPage, 'published_text'],\n            ['drawer.licence', source.licenceOrTerms, 'published_text'],\n            ['drawer.retrieved', source.retrievalDate, 'calendar_date'],\n            ['drawer.hash', source.sha256, 'published_text'],\n          ] as const\n        ).map(([label, value, kind]) => (\n          <div\n            key={`${source.sourceId}-${label}`}\n            data-context-source={source.sourceId}\n          >\n            <dt>{text(language, label)}</dt>\n            <dd>\n              <FactChip\n                variant=\"reference\"\n                kind={kind}\n                value={value}\n                recordId={source.sourceId}\n                language={language}\n              />\n            </dd>\n          </div>\n        )),\n      )}\n    </dl>\n  );\n}\n\nexport function PublicContextCard({\n  payload,\n  registry,\n  language,\n  onOpen,\n}: {\n  payload: ContextPayload;\n  registry: FactRegistry;\n  language: Language;\n  onOpen: (factId: string) => void;\n}) {\n  if (!contextAccepted(payload, registry)) return null;\n  const spec = contextFamilies[payload.family];\n  const resolved =\n    payload.state === 'ready' ? registry.resolve(payload.factId) : null;\n  const reason =\n    payload.state === 'no_data'\n      ? payload.reason === 'no_forecast'\n        ? 'context_no_forecast'\n        : 'context_no_data'\n      : resolved?.status === 'ready' && resolved.display === 'withheld'\n        ? 'context_withheld_reason'\n        : null;\n  return (\n    <article\n      className=\"public-context-card\"\n      data-context-family={payload.family}\n      lang={language}\n      dir={language === 'ar' ? 'rtl' : 'ltr'}\n    >\n      <h2>\n        <bdi>{words(payload.family, language)}</bdi>\n      </h2>\n      <ContextLevel\n        level=\"answer\"\n        language={language}\n        factId={payload.state === 'ready' ? payload.factId : undefined}\n      >\n        {payload.state === 'no_data' ? (\n          <p data-state=\"NO_DATA\">{words(reason!, language)}</p>\n        ) : (\n          <>\n            {resolved?.status === 'ready' && resolved.display === 'withheld' ? (\n              <div\n                className=\"layer-sample context-withheld\"\n                data-pattern=\"hatch-lock\"\n                data-state=\"withheld\"\n              >\n                <span className=\"chip-withheld\">\n                  <WithheldMark language={language} />\n                </span>\n                <p>{words('context_withheld_reason', language)}</p>\n              </div>\n            ) : (\n              <FactChip\n                variant=\"value\"\n                size=\"large\"\n                factId={payload.factId}\n                registry={registry}\n                language={language}\n                onOpen={onOpen}\n              />\n            )}\n            {resolved?.status === 'ready' &&\n            payload.family !== 'venue_busyness' ? (\n              <FactChip\n                variant=\"reference\"\n                kind={\n                  payload.family === 'night_lights'\n                    ? 'calendar_month'\n                    : 'calendar_year'\n                }\n                value={resolved.binding.fact.period}\n                recordId={payload.factId}\n                language={language}\n              />\n            ) : null}\n            {payload.family === 'venue_busyness' ? (\n              <div className=\"context-meta\">\n                <bdi>{words(`context_${payload.day}`, language)}</bdi>\n                <FactChip\n                  variant=\"reference\"\n                  kind=\"published_text\"\n                  value={payload.hour}\n                  recordId={payload.factId}\n                  language={language}\n                />\n                <span>{words('context_retrieved', language)}</span>\n                <FactChip\n                  variant=\"reference\"\n                  kind=\"calendar_date\"\n                  value={payload.retrievedOn}\n                  recordId={payload.factId}\n                  language={language}\n                />\n                {payload.providerUpdatedOn === null ? (\n                  <span>{words('context_update_not_stated', language)}</span>\n                ) : (\n                  <>\n                    <span>{words('context_updated', language)}</span>\n                    <FactChip\n                      variant=\"reference\"\n                      kind=\"calendar_date\"\n                      value={payload.providerUpdatedOn}\n                      recordId={payload.factId}\n                      language={language}\n                    />\n                  </>\n                )}\n              </div>\n            ) : null}\n            {payload.family === 'population_age_sex' ? (\n              <div className=\"context-meta\">\n                {payload.ageBand === null ? (\n                  <span>{words('context_all_ages', language)}</span>\n                ) : (\n                  <>\n                    <span>{words('context_age_band', language)}</span>\n                    <FactChip\n                      variant=\"reference\"\n                      kind=\"published_text\"\n                      value={payload.ageBand}\n                      recordId={payload.factId}\n                      language={language}\n                    />\n                  </>\n                )}\n                <span>{words(`context_${payload.sex}`, language)}</span>\n              </div>\n            ) : null}\n            <button type=\"button\" onClick={() => onOpen(payload.factId)}>\n              {words('context_source', language)}\n            </button>\n          </>\n        )}\n      </ContextLevel>\n      <ContextLevel\n        level=\"comparison\"\n        language={language}\n        factId={payload.state === 'ready' ? payload.factId : undefined}\n      >\n        <p>{words(spec.comparison, language)}</p>\n      </ContextLevel>\n      <ContextLevel\n        level=\"evidence\"\n        language={language}\n        factId={payload.state === 'ready' ? payload.factId : undefined}\n      >\n        <>\n          {reason ? <p>{words(reason, language)}</p> : null}\n          {resolved?.status === 'ready' ? (\n            <ContextEvidence resolved={resolved} language={language} />\n          ) : null}\n        </>\n      </ContextLevel>\n      <p data-caveat={spec.caveat}>\n        <bdi>{words(spec.caveat, language)}</bdi>\n      </p>\n    </article>\n  );\n}\n",
+    "replacement": "/** C36-C38, application-owned text and one isolated display fact per card. */\nimport { useId, useState, type ReactElement } from 'react';\nimport { fragmentField } from '../brief/catalogue';\nimport { FactChip } from '../facts/FactChip';\nimport { WithheldMark } from '../facts/ProvenanceMark';\nimport type { FactRegistry } from '../facts/registry';\nimport type { Resolution } from '../facts/types';\nimport type { Language } from '../i18n';\nimport { text } from '../i18n';\nimport { formatFactValue } from '../facts/formatters';\nimport { contextFamilies, type ContextFamily } from './public-context-contract';\nimport './public-context.css';\n\ntype Day =\n  | 'monday'\n  | 'tuesday'\n  | 'wednesday'\n  | 'thursday'\n  | 'friday'\n  | 'saturday'\n  | 'sunday';\ntype Ready = { state: 'ready'; factId: string };\nexport type ContextPayload =\n  | (Ready & { family: 'night_lights' })\n  | (Ready & {\n      family: 'venue_busyness';\n      retrievedOn: string;\n      providerUpdatedOn: string | null;\n      day: Day;\n      hour: string;\n    })\n  | (Ready & {\n      family: 'population_age_sex';\n      ageBand: string | null;\n      sex: 'female' | 'male' | 'none';\n    })\n  | {\n      family: ContextFamily;\n      state: 'no_data';\n      reason: 'missing_input' | 'no_forecast';\n    };\n\nfunction words(key: string, language: Language): string {\n  return (\n    fragmentField(key, language === 'ar' ? 'template_ar' : 'template_en') ?? ''\n  );\n}\n\nfunction dateAccepted(value: unknown): value is string {\n  return (\n    typeof value === 'string' &&\n    formatFactValue(value, 'calendar_date', 'en', 'reference').ok\n  );\n}\n\nexport function contextAccepted(\n  payload: unknown,\n  registry: FactRegistry,\n): payload is ContextPayload {\n  if (!payload || typeof payload !== 'object') return false;\n  const item = payload as Record<string, unknown>;\n  if (\n    typeof item.family !== 'string' ||\n    !Object.hasOwn(contextFamilies, item.family)\n  )\n    return false;\n  const family = item.family as ContextFamily;\n  if (item.state === 'no_data') {\n    return (\n      Object.keys(item).length === 3 &&\n      (item.reason === 'missing_input' ||\n        (family === 'venue_busyness' && item.reason === 'no_forecast'))\n    );\n  }\n  if (item.state !== 'ready' || typeof item.factId !== 'string') return false;\n  const keys = ['family', 'state', 'factId'];\n  if (family === 'venue_busyness') {\n    keys.push('retrievedOn', 'providerUpdatedOn', 'day', 'hour');\n    if (\n      !dateAccepted(item.retrievedOn) ||\n      (item.providerUpdatedOn !== null && !dateAccepted(item.providerUpdatedOn))\n    )\n      return false;\n    if (\n      ![\n        'monday',\n        'tuesday',\n        'wednesday',\n        'thursday',\n        'friday',\n        'saturday',\n        'sunday',\n      ].includes(String(item.day))\n    )\n      return false;\n    if (\n      typeof item.hour !== 'string' ||\n      !/^(?:[0-9]|1[0-9]|2[0-3])$/.test(item.hour)\n    )\n      return false;\n  }\n  if (family === 'population_age_sex') {\n    keys.push('ageBand', 'sex');\n    if (\n      item.ageBand !== null &&\n      (typeof item.ageBand !== 'string' ||\n        !formatFactValue(item.ageBand, 'published_text', 'en', 'reference').ok)\n    )\n      return false;\n    if (!['female', 'male', 'none'].includes(String(item.sex))) return false;\n  }\n  if (\n    Object.keys(item).length !== keys.length ||\n    Object.keys(item).some((key) => !keys.includes(key))\n  )\n    return false;\n  const resolved = registry.resolve(item.factId);\n  if (resolved.status !== 'ready') return false;\n  const { binding, table } = resolved;\n  const fact = binding.fact;\n  const spec = contextFamilies[family];\n  if (\n    binding.metricKey !== spec.metric ||\n    fact.unit !== spec.unit ||\n    table.tableName !== spec.table ||\n    fact.label_en !== spec.label\n  )\n    return false;\n  if (\n    (fact.provenance !== 'public' && fact.provenance !== 'suppressed') ||\n    fact.evidence_status !== 'observed' ||\n    binding.presentation !== 'ordinary'\n  )\n    return false;\n  if (fact.input_classes.length !== 1 || fact.input_classes[0] !== 'public')\n    return false;\n  if (\n    !fact.caveat_keys.includes(spec.caveat) ||\n    fact.geography.kind !== spec.geography ||\n    fact.geography.apportioned_from !== undefined\n  )\n    return false;\n  if (\n    family === 'night_lights' &&\n    fact.caveat_keys.includes('grid_cells_summed')\n  )\n    return false;\n  if (\n    family === 'venue_busyness' &&\n    (fact.period !== item.retrievedOn ||\n      resolved.lineage.rowRetrievalDate !== item.retrievedOn ||\n      resolved.lineage.providerUpdatedOn !== item.providerUpdatedOn ||\n      binding.qualifiers?.day_of_week !== item.day ||\n      binding.qualifiers?.hour !== item.hour)\n  )\n    return false;\n  if (\n    family === 'population_age_sex' &&\n    (binding.qualifiers?.age_band !== (item.ageBand ?? 'all') ||\n      binding.qualifiers?.sex !== item.sex)\n  )\n    return false;\n  return true;\n}\n\ntype Level = 'answer' | 'comparison' | 'evidence';\n\n/** Native buttons supply Enter, Space and pointer activation without dragging. */\nfunction ContextLevel({\n  level,\n  language,\n  factId,\n  children,\n}: {\n  level: Level;\n  language: Language;\n  factId?: string;\n  children: ReactElement;\n}) {\n  const id = useId();\n  const [open, setOpen] = useState(level === 'answer');\n  return (\n    <section data-context-level={level}>\n      <button\n        type=\"button\"\n        id={`${id}-control`}\n        aria-expanded={open}\n        aria-controls={`${id}-content`}\n        onClick={() => setOpen(!open)}\n      >\n        {words(`context_level_${level}`, language)}\n      </button>\n      <div\n        id={`${id}-content`}\n        role=\"region\"\n        aria-labelledby={`${id}-control`}\n        hidden={!open}\n        data-fact-id={factId}\n        className=\"context-level-body\"\n      >\n        {open ? children : null}\n      </div>\n    </section>\n  );\n}\n\n/** Read the same resolved chain as the answer; citation text may contain digits. */\nfunction ContextEvidence({\n  resolved,\n  language,\n}: {\n  resolved: Extract<Resolution, { status: 'ready' }>;\n  language: Language;\n}) {\n  const fields = [\n    ['drawer.release', resolved.table.tableName, resolved.binding.fact.fact_id],\n    ['drawer.method', resolved.lineage.method, resolved.lineage.lineageId],\n  ] as const;\n  return (\n    <dl className=\"context-chain\">\n      {fields.map(([label, value, recordId]) => (\n        <div key={label}>\n          <dt>{text(language, label)}</dt>\n          <dd>\n            <FactChip\n              variant=\"reference\"\n              kind=\"published_text\"\n              value={value}\n              recordId={recordId}\n              language={language}\n            />\n            {label === 'drawer.method' ? (\n              <FactChip\n                variant=\"reference\"\n                kind=\"published_text\"\n                value={resolved.lineage.methodVersion}\n                recordId={resolved.lineage.lineageId}\n                language={language}\n              />\n            ) : null}\n          </dd>\n        </div>\n      ))}\n      {resolved.sources.flatMap((source) =>\n        (\n          [\n            ['drawer.publisher', source.publisher, 'published_text'],\n            ['drawer.dataset', source.datasetOrPage, 'published_text'],\n            ['drawer.licence', source.licenceOrTerms, 'published_text'],\n            ['drawer.retrieved', source.retrievalDate, 'calendar_date'],\n            ['drawer.hash', source.sha256, 'published_text'],\n          ] as const\n        ).map(([label, value, kind]) => (\n          <div\n            key={`${source.sourceId}-${label}`}\n            data-context-source={source.sourceId}\n          >\n            <dt>{text(language, label)}</dt>\n            <dd>\n              <FactChip\n                variant=\"reference\"\n                kind={kind}\n                value={value}\n                recordId={source.sourceId}\n                language={language}\n              />\n            </dd>\n          </div>\n        )),\n      )}\n    </dl>\n  );\n}\n\nexport function PublicContextCard({\n  payload,\n  registry,\n  language,\n  onOpen,\n}: {\n  payload: ContextPayload;\n  registry: FactRegistry;\n  language: Language;\n  onOpen: (factId: string) => void;\n}) {\n  if (!contextAccepted(payload, registry)) return null;\n  const spec = contextFamilies[payload.family];\n  const resolved =\n    payload.state === 'ready' ? registry.resolve(payload.factId) : null;\n  const reason =\n    payload.state === 'no_data'\n      ? payload.reason === 'no_forecast'\n        ? 'context_no_forecast'\n        : 'context_no_data'\n      : resolved?.status === 'ready' && resolved.display === 'withheld'\n        ? 'context_withheld_reason'\n        : null;\n  return (\n    <article\n      className=\"public-context-card\"\n      data-context-family={payload.family}\n      lang={language}\n      dir={language === 'ar' ? 'rtl' : 'ltr'}\n    >\n      <h2>\n        <bdi>{words(payload.family, language)}</bdi>\n      </h2>\n      <ContextLevel\n        level=\"answer\"\n        language={language}\n        factId={payload.state === 'ready' ? payload.factId : undefined}\n      >\n        {payload.state === 'no_data' ? (\n          <p data-state=\"NO_DATA\">{words(reason!, language)}</p>\n        ) : (\n          <>\n            {resolved?.status === 'ready' && resolved.display === 'withheld' ? (\n              <div\n                className=\"layer-sample context-withheld\"\n                data-pattern=\"hatch-lock\"\n              >\n                <WithheldMark language={language} />\n                <p>{words('context_withheld_reason', language)}</p>\n              </div>\n            ) : null}\n            <FactChip\n              variant=\"value\"\n              size=\"large\"\n              factId={payload.factId}\n              registry={registry}\n              language={language}\n              onOpen={onOpen}\n            />\n            {resolved?.status === 'ready' &&\n            payload.family !== 'venue_busyness' ? (\n              <FactChip\n                variant=\"reference\"\n                kind={\n                  payload.family === 'night_lights'\n                    ? 'calendar_month'\n                    : 'calendar_year'\n                }\n                value={resolved.binding.fact.period}\n                recordId={payload.factId}\n                language={language}\n              />\n            ) : null}\n            {payload.family === 'venue_busyness' ? (\n              <div className=\"context-meta\">\n                <bdi>{words(`context_${payload.day}`, language)}</bdi>\n                <FactChip\n                  variant=\"reference\"\n                  kind=\"published_text\"\n                  value={payload.hour}\n                  recordId={payload.factId}\n                  language={language}\n                />\n                <span>{words('context_retrieved', language)}</span>\n                <FactChip\n                  variant=\"reference\"\n                  kind=\"calendar_date\"\n                  value={payload.retrievedOn}\n                  recordId={payload.factId}\n                  language={language}\n                />\n                {payload.providerUpdatedOn === null ? (\n                  <span>{words('context_update_not_stated', language)}</span>\n                ) : (\n                  <>\n                    <span>{words('context_updated', language)}</span>\n                    <FactChip\n                      variant=\"reference\"\n                      kind=\"calendar_date\"\n                      value={payload.providerUpdatedOn}\n                      recordId={payload.factId}\n                      language={language}\n                    />\n                  </>\n                )}\n              </div>\n            ) : null}\n            {payload.family === 'population_age_sex' ? (\n              <div className=\"context-meta\">\n                {payload.ageBand === null ? (\n                  <span>{words('context_all_ages', language)}</span>\n                ) : (\n                  <>\n                    <span>{words('context_age_band', language)}</span>\n                    <FactChip\n                      variant=\"reference\"\n                      kind=\"published_text\"\n                      value={payload.ageBand}\n                      recordId={payload.factId}\n                      language={language}\n                    />\n                  </>\n                )}\n                <span>{words(`context_${payload.sex}`, language)}</span>\n              </div>\n            ) : null}\n            <button type=\"button\" onClick={() => onOpen(payload.factId)}>\n              {words('context_source', language)}\n            </button>\n          </>\n        )}\n      </ContextLevel>\n      <ContextLevel\n        level=\"comparison\"\n        language={language}\n        factId={payload.state === 'ready' ? payload.factId : undefined}\n      >\n        <p>{words(spec.comparison, language)}</p>\n      </ContextLevel>\n      <ContextLevel\n        level=\"evidence\"\n        language={language}\n        factId={payload.state === 'ready' ? payload.factId : undefined}\n      >\n        <>\n          {reason ? <p>{words(reason, language)}</p> : null}\n          {resolved?.status === 'ready' ? (\n            <ContextEvidence resolved={resolved} language={language} />\n          ) : null}\n        </>\n      </ContextLevel>\n      <p data-caveat={spec.caveat}>\n        <bdi>{words(spec.caveat, language)}</bdi>\n      </p>\n    </article>\n  );\n}\n",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/component/context-deck.test.tsx > a withheld selected observation keeps its reason and lock, never its hidden value (en)",
+      "FAIL  tests/component/context-deck.test.tsx > a withheld selected observation keeps its reason and lock, never its hidden value (ar)",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 1 passed (3)"
+    ],
+    "log": "ui-removals/A-F5-empty-box.log"
+  },
+  {
+    "id": "A-F6-captions",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/mounted-opening-review.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/journeys/PublicStory.tsx",
+    "removed": "className=\"selection-caption\"",
+    "replacement": "className=\"INVENTED-caption\"",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (en)",
+      "FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (ar)",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 4 passed (6)"
+    ],
+    "log": "ui-removals/A-F6-captions.log"
+  },
+  {
+    "id": "A-F7-B-F7-refused-layer",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/mounted-opening-review.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/app/MountedPublicShell.tsx",
+    "removed": "<p role=\"alert\">{text(language, 'layers.unavailable')}</p>",
+    "replacement": "<p role=\"status\">{text(language, 'layers.fc.nodata')}</p>",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/component/mounted-opening-review.test.tsx > a refused night-lights chain is an alert with unavailable wording (en)",
+      "FAIL  tests/component/mounted-opening-review.test.tsx > a refused night-lights chain is an alert with unavailable wording (ar)",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 4 passed (6)"
+    ],
+    "log": "ui-removals/A-F7-B-F7-refused-layer.log"
+  },
+  {
+    "id": "A-A1",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/i18n/ar.json",
+    "removed": "\"المس الموضع الجديد لنقل النقطة المحددة.\"",
+    "replacement": "\"لمس الموضع الجديد لنقل الرأس المحدد.\"",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/unit/opening-copy.test.ts > keeps the reviewed Arabic opening instructions and captions exactly",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 1 passed (2)"
+    ],
+    "log": "ui-removals/A-A1.log"
+  },
+  {
+    "id": "A-A2",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/i18n/ar.json",
+    "removed": "\"عرض الانشغال النسبي في\"",
+    "replacement": "\"عرض الانشغال النسبي\"",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/unit/opening-copy.test.ts > keeps the reviewed Arabic opening instructions and captions exactly",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 1 passed (2)"
+    ],
+    "log": "ui-removals/A-A2.log"
+  },
+  {
+    "id": "A-A4",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/i18n/ar.json",
+    "removed": "\"يجري البحث في قائمة الأماكن المحفوظة على الجهاز.\"",
+    "replacement": "\"البحث في قائمة الأماكن دون اتصال\"",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/unit/opening-copy.test.ts > keeps the reviewed Arabic opening instructions and captions exactly",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 1 passed (2)"
+    ],
+    "log": "ui-removals/A-A4.log"
+  },
+  {
+    "id": "A-A5-map",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/i18n/ar.json",
+    "removed": "\"بيانات الخريطة\"",
+    "replacement": "\"أدلة الخريطة\"",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/unit/opening-copy.test.ts > keeps the reviewed Arabic opening instructions and captions exactly",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 1 passed (2)"
+    ],
+    "log": "ui-removals/A-A5-map.log"
+  },
+  {
+    "id": "A-A5-context",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/i18n/ar.json",
+    "removed": "\"شواهد السياق\"",
+    "replacement": "\"أدلة السياق\"",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/unit/opening-copy.test.ts > keeps the reviewed Arabic opening instructions and captions exactly",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 1 passed (2)"
+    ],
+    "log": "ui-removals/A-A5-context.log"
+  },
+  {
+    "id": "A-A6",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/i18n/ar.json",
+    "removed": "\"الكفاءات\"",
+    "replacement": "\"المواهب\"",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/unit/opening-copy.test.ts > keeps the reviewed Arabic opening instructions and captions exactly",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 1 passed (2)"
+    ],
+    "log": "ui-removals/A-A6.log"
+  },
+  {
+    "id": "A-A3",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/brief/catalogue.generated.json",
+    "removed": "مؤشر الكهرباء في شاشة البداية غير متاح في هذا الإصدار.",
+    "replacement": "قيمة الكهرباء الافتتاحية غير متاحة في هذا الإصدار.",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/unit/opening-copy.test.ts > keeps the unavailable opening figure and radiance caveat in the closed bilingual catalogue",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 1 passed (2)"
+    ],
+    "log": "ui-removals/A-A3.log"
+  },
+  {
+    "id": "A-F2-copy",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/brief/catalogue.generated.json",
+    "removed": "الضوء الليلي من NASA Black Marble ليس مقياسًا للنشاط التجاري.",
+    "replacement": "NASA Black Marble. الضوء الليلي ليس مقياسا للنشاط التجاري.",
+    "verdict": "KILLED",
+    "summary": [
+      "FAIL  tests/unit/opening-copy.test.ts > keeps the unavailable opening figure and radiance caveat in the closed bilingual catalogue",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 1 passed (2)"
+    ],
+    "log": "ui-removals/A-F2-copy.log"
+  },
+  {
+    "id": "restored-browser",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "map attribution has its own|opening audit 1440x900 ar dark"
+    ],
+    "cwd": "web",
+    "exit": 0,
+    "summary": ["2 passed (21.8s)"],
+    "log": "ui-removals/restored-browser.log"
+  },
+  {
+    "id": "restored-unit",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-copy.test.ts",
+      "tests/component/mounted-opening-review.test.tsx",
+      "tests/component/context-deck.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 0,
+    "summary": ["Test Files  3 passed (3)", "Tests  11 passed (11)"],
+    "log": "ui-removals/restored-unit.log"
+  },
+  {
+    "id": "A-F6-caption-labels",
+    "file": "web/src/journeys/PublicStory.tsx",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/mounted-opening-review.test.tsx"
+    ],
+    "exit": 1,
+    "verdict": "KILLED",
+    "removed": "import { useState } from 'react';\nimport type { ContextPayload } from '../cards/PublicContextCard';\nimport { ContextCards } from './ContextCards';\nimport { Brief } from '../brief/Brief';\nimport { fragmentField } from '../brief/catalogue';\nimport { FactChip } from '../facts/FactChip';\nimport type { FactRegistry } from '../facts/registry';\nimport { text, type Language } from '../i18n';\nimport { useArea } from '../state/store';\nimport { selectedAreaRequest, submitPlaceArea } from '../state/area-actions';\nimport {\n  DISTANCE_PRESETS,\n  WALK_PRESETS,\n  DRIVE_PRESETS,\n} from '../controls/presets';\nimport { ResolvePicker } from './ResolvePicker';\nimport type { ActivityCandidate, PlaceCandidate } from '../api/areas';\n\nexport function PublicStory({\n  language,\n  registry,\n  cards,\n  pending,\n  failed,\n  onRun,\n  onOpen,\n  onReset,\n}: {\n  language: Language;\n  registry: FactRegistry | null;\n  cards: readonly ContextPayload[];\n  pending: boolean;\n  failed: boolean;\n  onRun: (activity: string) => void;\n  onOpen: (factId: string) => void;\n  onReset: () => void;\n}) {\n  const area = useArea();\n  const [activity, setActivity] = useState<ActivityCandidate | null>(null);\n  const [place, setPlace] = useState<PlaceCandidate | null>(null);\n  return (\n    <section className=\"public-story\" data-scene=\"area\">\n      <h1>{text(language, 'opening.action.site')}</h1>\n      {activity ? (\n        <p data-part=\"activity-selected\">\n          <span className=\"selection-caption\">\n            {text(language, 'story.activityLabel')}\n          </span>\n          <bdi>{language === 'ar' ? activity.label_ar : activity.label_en}</bdi>\n        </p>\n      ) : null}\n      {place ? (\n        <p data-part=\"place-selected\">\n          <span className=\"selection-caption\">\n            {text(language, 'story.placeLabel')}\n          </span>\n          <bdi>{language === 'ar' ? place.label_ar : place.label_en}</bdi>\n        </p>\n      ) : null}\n      <details\n        className=\"story-selection\"\n        key={cards.length ? 'result' : 'selection'}\n        open={!cards.length}\n      >\n        <summary>{text(language, 'story.selection')}</summary>\n        <ResolvePicker\n          language={language}\n          kind=\"activity\"\n          onSelect={(candidate) => {\n            if (candidate.kind === 'activity') setActivity(candidate);\n          }}\n        />\n        <ResolvePicker\n          language={language}\n          kind=\"place\"\n          onSelect={(candidate) => {\n            if (candidate.kind === 'place') setPlace(candidate);\n          }}\n        />\n        <p className=\"story-caption\">\n          {text(language, 'layers.boundaries.absent')}\n        </p>\n        {place ? (\n          <div className=\"named-presets\" data-part=\"named-presets\">\n            {[...DISTANCE_PRESETS, ...WALK_PRESETS, ...DRIVE_PRESETS].map(\n              (preset) => (\n                <button\n                  type=\"button\"\n                  key={preset.id}\n                  data-place-preset={preset.id}\n                  onClick={() => {\n                    void submitPlaceArea(place.key, preset.id);\n                  }}\n                >\n                  <span>\n                    {text(\n                      language,\n                      preset.mode === 'distance'\n                        ? 'draw.radius'\n                        : preset.mode === 'walk'\n                          ? 'draw.mode.walk'\n                          : 'draw.mode.drive',\n                    )}\n                  </span>\n                  <FactChip\n                    variant=\"input\"\n                    language={language}\n                    kind=\"preset\"\n                    value={preset.value}\n                    unit={preset.unit}\n                    recordId={preset.recordId}\n                  />\n                </button>\n              ),\n            )}\n          </div>\n        ) : null}\n      </details>\n      <button\n        type=\"button\"\n        data-action=\"story-next\"\n        disabled={!activity || !area.presented?.showLayers || pending}\n        onClick={() => {\n          if (activity && selectedAreaRequest()) onRun(activity.commerce_code);\n        }}\n      >\n        {text(language, 'story.next')}\n      </button>\n      {pending ? <p role=\"status\">{text(language, 'story.loading')}</p> : null}\n      {failed ? (\n        <p role=\"alert\">{text(language, 'story.unavailable')}</p>\n      ) : null}\n      {registry && cards.length ? (\n        <>\n          <Brief\n            language={language}\n            registry={registry}\n            draft={null}\n            onOpen={onOpen}\n          />\n          <ContextCards\n            language={language}\n            registry={registry}\n            cards={cards}\n            onOpen={onOpen}\n          />\n          <p data-fragment=\"foundation_decision\">\n            {fragmentField(\n              'foundation_decision',\n              language === 'ar' ? 'cheapest_test_ar' : 'cheapest_test_en',\n            )}\n          </p>\n        </>\n      ) : null}\n      <button type=\"button\" data-action=\"story-reset\" onClick={onReset}>\n        {text(language, 'story.reset')}\n      </button>\n    </section>\n  );\n}\n",
+    "replacement": "import { useState } from 'react';\nimport type { ContextPayload } from '../cards/PublicContextCard';\nimport { ContextCards } from './ContextCards';\nimport { Brief } from '../brief/Brief';\nimport { fragmentField } from '../brief/catalogue';\nimport { FactChip } from '../facts/FactChip';\nimport type { FactRegistry } from '../facts/registry';\nimport { text, type Language } from '../i18n';\nimport { useArea } from '../state/store';\nimport { selectedAreaRequest, submitPlaceArea } from '../state/area-actions';\nimport {\n  DISTANCE_PRESETS,\n  WALK_PRESETS,\n  DRIVE_PRESETS,\n} from '../controls/presets';\nimport { ResolvePicker } from './ResolvePicker';\nimport type { ActivityCandidate, PlaceCandidate } from '../api/areas';\n\nexport function PublicStory({\n  language,\n  registry,\n  cards,\n  pending,\n  failed,\n  onRun,\n  onOpen,\n  onReset,\n}: {\n  language: Language;\n  registry: FactRegistry | null;\n  cards: readonly ContextPayload[];\n  pending: boolean;\n  failed: boolean;\n  onRun: (activity: string) => void;\n  onOpen: (factId: string) => void;\n  onReset: () => void;\n}) {\n  const area = useArea();\n  const [activity, setActivity] = useState<ActivityCandidate | null>(null);\n  const [place, setPlace] = useState<PlaceCandidate | null>(null);\n  return (\n    <section className=\"public-story\" data-scene=\"area\">\n      <h1>{text(language, 'opening.action.site')}</h1>\n      {activity ? (\n        <p data-part=\"activity-selected\">\n          <bdi>{language === 'ar' ? activity.label_ar : activity.label_en}</bdi>\n        </p>\n      ) : null}\n      {place ? (\n        <p data-part=\"place-selected\">\n          <bdi>{language === 'ar' ? place.label_ar : place.label_en}</bdi>\n        </p>\n      ) : null}\n      <details\n        className=\"story-selection\"\n        key={cards.length ? 'result' : 'selection'}\n        open={!cards.length}\n      >\n        <summary>{text(language, 'story.selection')}</summary>\n        <ResolvePicker\n          language={language}\n          kind=\"activity\"\n          onSelect={(candidate) => {\n            if (candidate.kind === 'activity') setActivity(candidate);\n          }}\n        />\n        <ResolvePicker\n          language={language}\n          kind=\"place\"\n          onSelect={(candidate) => {\n            if (candidate.kind === 'place') setPlace(candidate);\n          }}\n        />\n        <p className=\"story-caption\">\n          {text(language, 'layers.boundaries.absent')}\n        </p>\n        {place ? (\n          <div className=\"named-presets\" data-part=\"named-presets\">\n            {[...DISTANCE_PRESETS, ...WALK_PRESETS, ...DRIVE_PRESETS].map(\n              (preset) => (\n                <button\n                  type=\"button\"\n                  key={preset.id}\n                  data-place-preset={preset.id}\n                  onClick={() => {\n                    void submitPlaceArea(place.key, preset.id);\n                  }}\n                >\n                  <span>\n                    {text(\n                      language,\n                      preset.mode === 'distance'\n                        ? 'draw.radius'\n                        : preset.mode === 'walk'\n                          ? 'draw.mode.walk'\n                          : 'draw.mode.drive',\n                    )}\n                  </span>\n                  <FactChip\n                    variant=\"input\"\n                    language={language}\n                    kind=\"preset\"\n                    value={preset.value}\n                    unit={preset.unit}\n                    recordId={preset.recordId}\n                  />\n                </button>\n              ),\n            )}\n          </div>\n        ) : null}\n      </details>\n      <button\n        type=\"button\"\n        data-action=\"story-next\"\n        disabled={!activity || !area.presented?.showLayers || pending}\n        onClick={() => {\n          if (activity && selectedAreaRequest()) onRun(activity.commerce_code);\n        }}\n      >\n        {text(language, 'story.next')}\n      </button>\n      {pending ? <p role=\"status\">{text(language, 'story.loading')}</p> : null}\n      {failed ? (\n        <p role=\"alert\">{text(language, 'story.unavailable')}</p>\n      ) : null}\n      {registry && cards.length ? (\n        <>\n          <Brief\n            language={language}\n            registry={registry}\n            draft={null}\n            onOpen={onOpen}\n          />\n          <ContextCards\n            language={language}\n            registry={registry}\n            cards={cards}\n            onOpen={onOpen}\n          />\n          <p data-fragment=\"foundation_decision\">\n            {fragmentField(\n              'foundation_decision',\n              language === 'ar' ? 'cheapest_test_ar' : 'cheapest_test_en',\n            )}\n          </p>\n        </>\n      ) : null}\n      <button type=\"button\" data-action=\"story-reset\" onClick={onReset}>\n        {text(language, 'story.reset')}\n      </button>\n    </section>\n  );\n}\n",
+    "summary": [
+      "FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (en)",
+      "FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (ar)",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 4 passed (6)"
+    ],
+    "log": "ui-removals/A-F6-caption-labels.log"
+  },
+  {
+    "id": "A-F7-boundary-scope",
+    "file": "web/src/journeys/PublicStory.tsx",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/mounted-opening-review.test.tsx"
+    ],
+    "exit": 1,
+    "verdict": "KILLED",
+    "removed": "import { useState } from 'react';\nimport type { ContextPayload } from '../cards/PublicContextCard';\nimport { ContextCards } from './ContextCards';\nimport { Brief } from '../brief/Brief';\nimport { fragmentField } from '../brief/catalogue';\nimport { FactChip } from '../facts/FactChip';\nimport type { FactRegistry } from '../facts/registry';\nimport { text, type Language } from '../i18n';\nimport { useArea } from '../state/store';\nimport { selectedAreaRequest, submitPlaceArea } from '../state/area-actions';\nimport {\n  DISTANCE_PRESETS,\n  WALK_PRESETS,\n  DRIVE_PRESETS,\n} from '../controls/presets';\nimport { ResolvePicker } from './ResolvePicker';\nimport type { ActivityCandidate, PlaceCandidate } from '../api/areas';\n\nexport function PublicStory({\n  language,\n  registry,\n  cards,\n  pending,\n  failed,\n  onRun,\n  onOpen,\n  onReset,\n}: {\n  language: Language;\n  registry: FactRegistry | null;\n  cards: readonly ContextPayload[];\n  pending: boolean;\n  failed: boolean;\n  onRun: (activity: string) => void;\n  onOpen: (factId: string) => void;\n  onReset: () => void;\n}) {\n  const area = useArea();\n  const [activity, setActivity] = useState<ActivityCandidate | null>(null);\n  const [place, setPlace] = useState<PlaceCandidate | null>(null);\n  return (\n    <section className=\"public-story\" data-scene=\"area\">\n      <h1>{text(language, 'opening.action.site')}</h1>\n      {activity ? (\n        <p data-part=\"activity-selected\">\n          <span className=\"selection-caption\">\n            {text(language, 'story.activityLabel')}\n          </span>\n          <bdi>{language === 'ar' ? activity.label_ar : activity.label_en}</bdi>\n        </p>\n      ) : null}\n      {place ? (\n        <p data-part=\"place-selected\">\n          <span className=\"selection-caption\">\n            {text(language, 'story.placeLabel')}\n          </span>\n          <bdi>{language === 'ar' ? place.label_ar : place.label_en}</bdi>\n        </p>\n      ) : null}\n      <details\n        className=\"story-selection\"\n        key={cards.length ? 'result' : 'selection'}\n        open={!cards.length}\n      >\n        <summary>{text(language, 'story.selection')}</summary>\n        <ResolvePicker\n          language={language}\n          kind=\"activity\"\n          onSelect={(candidate) => {\n            if (candidate.kind === 'activity') setActivity(candidate);\n          }}\n        />\n        <ResolvePicker\n          language={language}\n          kind=\"place\"\n          onSelect={(candidate) => {\n            if (candidate.kind === 'place') setPlace(candidate);\n          }}\n        />\n        <p className=\"story-caption\">\n          {text(language, 'layers.boundaries.absent')}\n        </p>\n        {place ? (\n          <div className=\"named-presets\" data-part=\"named-presets\">\n            {[...DISTANCE_PRESETS, ...WALK_PRESETS, ...DRIVE_PRESETS].map(\n              (preset) => (\n                <button\n                  type=\"button\"\n                  key={preset.id}\n                  data-place-preset={preset.id}\n                  onClick={() => {\n                    void submitPlaceArea(place.key, preset.id);\n                  }}\n                >\n                  <span>\n                    {text(\n                      language,\n                      preset.mode === 'distance'\n                        ? 'draw.radius'\n                        : preset.mode === 'walk'\n                          ? 'draw.mode.walk'\n                          : 'draw.mode.drive',\n                    )}\n                  </span>\n                  <FactChip\n                    variant=\"input\"\n                    language={language}\n                    kind=\"preset\"\n                    value={preset.value}\n                    unit={preset.unit}\n                    recordId={preset.recordId}\n                  />\n                </button>\n              ),\n            )}\n          </div>\n        ) : null}\n      </details>\n      <button\n        type=\"button\"\n        data-action=\"story-next\"\n        disabled={!activity || !area.presented?.showLayers || pending}\n        onClick={() => {\n          if (activity && selectedAreaRequest()) onRun(activity.commerce_code);\n        }}\n      >\n        {text(language, 'story.next')}\n      </button>\n      {pending ? <p role=\"status\">{text(language, 'story.loading')}</p> : null}\n      {failed ? (\n        <p role=\"alert\">{text(language, 'story.unavailable')}</p>\n      ) : null}\n      {registry && cards.length ? (\n        <>\n          <Brief\n            language={language}\n            registry={registry}\n            draft={null}\n            onOpen={onOpen}\n          />\n          <ContextCards\n            language={language}\n            registry={registry}\n            cards={cards}\n            onOpen={onOpen}\n          />\n          <p data-fragment=\"foundation_decision\">\n            {fragmentField(\n              'foundation_decision',\n              language === 'ar' ? 'cheapest_test_ar' : 'cheapest_test_en',\n            )}\n          </p>\n        </>\n      ) : null}\n      <button type=\"button\" data-action=\"story-reset\" onClick={onReset}>\n        {text(language, 'story.reset')}\n      </button>\n    </section>\n  );\n}\n",
+    "replacement": "import { useState } from 'react';\nimport type { ContextPayload } from '../cards/PublicContextCard';\nimport { ContextCards } from './ContextCards';\nimport { Brief } from '../brief/Brief';\nimport { fragmentField } from '../brief/catalogue';\nimport { FactChip } from '../facts/FactChip';\nimport type { FactRegistry } from '../facts/registry';\nimport { text, type Language } from '../i18n';\nimport { useArea } from '../state/store';\nimport { selectedAreaRequest, submitPlaceArea } from '../state/area-actions';\nimport {\n  DISTANCE_PRESETS,\n  WALK_PRESETS,\n  DRIVE_PRESETS,\n} from '../controls/presets';\nimport { ResolvePicker } from './ResolvePicker';\nimport type { ActivityCandidate, PlaceCandidate } from '../api/areas';\n\nexport function PublicStory({\n  language,\n  registry,\n  cards,\n  pending,\n  failed,\n  onRun,\n  onOpen,\n  onReset,\n}: {\n  language: Language;\n  registry: FactRegistry | null;\n  cards: readonly ContextPayload[];\n  pending: boolean;\n  failed: boolean;\n  onRun: (activity: string) => void;\n  onOpen: (factId: string) => void;\n  onReset: () => void;\n}) {\n  const area = useArea();\n  const [activity, setActivity] = useState<ActivityCandidate | null>(null);\n  const [place, setPlace] = useState<PlaceCandidate | null>(null);\n  return (\n    <section className=\"public-story\" data-scene=\"area\">\n      <h1>{text(language, 'opening.action.site')}</h1>\n      {activity ? (\n        <p data-part=\"activity-selected\">\n          <span className=\"selection-caption\">\n            {text(language, 'story.activityLabel')}\n          </span>\n          <bdi>{language === 'ar' ? activity.label_ar : activity.label_en}</bdi>\n        </p>\n      ) : null}\n      {place ? (\n        <p data-part=\"place-selected\">\n          <span className=\"selection-caption\">\n            {text(language, 'story.placeLabel')}\n          </span>\n          <bdi>{language === 'ar' ? place.label_ar : place.label_en}</bdi>\n        </p>\n      ) : null}\n      <details\n        className=\"story-selection\"\n        key={cards.length ? 'result' : 'selection'}\n        open={!cards.length}\n      >\n        <summary>{text(language, 'story.selection')}</summary>\n        <ResolvePicker\n          language={language}\n          kind=\"activity\"\n          onSelect={(candidate) => {\n            if (candidate.kind === 'activity') setActivity(candidate);\n          }}\n        />\n        <ResolvePicker\n          language={language}\n          kind=\"place\"\n          onSelect={(candidate) => {\n            if (candidate.kind === 'place') setPlace(candidate);\n          }}\n        />\n        {place ? (\n          <div className=\"named-presets\" data-part=\"named-presets\">\n            {[...DISTANCE_PRESETS, ...WALK_PRESETS, ...DRIVE_PRESETS].map(\n              (preset) => (\n                <button\n                  type=\"button\"\n                  key={preset.id}\n                  data-place-preset={preset.id}\n                  onClick={() => {\n                    void submitPlaceArea(place.key, preset.id);\n                  }}\n                >\n                  <span>\n                    {text(\n                      language,\n                      preset.mode === 'distance'\n                        ? 'draw.radius'\n                        : preset.mode === 'walk'\n                          ? 'draw.mode.walk'\n                          : 'draw.mode.drive',\n                    )}\n                  </span>\n                  <FactChip\n                    variant=\"input\"\n                    language={language}\n                    kind=\"preset\"\n                    value={preset.value}\n                    unit={preset.unit}\n                    recordId={preset.recordId}\n                  />\n                </button>\n              ),\n            )}\n          </div>\n        ) : null}\n      </details>\n        <p className=\"story-caption\">\n          {text(language, 'layers.boundaries.absent')}\n        </p>\n\n      <button\n        type=\"button\"\n        data-action=\"story-next\"\n        disabled={!activity || !area.presented?.showLayers || pending}\n        onClick={() => {\n          if (activity && selectedAreaRequest()) onRun(activity.commerce_code);\n        }}\n      >\n        {text(language, 'story.next')}\n      </button>\n      {pending ? <p role=\"status\">{text(language, 'story.loading')}</p> : null}\n      {failed ? (\n        <p role=\"alert\">{text(language, 'story.unavailable')}</p>\n      ) : null}\n      {registry && cards.length ? (\n        <>\n          <Brief\n            language={language}\n            registry={registry}\n            draft={null}\n            onOpen={onOpen}\n          />\n          <ContextCards\n            language={language}\n            registry={registry}\n            cards={cards}\n            onOpen={onOpen}\n          />\n          <p data-fragment=\"foundation_decision\">\n            {fragmentField(\n              'foundation_decision',\n              language === 'ar' ? 'cheapest_test_ar' : 'cheapest_test_en',\n            )}\n          </p>\n        </>\n      ) : null}\n      <button type=\"button\" data-action=\"story-reset\" onClick={onReset}>\n        {text(language, 'story.reset')}\n      </button>\n    </section>\n  );\n}\n",
+    "summary": [
+      "FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (en)",
+      "FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (ar)",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 4 passed (6)"
+    ],
+    "log": "ui-removals/A-F7-boundary-scope.log"
+  }
+]

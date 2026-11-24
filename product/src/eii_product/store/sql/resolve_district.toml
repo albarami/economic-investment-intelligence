@@ -1,0 +1,19 @@
+[[tables]]
+name = "district"
+anchor = "docs/03_DATA_CONTRACTS.md section \"### 7.3 Columns\" row district"
+key = ["district_key"]
+
+[[tables.columns]]
+name = "district_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_en"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = false

@@ -1,0 +1,39 @@
+[[tables]]
+name = "graph_node"
+anchor = "10. The economic graph"
+key = ["node_id"]
+
+[[tables.columns]]
+name = "node_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "node_type"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "label_en"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "label_ar"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "provenance"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = true

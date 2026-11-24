@@ -1,0 +1,74 @@
+[[tables]]
+name = "release_manifest"
+anchor = "7.3 Columns"
+key = ["table_name"]
+
+[[tables.columns]]
+name = "release_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "table_name"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "provenance_class"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "file"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "sha256"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "row_count"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "schema_sha256"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "release_kind"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "release_contract_version"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "build_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "built_at"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "code_version"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "rules_version_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "engine_versions"
+type = "string"
+nullable = false

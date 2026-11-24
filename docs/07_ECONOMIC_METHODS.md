@@ -56,6 +56,27 @@
 
 Each card states its compute cost and which research review measured it. All research timings were taken on 2026-11-11 on the build machine with the CPU only; they show that compute is not the constraint and are not promises for the demo. Where no time was recorded, the card says so. A card added on 2026-11-12 says "not yet timed" where no research timing exists.
 
+### Classes of a classed map layer
+
+**Purpose.** Relative display classes for one layer and period, never a ranking, score or verdict. Method MTH-126 is implemented by `eii_core.calc.layer_classes`.
+
+**Inputs.** Nonempty unique key/value pairs, with finite `Decimal` or integer values only; booleans and floats are refused. A hero zone the calculator does not rank is never an input.
+
+**Formula.** Order by value, then key. With `n` items and `CLASS_COUNT = 5`, slice `i` is `ordered[floor(i*n/5):floor((i+1)*n/5)]`, for `i` from zero through four. Drop empty slices. Merge a slice into the preceding merged slice when its first value equals that slice's last value. Name the resulting classes from `band_low` upward. The last item in each class is its boundary key. Round nothing. Routes use class keys and boundary keys only; low and high values are not sent. The legend shows each boundary feature's existing fact, with no empty band.
+
+**Worked example (invented inputs).**
+
+| Input | Classes |
+|---|---|
+| a 1, b 2, c 2, d 3, e 5, f 8, g 8, h 8, i 13, j 21 | `band_low` 1–3 (boundary d); `band_mid_low` 5–8 (h); `band_mid` 13–21 (j) |
+| p 4, q 4, r 4, s 7, t 7 | `band_low` 4–4 (r); `band_mid_low` 7–7 (t) |
+| u 9 | `band_low` 9–9 (u) |
+| empty | refused `class_input_empty` |
+
+| ID | Requirement |
+|---|---|
+| MTH-126 | A classed map layer (`night_lights`, `land_prices`, `zone_electricity_growth`) takes its class keys only from `eii_core.calc.layer_classes`: equal-count classes, five at most (`CLASS_COUNT`), ordered by value then key, ties never split across classes, classes named from `band_low` upward, each class's break shown as the fact of its boundary feature, an empty input refused and the layer `NO_DATA`; a hero zone the calculator does not rank is never an input; the layer sends each present class's key and its boundary feature's fact ID, never a low or high value, and the legend shows only the classes present; no class is chosen in the browser (DES-19); it reproduces the fixtures above. |
+
 ## 2. Card overview
 
 | Card | Capability | Tool | Output provenance |

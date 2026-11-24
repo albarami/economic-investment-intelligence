@@ -1,0 +1,69 @@
+[[tables]]
+name = "pub_place"
+anchor = "7.3 Columns"
+key = ["place_id"]
+
+[[tables.columns]]
+name = "place_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "category"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "lon"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "lat"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "cell"
+type = "cell"
+nullable = false
+
+[[tables.columns]]
+name = "source_release"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_provider"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "licence"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "confidence"
+type = "decimal(5,4)"
+nullable = false
+
+[[tables.columns]]
+name = "merged_ids"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

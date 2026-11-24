@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft written by task S0-T13 on 2026-11-12; every row is as true as the page or run it names, on the date it names |
-| Date | 2026-11-12 |
+| Status | Draft written by task S0-T13 on 2026-11-12; pages P21 to P24, statements S39 to S44 and runs R9 and R10 added by task S3-T27 on 2026-11-19; every row is as true as the page or run it names, on the date it names |
+| Date | 2026-11-20 |
 | Owner | Project owner (see OPEN_ITEMS.md) |
 | Purpose | Record the official pages read and the idioms that changed from earlier major versions for MapLibre GL JS 6, deck.gl 9.4 and the deck.gl MapLibre module (FE-02), and the two confirmations of DES-25 and DES-45 recorded in the section "Confirmations assigned to this task". |
 | Read first | [docs/10_FRONTEND.md](../docs/10_FRONTEND.md) section 2, [the notes for DuckDB, PostgreSQL and the Claude API](../docs/REFERENCE_NOTES.md) |
@@ -32,14 +32,35 @@ Used here for the basemap, camera, building extrusion and label rendering (docs/
 | P1 | https://maplibre.org/maplibre-gl-js/docs/guides/v5-to-v6-migration-guide/ | v5 to v6 migration guide - MapLibre GL JS | 2026-11-12 |
 | P2 | https://maplibre.org/maplibre-gl-js/docs/ | Introduction - MapLibre GL JS | 2026-11-12 |
 | P3 | https://raw.githubusercontent.com/maplibre/maplibre-gl-js/main/CHANGELOG.md | CHANGELOG.md (repository file; entries are named by their version heading) | 2026-11-12 |
-| P4 | https://maplibre.org/maplibre-gl-js/docs/API/functions/setRTLTextPlugin/ | ~~setRTLTextPlugin()~~ - MapLibre GL JS | 2026-11-12 |
+| P4 | https://maplibre.org/maplibre-gl-js/docs/API/functions/setRTLTextPlugin/ | ~~setRTLTextPlugin()~~ - MapLibre GL JS | 2026-11-16 |
 | P5 | https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/ | MapOptions - MapLibre GL JS | 2026-11-12 |
 | P6 | https://raw.githubusercontent.com/maplibre/maplibre-agent-skills/main/README.md | README.md (repository file of MapLibre Agent Skills) | 2026-11-12 |
 | P7 | https://raw.githubusercontent.com/maplibre/maplibre-agent-skills/main/skills/maplibre-fonts-glyphs/SKILL.md | SKILL.md (repository file; a secondary source, its own text says to follow the migration guide where they differ) | 2026-11-12 |
+| P8 | https://github.com/maplibre/maplibre-style-spec/blob/main/src/reference/v8.json | Style specification source, light position | 2026-11-16 |
+| P9 | https://github.com/maplibre/maplibre-style-spec/blob/main/src/reference/v8.json | Style specification source, sky and atmosphere-blend | 2026-11-16 |
+| P10 | https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/ | Map - MapLibre GL JS | 2026-11-16 |
+| P11 | https://maplibre.org/maplibre-gl-js/docs/API/classes/DragPanHandler/ | DragPanHandler - MapLibre GL JS | 2026-11-16 |
+| P12 | https://maplibre.org/maplibre-gl-js/docs/API/classes/ScrollZoomHandler/ | ScrollZoomHandler - MapLibre GL JS | 2026-11-16 |
+| P13 | https://maplibre.org/maplibre-gl-js/docs/API/classes/BoxZoomHandler/ | BoxZoomHandler - MapLibre GL JS | 2026-11-16 |
+| P14 | https://maplibre.org/maplibre-gl-js/docs/API/classes/DragRotateHandler/ | DragRotateHandler - MapLibre GL JS | 2026-11-16 |
+| P15 | https://maplibre.org/maplibre-gl-js/docs/API/classes/DoubleClickZoomHandler/ | DoubleClickZoomHandler - MapLibre GL JS | 2026-11-16 |
+| P16 | https://maplibre.org/maplibre-gl-js/docs/API/classes/TwoFingersTouchZoomRotateHandler/ | TwoFingersTouchZoomRotateHandler - MapLibre GL JS | 2026-11-16 |
+| P17 | https://maplibre.org/maplibre-gl-js/docs/API/classes/TwoFingersTouchPitchHandler/ | TwoFingersTouchPitchHandler - MapLibre GL JS | 2026-11-16 |
+| P18 | https://maplibre.org/maplibre-gl-js/docs/API/classes/KeyboardHandler/ | KeyboardHandler - MapLibre GL JS | 2026-11-16 |
+| P19 | https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/ | Map - MapLibre GL JS | 2026-11-16 |
+| P20 | https://maplibre.org/maplibre-gl-js/docs/API/classes/MapMouseEvent/ | MapMouseEvent - MapLibre GL JS | 2026-11-16 |
+| P21 | https://maplibre.org/maplibre-style-spec/glyphs/ | Glyphs - MapLibre Style Specification | 2026-11-19 |
+| P22 | https://maplibre.org/maplibre-gl-js/docs/API/functions/addProtocol/ | addProtocol - MapLibre GL JS | 2026-11-19 |
+| P23 | https://docs.protomaps.com/pmtiles/maplibre | PMTiles for MapLibre - Protomaps documentation | 2026-11-19 |
+| P24 | https://docs.protomaps.com/pmtiles/cloud-storage | PMTiles on cloud storage - Protomaps documentation | 2026-11-19 |
+| P25 | https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/ | Map - MapLibre GL JS; S3-T10 camera methods, read before implementation | 2026-11-20 |
+| P26 | https://maplibre.org/maplibre-gl-js/docs/API/classes/NavigationControl/ | NavigationControl - MapLibre GL JS | 2026-11-20 |
+| P27 | https://maplibre.org/maplibre-gl-js/docs/API/classes/LngLatBounds/ | LngLatBounds - MapLibre GL JS | 2026-11-20 |
+| P28 | https://maplibre.org/maplibre-gl-js/docs/API/functions/setRTLTextPlugin/ | setRTLTextPlugin - MapLibre GL JS; retained under decision 0042 item 7 | 2026-11-20 |
 
 ### Runs
 
-Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `package.json` that holds `"private": true`, `"type": "module"` and exact dependencies (`v6`: `maplibre-gl` 6.17.0, `@deck.gl/core` 9.4.1, `@deck.gl/maplibre` 9.4.1; `v5`: `maplibre-gl` 5.24.1; `mb`: `@deck.gl/mapbox` 9.4.1), then `npm install --ignore-scripts --no-audit --no-fund` in each. Node 22 on Linux. A run's output is the last line printed (the standard error stream included).
+Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `package.json` that holds `"private": true`, `"type": "module"` and exact dependencies (`v6`: `maplibre-gl` 6.17.0, `@deck.gl/core` 9.4.1, `@deck.gl/maplibre` 9.4.1; `v5`: `maplibre-gl` 5.24.1; `mb`: `@deck.gl/mapbox` 9.4.1), then `npm install --ignore-scripts --no-audit --no-fund` in each. Node 22 on Linux. A run's output is the last line printed (the standard error stream included). Runs R9 and R10 instead ran inside the repository's `web/` folder of the S3-T27 checkout, where the pins are installed dependencies.
 
 | Id | Package and version | Date | Command | Output |
 |---|---|---|---|---|
@@ -51,6 +72,8 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 | R6 | maplibre-gl 6.17.0 | 2026-11-12 | `cd v6 && node -e 'const t=require("fs").readFileSync("node_modules/maplibre-gl/dist/maplibre-gl.d.ts","utf8");const i=t.indexOf("declare function setRTLTextPlugin");console.log(t.slice(t.lastIndexOf("/**",i),i).includes("@deprecated"))'` | true |
 | R7 | maplibre-gl 5.24.1 | 2026-11-12 | `cd v5 && node -e 'const t=require("fs").readFileSync("node_modules/maplibre-gl/dist/maplibre-gl.d.ts","utf8");const i=t.indexOf("declare function setRTLTextPlugin");console.log(t.slice(t.lastIndexOf("/**",i),i).includes("@deprecated"))'` | false |
 | R8 | maplibre-gl 6.17.0 | 2026-11-12 | `cd v6 && node -e 'const f=require("fs");const t=f.readFileSync("node_modules/maplibre-gl/dist/maplibre-gl.d.ts","utf8");console.log(t.includes("declare function setWorkerUrl(value: string): void"),f.existsSync("node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs"))'` | true true |
+| R9 | pmtiles 4.5.0 | 2026-11-19 | `cd web && node --input-type=module -e 'import {Protocol} from "pmtiles"; const p=new Protocol(); console.log(typeof Protocol, typeof p.tile)'` | function function |
+| R10 | maplibre-gl 6.17.0 | 2026-11-19 | `cd web && node --input-type=module -e 'import * as m from "maplibre-gl"; console.log(typeof m.getRTLTextPluginStatus, typeof m.setRTLTextPlugin)'` | function function |
 
 ### Idioms that changed
 
@@ -88,6 +111,33 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 | S19 | The project's agent-skills repository lists a skill for the version 6 migration (maplibre-v6-migration). | READ | P6 | "A v5 app breaks after upgrading to v6, or before pinning a v6 install" |
 | S20 | The project's agent-skills repository lists a skill for hosting tiles without a tile server (maplibre-pmtiles-patterns). | READ | P6 | "Hosting tiles without a tile server" |
 | S21 | The pack gives the light position of the MapLibre style specification as an azimuthal angle clockwise from north and a polar angle of 0 directly overhead (docs/11_DESIGN_DIRECTION.md section "The map"); no page of the style specification was read here: not verified. | PACK | docs/11_DESIGN_DIRECTION.md section "The map" | - |
+| S22 | With map anchor, position is radius, clockwise azimuth from north and polar angle from overhead; the clock converts the incoming sun vector to that position (docs/10_FRONTEND.md FE-143). | READ | P8 | "degrees proceed clockwise" |
+| S23 | Sky is experimental; atmosphere-blend ranges from hidden at zero to visible at one (docs/10_FRONTEND.md FE-143). | READ | P9 | "0 is hidden" |
+| S25 | The plugin API takes a source URL and lazy boolean; true defers loading until RTL text is encountered (docs/10_FRONTEND.md section "Stack and pins"). | READ | P4 | "defer loading the plugin until rtl text is encountered" |
+| S26 | A configured plugin replaces the built-in shaper despite deprecation; decision 0042 item 7 retains it pending native evidence (docs/10_FRONTEND.md section "Stack and pins"). | READ | P4 | "still replaces the built-in implementation" |
+| S24 | setLight accepts LightSpecification and setSky accepts SkySpecification (docs/10_FRONTEND.md FE-143). | READ | P10 | "Light properties to set" |
+| S27 | In-house pointer handling suspends dragPan, scrollZoom, boxZoom, dragRotate, doubleClickZoom, touchZoomRotate, touchPitch and keyboard while drawing, subscribes to move and resize through the handle, and the Stage sends only project and unproject out of the map; with no map the drawing tools stay unavailable; a pinned drawing library is the retreat: not verified. | PACK | docs/10_FRONTEND.md FE-102 | - |
+| S28 | DragPanHandler is the handler that pans the map by clicking and dragging the cursor. | READ | P11 | "The DragPanHandler allows the user to pan the map by clicking and dragging the cursor." |
+| S29 | ScrollZoomHandler is the handler that zooms the map by scrolling. | READ | P12 | "The ScrollZoomHandler allows the user to zoom the map by scrolling." |
+| S30 | BoxZoomHandler is the handler that zooms the map to fit within a bounding box. | READ | P13 | "The BoxZoomHandler allows the user to zoom the map to fit within a bounding box." |
+| S31 | DragRotateHandler is the handler that rotates the map by dragging the cursor with the right mouse button or ctrl key. | READ | P14 | "The DragRotateHandler allows the user to rotate the map by clicking and dragging the cursor while holding the right mouse button or ctrl key." |
+| S32 | DoubleClickZoomHandler is the handler that zooms the map at a point by double clicking or double tapping. | READ | P15 | "The DoubleClickZoomHandler allows the user to zoom the map at a point by double clicking or double tapping." |
+| S33 | TwoFingersTouchZoomRotateHandler is the handler that zooms and rotates the map by pinching on a touchscreen. | READ | P16 | "The TwoFingersTouchZoomRotateHandler allows the user to zoom and rotate the map by pinching on a touchscreen." |
+| S34 | TwoFingersTouchPitchHandler is the handler that pitches the map by dragging up and down with two fingers. | READ | P17 | "The TwoFingersTouchPitchHandler allows the user to pitch the map by dragging up and down with two fingers." |
+| S35 | KeyboardHandler is the handler for zoom, rotate and pan from keyboard shortcuts. | READ | P18 | "The KeyboardHandler allows the user to zoom, rotate, and pan the map using the following keyboard shortcuts:" |
+| S36 | Map.project returns pixel coordinates, relative to the map container, for a geographical location. | READ | P19 | "Returns a Point representing pixel coordinates, relative to the map's container, that correspond to the specified geographical location." |
+| S37 | Map.unproject returns geographical coordinates for specified pixel coordinates. | READ | P19 | "Returns a LngLat representing geographical coordinates that correspond to the specified pixel coordinates." |
+| S38 | A MapMouseEvent carries the Map object that fired it. | READ | P20 | "The Map object that fired the event." |
+| S39 | The style's glyphs property is a URL template holding {fontstack} and {range} tokens; the extract supplied with the task states that the template must be absolute, that ranges are 256-codepoint blocks, and that a missing glyphs property may fall back to locally installed fonts — so the serving test must fail on route coverage and label proof, not on a blank map alone. | READ | P21 | "URL template for signed-distance-field glyph sets" |
+| S40 | addProtocol registers a handler for a custom URL scheme and the pmtiles package's Protocol.tile is the handler registered for the pmtiles scheme; the function runs on the main thread, so glyphs stay on plain same-origin HTTP at /fonts/* rather than a custom protocol. | READ | P22 | "runs on the main thread" |
+| S41 | The Protomaps MapLibre guide registers the pmtiles package's Protocol as the pmtiles protocol handler and uses a vector source whose url is the pmtiles scheme followed by the archive's same-origin path. | READ | P23 | "PMTiles for MapLibre" |
+| S42 | With pmtiles 4.5.0 installed in the workspace, Protocol is exported, protocol.tile handles pmtiles URLs, and the pinned package parsed the generated test archive (header, root directory and tile lookup). | OBSERVED | R9 | - |
+| S43 | With maplibre-gl 6.17.0 installed in the workspace, getRTLTextPluginStatus is a module-level export, not a Map method, and setRTLTextPlugin with lazy true defers the plugin request until right-to-left text is encountered. | OBSERVED | R10 | - |
+| S44 | A PMTiles archive is served over HTTP with byte-range reads on one file, and plain static file servers are named as suitable. | READ | P24 | "PMTiles on cloud storage" |
+| S45 | The camera API pans by a supplied screen offset. | READ | P25 | "Pans the map by the specified offset." |
+| S46 | The stock navigation control combines zoom buttons and a compass. | READ | P26 | "A NavigationControl control contains zoom buttons and a compass." |
+| S47 | LngLatBounds.extend accepts supplied geographic bounds or points. | READ | P27 | "Extend the bounds to include a given LngLatLike or LngLatBoundsLike." |
+| S48 | With lazy true, the plugin finishes loading before RTL text renders. | READ | P28 | "rtl text will then be rendered only after the plugin finishes loading." |
 
 ### Slice S1 confirmation
 
@@ -114,6 +164,11 @@ Used here for the data layers, interleaved with the basemap through `@deck.gl/ma
 | P4 | https://deck.gl/docs/developer-guide/webgpu | WebGPU - deck.gl | 2026-11-12 |
 | P5 | https://deck.gl/docs/api-reference/extensions/fill-style-extension | FillStyleExtension - deck.gl | 2026-11-12 |
 | P6 | https://deck.gl/docs/api-reference/core/lighting-effect | LightingEffect - deck.gl | 2026-11-12 |
+| P7 | https://deck.gl/docs/api-reference/core/sun-light | SunLight (Experimental) - deck.gl | 2026-11-16 |
+| P8 | https://deck.gl/docs/api-reference/core/directional-light | DirectionalLight - deck.gl | 2026-11-16 |
+| P9 | https://github.com/visgl/deck.gl/blob/master/modules/core/src/effects/lighting/sun-light.ts | SunLight source - deck.gl | 2026-11-16 |
+| P10 | https://deck.gl/docs/api-reference/geo-layers/tile-3d-layer | Tile3DLayer - deck.gl | 2026-11-16 |
+| P11 | https://github.com/visgl/loaders.gl/blob/master/modules/3d-tiles/src/tiles-3d-loader.ts | Tiles3DLoader source - loaders.gl | 2026-11-16 |
 
 ### Runs
 
@@ -122,6 +177,8 @@ Same setup and folders as the Runs table of the MapLibre section.
 | Id | Package and version | Date | Command | Output |
 |---|---|---|---|---|
 | R1 | @deck.gl/core 9.4.1 | 2026-11-12 | `cd v6 && node -e 'const p=JSON.parse(require("fs").readFileSync("node_modules/@deck.gl/core/package.json","utf8"));console.log("visgl:webgl-only" in p.exports["."])'` | true |
+| R2 | @loaders.gl/3d-tiles 4.5.4 and deck.gl 9.4.1 | 2026-11-16 | `node --test scripts/tests/photoreal-browser.node-test.mjs` | native WebGL fixture passed, decoded PNG released on exit |
+| R3 | deck.gl 9.4.1 | 2026-11-16 | `node node_modules/vitest/vitest.mjs run tests/unit/photoreal.test.ts` | late-root traversal and post-exit refusal passed |
 
 ### Idioms that changed
 
@@ -145,6 +202,17 @@ Same setup and folders as the Runs table of the MapLibre section.
 | S10 | The performance page says that on 2015 hardware with dual graphics cards most basic layers render at 60 FPS during pan and zoom up to about one million data items. | READ | P2 | "On 2015 ... with dual graphics cards ... renders fluidly at 60 FPS during pan and zoom operations up to about 1M (one million) data items" |
 | S11 | The fillPatternSizeUnits property of FillStyleExtension takes the units meters, common or pixels. | READ | P5 | "fillPatternSizeUnits (string, optional) ... The units of the pattern size, one of 'meters', 'common' and 'pixels'" |
 | S12 | The LightingEffect page calls the shadow effect experimental. | READ | P6 | "For rendering experimental shadow effect, _shadow prop of DirectionalLight must be set to true" |
+| S13 | LightingEffect takes a collection of light sources; shadow rendering is experimental and remains off in Part A (docs/10_FRONTEND.md FE-143); P6 reread on 2026-11-16. | READ | P6 | "a collection of light sources" |
+| S14 | Experimental _SunLight takes a Unix timestamp in milliseconds and calculates sun position (docs/10_FRONTEND.md FE-143). | READ | P7 | "Unix timestamp in milliseconds" |
+| S15 | DirectionalLight direction is a three-dimensional vector, defaulting downward; the clock uses its horizon crossing for night visibility (docs/10_FRONTEND.md FE-143). | READ | P8 | "3D vector specifies the direction" |
+| S16 | The official SunLight source exposes getProjectedLight with a layer argument, reads its viewport and calculates direction from its timestamp and viewport coordinates (docs/10_FRONTEND.md FE-143). | READ | P9 | "const {viewport} = layer.context;" |
+| S17 | Tile3DLayer accepts an explicit loader; Part P supplies the pinned loader (docs/10_FRONTEND.md FE-148). | READ | P10 | "A loader which is used" |
+| S18 | Tile3DLayer forwards loader and tileset configuration through loadOptions (docs/10_FRONTEND.md FE-148). | READ | P10 | "Forward parameters to the" |
+| S19 | Tile3DLayer exposes tile-load, tile-unload and tile-error callbacks (docs/10_FRONTEND.md FE-148). | READ | P10 | "when a tile failed to load" |
+| S20 | The current loader source offers loadGLTF to parse embedded binaries; installed-module identity remains a separate qualification (docs/10_FRONTEND.md FE-148). | READ | P11 | "Whether to parse any embedded glTF binaries" |
+| S21 | The invented fixture decoded PNG into ImageBitmap and closed the decoded image on exit (docs/10_FRONTEND.md FE-148). | OBSERVED | R2 | - |
+| S22 | Root completion starts traversal using the current viewport; late completion after exit destroys the tileset (docs/10_FRONTEND.md FE-148). | OBSERVED | R3 | - |
+
 
 ### Slice S1 confirmation
 
@@ -303,3 +371,4 @@ Setup, in an empty folder: three sub-folders `f1`, `f2` and `ic`; in each, `npm 
 | GlobeView is experimental | docs/10_FRONTEND.md section "Stack and pins" row "deck.gl `GlobeView`" | deck.gl MapLibre module S10 |
 | Data layers sit beneath the label layers through the interleaved beforeId placement | docs/10_FRONTEND.md section "Map layers" | deck.gl MapLibre module S6 |
 | The retreat uses @deck.gl/mapbox in place of the module | docs/10_FRONTEND.md section "Stack and pins" | deck.gl MapLibre module S12 |
+| In-house pointer handling is the drawing approach, read from the installed MapLibre typings, with a pinned library as the retreat | docs/10_FRONTEND.md FE-102 | MapLibre GL JS 6 S27 |

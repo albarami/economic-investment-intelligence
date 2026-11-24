@@ -49,6 +49,7 @@ SUBJECTS = frozenset(
         "place_public",
         "fdi_project",
         "register_company",
+        "district",
         "municipality",
         "sector",
         "national",
@@ -130,6 +131,11 @@ _PERCENT = frozenset({"percent"})
 _QAR = frozenset({"qar"})
 _RATIO = frozenset({"ratio"})
 
+# DAT-141: the register's published company attribute, never a worker split.
+# Extend only with explicitly defined public-card fields, never aggregate metrics.
+PUBLIC_REGISTER_CARD_METRICS = frozenset({"establishment_nationality"})
+REGISTER_COMPANY_METRICS = PUBLIC_REGISTER_CARD_METRICS | {"employee_count"}
+
 METRIC_UNITS: dict[str, frozenset[str]] = {
     "forecast_value": FACT_UNITS,
     "forecast_low": FACT_UNITS,
@@ -182,6 +188,7 @@ METRIC_UNITS: dict[str, frozenset[str]] = {
     "sector_growth": _PERCENT,
     "firms_per_tower": _COUNT,
     "employee_count": _COUNT,
+    "establishment_nationality": frozenset({"published_text"}),
 }
 
 BRIEF_ORDER = (

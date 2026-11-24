@@ -1,0 +1,4 @@
+
+> [email-shaped-token] lint
+> eslint --max-warnings 0 .
+

@@ -1,0 +1,44 @@
+[[tables]]
+name = "gazetteer"
+anchor = "docs/03_DATA_CONTRACTS.md section \"### 7.3 Columns\" row gazetteer"
+key = ["place_key"]
+
+[[tables.columns]]
+name = "place_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "kind"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_en"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "aliases"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "lon"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "lat"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "cell"
+type = "cell"
+nullable = true

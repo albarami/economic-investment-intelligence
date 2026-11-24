@@ -1,0 +1,6 @@
+
+> [email-shaped-token] format:check
+> prettier --check --no-editorconfig .
+
+Checking formatting...
+All matched files use Prettier code style!

@@ -1,0 +1,14 @@
+[[tables]]
+name = "municipality"
+anchor = "docs/03_DATA_CONTRACTS.md section \"### 7.3 Columns\" row municipality"
+key = ["municipality_code"]
+
+[[tables.columns]]
+name = "municipality_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "geometry"
+type = "geometry"
+nullable = false

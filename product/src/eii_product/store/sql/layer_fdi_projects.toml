@@ -1,0 +1,264 @@
+[[tables]]
+name = "fdi_projects"
+anchor = "7.3 Columns"
+key = ["project_key"]
+
+[[tables.columns]]
+name = "project_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "company"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_country"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "source_country_iso3"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "sector"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "sub_sector"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "business_function"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "project_type"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "capex_value"
+type = "decimal(18,2)"
+nullable = true
+
+[[tables.columns]]
+name = "capex_unit"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "jobs"
+type = "decimal(18,2)"
+nullable = true
+
+[[tables.columns]]
+name = "announced"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "location_text"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "municipality_code"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "place_key"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "project_id"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "project_year"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "project_month"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "capex_currency"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "lat"
+type = "decimal(15,12)"
+nullable = true
+
+[[tables.columns]]
+name = "lng"
+type = "decimal(15,12)"
+nullable = true
+
+[[tables.columns]]
+name = "tags"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "tech_level_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "city_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "world_region_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "src_country_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "fdi_sector_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "src_world_region_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "src_state_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "function_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "src_city_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "sector_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "state_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "country_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "parent_company_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "project_type_id"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "src_state_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "freezone_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "city_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "state_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "src_world_region_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "country_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "description"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "parent_company_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "naics_sub_sector_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "src_city_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "state_abbr"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "world_region_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "parent_company_website"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "fdi_sector_name"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "province"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

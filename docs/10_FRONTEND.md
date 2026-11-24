@@ -338,7 +338,7 @@ Card types added for [decision 0016](decisions/0016-version-1-covers-the-whole-i
 | `qualification_route` | the fixed steps of the structured qualification route, from the catalogue; no figure | catalogue | none | journey D4; service S3 |
 | `public_series` | Public figures from the added portal datasets, on their own geography: employer scale by size and activity, industrial capacity, wholesale and retail context, population by age, labour force, students, hotels, visitor arrivals, building permits and completions, certificates of origin and arriving vessels; each with source, reference year or month and retrieval date, and each dataset's known traps as caveats; forecasts of listed series are on the `series_forecast` card and the population grid by age and sex on the `population_age_sex` card | the added datasets of [04](04_PUBLIC_DATA_PACK.md) | Public | per dataset, as [04](04_PUBLIC_DATA_PACK.md) lists |
 | `public_split` | an official figure split by sex or nationality (FE-117), tabulated on the source's geography and categories, with source and year; a sum of the population grid over an area is the separate `population_age_sex` card | the split datasets of [04](04_PUBLIC_DATA_PACK.md) | Public | journeys D1, D3 and D5 |
-| `fdi_projects` | announced investment projects (FE-116): counts by sector, source country, period and stated location; the list of projects as published announcements with every field available; collapsed source credits, page caveat and announced-estimate labels as in FE-116 | `fdi_projects` | Public | journeys D1, D4, D6 and D7; services S1 and S2 |
+| `fdi_projects` | announced investment projects (FE-116): counts by sector, source country, period and stated location, each count a supplied fact with its year; the four filters hide list items by supplied category keys and the page shows no count of the filtered list; the list of projects as published announcements with every field available; collapsed source credits as ordered plain-text and reference segments, page caveat and announced-estimate labels as in FE-116 | `fdi_projects` | Public | journeys D1, D4, D6 and D7; services S1 and S2 |
 | `agency_records` | sector context, opportunities, set-up steps, incentive packages and law links from the agency's pages (FE-121), each with its page link and retrieval date | the agency page records of [04](04_PUBLIC_DATA_PACK.md) | Public | journey D1; service S1; the break-even calculator |
 | `labour_market` | the labour-market view (FE-114): area pay and occupations with pay bands, middle ranges and earner counts from permitted released units; the wage trend of the same earners for a municipality or nationally, never by sector; national wage trends by sector from the Public activity table, separated from the employment mix; Public series and splits; projections marked as projections; no protected pay band by sector | released monthly pay tables ([03](03_DATA_CONTRACTS.md)); Public series ([04](04_PUBLIC_DATA_PACK.md)) | Synthetic and Public, marked per chip | journey D5 |
 | `what_changed` | changes between the selected month and the month compared (FE-113): for synthetic months, the cohort counts of each pair of adjacent months and the wage index of the same earners for each municipality unit that contains units of the area and nationally, a carried-forward pair shown as suppressed, never zero; for Public series, change facts with sign and word; openings and closures (licence issues and cancellations, and the register companies' Public counts of DAT-164, never a synthetic cohort; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12); every Synthetic change with its caveat | monthly periods ([03](03_DATA_CONTRACTS.md)); public licence issues and cancellations; the register's own dates and monthly snapshots (`pub_register_company`, `pub_register_snapshot`) | Synthetic or Public, per row | journeys D2 and D6; case C4 |
@@ -430,7 +430,7 @@ Each view is a layout of a brief from the closed component catalogue of [09](09_
 | Register-company list | register companies with their card fields and employee counts, ordered by tested code over criteria the user can see and change where the journey orders, with the rank-stability sentence; selecting one opens its company card | `register_company` facts | ready, shortened by a privacy rule, suppressed, no data | journeys D3, D4 and D7; service S3 |
 | Company card | one register company: every field the public business register publishes for it, person names excluded, and its employee count from the attached records | `register_company` facts | ready, employee count withheld (`CARRIED_FORWARD`), no data | the living map; journeys D3, D4 and D7; service S3 |
 | Business list | real businesses from public places data and public listings, in their own container | `place_public` facts | ready, no data | journeys D1, D3, D4 and D7 |
-| FDI list | announced investment projects as published announcements with every field available, the collapsed source credits, page caveat and announced-estimate labels of FE-116, filtered by sector, source country, period and stated location | `fdi_projects` facts | ready, filtered, no data | journeys D1, D4, D6 and D7; services S1 and S2 |
+| FDI list | announced investment projects as published announcements with every field available, the collapsed source credits, page caveat and announced-estimate labels of FE-116, filtered by sector, source country, period and stated location; the filters hide rows by supplied category keys and the page shows no count of the filtered list | `fdi_projects` facts | ready, filtered, no data | journeys D1, D4, D6 and D7; services S1 and S2 |
 | Agency records | sector context, opportunities, set-up steps in their published order, incentive packages and law links, each with its page link and retrieval date | agency record ids and facts | ready, no data | journey D1; service S1 |
 
 ### 4.9 Journey home, cases and sample files
@@ -470,7 +470,7 @@ Each view is a layout of a brief from the closed component catalogue of [09](09_
 | FE-38 | The pack is bilingual on one A4 portrait page unless it overflows. Every printed number is one Fact chip between its English and Arabic labels, and its complete source chain appears in the pack's Source chain section. | slice S10 |
 | FE-106 | The Hour control offers only the release's stored hours for the selected day type, season and month. Play steps one stored hour at a time with the hold and cross-fade of [11](11_DESIGN_DIRECTION.md) and never draws an interpolated frame or value; Pause motion and `prefers-reduced-motion` stop it; the Right and Left arrow keys step one hour forward and back in both languages; hour labels are `reference` chips. | map foundation |
 | FE-107 | The Day selector offers the day types behind the dial situations and the three event days as simulated day types. Choosing an event day clears the dial's situation, disables the summer switch with its reason where the release holds no summer profile for that day, and shows the fixed event-day caveat of [11](11_DESIGN_DIRECTION.md): the profile is simulated and is not a measurement of the event or the attendance of any venue. | flagship |
-| FE-108 | The drawing tools offer a polygon, a radius from the closed presets and a walk or drive time from the closed cut-offs at the hour of the Hour control. A polygon can be drawn by pointer, by touch and by keyboard (a crosshair moved by the arrow keys, a vertex placed by Enter). The submitted shape is posted to the server, which returns its identifier, its facts or a governed refusal; the browser computes no area, intersection, apportioned share or other figure for it. | flagship |
+| FE-108 | The drawing tools offer a polygon, a radius from the closed presets and a walk or drive time from the closed cut-offs at the hour of the Hour control. A polygon can be drawn by pointer, by touch and by keyboard (a crosshair moved by the arrow keys, a vertex placed by Enter). The submitted shape is posted to the server, which returns its identifier, its facts or a governed refusal; the browser computes no area, intersection, apportioned share or other figure for it. Public point membership arrives in `make_area.payload.point_feature_ids`, grouped by layer key, computed on the server against its exact returned outline with boundary inclusion (`eii_core.shapes`). The browser renders only those feature identifiers and omits Public points when membership is unavailable; non-point Public features remain unchanged on their source geography (DAT-147). | flagship |
 | FE-109 | The snap animation and the snap report appear only when a figure of a protected record type (business register, employment, residence, wages) is shown for the area, and always before that figure. When only Public points and Simulated estimates other than a movement split are shown for a drawn shape, the exact-shape caption of [11](11_DESIGN_DIRECTION.md) appears instead and names the apportioning method of those Simulated estimates; a Public statistic apportioned to the shape shows as Inferred, naming its method and its official geography ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), item 6). A movement split is never apportioned to a drawn outline: its values are sums over the snapped whole units, and the caption identifies that returned whole-unit geography. The exact-shape caption and the apportionment wording never apply to split values (PRV-134, FE-154). A component case rejects that caption on a movement split. In a public-only release, which holds no protected figure, the snap report that `make_area` emits as technical metadata (BE-105) appears only in the Privacy receipt. | flagship |
 | FE-110 | The Ranking panel shows, for every candidate area, every criterion with its value as a Fact chip, its weight as an `input` chip the user can edit, the rank as a Fact chip, and the rank-stability sentence beside every rank; no rank is ever shown without that sentence. Editing a weight posts the weights to the server, which returns the new ranks and stability facts; the browser never orders, ranks, normalises or re-weights anything. A public-only switch ranks on Public criteria only. The title and labels carry no advice or verdict wording ([11](11_DESIGN_DIRECTION.md)). | flagship |
 | FE-111 | The Reverse view lists activities ranked by fit for the selected site, for property owners matching tenants to the business mix and the catchment's pay profile, under the same rules as FE-110. | flagship |
@@ -478,8 +478,8 @@ Each view is a layout of a brief from the closed component catalogue of [09](09_
 | FE-113 | The Month selector offers only the release's monthly periods. Choosing a comparison month opens What changed: each row is a returned fact: for synthetic months, a cohort count of a pair of adjacent months (joiners, leavers and stayers) or the wage index of the same earners for one unit at municipality level or coarser (a municipality unit that contains units of the area, or the national unit), labelled with that unit's own released area; for a Public series, a change fact with an explicit sign and its catalogue word; for the openings and closures of register companies, the Public counts of method card C22 of [07](07_ECONOMIC_METHODS.md) over the exact shape, each naming its route, never a synthetic cohort and never added to a licence count ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12; [03](03_DATA_CONTRACTS.md) DAT-164); a carried-forward pair shows its suppressed state and reason, never zero or no change; Public series rows stay on their official geography and register counts on the exact shape; every Synthetic row carries the fixed caveat `synthetic_change` ([11 Design direction](11_DESIGN_DIRECTION.md), section 10.13; decision 0035 item 1). Openings and closures are two separate hero layers, never one net layer. | journeys |
 | FE-114 | The Labour-market view shows, as separate views ([11](11_DESIGN_DIRECTION.md) DES-182): area pay, with pay bands, middle ranges and earner counts read only from permitted released units (the whole release units of a snapped area, a municipality unit of the four pay partitions or the national unit), each statistic from the one partition that [07](07_ECONOMIC_METHODS.md) MTH-55 assigns it (a municipality's one earner count from its money unit, its bands and their denominator from its quartile unit, never a second earner count), and the pay figures for the chosen municipality or nationally (Synthetic); occupations with pay bands, middle ranges and earner counts; the wage trend of the same earners only for a municipality unit or the national unit, never for a smaller area and never by sector (Synthetic), each Synthetic figure labelled with its own released area; wage trends by sector only from the public wage series by economic activity (`wage_act`) and only nationally, as each activity's mean pay beside its paid-worker count, with the national change split into within-sector and employment-mix components (Public); no protected pay band by sector, and no sector figure for an area or a municipality; Public series and Public splits with source and year, and projections drawn as [11](11_DESIGN_DIRECTION.md) sets, each labelled a projection with its method and period and never called a forecast. A forecast of method card C30 is not a projection: it appears on its own `series_forecast` card (FE-128). | journeys |
 | FE-115 | Named synthetic firms are retired ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)). A Register-company list shows register companies, each with its card fields and its employee count from the attached records, and selecting a row opens its company card. The company card shows every field the public business register publishes for the company, person names excluded, and its employee count; it opens from an establishment point of the map (FE-103) or a list row. Neither shows a company's wages, wage bill or any other labour or residence detail. A list's order is the output of tested code over criteria the user can see and change, shown with its criteria and the rank-stability sentence, and never uses, or breaks a tie by, a company's wages or another unreleased labour or residence value. Showing a card is not a lookup; the front end offers no search by company name and no lookup of an owner or a person. A register-company list or a company card never shares a container, list or row with the Business list of public places data and public listings, which keeps its "open listings are incomplete" note. | journeys |
-| FE-116 | The FDI layer draws announced projects at the geography the source states, as solid map symbols with no origin meaning (decision 0035 items 1 and 3), with their counts as `compact` chips in the DOM legend, never at an invented address. The FDI list shows each project as a published announcement with every field available, filters by sector, source country, period and stated location, and offers no search by company name. Each project card, list and map legend shows the agency as publisher, the data gatherer as the page names it, the date read and a link to the dashboard, in collapsed credits, with the page's caveat in its own words: "includes estimates of publicly announced projects" and "does not capture all investment projects". Capex and jobs are always labelled "announced estimates", are never added to measured figures, and never appear beside measured figures without that label. Every FDI chip shows its year; Public remains backend metadata, never an audience mark (decision 0035 items 1 and 3). This follows [decision 0026](decisions/0026-public-sources-used-in-full-locally.md). | journeys |
-| FE-117 | A Public split appears only on its own Public card, on the source's geography and categories, with source and year, and a backend origin marker that is never rendered (decision 0035 items 1 and 3), and never as a map layer. A tabulated split is never drawn on a drawn shape, never apportioned to one, never set on one chart or row with a Synthetic or Simulated figure, and no control applies it to a synthetic figure. The one case of a split over an area the user chose is the `population_age_sex` card of FE-135: whole cells of the published grid, summed, Public and display only. | journeys |
+| FE-116 | The FDI layer draws announced projects at the geography the source states, as solid map symbols with no origin meaning (decision 0035 items 1 and 3), with their counts as `compact` chips in the DOM legend, never at an invented address. The FDI list shows each project as a published announcement with every field available, filters by sector, source country, period and stated location, and offers no search by company name. The four filters hide list items by the category keys the payload supplies, and the page shows no count of the filtered list. Publisher and gatherer are ordered lists of plain-text segments and reference segments; a plain segment that holds a digit is refused (`numeral_in_plain_segment`) and the browser does not scan a string to find a numeral. Each project card, list and map legend shows the agency as publisher, the data gatherer as the page names it, the date read and a link to the dashboard, in collapsed credits, with the page's caveat in its own words: "includes estimates of publicly announced projects" and "does not capture all investment projects". Capex and jobs are always labelled "announced estimates", are never added to measured figures, and never appear beside measured figures without that label. Every FDI chip shows its year; Public remains backend metadata, never an audience mark (decision 0035 items 1 and 3). A legend count whose year is blank is refused (`fdi_year_missing`) and the page supplies no empty year. An announced date is a typed reference segment (`calendar_year`, `calendar_month` or `calendar_date`). The announced-estimate label is required whenever a capex slot or a jobs slot is present, whatever the metric key. This follows [decision 0026](decisions/0026-public-sources-used-in-full-locally.md). | journeys |
+| FE-117 | A Public split appears only on its own Public card, on the source's geography and categories, with source and year, and a backend origin marker that is never rendered (decision 0035 items 1 and 3), and never as a map layer. A split handed to a layer plate renders that source, year and those categories as typed segments and adds no split layer. A tabulated split is never drawn on a drawn shape, never apportioned to one, never set on one chart or row with a Synthetic or Simulated figure, and no control applies it to a synthetic figure. The one case of a split over an area the user chose is the `population_age_sex` card of FE-135: whole cells of the published grid, summed, Public and display only. | journeys |
 | FE-118 | The Journey home shows the ask bar and three groups: the seven decisions, the three services and the four cases. Each decision or service card starts its playbook with one prepared example on a tap; each case card starts its case story with one click. | journeys |
 | FE-119 | A case story runs its prepared steps from `/{lang}/case/{case}/{step}`, discrete and reversible, with the "Prepared" mark on prepared answers and the fixed note that the case is illustrative and its company fictional, and ends with the case's answer named in [09](09_AI_ASSISTANT.md) section 3. | journeys |
 | FE-120 | No file enters the product from the browser. For cases C3 and C4 the Sample-file loader offers only closed controls, one for each shipped synthetic sample file of the case, and posts only the case key and that file's closed key to the case route ([08 Back end](08_BACKEND.md) fixes the route); the server loads the committed synthetic file that the key names and uses it only when its SHA-256 equals the committed value. The application has no file input, no drag-and-drop or paste path for files and no client-side hashing, and the route accepts only a closed key: it refuses a file body, a path, a URL or an unknown key with the governed refusal and keeps nothing. A loaded file is held only for the session and seat that loaded it and is unloaded by Reset, by a change of seat and at the end of the session; the browser receives none of its rows (section 3.4). Every fact from it carries the backend origin marker of decision 0035 item 3 and the "your inputs" tag; the loader states that the file stands for the company's own records and stays in this session, without an audience origin label (decision 0035 item 1). Tests: a scan of the built pages and a browser test find no file-input element and no drop handler on any page; the route loads each closed key and refuses each other body. | journeys |
@@ -512,7 +512,7 @@ Each view is a layout of a brief from the closed component catalogue of [09](09_
 
 ## 5. The Fact chip rule
 
-**Rule.** No numeral may be rendered anywhere in the interface except by the Fact chip family in `web/src/facts/`. A "numeral" is any character of Unicode category Nd: Western digits, Arabic-Indic digits and Extended Arabic-Indic digits all count. The one exception is `verbatim-quotation` of decision 0029: a character of the stored `pub_investqa_page.page_text`, rendered as one opaque run inside the body element of the `source_quotation` component.
+**Rule.** No numeral may be rendered anywhere in the interface except by the Fact chip family in `web/src/facts/`. A "numeral" is any character of Unicode category Nd: Western digits, Arabic-Indic digits and Extended Arabic-Indic digits all count. The one exception is `verbatim-quotation` of decision 0029: a character of the stored `pub_investqa_page.page_text`, rendered as one opaque run inside the body element of the `source_quotation` component. The answer shell resolves a fact through `web/src/facts/registry.ts` and refuses a missing link before any digit is drawn; the rule `eii/numerals-only-in-fact-chip` and `web/scripts/check-answer.mjs` are the build checks for that boundary.
 
 The family has four variants, all one component:
 
@@ -525,7 +525,7 @@ The family has four variants, all one component:
 
 Non-fact positions that need a number for assistive technology (for example the story position "step 3 of 10" in an `aria-label`) are produced by `formatUiOrdinal` in `src/facts/`, never by a literal or by `String(n)` elsewhere.
 
-**How the lint rule works.** A custom ESLint rule, `eii/numerals-only-in-fact-chip`, runs on every `.ts` and `.tsx` file outside `src/facts/` and reports:
+**How the lint rule works.** A custom ESLint rule, `eii/numerals-only-in-fact-chip`, runs on every `.ts` and `.tsx` file except `src/facts/FactChip.tsx`, `src/facts/NumericInput.tsx`, and `src/facts/formatters.ts`, and reports:
 
 1. JSX text containing a numeral;
 2. a string literal or template-literal part containing a numeral that is a JSX child, or the value of a rendered attribute (`title`, `alt`, `placeholder`, `label`, `aria-label`, `aria-description`, `aria-valuetext`);
@@ -535,7 +535,7 @@ Non-fact positions that need a number for assistive technology (for example the 
 
 Two companion checks run in the same CI step: a catalogue test that fails when `en.json` or `ar.json` contains a numeral or a number word from the versioned lexicon in `product/assistant/lexicons/` named by [09](09_AI_ASSISTANT.md) AI-38 (placeholders are allowed only for fact slots), and a search that fails on any `eslint-disable` comment naming this rule. The rule has its own RuleTester tests with cases for each item above and for each digit script.
 
-**What it exempts.** Files in `web/src/facts/`; test files and fixtures; numbers in non-rendered positions (style values, SVG geometry attributes such as `x`, `width`, `d` and `viewBox`, coordinates, array indices, `key` and `data-*` attributes); and basemap labels drawn by MapLibre from tiles. For the last, the style generator hides label layers that are numeric-only (house numbers and road reference numbers), and keeps official place and zone names, which are Public geography names (ASSUMPTION: zone numbers are part of public place names in Qatar and are not facts). The `/{lang}/_perf` route is exempt from the numeral rule and provenance audit, is registered only in development builds and is absent from the frozen bundle.
+**What it exempts.** `web/src/facts/FactChip.tsx`, `web/src/facts/NumericInput.tsx`, and `web/src/facts/formatters.ts`; test files and fixtures; numbers in non-rendered positions (style values, SVG geometry attributes such as `x`, `width`, `d` and `viewBox`, coordinates, array indices, `key` and `data-*` attributes); and basemap labels drawn by MapLibre from tiles. For the last, the style generator hides label layers that are numeric-only (house numbers and road reference numbers), and keeps official place and zone names, which are Public geography names (ASSUMPTION: zone numbers are part of public place names in Qatar and are not facts). The `/{lang}/_perf` route is exempt from the numeral rule and provenance audit, is registered only in development builds and is absent from the frozen bundle.
 
 **Runtime net.** In development builds a mutation observer outlines in red any text node with a numeral outside a chip. The gate is the provenance audit of section 13.
 
@@ -574,23 +574,27 @@ Layer order: basemap fill and line layers, then deck.gl data layers placed benea
 | Suppressed elements | `suppression_reason` | cell polygons with `FillStyleExtension` hatch; lock icon at the unit's centre | grey hatch with lock |
 | Zones and municipalities | `zone`, `municipality`, `pub_zone_utility`, `pub_licence_active` | `GeoJsonLayer` fill and outline | no origin word or texture; Public in backend metadata (decision 0035) |
 | Metro and tram | `pub_transit_monthly`, station points from the gazetteer | `ScatterplotLayer` | no origin word or texture; Public in backend metadata (decision 0035) |
-| Public places and real businesses | `pub_place`, `pub_place_fsq` and public listings | `ScatterplotLayer` or `IconLayer`; names in a MapLibre symbol layer, only while no Synthetic or Simulated hero layer is on | no origin word or texture; Public in backend metadata (decision 0035) |
+| Public places and real businesses (`public_places`) | `pub_place`, `pub_place_fsq` and public listings | `ScatterplotLayer` or `IconLayer`; names in a MapLibre symbol layer, only while no Synthetic or Simulated hero layer is on | no origin word or texture; Public in backend metadata (decision 0035) |
 | Register companies (`company_points`) | `pub_register_company`, each company at its registered location as the register publishes it; each point opens the company card (FE-115) | `ScatterplotLayer` or `IconLayer`; names in a MapLibre symbol layer, only while no Synthetic or Simulated hero layer is on | no origin word or texture; Public in backend metadata (decision 0035) |
 | Distance connectors | `scan_places` | `PathLayer` | no origin word or texture; Public in backend metadata (decision 0035) |
-| Announced investment projects | `fdi_projects`, at the geography the source states | `ScatterplotLayer` at that geography's gazetteer point; counts in the DOM legend; each mark opens the full project card, and card, list and legend carry the collapsed source credits and page caveat of FE-116 | no origin word or texture; Public in backend metadata (decision 0035) |
-| Property prices; construction pipeline | residential sales with their deal counts, and building permits and completion certificates, on their official geography ([04](04_PUBLIC_DATA_PACK.md)) | `GeoJsonLayer` fill and outline | no origin word or texture; Public in backend metadata (decision 0035) |
-| Night-time lights | `pub_night_lights`, by frame cell (whole pixels, no split) and month, with a Public month list of its own | `H3HexagonLayer`, flat fill on the five-class ramp, over resolution-9 cells, a resolution-8 frame cell drawn as its seven resolution-9 children ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 3) | no origin word or texture; Public in backend metadata (decision 0035) |
+| Announced investment projects (`fdi_projects`) | `fdi_projects`, at the geography the source states | `ScatterplotLayer` at that geography's gazetteer point, only for a project the gazetteer places; counts in the DOM legend stay supplied facts, each with its year, and the four filters hide list items without a count of the filtered list; each mark opens the full project card, and card, list and legend carry the collapsed source credits (plain-text and reference segments) and page caveat of FE-116 | no origin word or texture; Public in backend metadata (decision 0035) |
+| Property prices (`property_prices`); construction pipeline | residential sales with their deal counts, and building permits and completion certificates, on their official geography ([04](04_PUBLIC_DATA_PACK.md)) | `GeoJsonLayer` fill and outline; an apportioned district figure names its method and its official geography as `reference` chips | no origin word or texture; Public in backend metadata (decision 0035) |
+| Night-time lights (`night_lights`) | `pub_night_lights`, by frame cell (whole pixels, no split) and month, with a Public month list of its own | `H3HexagonLayer`, flat fill on the five-class ramp, over resolution-9 cells, a resolution-8 frame cell drawn as its seven resolution-9 children, each child keeping that parent's class and feature id ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 3); each supplied class key maps one-to-one onto `--eii-seq-1` through `--eii-seq-5` (DES-19); a missing, empty or unknown class is refused (`night_class_missing`), and a missing, empty or unknown direction is refused (`night_direction_missing`), with no break computed | no origin word or texture; Public in backend metadata (decision 0035) |
 | Satellite imagery (map mode) | the imagery provider's satellite imagery, fetched by the local server with `ESRI_API_KEY` and passed on from its own paths; in no table and never stored | a raster base under the product's own layers, shown only in the satellite mode (FE-141) | a picture; no provenance class, because no fact is read from it; its credits inside the collapsed map credits |
 | Photorealistic 3D (map mode) | The photorealistic 3D tiles of the provider that [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) records (PUB-109), requested only through the product's own same-origin route, where the server adds `MAPTILE_API_KEY`; in no table and never stored | a 3D-tiles layer in place of the basemap and its buildings, shown only in that mode (FE-148); the library layer is confirmed at its task from the current official documentation | a picture; no provenance class, because no fact is read from it; the attribution its tiles carry, visible while the mode is on |
 | Buildings of all of Qatar in 3D (with the clock) | canonical Overture buildings (decision 0077) with heights in the order of PUB-106 ([04](04_PUBLIC_DATA_PACK.md)), each with its height source | MapLibre `fill-extrusion`, lit by the clock (FE-143) | heights labelled estimates (FE-52) |
 | Home-to-work flows of "Talent available near this site" | released home-to-work totals as exact sums of published `home_area_share` rows from each whole home municipality to the site's snapped catchment (C39, PRV-131); no home location finer than the municipality ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A1) | flowmap.gl flow map, animated with deck.gl's `TripsLayer` as aggregate flows (FE-144) | no origin word or texture; Synthetic in backend metadata (decision 0035) |
 | The financial centre's firms per tower | register companies of `fc_register` counted per tower, and per district where no building is given ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)) | `ScatterplotLayer` sized by class at each tower; district counts as `GeoJsonLayer` fills (FE-145) | no origin word or texture; Public in backend metadata (decision 0035) |
-| Land guide prices | `pub_land_price`: the national GIS centre's 2026 guide prices by district (residential, city-centre residential, flats, villas and commercial) | `GeoJsonLayer` fill by class on the district geography | no origin word or texture; Public in backend metadata (decision 0035); a guide price, never a deal price or a rent (FE-153) |
-| Rail plan | `pub_rail_plan`: rail lines with planned stations and protection zones | `PathLayer` lines, `ScatterplotLayer` stations, `GeoJsonLayer` zone outlines | no origin word or texture; Public in backend metadata (decision 0035); planned stations labelled as plans (FE-153) |
-| Health centres and their catchments | `pub_health_centre` | `ScatterplotLayer` points; catchment outlines in a `GeoJsonLayer` | no origin word or texture; Public in backend metadata (decision 0035) |
-| Zoning | `pub_zoning`: permitted uses, height and setbacks | `GeoJsonLayer` boundary outlines, 1 px in `--eii-map-boundary`, never a fill by category (DES-212) | no origin word or texture; Public in backend metadata (decision 0035); on selection a permitted use shows as words; never an approval, a permit or availability (FE-153) |
+| Land guide prices (`land_prices`) | `pub_land_price`: the national GIS centre's 2026 guide prices by district (residential, city-centre residential, flats, villas and commercial) | `GeoJsonLayer` fill by class on the district geography; a feature with no closed class is refused (`night_class_missing`) | no origin word or texture; Public in backend metadata (decision 0035); a guide price, never a deal price or a rent (FE-153) |
+| Rail plan (`rail_plan`) | `pub_rail_plan`: rail lines with planned stations and protection zones | `PathLayer` lines, `ScatterplotLayer` stations, `GeoJsonLayer` zone outlines at 1 px in `--eii-map-boundary` even when the geometry kind is fill; a request to fill them is refused (`outline_filled`) | no origin word or texture; Public in backend metadata (decision 0035); planned stations labelled as plans (FE-153) |
+| Health centres and their catchments (`health_centres`) | `pub_health_centre` | `ScatterplotLayer` points; catchment polygons as `GeoJsonLayer` outlines at 1 px in `--eii-map-boundary` even when the geometry kind is fill | no origin word or texture; Public in backend metadata (decision 0035) |
+| Zoning (`zoning`) | `pub_zoning`: permitted uses, height and setbacks | `GeoJsonLayer` boundary outlines, 1 px in `--eii-map-boundary`, never a fill by category (DES-212) | no origin word or texture; Public in backend metadata (decision 0035); on selection a permitted use shows as words; never an approval, a permit or availability (FE-153) |
 | Plots | parcels of `pub_parcel` that tested code labels "Permitted by zoning and looks empty": a use that `pub_zoning` permits, no address point of `pub_address_point` and no building ([12](12_TESTING_AND_QUALITY.md) TST-247) | `GeoJsonLayer` outlines | no origin word or texture; Public in backend metadata (decision 0035); the plot label only (FE-153) |
-| Commercial points | `pub_poi_comm` | `ScatterplotLayer` | no origin word or texture; Public in backend metadata (decision 0035); Public facts only on a named business |
+| Commercial points (`commercial_points`) | `pub_poi_comm` | `ScatterplotLayer` | no origin word or texture; Public in backend metadata (decision 0035); Public facts only on a named business; the open-listings note |
+| Address points (`address_points`) | `pub_address_point` | `ScatterplotLayer`; no label on the point | no origin word or texture; Public in backend metadata (decision 0035); zone, street and building numbers as `reference` chips on selection |
+| Landmarks (`landmarks`) | landmark names of `gazetteer` from the centre's landmarks layer | `ScatterplotLayer` | no origin word or texture; Public in backend metadata (decision 0035) |
+| Land parcels (`parcels`) | `pub_parcel` | `GeoJsonLayer` outlines, 1 px in `--eii-map-boundary`, never a fill, including when the geometry kind is fill | no origin word or texture; Public in backend metadata (decision 0035); the plot label only when tested code has already marked the plot |
+| Official district and zone boundaries | absent; no table and no layer key | none: a catalogue sentence that the boundaries are not available; no outline, and never the frame geometry under the centre's source line | the sentence only |
 | Imagery history (fixed views) | a few fixed before-and-after views of the national GIS centre's imagery history (satellite 2003 to 2024, aerial 1995 to 2022), fetched by `./eii build-public` for the committed list of views and never committed (PUB-105); in no table | a picture on each side of the before-and-after swipe (FE-143) | a picture; no provenance class, because no fact is read from it; the centre's source line while it is on (FE-139) |
 | Live traffic (optional) | the provider's flow tiles, fetched by the local server and passed on from its own paths; in no table | a raster tile layer over local-path tiles (a MapLibre raster source or a deck.gl `TileLayer`, chosen at the spike) | a picture shown as the provider draws it; no provenance class, because no fact is read from it; the provider's attribution (FE-136) |
 | Optional 3D view | the unit statistic or the crowd density of the hero layer already on | the same `H3HexagonLayer` with extrusion on, a fixed height step for each class of the layer's five breaks | no origin texture (decision 0035 item 1); backend origin metadata remains (item 3; FE-138) |
@@ -598,7 +602,7 @@ Layer order: basemap fill and line layers, then deck.gl data layers placed benea
 
 Every layer keyed by frame cell or release unit draws a resolution-8 base cell as its seven resolution-9 children, never as its own hexagon. This covers the pay, crowd density, firm density and worker density rows, the optional 3D view and the `PolygonLayer` fallback. Every cell-set outline is traced over those resolution-9 cells, so that it equals the stored outline ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 3; FE-54).
 
-**Provenance textures.** Decision 0035 removes the audience origin legend and origin textures. The backend class mapping is unchanged; suppression retains hatch and lock and method limitations stay visible.
+**Provenance textures.** Decision 0035 removes the audience origin legend and origin textures. The backend class mapping is unchanged; suppression retains hatch and lock and method limitations stay visible. Since S3-T18 the layer legend draws one line sample only, the withheld hatch with its lock and word; no dotted or dashed sample is chosen by a provenance class (section "S3-T18 audience origin removal").
 
 **Particles.** Particles are drawn only from the aggregated, released `flow_hourly` table, for the selected stored hour. Bands 1 to 5 place 2, 4, 8, 16 and 32 particles on each released origin-destination pair. The layer caps at 50,000 particles by dropping pairs from the smallest band. The seed is 1. Paths are straight or arced between the two unit centres, never routed street traces. The legend states that a moving dot is a visual unit of a simulated aggregate flow, not a person or a trip. Agent trails are dropped; particles never carry an individual path.
 
@@ -608,7 +612,7 @@ Every layer keyed by frame cell or release unit draws a resolution-8 base cell a
 
 **Hourly layers.** Crowd density and the simulated traffic hold every stored hour of the selected day type, season and month in one data array, and the hour is selected by a filter uniform or an update trigger (FE-91). Playback steps through stored hours only (FE-106). These two layers are the only ones animated through the day ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md), item 19), and crowd density is always marked in backend metadata only (decision 0035), as is traffic with the default provider. The live traffic layer, when the provider is on, is a picture of current flow with no stored-hour payload; it has no hour control and is not played. The `presence` layer values of [08 Back end](08_BACKEND.md) (estimated people per unit) feed the presence card and its chart, not a map fill: release units differ in size, so the map shows people per square kilometre only.
 
-**Living map.** Real businesses from public places data and public listings, and the establishment points of the public business register, are context points. While a Synthetic or Simulated hero layer is on they stay unlabelled. Selecting a public place or listing opens its Public facts in a Public-only panel; selecting a register company opens its company card, with its published fields and its employee count only (FE-115). Firm counts and density come from the register; workers appear only as density and statistics by release unit from the attached records ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)). No layer, label, marker or panel shows a company's wages or other labour or residence detail. Named synthetic firms are retired.
+**Living map.** Real businesses from public places data and public listings, and the establishment points of the public business register, are context points. While a Synthetic or Simulated hero layer is on they stay unlabelled. The layer plate draws geometry only when a fact registry is supplied; without one it shows the catalogue refusal for `registry_absent` and mounts no geometry. A feature identifier is never rendered as text. A visible name comes from the feature's name words, or from typed name segments; a plain name segment that holds a digit is refused (`numeral_in_plain_segment`). A feature with company words and no name shows that company text, visibly and as its accessible name. A feature with neither a name nor company words shows the catalogue name `layers.feature.unnamed`. Every accepted layer, including one with no features, offers its source chain and its retrieval date when nothing is selected. Selecting a public place or listing opens its Public facts in a Public-only panel; selecting a register company opens its company card, with its published fields and its employee count only (FE-115). Firm counts and density come from the register; workers appear only as density and statistics by release unit from the attached records ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)). No layer, label, marker or panel shows a company's wages or other labour or residence detail. Named synthetic firms are retired.
 
 **Watermark.** Decision 0035 removes the data-origin watermark from the canvas, screenshots and exports. Method limitations and source access remain; FE-53 checks absence by script.
 
@@ -645,7 +649,7 @@ Every layer keyed by frame cell or release unit draws a resolution-8 base cell a
 - **Map modes.** Three modes share one switch ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7): the open map (the default and the only mode that needs no network), satellite (the imagery provider's satellite imagery under the product's own layers, online only, through the local server) and photorealistic 3D (the photorealistic 3D tiles of the provider that [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) records (PUB-109), online only, through the product's own same-origin route, where the server adds `MAPTILE_API_KEY`; the one paid service of that decision, capped by the owner at USD 20 in total; FE-148). One base shows at a time: the photorealistic 3D mode is never mixed with another basemap in one view. The open map is the mode of the guided story, every test and every gate.
 - **No third-party requests at run time.** The style contains no absolute URL to another host. The page sends a Content Security Policy that allows `'self'` (plus `blob:` and `data:` where MapLibre workers and images need them) and nothing else. Telemetry of any kind is absent.
 - **Label check.** Before slice S3 closes, a reviewer checks in both languages how the basemap names the Gulf, neighbouring territories and Qatari districts, and hides or edits labels as needed (design research: a mandatory check, not a known fault).
-- **Attribution.** OpenStreetMap and Protomaps attribution stays visible on the map (ODbL Produced Work); under decision 0077, Overture attribution and ODbL/contributor notices are shown whenever Overture-derived places or canonical building footprints are on screen, using the building manifest's record-level footprint-dataset counts and retained notices, Foursquare Open Source Places attribution whenever its places are on screen, the NASA acknowledgement with the product DOI whenever the night-lights layer is on, and the provider attribution "© TomTom" whenever the live traffic layer is on. The satellite credits, as the provider's imagery style carries them, show only inside the collapsed map credits, and only while the satellite mode is on (OI-132). The 3D-GloBFP credit "Che et al. 2024" shows while buildings are extruded to the heights of PUB-106, the national GIS centre's source line while one of its layers or imagery-history views is on, and the attribution that the photorealistic 3D tiles carry while that mode is on (FE-139). The satellite imagery provider's credit is written in one line of web code only: the one line of `web/src/stage/attribution.ts` (a leading byte-order mark ignored) that is `export const MAP_ATTRIBUTION`, optionally `: string`, ` = `, one template literal with no backquote, backslash or dollar sign or one quoted string with no backslash and no quote of its own kind, and a semicolon, at column 0, starting outside every comment, string, template and bracket; the file may hold other code and comments, but no second such line, no hashbang line, no vertical tab, form feed, U+001C to U+001E, U+0085, U+2028, U+2029 or carriage return not followed by a line feed, no slash outside comments, no template substitution, no unclosed comment, string or template and no unbalanced bracket. A template literal keeps the line whole under the formatter. The credit is shown as written in both languages and is not in `src/i18n/en.json` or `ar.json` (an exception to the Strings rule of section 8); no translated, transliterated or shortened form of the provider's name is written anywhere. A name of the private list passes there only under TST-263 ([12](12_TESTING_AND_QUALITY.md)).
+- **Attribution.** OpenStreetMap and Protomaps attribution stays visible on the map (ODbL Produced Work); under decision 0077, Overture attribution and ODbL/contributor notices are shown whenever Overture-derived places or canonical building footprints are on screen, using the building manifest's record-level footprint-dataset counts and retained notices, Foursquare Open Source Places attribution whenever its places are on screen, each source row's attribution and publisher rendered together on the layer plate as the payload's ordered plain-text and reference segments and a record credited from its own source row, the NASA acknowledgement with the product DOI whenever the night-lights layer is on, and the provider attribution "© TomTom" whenever the live traffic layer is on. The satellite credits, as the provider's imagery style carries them, show only inside the collapsed map credits, and only while the satellite mode is on (OI-132). The 3D-GloBFP credit "Che et al. 2024" shows while buildings are extruded to the heights of PUB-106, the national GIS centre's source line while one of its layers or imagery-history views is on, and the attribution that the photorealistic 3D tiles carry while that mode is on (FE-139). The satellite imagery provider's credit is written in one line of web code only: the one line of `web/src/stage/attribution.ts` (a leading byte-order mark ignored) that is `export const MAP_ATTRIBUTION`, optionally `: string`, ` = `, one template literal with no backquote, backslash or dollar sign or one quoted string with no backslash and no quote of its own kind, and a semicolon, at column 0, starting outside every comment, string, template and bracket; the file may hold other code and comments, but no second such line, no hashbang line, no vertical tab, form feed, U+001C to U+001E, U+0085, U+2028, U+2029 or carriage return not followed by a line feed, no slash outside comments, no template substitution, no unclosed comment, string or template and no unbalanced bracket. A template literal keeps the line whole under the formatter. The credit is shown as written in both languages and is not in `src/i18n/en.json` or `ar.json` (an exception to the Strings rule of section 8); no translated, transliterated or shortened form of the provider's name is written anywhere. A name of the private list passes there only under TST-263 ([12](12_TESTING_AND_QUALITY.md)).
 
 | ID | Requirement | Slice |
 |---|---|---|
@@ -657,7 +661,7 @@ Every layer keyed by frame cell or release unit draws a resolution-8 base cell a
 | FE-139 | The attribution of each source on screen is visible while its layer, places, view or map mode is on: under decision 0077, Overture and ODbL with the contributing footprint datasets' recorded notices while buildings are drawn; "© TomTom" while the live traffic layer is on, the NASA acknowledgement with the product DOI while the night-lights layer is on, the clock's night lights at dusk included (FE-143), and the Foursquare Open Source Places attribution while its places are on. [Decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) adds: the 3D-GloBFP credit "Che et al. 2024" (CC BY 4.0) while buildings are extruded to the heights of PUB-106, with the WSF 3D credit as recorded at its first fetch where a height comes from it; the source line of the national GIS centre (publisher, service name, public map service, retrieval date, the publisher's terms as recorded in document 04) while one of its layers or imagery-history views is on (FE-153); the satellite credits, as the imagery provider's imagery style carries them, only inside the collapsed map credits and only while the satellite mode is on (FE-141); the attribution that the photorealistic 3D tiles carry, while that mode is on (FE-148); and, if the offline satellite opening shot of that decision's item 13 is built, "Contains modified Copernicus Sentinel data" while it is on screen. Each credit leaves the screen when its layer, view or mode is turned off. | map foundation |
 | FE-140 | The map-mode switch offers the open map, satellite and photorealistic 3D ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7). The open map is the default, the only mode that needs no network, and the mode of the guided story, every test and every gate. The satellite control is hidden when `ESRI_API_KEY` is absent. When that key is present, offline operation and network failure show the satellite control disabled with its reason. The photorealistic 3D control stays disabled, and is not hidden, when `MAPTILE_API_KEY` is absent, for offline operation, for network failure and when the owner's spend cap is reached. Those disabled states never break the open map; switching modes keeps the camera, the hero layer and the drawn area. A component check with `ESRI_API_KEY` absent finds no satellite control, beside TST-248's planted case that a request to the provider's hosts without the key fails. A component check with the key present and the offline control set, and one with the network down, finds the satellite control disabled with its reason. A component check at the photorealistic spend cap finds that control disabled with its reason. One base shows at a time, and the photorealistic 3D mode is never mixed with another basemap in one view (FE-148). | slice S3 |
 | FE-141 | The satellite mode shows the imagery provider's satellite imagery under the product's own layers. It is offered only with `ESRI_API_KEY` present and the presenter's offline control not set; its tiles are requested only from the local server's own paths, the browser never holds the key, and no tile is cached by the page or stored by the server ([13](13_DEPLOYMENT_AND_OPERATIONS.md) OPS-73). Its credits show only inside the collapsed map credits, and only while the mode is on. Tests and continuous integration never call the provider; a planted request to the provider's hosts without the key fails, and FE-56 still blocks every non-same-origin request. | slice S3 |
-| FE-148 | The photorealistic 3D mode ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7) shows the photorealistic 3D tiles of the provider that [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) records (PUB-109), the one paid service of that decision. It is offered only with `MAPTILE_API_KEY` present and the presenter's offline control not set, and it runs online only. Every request of the mode, for the tileset and for each tile, goes only to the product's own same-origin route, where the server adds the key ([08 Back end](08_BACKEND.md) fixes the route); the browser never holds the key, and no tile is cached by the page or stored by the server. The mode is never mixed with another basemap in one view: the open map's basemap, its buildings and the satellite imagery are off while it is on, and the product's own layers and legend plates stay, without origin textures or watermark (decision 0035) (DES-206). One view loads at most 600 tiles, and a test with a hand-made fixture fails if one view requests more. The server counts every billable tile request project-wide and refuses requests once the count reaches the owner's cap of USD 20 in total; the switch then shows the mode disabled with its reason and keeps the open map (FE-140). The attribution its tiles carry is visible while the mode is on (FE-139). Tests and continuous integration never call the provider: a hand-made fixture serves the route in tests, and FE-56 still blocks every non-same-origin request. | slice S3 |
+| FE-148 | The photorealistic 3D mode ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7) shows the photorealistic 3D tiles of the provider that [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) records (PUB-109), the one paid service of that decision. It is offered only with `MAPTILE_API_KEY` present and the presenter's offline control not set, and it runs online only. Every request of the mode, for the tileset and for each tile, goes only to the product's own same-origin route, where the server adds the key ([08 Back end](08_BACKEND.md) fixes the route); the browser never holds the key, and no tile is cached by the page or stored by the server. The mode is never mixed with another basemap in one view: the open map's basemap, its buildings and the satellite imagery are off while it is on, and the product's own layers and legend plates stay, without origin textures or watermark (decision 0035) (DES-206). No view has a per-view tile budget: a test with a hand-made fixture serves a view past the former per-view allowance below the ceiling; the only stop is the project-wide ceiling `SPEND_CEILING_USD`, warned before at `WARNING_FRACTION`, and a registered view expires 10,800 seconds after it starts and one view's tile set is refused above 10,000 aliases, as security bounds, not spend rules ([decision 0063](decisions/0063-the-photoreal-spend-meter-and-the-operational-fact-chip.md)). The server counts every billable tile request project-wide and refuses requests once the count reaches the owner's cap of USD 20 in total; the switch then shows the mode disabled with its reason and keeps the open map (FE-140). The attribution its tiles carry is visible while the mode is on (FE-139). Tests and continuous integration never call the provider: a hand-made fixture serves the route in tests, and FE-56 still blocks every non-same-origin request. | slice S3 |
 
 ## 8. Bilingual and right-to-left rules
 
@@ -752,7 +756,7 @@ Before an answer is shown, the product plane runs the fixed accounting gate: Sou
 
 ## 11. Accessibility
 
-Target: WCAG 2.2 Level AA for every route, with these specific requirements. Decision 0042 item 7 adds a single-pointer non-drag alternative to every drag, including named-area choice and click-to-place vertices for area drawing; keyboard support alone does not meet this requirement.
+Target: WCAG 2.2 Level AA for every route, with these specific requirements. Decision 0042 item 7 adds a single-pointer non-drag alternative to every drag, including named-area choice and click-to-place vertices for area drawing; keyboard support alone does not meet this requirement. A placed vertex can be moved by tapping its knob then tapping its destination, including after closure; the selection clears after that move. A visible Cancel button returns the drawing to idle and restores map gestures in both languages. Crosshair focus clears any knob selection before arrow-key movement.
 
 | ID | Requirement | Slice |
 |---|---|---|
@@ -879,7 +883,7 @@ Open points from decisions 0016 and 0017:
 - OPEN: the limits on a drawn polygon (vertices, size, frame) and any radius or travel-time presets beyond the closed lists are fixed in [08 Back end](08_BACKEND.md) with the closure checks of [06 Privacy and disclosure control](06_PRIVACY_AND_DISCLOSURE_CONTROL.md).
 - The four dial situations select hours of the hourly day types through `situation_windows`, and the event day types are released with `summer = false` only ([03 Data contracts](03_DATA_CONTRACTS.md) DAT-76); the summer switch is disabled on the three event days ([05 Synthetic world and simulation](05_SYNTHETIC_WORLD_AND_SIMULATION.md) SYN-52). The controls follow.
 - [Decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) items 6 and 17 keep decision 0006 items 3 and 4 for protected figures only: any requested or drawn shape snaps to whole release units before a protected figure is read, as FE-109 does and as PRV-17 of [06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) and `make_area` of [08](08_BACKEND.md) confirm.
-- OPEN: the drawing approach and its pin are chosen at the slice S1 spike (FE-102).
+- The drawing approach chosen in S3-T13 is in-house pointer handling, recorded in [web/REFERENCE_NOTES.md](../web/REFERENCE_NOTES.md); a pinned drawing library is the retreat and no library is pinned (FE-102). The Stage keeps the map object and passes out only `project` and `unproject`, plus the measured frame. When the Stage builds no map, it registers no projection and the drawing tools stay unavailable, so no area request is built. While a shape is being drawn or edited, the handlers `dragPan`, `scrollZoom`, `boxZoom`, `dragRotate`, `doubleClickZoom`, `touchZoomRotate`, `touchPitch` and `keyboard` are suspended, and they are restored on submit, Escape and unmount. The Stage subscribes, through the same handle, to the map events `move` and `resize` read from the installed maplibre-gl 6.17.0 typings (`MapEventType`), publishes a render revision and refreshes the frame, and unsubscribes on cleanup. A map event that leaves the Stage is a drawing event of primitive coordinates and a key. The handler pages, Map.project, Map.unproject and MapMouseEvent were read on 2026-11-16 and recorded in that file. The `move` and `resize` names were read from those installed typings on 2026-11-16; their website pages were not fetched in this pass, so the wiring statement stays a pack row marked not verified.
 - OPEN: the FDI source's location field may name a place coarser than a point; the FDI layer draws only at the geography it names (FE-116), confirmed against the page structure at slice S2 ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)).
 - OPEN: the public source of tenders is named by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 10 (`tenders_pub`, [04 Public data pack](04_PUBLIC_DATA_PACK.md) PUB-108); its visitor-readable pages are fetched in S2-T19 and shown in full once their checks pass. Terms are recorded in document 04 and any permission needed for real use in document 17; they do not hold back version 1 ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)).
 - OPEN: the closed layer keys `night_lights` and `live_traffic`, the switch of the 3D view and the traffic provider field of `GET /health` are fixed in [08 Back end](08_BACKEND.md); this document states the front end's expectation, and 08 wins.
@@ -948,3 +952,237 @@ Unless dated otherwise, retrieved 2026-11-11, through the stack research and des
 Under [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) items 4 and 5 (S2-T51), `POST /api/address-search/structured` accepts exactly string fields `zone`, `street`, `building`, with no text, language, limit, URL, utility account, PIN or person field. It reads only `pub_address_point` and returns bounded, feature-key-ordered candidates with published subtype/point and release/source lineage, and found, ambiguous, not-found or missing-source status. Duplicate triples remain ambiguous; nothing guesses a point. The request and result never enter a log, ledger, model payload or persisted query/result store. The fixed read `structured-address-v1` and composite index apply in both stores. The model has no callable tool for this route. Every displayed address numeral uses the Fact chip family.
 
 `GET /api/gis-imagery/{date}/{level}/{row}/{column}` serves only explicitly selected verified released pictures, with credits from `/api/gis-imagery/credit`; the page shows the selected date's publisher, service, retrieval date and terms/basis while imagery is visible (PUB-110). A missing snapshot remains missing coverage. No product reader imports custodian code, contacts the centre, reads the external root or infers a number from a tile. Level 11 and free text are refused by name before any send, with keys present/absent and offline control set/unset. This supplement leaves BE-135, BE-136, AI-130, FE-142, TST-248, TST-249, OPS-73 and the keyed provider unchanged.
+
+## S3-T16 Part A component boundary
+
+The in-progress `MapModeSwitch` consumes a closed availability object, hides
+satellite without its key, shows disabled reasons and keeps the open map
+selected when a requested mode is unavailable. Its words use the bilingual
+catalogues; Arabic additions await native review. The existing Stage credits
+component accepts a runtime credit: satellite credits appear inside collapsed
+map credits during satellite mode, while photorealistic credits occupy the
+footer without an open-map credit.
+
+`Swipe` provides a non-drag comparison: both scenario states stay visible,
+buttons select emphasis, and reset immediately restores baseline emphasis.
+Values resolve through Fact chips and the existing registry; both facts must
+be in a user scenario with user-input lineage. The typed imagery-history
+input reserves fixed before/after view identities and draws nothing until
+S2-T19 integration. No imagery history is fetched or invented.
+
+The Stage now mounts these controls and reads the closed availability object
+through the existing local fetch layer. Disabled choices retain open mode and
+show their reason. Mode rendering replaces the basemap style, requests remote
+bytes with no-store, and scopes runtime credits to the active mode. These
+paths are fixture-tested, not verified against a live provider. Part P adds the
+qualified tile layer to the existing interleaved overlay. The switch consumes
+server availability; initialization and tile failures restore open mode without
+automatically allocating another view. Each view has its own layer identity;
+clock and payload updates retain it. Arabic and native appearance review remain
+open.
+
+The native adapter validates child references and rewrites them to query-free,
+view-bound local aliases. Native session metadata is memory-only and expires
+on disposal, restart or three hours after the root request. A view sends its
+root once. Existing closed path/query guards and the budget transaction remain;
+child JSON requests count against the project-wide count, with no per-view
+budget ([decision 0063](decisions/0063-the-photoreal-spend-meter-and-the-operational-fact-chip.md)).
+The browser keeps its application view query inside transport, including the response URL
+exposed to the loader, and every tile request uses no-store and cancellation.
+
+The qualified content path accepts embedded GLB geometry with Draco and embedded
+PNG images; the browser fixture proves Draco and PNG. Other required
+extensions and external resources are refused before nested loading. Decoder
+assets have exact hashes, local module overrides and disabled loader workers.
+Hash-checked dependency replacements remove remote defaults and URL-bearing
+error messages. Decoder notices ship unchanged; their exact identity entries
+are the separate approval part specified by ruling L-753. Visible tile copyright
+is aggregated in the existing photoreal credit slot and removed on exit.
+Fixture proofs do not establish live compatibility, terms, pricing or native
+appearance. The server journal and the project-wide ceiling remain Part A
+responsibilities; there is no per-view budget
+([decision 0063](decisions/0063-the-photoreal-spend-meter-and-the-operational-fact-chip.md)).
+
+### S3-T16 Part A clock control under implementation
+
+`ClockScrubber` accepts a day basis and defaults to the current Asia/Qatar
+calendar day (ASSUMPTION under decision 0048 item 3). Its continuous fraction
+selects an instant within that local day. The direct input uses the Fact input
+family and the day uses a reference chip. There is no playback or district
+setting. The Stage passes the instant to the existing overlay; experimental
+pinned SunLight supplies the direction, converted to the MapLibre map-anchored
+light position. Sky atmosphere follows the vertical direction. Transitions
+for light and sky are immediate. The existing night layer fades at the sun's
+horizon using the DES-59 scene token, with immediate changes under reduced
+motion. No fact, stored hour or payload changes. The layer retains its own
+month, radiance wording and source acknowledgement; native rendering still
+needs verification.
+
+Official light, sky and setter readings are recorded in
+`web/REFERENCE_NOTES.md`, MapLibre GL JS 6 S22–S24 and deck.gl 9.4 S13–S16.
+Light and sky now cite the official specification source under the checker's
+accepted GitHub prefix. GPU integration and native visual review remain required.
+Decision 0042 item 7 retains the pinned RTL plugin, installed by the lead and
+loaded lazily at map boot from a bundled same-origin asset (MapLibre S25–S26).
+The package exports its source entry rather than its distribution subpath, so
+the asset import uses the installed distribution file directly. Its unchanged
+licence and ICU notice ship through `dist/licences`, with the existing exact
+path and SHA-256 licence mechanism; this adds no executable-host allowance.
+The API's linked right-to-left example returned not found at this reading;
+its content is not claimed as READ. S6-T35 retains the native shaping review.
+
+Scenario states are typed inputs, with distinct invented fixtures in the
+mounted-Stage tests. A tested scenario producer remains S7-T01; these fixtures
+do not complete that criterion. Screen tests read wrapping styles and target
+sizes from mounted controls in both directions. They do not replace the native
+size-matrix screenshots or an independent review. Part A is not approved.
+
+Part P starts native tile traversal on root completion using the current viewport,
+including when the root finishes after a viewport-change pass. Embedded PNG
+decoding explicitly requests ImageBitmap output; exit closes decoded images.
+The delayed-root unit regression and the native WebGL fixture cover these paths.
+
+Runtime satellite and photoreal credits use the existing published-text reference
+Fact chip. Their source text is kept intact, including a year or other reference
+numeral; the shared chip supplies directional isolation in either UI language.
+
+
+### S3-T16 Part P fix pass: transport and restoration
+
+Under FE-140 and FE-148, local renderer construction failures retain the existing
+`renderer_unavailable` reason in both languages. View and tile failures restore
+open and refresh server availability without allocating another view. The view
+adapter retains a valid allocated identifier before accepting the complete
+response schema, and deletes it once on rejection or late cancellation.
+
+Both hash-pinned library loaders fetch their executable assets with `no-store`
+and redirect refusal, rejecting unsuccessful responses and locations outside the
+closed asset path. The unused application decoder transport is removed. The
+qualified Draco executable assets ship; Basis transcoder assets are removed
+from the build. Their notice identity rows and tests are removed in the
+separately reviewable notice patch. All remaining notice identities and host
+rules retain their bytes.
+
+Every pinned dependency replacement must match during a build. The closure test
+builds the current web configuration in memory and reads its returned manifest,
+without reading or writing the shared production output. The unrelated
+performance production test still builds and reads that output; it remains
+outside this finding's changes. Fixture tests and planted violations cover
+malformed views, cap restoration and service-worker registration attempts.
+
+
+### S3-T16 Part P fix pass 2: content validation and root refusal
+
+Under FE-148, the qualified GLB path accepts one JSON chunk followed by at
+most one binary chunk, with no trailing chunk or bytes. Every embedded image
+must reference bytes inside that binary chunk and carry the PNG signature as
+well as the PNG media type. The native fixture includes a GIF under that label
+and requires mode failure and restoration of the open map.
+
+Root-load rejection is routed through the pinned layer's existing error callback
+with the fixed unavailable message. The adapter wraps the pinned private
+`_loadTileset` method; a dependency update must requalify that integration.
+Fixture cases cover a refused root, malformed JSON and a missing root, checking
+one failure callback, one view deletion, layer removal and no page error or
+payload-bearing log. These invented cases do not establish live compatibility.
+The fixture build refuses an unset output directory, and its worker owns and
+removes its temporary build folder. The existing browser test command checks
+that no fixture build folder survives the run.
+
+### S3-T16 Part P fix pass 3: sublayer and traversal refusal
+
+An error raised in a tile's sublayer is routed through the pinned layer's
+existing error callback with the fixed unavailable message, by the layer's
+`_subLayerProps` entry for its `scenegraph` sublayer. It is raised after the
+current step, because the pinned layer manager drops a layer list that is set
+while it updates its layers. An update of the tile set that is refused, an
+error thrown by its traversal, and an error thrown after a tile's content has
+loaded are routed the same way, by an instance wrapper on the pinned layer's
+private `_updateTileset` method that guards the tile set's `selectTiles`,
+`doUpdate` and private `_onTileLoad`. A dependency update must requalify both
+integrations. Fixture cases plant an invented primitive mode that passes
+validation and parsing and is refused by the scene builder, the same tile on a
+page that does not return to the open mode, an invented value in place of a
+tile's list of removed extensions that the tile set refuses after the tile's
+content has loaded, and two invented bounding volumes, one refused when the
+tile set builds its tiles and one refused by its traversal, checking one
+failure callback, one view deletion, removal of the layer from the overlay's
+list and from the map-layer library's own list, and no page error or
+payload-bearing log. These invented cases do not establish live compatibility.
+
+## S3-T18 audience origin removal
+
+S3-T18 removes the audience origin marks of the map foundation under
+decision 0035 items 1, 2 and 6. The source drawer shows no class word, no
+class shape and no list of input classes; a withheld fact keeps its lock
+and the word for Suppressed, and the evidence status, method and version,
+the sources with their publishers, coverage, caveats, reliability and the
+receipt stay. The layer
+legend keeps one line sample, the withheld hatch with its lock; the dotted
+and dashed origin samples and their styles are gone, as are the class
+marks of the FDI panel and the split chip. A layer that has no map yet is
+refused with the catalogue sentence `layers.refused.pending` ("This layer
+has no map in this version"), which names no data origin; the earlier
+sentence that named a class is removed. The removed catalogue keys are
+`drawer.inputs`, `drawer.class.public`, `drawer.class.synthetic`,
+`drawer.class.simulated` and `layers.refused.class`; no Arabic string was
+added. The answer check treats `drawer.class.suppressed` as the only
+withheld-word key, so a class word planted under another drawer class key
+fails it.
+
+The fact registry, its `provenance` and `input_classes` checks, the
+refusal of a synthetic input without its feed and every suppression rule
+are unchanged; backend provenance is validated as before and is not drawn.
+Component tests in `web/tests/component/audience-origin.test.tsx` check
+every mounted surface in both languages for origin words in visible and
+accessible text and for origin-driven styles, and check that a withheld
+fact shows neither zero nor its hidden count; each guard has its own
+planted violation. A browser test renders the opened drawer and the layer
+plate at the eight sizes of decision 0049, both orientations of the two
+phone sizes included, in both languages. Backend origin markers and the
+truthful naming of the producing pipeline are checked by
+`eii_product.backend_origin` on invented fixtures only; the placement of
+those fields in the release, database and ledger schemas belongs to
+S4-T01, S5-T04 and S9-T01. Captures, exports, voice and the broader
+aggregation surface do not exist yet and are not claimed; the standing
+script of S3-T19 is separate. Arabic wording is not claimed as approved.
+
+## S3-T10 Public opening implementation
+
+The `/` entry mounts the bilingual opening and its existing persistent Stage
+through `MountedPublicShell`. Language changes update `lang`, `dir` and the
+`lang` query parameter without changing routes or rebuilding facts. Only the
+provided site-choice journey becomes an action; the other journey descriptors
+stay closed until their producing slices supply them (decision 0042 item 7).
+
+Before the first story frame, bootstrap loads both bundled interface font
+families at their shipped weights with text in their actual scripts. An absent
+font refuses readiness. The method follows the official
+[FontFaceSet.load reference](https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/load),
+read before implementation on 2026-11-20. Map controls and the layer inspector
+remain reachable in collapsed panels; the phone sheet keeps its own stacking
+context and selected activity/place names remain visible.
+
+The site scene reuses the offline resolver, existing drawing tools, returned
+area outlines and session shape registration. The exact selected polygon,
+radius, walk or free-flow drive projection reaches `site_check`. Its buffered
+stream must finish with the accounting receipt and template-writer status;
+stream prose never renders. Cards C36 and C38 are read again through their
+fixed tool projections and matched by fact ID to the checked stream. C37 uses
+a selected listed place's verified Fact geography in the existing `place:`
+namespace, never a feature-ID guess; its returned observations are selected
+without changing the underlying facts. All three cards reuse S3-T14's disclosure
+levels and the shared registry/drawer. Layer changes reapply the last successful
+area response's point-membership lists and preserve source polygons.
+Returned method, publisher, dataset and licence text in that drawer also use
+reference Fact chips, including any numerals in those fields. The browser fixture
+keeps its operational budget-journal path inside its disposable work directory.
+
+The mounted electricity layer supplies `ranked_ratio`, not the approved Scene 0
+growth slot. Under L-1136 C3, the opening renders the catalogue fragment
+`opening_electricity_unavailable`; it supplies no substitute value. The dated
+opening-chip criterion stays unmet until the lead verifies the actual slot,
+period and wording. Native approval, independent design review and live
+release/two-store evidence remain gate requirements. The task's built-bundle
+browser proof uses only invented local assets and a disposable loaded fixture;
+it is not that live evidence. No visual baseline is changed.

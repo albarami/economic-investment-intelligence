@@ -211,7 +211,7 @@ class RealNotes(unittest.TestCase):
             len(lib.rows) for lib in tables.LIBRARIES[tables.DOCS]
         ]
         self.assertEqual(pin_rows, [2, 4, 2, 1, 3, 2])
-        self.assertEqual(len(tables.OFFICIAL), 13)
+        self.assertEqual(len(tables.OFFICIAL), 15)
         self.assertEqual(len(tables.CLAIM_WORDS), 13)
         self.assertEqual(len(tables.RULES), 23)
         self.assertEqual(len(tables.TABLES), 5)

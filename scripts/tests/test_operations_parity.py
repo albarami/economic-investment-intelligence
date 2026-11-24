@@ -89,6 +89,27 @@ def assert_parity(text: str, kind: str, actual: set[str]) -> None:
 
 
 class OperationsParity(unittest.TestCase):
+    def test_each_operations_name_is_required_in_each_inventory(self) -> None:
+        text = DOCUMENT.read_text()
+        names = {
+            "EII_ENVIRONMENT",
+            "EII_LISTEN_HOST",
+            "EII_API_PORT",
+            "EII_STATE_DIR",
+            "EII_OPERATION_RECORD",
+            "EII_SOURCE_RELEASE_DIR",
+            "EII_APPLICATION_ARCHIVE",
+        }
+        for kind in ("example", "tree"):
+            for name in sorted(names):
+                actual = documented(text, kind)
+                self.assertIn(name, actual)
+                with (
+                    self.subTest(kind=kind, name=name),
+                    self.assertRaisesRegex(AssertionError, "inventory differs"),
+                ):
+                    assert_parity(text, kind, actual - {name})
+
     def test_document_and_code_inventories(self) -> None:
         text = DOCUMENT.read_text(encoding="utf-8")
         examples = set(

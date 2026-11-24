@@ -44,7 +44,7 @@ All three packages use a `src` layout: `core/src/eii_core/`, `custodian/src/eii_
 | `facts` | The pinned fact object as a strict Pydantic model; deterministic `fact_id`; the reliability band helper that applies the rule in document 06. |
 | `manifest` | Manifest model, canonical hashing, `release_id` check, and the allow-list of release table names from the master design (section 5.4). |
 | `grid` | H3 helpers: the base cell of a point by index ownership (the stored cell that is the point's resolution-9 cell or that cell's resolution-8 parent, or none; [03](03_DATA_CONTRACTS.md) section 1.1), the outline of a resolution-8 base cell as the union of its seven resolution-9 children, cell to parent, distance rings, and a polygon or circle to frame cells under the containment rule of BE-84. It never derives a resolution from Greater Doha or the municipality, and never substitutes a nearest cell. No database access. |
-| `shapes` | The canonical form and SHA-256 of a drawn polygon; its validity checks (a simple polygon inside the mapped land area of [03](03_DATA_CONTRACTS.md) section 1.1, the union of the eight municipality polygons and not the union of stored cell shapes, within the vertex and size limits fixed at the slice S2 gate); exact point-in-shape tests for Public points; the representative point of a shape for travel times (ASSUMPTION). No database access. |
+| `shapes` | The canonical form and SHA-256 of a drawn polygon; its validity checks (a simple polygon inside the mapped land area of [03](03_DATA_CONTRACTS.md) section 1.1, the union of the eight municipality polygons and not the union of stored cell shapes, within 500 vertices, a request body of at most 64 KiB, and at most 50 shapes held per session (decision 0061 item 5)); exact point-in-shape tests for Public points; the representative point of a shape for travel times (ASSUMPTION). No database access. |
 | `ids` | All five synthetic identifier formats (`SYN-E-…`, `SYN-L-…`, `SYN-G-…`, `SYN-P-…`, `SYN-F-…`) and the complete `SYN-[ELGPF]-` pattern used to reject them in released data. The pattern exempts no column: since [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) retired the firm list and its `firm_key`, a match in any column of any table, a `SYN-E-` value included, is rejected ([03](03_DATA_CONTRACTS.md) DAT-83, DAT-140). A register company's `registration_number` is the register's Public key, not a synthetic identifier; it stands only in `register_company_list`, `pub_register_company` and `pub_register_snapshot` (DAT-164, [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12). |
 | `text` | Normalisation for matching: Unicode NFKC, case folding, Arabic normalisation (unify alef variants, remove diacritics and tatweel, unify final yaa and taa marbuta forms). ASSUMPTION: these steps are pending native review (OI-09). |
 | `situations` | The four situations (`weekday_lunch`, `weekday_evening`, `friday_evening`, `ramadan_iftar`) and the `summer` switch rule; the closed hour, day and month key lists of the release (document 03), the day keys including the three event days of decision 0016. |
@@ -64,7 +64,7 @@ All three packages use a `src` layout: `core/src/eii_core/`, `custodian/src/eii_
 | `tools/` | `registry.py`, one module per tool of section 6.2, `areas.py` (area ids and snapping), `routing.py` (pyvalhalla with the hourly link speeds), `fact_builder.py`. |
 | `traffic_provider/` | The adapter of the optional traffic provider (BE-129 to BE-131): the flow-tile proxy and the traffic-aware drive-time area for `make_area`. It is called only by the API process, holds the key in memory only and writes nothing; `eii_core` never imports it. |
 | `imagery_provider/` | The adapter of the imagery provider ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 7; BE-135 to BE-137): the satellite-tile proxy and the address search. It is called only by the API process, holds the key in memory only and writes nothing; `eii_core` never imports it. |
-| `photoreal_tiles/` | The adapter of the photorealistic 3D mode ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 7; BE-139): the same-origin tile proxy, its project-wide request count and its view budget. It is called only by the API process, holds the key in memory only and writes nothing but the request count; `eii_core` never imports it. |
+| `photoreal_tiles/` | The adapter of the photorealistic 3D mode ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 7; BE-139): the same-origin tile proxy, its project-wide spend meter and hard ceiling. It is called only by the API process, holds the key in memory only and writes nothing but the request count; `eii_core` never imports it. |
 | `assistant/` | `playbooks/` (the playbooks of document 09 and their evidence bundles) and `templates/` (template writer and status templates); the other sub-folders (parser, router, model loop, validator, memo, egress scan, providers) are specified in document 09. |
 | `ledger/` | `postgres.py`, `local.py` (SQLite local ledger), `egress_store.py`. There is no seed module: the ledger starts empty and holds only questions asked ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12; BE-76). There is no oversight module: item 15 of that decision removed the oversight seat with its read functions, and the ledger stays only as the internal question log, with no screen. |
 | `api/` | FastAPI application, routes, server-sent events, seat handling, presenter routes, the drawn-shape and case routes (section 8.3), the flow-tile route of the traffic provider, the satellite-tile and address-search routes of the imagery provider and the tile route of the photorealistic 3D mode (section 8.1), `session_store.py` (BE-109), static files (built front end, PMTiles, glyphs). |
@@ -81,6 +81,9 @@ All three packages use a `src` layout: `core/src/eii_core/`, `custodian/src/eii_
 | BE-06 | The front end (`web/`) reaches the backend only over HTTP; no Python module serves data to it by any other route. |
 | BE-102 | `eii_product` never imports or invokes the typed-decision gateway and does not read `EII_DECISION_PROVIDER` or `JEV_PRO_API_KEY`; those variables belong only to explicit offline build/evaluation scripts. The separate `gateway/` package (`eii_gateway`) is imported only by tooling under `evals/` and `scripts/`; nothing under `core/`, `custodian/` or `product/` imports it. |
 | BE-109 | `api/session_store.py` holds drawn shapes, traffic-aware drive-time areas fetched through the provider adapter (BE-130) and case sample files in process memory only, keyed by the verified `eii_seat` session and its seat. It has no disk, database, cache or log path. An entry is never visible to another session or another seat, and every entry is dropped when its session ends, at `./eii down` and at every restart. No `app` table holds any of them (DAT-149). |
+
+Interim S3-T22 amendment ([decision 0061](decisions/0061-public-routes-of-slice-s3.md) item 6): until S9-T02, shapes use the random `eii_session` cookie with an empty seat, HttpOnly, SameSite=Strict and Path=/, with no Secure flag on loopback HTTP until S3-T20. Storage is process memory only, cleared on restart. At most `SESSION_CAP` live sessions (default 1,000) are admitted; a new session beyond it is refused with `RATE_LIMITED` and no allocation, eviction or Set-Cookie. Existing sessions keep working. Admission and insertion share one lock. No client-supplied unknown session key is adopted.
+
 
 ## 3. The store interface
 
@@ -103,7 +106,7 @@ class QueryResult:
     rows: tuple[tuple[NormalValue, ...], ...]   # already normalised (section 3.4)
 ```
 
-`QueryName` is an enumeration generated from the files in `store/sql/`. A query file starts with a header that the lint step and the adapters read:
+`QueryName` is a value the loader builds for one inventory. A caller obtains it by lookup on that inventory, and a store accepts only a value of its own inventory. A query file starts with a header that the lint step and the adapters read:
 
 ```sql
 -- name: unit_pay_sums
@@ -120,6 +123,10 @@ ORDER BY p.unit_id ASC NULLS LAST, p.period ASC NULLS LAST,
          p.band_from ASC NULLS LAST, p.band_to ASC NULLS LAST
 ```
 
+Parameter types are `bigint`, `text`, `bool`, `date`, `list[bigint]` and `list[text]`, bound from `int`, `str`, `bool`, `datetime.date` and lists of one member type. A `bool` is never a `bigint`, and a `datetime` is never a `date`. A parameter is never null, a tuple, a mixed list, a float or a `Decimal`. Return types are `text`, `bigint`, `numeric`, `date` and `geometry`. A boolean result column is refused until a query needs one. The header is exactly those four comment lines, in that order, and `name` equals the file stem.
+
+A `geometry` value leaves the store as text: the ISO Well-Known Binary of the value, little-endian, upper-case hexadecimal, with no spatial-reference identifier. The query file names the column and does not convert it. When an adapter prepares the statement, for `fetch` and for `plan`, it wraps each geometry item of the outermost projection and keeps that item's column name. The embedded adapter wraps the item as `hex(ST_AsWKB(<column>))`. The PostgreSQL adapter wraps it as `upper(encode("<schema>".ST_AsBinary(<column>, 'NDR'), 'hex'))`, naming the extension's function by the extension's own schema, read at open. A query with no geometry column is sent unchanged apart from placeholder rewriting. NULL stays NULL. The normaliser holds that hexadecimal text and does not convert it; lower case, bytes, a memory view and any other value are refused.
+
 Tables are named without a schema. The PostgreSQL adapter sets the release schema per transaction with `SELECT set_config('search_path', :schema, true)` (PostgreSQL 18 documentation: `is_local` true limits the value to the current transaction). The DuckDB file holds one release in its default schema.
 
 | ID | Requirement |
@@ -133,15 +140,21 @@ Tables are named without a schema. The PostgreSQL adapter sets the release schem
 
 ### 3.2 The portable SQL subset
 
-Tool queries are plain `SELECT` statements over precomputed tables. All spatial work, H3 arithmetic and routing happen at build time or in Python (master design section 4; architecture research measured that DuckDB accepts the portable `cell = ANY(list)` form, 2026-11-11). Allowed constructs (the allow-list):
+Tool queries are plain `SELECT` statements over precomputed tables. All spatial work, H3 arithmetic and routing happen at build time or in Python (master design section 4; architecture research measured that DuckDB accepts the portable `cell = ANY(list)` form, 2026-11-11). Each query file has an adjacent `<query>.toml` contract. The contract names each table the query reads, that table's columns with their logical type and nullability, its key columns, and an anchor in document 03. It holds no SQL. The invented control fixture's anchor is the words "invented control table", because that table is not a release table. Allowed constructs (the allow-list):
 
 | Kind | Allowed |
 |---|---|
 | Statements | One `SELECT` per file; `WITH` (common table expressions); `WITH RECURSIVE` only in files whose name starts with `graph_`. |
 | Clauses | `FROM`, `JOIN … ON` (`INNER`, `LEFT`), `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT` with a parameter or literal, `UNION ALL`. |
 | Predicates | `=`, `<>`, `<`, `<=`, `>`, `>=`, `AND`, `OR`, `NOT`, `IN (literal list)`, `= ANY(:param)`, `BETWEEN`, `IS NULL`, `IS NOT NULL`. |
-| Expressions | Column references with a table alias, literals, `:name` parameters, `+`, `-`, `*`, `CASE WHEN … THEN … ELSE … END`, `COALESCE`, `NULLIF`, `CAST(x AS t)` where `t` is `BIGINT`, `INTEGER`, `TEXT` or `DATE`. |
+| Expressions | Column references with a table alias, literals, `:name` parameters, `+`, `-`, `*`, `CASE WHEN … THEN … ELSE … END`, `COALESCE`, `NULLIF`, `CAST(x AS t)` where `t` is `BIGINT`, `INTEGER`, `TEXT` or `DATE`. The cast type is that word in the query text: `INT4`, `INT8`, `STRING` and a comment between `AS` and the type are refused. |
 | Aggregates | `SUM`, `COUNT`, `COUNT(DISTINCT …)`, `MIN`, `MAX` (public and control tables only; protected tables never release minima or maxima, document 06). |
+
+A common-table name that is the name of a table in that query's contract is refused, and a table or common-table name that is not its own lower-case form is refused.
+
+A statement that is one `SELECT` with no `UNION ALL`, no common table expression and no recursive form, that reads exactly one table and no join, has no `GROUP BY`, no `HAVING` and no `LIMIT`, and whose every projected item is an allowed aggregate (`SUM`, `COUNT`, `COUNT(DISTINCT …)`, `MIN` or `MAX`) at the top of the item, with no bare column outside an aggregate, is one row and is admitted with no `ORDER BY`, and its `-- order:` line is empty. A grouping parenthesis may stand directly after exactly these keywords: `AND`, `OR`, `NOT`, `WHERE`, `ON`, `HAVING`, `WHEN`, `THEN` and `ELSE`.
+
+A join, a `UNION ALL` and a graph query are refused today as `order unproved` until a proof of their total order is built with the first query that needs one.
 
 Forbidden, with the reason:
 
@@ -150,7 +163,7 @@ Forbidden, with the reason:
 | `/` and `%` | DuckDB's `/` is float division (`5 / 2` gives `2.5`, DuckDB 2.0 documentation) while PostgreSQL's integer division truncates towards zero (`5 / 2` gives `2`, PostgreSQL 18 documentation); `%` collides with driver placeholders. Ratios are computed in Python with `Decimal`. |
 | `::` casts, `SELECT *`, `DISTINCT ON`, `LATERAL`, window functions, `FILTER`, `QUALIFY`, `PIVOT`, `ASOF` | Dialect-specific or unnecessary. |
 | `ORDER BY` without explicit `NULLS FIRST` or `NULLS LAST` | DuckDB keeps `NULLS LAST` for `DESC` (DuckDB 2.0 documentation); PostgreSQL defaults to `NULLS FIRST` for `DESC` (PostgreSQL 18 documentation). |
-| Any `ST_*`, `h3_*` or other extension function | No spatial predicates in tool queries (master design section 4). |
+| Any `ST_*`, `h3_*` or other extension function | No spatial predicates in tool queries (master design section 4). A column of logical type `geometry` is admitted in one place only: a bare selected column of the outermost projection, the table alias, a dot and the column name, with nothing around it, and only when the column reached through that table alias has logical type `geometry` and that column's return type is `geometry`. It is refused in a predicate, a join condition, an order, a group, an aggregate, a cast, a function or any other expression, and under any other return type. The conversion in section 3.1 is added by the adapter, outside the query file. |
 | `NOW`, `CURRENT_DATE`, `RANDOM` and other volatile functions | Identical questions must return identical answers. |
 | Data definition or change (`CREATE`, `INSERT`, `UPDATE`, `DELETE`, `COPY`, `ATTACH`, `INSTALL`, `LOAD`, `PRAGMA`, `SET`), `;` | Tool queries only read. |
 
@@ -168,7 +181,7 @@ Lists of cells and units are computed in Python and passed as one list parameter
 | ID | Requirement |
 |---|---|
 | BE-17 | Placeholders match `:[a-z_][a-z0-9_]*`; the rewrite is a whole-token replacement and is tested for both drivers, including an empty list. |
-| BE-18 | Values are always bound as parameters. The only identifier ever composed into SQL is the release schema name, built by BE-33 and passed through `set_config`, never by string formatting. |
+| BE-18 | Values are always bound as parameters. The release schema name of BE-33 reaches the engine only as the bound value of `set_config`. The one identifier composed into a statement is the schema of the PostGIS extension, read once from the catalogue when the adapter opens, held to a plain-identifier pattern, quoted, and used only to qualify the geometry conversion function. |
 | BE-19 | H3 cells are stored and passed as signed 64-bit integers (`BIGINT`), as the architecture research recommends; the loader verifies every cell column is non-negative and fits that type. |
 
 ### 3.4 Normalisation and the rounding rule before comparison
@@ -280,7 +293,7 @@ The loader is the only way data enters PostgreSQL or the embedded DuckDB file. I
 | 6 | Apply the canonical `app` schema DDL from [document 03, section 12](03_DATA_CONTRACTS.md#12-the-application-schema-postgresql-only-schema-app) through the idempotent migrations in `infra/postgres/`; do not restate its columns in backend SQL. No ledger history is loaded or generated: the ledger starts empty and holds only questions asked ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12; BE-76). |
 | 7 | Verify both final store names, release id, tables, counts and digests, then atomically write one `load_receipt.json` beside the manifest. It is not listed in `manifest.artefacts` and carries `state: complete`, the manifest's `release_id`, both engines, tables, counts, digests and durations. For a `protected` release it also carries matching `window_key`, `protected_sha256`, `rules_version_id` and `parameter_set`; for `public_only` it omits those protected-window fields. A temporary, incomplete or wrong-release receipt is never eligible to serve. |
 
-The copy mechanism (DuckDB's PostgreSQL extension or psycopg `COPY`) is chosen at slice S1. The architecture research measured the first: 2.2 s copy plus 2.7 s indexing for 7.5 million rows, and noted that `postgres_execute` accepts one statement per call.
+The copy mechanism is DuckDB reading the Parquet files and psycopg `COPY` writing PostgreSQL. The architecture research measured DuckDB's PostgreSQL extension: 2.2 s copy plus 2.7 s indexing for 7.5 million rows, and noted that `postgres_execute` accepts one statement per call.
 
 | ID | Requirement |
 |---|---|
@@ -363,14 +376,40 @@ Statuses are exactly `OK`, `SUPPRESSED`, `NO_DATA`, `OUT_OF_SCOPE`. A status is 
 
 | Field | Contract |
 |---|---|
-| Inputs | Either `shape_id` (a polygon the user drew, registered by `POST /api/areas/shapes` for this session and seat, BE-117; the model passes only the identifier), or `pin` (latitude and longitude from the user's click, or a gazetteer key) with `mode` (`distance`, `walk`, `drive`) and `cutoff` (250, 500, 1,000 metres for distance; 5, 10, 15 minutes for walk or drive; drive 20 and 30 only for `staffing_and_pay`; no drive cut-off above 30 minutes anywhere, decision 0023 item 17; TST-256). For drive only: optional `situation` and `summer`, or an `hour_key` and a `day_key` from the release's closed lists ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). |
-| Outputs | `payload.area_id` (section 11.1); `payload.outline` (GeoJSON of the exact shape, used for Public points and Simulated layers); `payload.units` by partition key, where the list of each protected partition holds only the whole-cell units of its snapped set, of `unit_kind` `cell` or `merged`: a remainder is never added to an area sum, and a unit of kind `municipality` or `national` is never snapped ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-18); `payload.snap_report` with the requested outline, cells inside, units used, cells added and cells dropped by snapping, and the key of the snap sentence. No snap report is returned for a point-origin request governed by PRV-135. The snap-report counts are facts with provenance `synthetic`, because the unit partition is derived from protected tables (ASSUMPTION). The site answer assigns its headline area independently of the playbook's near and wider defaults (section 7): the area the user picked, a drawn shape, a radius, a walk time or a drive time, and walk 5 when nothing is picked. With an explicit drive selection both `worker_pay` and `resident_pay` use that drive area's identifier, each snapped on its own partition. |
+| Inputs | Either `shape_id` (a polygon the user drew, registered by `POST /api/areas/shapes` for this session and seat, BE-117; the model passes only the identifier), or exactly `area_id` alone (an identifier that `make_area` returned on this release, decoded by BE-86 to an answer whose payload is byte-identical, the envelope carrying a new call identifier; a malformed identifier, another release's or another session's identifier is `INVALID_ARGUMENT`; [decision 0087](decisions/0087-make-area-by-a-returned-area-id.md)), or `pin` (latitude and longitude from the user's click, or a gazetteer key) with `mode` (`distance`, `walk`, `drive`) and `cutoff` (250, 500, 1,000 metres for distance; 5, 10, 15 minutes for walk or drive; drive 20 and 30 only for `staffing_and_pay`; no drive cut-off above 30 minutes anywhere, decision 0023 item 17; TST-256). For drive only: optional `situation` and `summer`, or an `hour_key` and a `day_key` from the release's closed lists ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). |
+| Outputs | `payload.area_id` (section 11.1); `payload.outline` (GeoJSON of the exact shape, used for Public points and Simulated layers); `payload.point_feature_ids`, the server-computed exact-shape membership as feature identifiers grouped by Public layer key, from the same server-owned layer snapshot and release as the displayed payload, never from browser-supplied coordinates. The application supplies this snapshot beside the store through `MakeAreaContext.public_points`, as identifier, latitude and longitude rows; it is not a request field, a new tool or a release-table field. Membership uses `eii_core.shapes.point_in_ring` for polygons (edges and vertices included) and `within_radius` for circles, against the returned outline, never the snapped cells. A missing snapshot yields null membership; an available empty layer yields an empty identifier list. The browser selects only these identifiers, omits Public point features when their membership is unavailable, and computes no intersection or distance test. Non-point Public features retain their source geography (DAT-147); `payload.units` by partition key, where the list of each protected partition holds only the whole-cell units of its snapped set, of `unit_kind` `cell` or `merged`: a remainder is never added to an area sum, and a unit of kind `municipality` or `national` is never snapped ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-18); `payload.snap_report` with the requested outline, cells inside, units used, cells added and cells dropped by snapping, and the key of the snap sentence. No snap report is returned for a point-origin request governed by PRV-135. The snap-report counts are facts with provenance `synthetic`, because the unit partition is derived from protected tables (ASSUMPTION). The site answer assigns its headline area independently of the playbook's near and wider defaults (section 7): the area the user picked, a drawn shape, a radius, a walk time or a drive time, and walk 5 when nothing is picked. With an explicit drive selection both `worker_pay` and `resident_pay` use that drive area's identifier, each snapped on its own partition. |
 | Statuses | `OK`; `OUT_OF_SCOPE` for a pin outside the mapped land area or a drawn shape not wholly contained in it. A pin inside the mapped land area whose point has no base cell ([03](03_DATA_CONTRACTS.md) section 1.1) is not `OUT_OF_SCOPE`. For `distance`, `walk` and free-flow `drive` it gives `OK` with the exact outline, a null `anchor_cell`, no `protected` entry and no unit list for any partition. Its Public context comes from the pin itself and its Public layers from the outline (PUB-29). Every protected and Simulated block read through it returns `NO_DATA` with reason `point_without_base_cell`. A `drive` with a `situation`, an `hour_key` or a `day_key` returns `NO_DATA` with that reason, makes no area and reads no `traffic_hourly` row. No nearest cell is substituted ([06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-135; [decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 10). When no release unit survives snapping, the area is still made for its exact outline with an empty unit list, and every protected block read through it returns `NO_DATA` with reason `SNAPPED_TO_WHOLE_UNITS` (ASSUMPTION: in the first pack `make_area` itself returned `NO_DATA` here; Public and Simulated blocks now use the exact outline). |
 | Errors | `INVALID_ARGUMENT` for a cutoff not in the list, a drive cut-off above 30 minutes (TST-256), drive 20 or 30 outside `staffing_and_pay`, `summer` with `ramadan_iftar`, an hour or day key outside the release's lists, both a `shape_id` and a `pin`, an unknown `shape_id`, or a `shape_id` of another session or seat. |
-| Reads | `grid_cell`, `release_unit`, `unit_member`, `road_link` and `traffic_hourly` (drive with a situation or an hour). In public-only mode (BE-105): `grid_cell` only, with free-flow drive areas. |
-| Public-only mode | When the mounted release holds Public tables only (slice S3), `make_area` uses the fixed base-cell frame: it reads no privacy-derived `release_unit` and no protected or simulated table, its area is the set of frame cells selected by the shape plus the pin's base cell; a pin without a base cell has no cell set and no snap report in this mode either, and gets its Public context only ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 10), and the snap report is emitted as technical metadata, not as a Synthetic fact. |
+| Reads | `grid_cell`, `release_unit`, `unit_member`, `road_link` and `traffic_hourly` (drive with a situation or an hour). In public-only mode (BE-105): `grid_cell`, and `municipality` and `gazetteer` for its own contract, with free-flow drive areas. |
+| Public-only mode | When the mounted release holds Public tables only (slice S3), `make_area` uses the fixed base-cell frame: it reads no privacy-derived `release_unit` and no protected or simulated table, its area is the set of frame cells selected by the shape plus the pin's base cell; a pin without a base cell has no cell set and no snap report in this mode either, and gets its Public context only ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 10), and the snap report is emitted as technical metadata, not as a Synthetic fact. The public-only snap report and cell set are carried in `payload` as sorted cell identifiers with the snap-sentence key and no count numeral, and the cell set is not in the area record. |
 | Provider mode | When `EII_TRAFFIC_PROVIDER=tomtom`, `TOMTOM_API_KEY` is present and the presenter's offline control is not set, a `drive` area may be the traffic-aware drive-time area that the API process obtains from the pin, the cutoff (5, 10 or 15 minutes) and the closed values of the request through the traffic provider adapter (BE-129). It enters the product only here, is held in the session store (BE-109), bound to the session and seat like a drawn shape, and is marked with the provider and its retrieval time (BE-130). The provider choice is a server setting, never a request field, and "now" is not a key of the closed hour list (BE-67). The adapter is never called for a pin whose point has no base cell: the request is answered under [06](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-135, and no traffic-aware area is registered for it ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 10). Otherwise the drive area is the simulated one above. |
 | Parity case | The flagship pin with walk 5 and drive 10; a drive 10 area at two hours of one day key; a fixture polygon: identical unit lists and outlines on both engines. The provider mode has no parity case; it is tested on hand-made fixtures in the documented response format (BE-131). |
+
+#### site_check structured area projection
+
+S3-T26 projects the existing `POST /api/playbooks/site_check` body onto
+`make_area`, without adding a route. The body has `activity`, optional `lang`
+(`en` by default), and exactly one area alternative: a same-session `shape_id`,
+or `pin: {lat, lon}`. Only the pin alternative accepts the paired fields `mode`
+and `cutoff`; both absent selects walk with the existing default cutoff of five
+minutes. Explicit null fields, incomplete pairs, a shape combined with any pin,
+mode or cutoff field, and unknown fields are refused with `422 INVALID_ARGUMENT`
+before execution and write no ledger rows. Preset membership and coordinate
+validation reuse `make_area.validate_request`: distance, walk and free-flow drive
+only, with the cutoffs already specified above. This projection accepts no seat,
+release, routing, raw geometry, situation or provider field. A gazetteer choice
+continues through its existing typed tool path; this projection invents no pin
+from a named candidate.
+
+The route uses the same trusted area-context dependency as the mounted tools,
+including its release, routing and Public-point snapshot. Shapes are looked up
+by the session cookie and the dependency's seat. Under the lead's L-1160 ruling,
+until S9-T02 supplies the signed seat cookie, one opaque seat is bound to each
+admitted session. A second seat on that same session, injected only by overriding
+the trusted dependency in a test, cannot read its shapes. No request body field
+can choose a seat. A context whose release differs from the mounted store is
+refused before any tool executes; an invalid shape outcome rolls back the whole
+playbook transaction. S9-T02 must repeat that seat test using its signed cookie.
 
 `area_evidence`
 
@@ -389,7 +428,7 @@ The six income indicators of [decision 0016](decisions/0016-version-1-covers-the
 | Field | Contract |
 |---|---|
 | Inputs | `area_id`; `categories` (spine keys); `limit` (1 to 50); `include_neighbours` (bool). |
-| Outputs | Public places whose precomputed cell is in the area and, for a drawn shape or an exact outline, whose point lies inside it (`eii_core.shapes`), each with name, category, source provider, licence and confidence (the `pub_place` columns of PUB-48; for the places layer of `places_fsq`, the source-given fields of `pub_place_fsq` with the source's attribution), its verification status when `pub_place_verification` holds a row for it (PUB-53), and a network distance from the pin as a Public fact; it never takes an hourly link speed (MTH-57, PUB-92). For a named museum, exhibition or health centre, its published visitor counts as Public facts of a `place_public` subject with source and period ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)), never an estimate of people present; the relative busyness of a named venue is returned only by `venue_busyness` (BE-125). These are the real businesses and named public places of the journeys; no Synthetic or Simulated figure, fit or rank is attached to one. The caveat key `open_listings_incomplete` is always present. With `include_neighbours`, at most six "found near" categories from co-location edges (capability S9). |
+| Outputs | Public places whose points lie inside the exact requested shape (`eii_core.shapes`); a cell candidate list may only speed up selection if it covers that outline and never drops an inside point, each with name, category, source provider, licence and confidence (the `pub_place` columns of PUB-48; for the places layer of `places_fsq`, the source-given fields of `pub_place_fsq` with the source's attribution), its verification status when `pub_place_verification` holds a row for it (PUB-53), and a network distance from the pin as a Public fact; it never takes an hourly link speed (MTH-57, PUB-92). For a named museum, exhibition or health centre, its published visitor counts as Public facts of a `place_public` subject with source and period ([decision 0017](decisions/0017-public-data-additions-and-public-splits.md)), never an estimate of people present; the relative busyness of a named venue is returned only by `venue_busyness` (BE-125). These are the real businesses and named public places of the journeys; no Synthetic or Simulated figure, fit or rank is attached to one. The caveat key `open_listings_incomplete` is always present. No `found_near` entries are emitted in this task; a request with `include_neighbours` carries the closed reason `neighbours_geography_unreleased`. C6 emission stays with its owning task once its geography is released (capability S9). |
 | Statuses | `OK`; `NO_DATA` (no listed place, which is not evidence that none exist); `OUT_OF_SCOPE` for a category outside the spine. |
 | Reads | `pub_place`, `pub_place_fsq`, `pub_place_verification`, `pub_venue_visits`, `graph_node`, `graph_edge`, `grid_cell`. |
 | Parity case | Restaurants around the flagship pin. |
@@ -421,7 +460,7 @@ The six income indicators of [decision 0016](decisions/0016-version-1-covers-the
 | Inputs | `activity`; `topic` (`unit_economics`, `licences`, `churn`, `zone_momentum`, `pay_decomposition`, and from [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) `employer_scale`, `market_context` and `visitor_markets`); `geography` (national, municipality or zone code); optional `scenario_inputs` for `unit_economics`: the six inputs of method card C4 in document 07 — monthly rent, seats, average bill, opening days (default 30), and the optional expected covers per day and monthly staff cost — plus the optional target surplus share `U` (default 0, break-even), and an optional `incentive_key` naming one `incentive` record of `pub_investqa_record` that the user chose, whose parameters are that record's `incentive_parameter` rows (DAT-143). |
 | Outputs | Public facts on their official geography; with `scenario_inputs`, the covers per day required and the breakpoint as `inferred` facts tagged "your inputs", every one computed by `eii_core.calc` under method card C4 (MTH-25 to MTH-28). Breakpoints appear only when expected covers are entered; the break-even point of the user's revenue range, which takes its covers from the user's capture rate, is returned by `revenue_range_scenario` (BE-124). The target-surplus result is a separate line labelled "to earn the sector's 2022 surplus share" and is never called break-even (MTH-26). With an `incentive_key`, the package's parameters enter the calculator as Public facts naming their source page and retrieval date, as document 07 defines; the result keeps the "your inputs" tag and no Public figure changes. Churn facts flag bulk months (capability S8). `employer_scale`: establishments and employees by size class and activity, with compensation where published, each bulletin with its own last year, and the 2015 census by municipality marked as dated 2015. `market_context`: wholesale and retail purchases, sales and stocks, national, as context and never a forecast. `visitor_markets`: hotels and hotel apartments by municipality, hotel guests by nationality as a Public split (BE-110) and visitor arrivals. |
 | Statuses | `OK`; `NO_DATA`; `OUT_OF_SCOPE` for an activity with no published cost structure. |
-| Reads | `pub_sector_accounts`, `pub_licence_active`, `pub_licence_cancelled`, `pub_zone_utility`, `pub_wage_table`, `pub_price_index`, `pub_establishment_size`, `pub_census_2015_municipality`, `pub_trade_wr`, `pub_hotels_municipality`, `pub_visitor_markets`, `pub_investqa_record`, `fact_lineage`, `source_registry`. |
+| Reads | `pub_sector_accounts`, `pub_licence_active`, `pub_licence_cancelled`, `pub_zone_utility`, `pub_wage_table`, `pub_price_index`, `pub_establishment_size`, `pub_census_2015_municipality`, `pub_trade_wr`, `pub_hotels_municipality`, `pub_visitor_markets`, `pub_investqa_record`, `pub_population_municipality`, `pub_census_national`, `fact_lineage`, `source_registry`. |
 | Parity case | Restaurants (activity 561), 2022, national unit economics; the national pay-versus-mix decomposition. |
 
 `supplier_lens`
@@ -735,8 +774,37 @@ The four cases of decision 0016 are guided stories with a one-click start: case 
 
 The two headline blocks of `site_check` ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 11; [09](09_AI_ASSISTANT.md) AI-131) both use the requested headline area, which is one of the playbook's two evidence areas. That area is the area the user picked: a drawn shape, a radius, a walk time or a drive time; with nothing picked it is walk 5, the near area. A picked shape, radius or walk time is the near area, and a picked drive time is the wider area. `worker_pay` and `resident_pay` both use that one area's identifier, each snapped on its own partition under document 06, and the working block's main sectors and employer sizes are read from `register` on that same area. With an explicit drive selection both blocks, the `register` block included, use that drive area's identifier and never walk 5, and `area_evidence` runs once on that drive area. The near and wider areas stay the two evidence areas; no third area is made. Wider-area evidence, including coverage and traffic when that area is a drive area, stays clearly identified as the wider area. Presence by hour, the register and the public context use the requested headline area; outlets (`scan_places`, with neighbours), the people present by pay band and the site estimate use the near area. Staffing uses drive 30, the staffing-only cut-off pinned by the master design. A pairing of workers on the near area with residents on the wider area is refused (TST-250).
 
+S3-T26 implements only the selected-area propagation in the Public foundation
+bundle. A selected polygon, radius or walk replaces the near call; a selected
+drive replaces the wider call and is the headline. A pin's distinct other
+default remains context. `Bundle.area_roles` binds `headline`, `near` and `wider`
+to their actual identifiers; missing areas are null. No third area is built.
+For a shape-only request there is no clicked origin for a separate drive area:
+the wider step is `NO_DATA` with `context_pin_absent`, rather than inventing an
+origin or treating the selected polygon as a distinct wider context. Fly targets
+the headline's `area_id`; rings names the one or two returned areas. The exact
+outlines remain in the corresponding `make_area` step payloads. The browser draws
+the wider area as a dashed, labelled ring only when its role differs from the
+headline (a walk, radius or default near headline), requesting its outline by
+`area_id` through `make_area` ([decision 0087](decisions/0087-make-area-by-a-returned-area-id.md));
+a drive headline is itself the wider area and a shape has none.
+
+The closed definition also dispatches the existing `night_lights` and
+`population_age_sex` readers on the headline identifier through `run_card`, using
+the same context for decoding. Radiance uses the last published month key from
+`layer_night_lights_months`, as the existing layer reader does; population uses
+its existing `none` split. Their evidence cards add only `area_id` and the closed
+`area_role` (`near` or `wider`) to identify that binding. The facts keep their
+calculator metric keys, Public provenance and full existing chains. National
+sector context stays national and separately identified by its facts. This adds
+no protected block, simulated block, comparison, forecast or recommendation.
+Template narrative remains buffered by the unchanged accounting gate, and each
+tool outcome keeps its own identifier-only ledger row. Invalid arguments and
+execution failures retain atomic rollback and sanitized logs. No model or
+`/api/ask` call is part of this path.
+
 The template writer and the model path share the versioned catalogues under
-`product/assistant/catalogue/`: `claims.yaml`, `components.yaml`, `fragments.yaml` and
+`product/src/eii_product/assistant/catalogue/assets/`: `claims.yaml`, `components.yaml`, `fragments.yaml` and
 `questions.yaml`. The template writer turns a bundle into the same structured brief as the model
 path: `headline_key`; `decision_template_key`; `observed[]` and `inferred[]` items with `claim_key`
 and fact-id `slots`, plus `strength` (`strong`, `indicative` or `illustrative`) for inferred items;
@@ -773,7 +841,7 @@ window binding, not authentication. `EventSource` therefore needs no custom seat
 | `GET /api/seats` | none | the two company seat keys with labels, for the seat picker ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15) |
 | `GET /api/seat/whoami` | none | `{seat, organisation_label_en, organisation_label_ar, fictional: true}`: the Viewing-as value from the signed cookie |
 | `POST /api/ask` | `{question, lang}` plus optional `{pin, shape_id, mode, cutoff, situation, summer, hour_key, day_key, month_key, scenario_inputs, case_key}` | `202 {answer_id, events_url}` |
-| `POST /api/playbooks/{playbook}` | structured playbook inputs, for any playbook of section 7 | `202 {answer_id, events_url}`; never calls the model |
+| `POST /api/playbooks/{playbook}` | structured playbook inputs, for any playbook of section 7; `site_check` uses the closed shape-or-pin projection in section 6.2, **site_check structured area projection** | `202 {answer_id, events_url}`; never calls the model |
 | `GET /api/answers/{answer_id}/events` | `Last-Event-ID` header optional | event stream (section 8.2) |
 | `POST /api/tools/{tool}` | tool input model of any tool of section 6.2 | tool result envelope; used by the dial, the hour, day and month controls, pins, drawn areas and area cards with no model |
 | `POST /api/areas/shapes` | `{geometry}` exactly: one GeoJSON polygon from the user's drawing | `201 {shape_id}`, bound to the session and seat (BE-117); `422 INVALID_ARGUMENT` for an extra property or a polygon that is not simple, lies outside the mapped land area or exceeds the vertex or size limit. Not model-callable |
@@ -785,11 +853,11 @@ window binding, not authentication. `EventSource` therefore needs no custom seat
 | `POST /api/briefs` | `{answer_id}` | `201 {brief_id}` |
 | `GET /api/briefs` | none | own briefs through the company read function |
 | `GET /api/briefs/{brief_id}` | none | brief, or 404 (BE-39) |
-| `GET /api/layers/{layer}` | `situation`, `summer`; from decision 0016, `day_key`, `hour_key` or `hours=all` (the 24-hour animation, for `traffic` and `crowd_density` only), and `month_key`; optional `split_kinds` on `presence` and `flows` only. The optional request argument that selects movement splits is `split_kinds`: a closed list of `age_band`, `gender` and `nationality_group`, empty by default; each selected kind returns its own one-way output; an unknown kind, a crossed specification or its use on another block or layer is refused (`INVALID_ARGUMENT`, BE-67) | layer values as facts for one key of the closed layer list: `zone_electricity_growth`, `licence_density`, `transit_riders`, `presence` (estimated people by hour, replacing `presence_index`; when `split_kinds` names them, separate one-way outputs for `age_band`, `gender` and `nationality_group`, each kind whole with `other` or withheld whole with its reason; a movement split is never apportioned to a drawn outline, its values are sums over the snapped whole units with their `other` values, a share is over the split's own summed total, and a split count carries no range; `other` is shown only when the published split returns it), `crowd_density`, `traffic`, `flows` (aggregate flows; when `split_kinds` names a kind, person-trip split outputs, each its own one-way output, with shares over that split's own summed total, never as a split of the `flow_hourly` estimate and never apportioned to a drawn outline; each kind whole with `other` or withheld whole with its reason; a split count carries no range; `other` is shown only when the published split returns it), `public_places`, `release_units`, `openings`, `closures` (licence issues and cancellations on their own geography, and the openings and closures of register companies from the register's own dates and monthly snapshots, all Public, DAT-164; no synthetic births or closures since [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12), `firm_density` (firm counts and density from the register, Public, [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)), `company_points` (the register's establishment points from `pub_register_company`, Public; each opens the company card), `fc_firms_per_tower` (the companies of the financial centre's register in `pub_register_company` counted per tower by `eii_core.calc`, and per district where the register gives no building, Public; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 6), the Public layers of the national GIS centre of that decision's item 3, each on its own geography from the release table that document 04 names (`land_prices`: the 2026 guide land prices by district and use category, `pub_land_price`, guide prices and never deal prices or rents; `rail_plan`: rail lines, planned stations and protection zones, `pub_rail_plan`, a planned station shown as a plan and never as operating; `health_centres`: health centres and their catchments, `pub_health_centre`; `zoning`: permitted uses, heights and setbacks, `pub_zoning`, never shown as an approval, a permit or availability), `fdi_projects`, `property_prices`, `construction_pipeline`, `night_lights` (ASSUMPTION: the list the opening scene, the dial, the hour, day and month controls and the journeys need). Simulated layers carry backend origin metadata under decision 0035 item 3; no frame renders an origin mark (item 1); a Public layer stays on its official geography, and the `night_lights` layer on the frame cells that the public-data build aggregated it to (month key as for other monthly layers). The live flow layer of the traffic provider is not a key of this list; it is served by the tile route below, and the satellite tiles of the imagery provider are served by a tile route of their own (BE-135). The home-to-work flows of talent available near this site come with the result of `workers_within_reach` (BE-132), not from this route. JSON, or Arrow when the client asks for it and the layer exceeds about 10,000 rows (document 10). |
+| `GET /api/layers/{layer}` | `situation`, `summer`; from decision 0016, `day_key`, `hour_key` or `hours=all` (the 24-hour animation, for `traffic` and `crowd_density` only), and `month_key`; optional `split_kinds` on `presence` and `flows` only. The optional request argument that selects movement splits is `split_kinds`: a closed list of `age_band`, `gender` and `nationality_group`, empty by default; each selected kind returns its own one-way output; an unknown kind, a crossed specification or its use on another block or layer is refused (`INVALID_ARGUMENT`, BE-67) | layer values as facts for one key of the closed layer list: `zone_electricity_growth`, `licence_density`, `transit_riders`, `presence` (estimated people by hour, replacing `presence_index`; when `split_kinds` names them, separate one-way outputs for `age_band`, `gender` and `nationality_group`, each kind whole with `other` or withheld whole with its reason; a movement split is never apportioned to a drawn outline, its values are sums over the snapped whole units with their `other` values, a share is over the split's own summed total, and a split count carries no range; `other` is shown only when the published split returns it), `crowd_density`, `traffic`, `flows` (aggregate flows; when `split_kinds` names a kind, person-trip split outputs, each its own one-way output, with shares over that split's own summed total, never as a split of the `flow_hourly` estimate and never apportioned to a drawn outline; each kind whole with `other` or withheld whole with its reason; a split count carries no range; `other` is shown only when the published split returns it), `public_places`, `release_units`, `openings`, `closures` (licence issues and cancellations on their own geography, and the openings and closures of register companies from the register's own dates and monthly snapshots, all Public, DAT-164; no synthetic births or closures since [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12), `firm_density` (firm counts and density from the register, Public, [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)), `company_points` (the register's establishment points from `pub_register_company`, Public; each opens the company card), `fc_firms_per_tower` (the companies of the financial centre's register in `pub_register_company` counted per tower by `eii_core.calc`, and per district where the register gives no building, Public; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 6), the Public layers of the national GIS centre of that decision's item 3, each on its own geography from the release table that document 04 names (`land_prices`: the 2026 guide land prices by district and use category, `pub_land_price`, guide prices and never deal prices or rents; `rail_plan`: rail lines, planned stations and protection zones, `pub_rail_plan`, a planned station shown as a plan and never as operating; `health_centres`: health centres and their catchments, `pub_health_centre`; `zoning`: permitted uses, heights and setbacks, `pub_zoning`, never shown as an approval, a permit or availability), `commercial_points` (commercial points of `pub_poi_comm`), `address_points` (address points of `pub_address_point`), `parcels` (land parcels of `pub_parcel`), `landmarks` (landmark names of `gazetteer` supplied by the centre's landmarks layer, DAT-168), `fdi_projects`, `property_prices`, `construction_pipeline`, `night_lights` (ASSUMPTION: the list the opening scene, the dial, the hour, day and month controls and the journeys need). Simulated layers carry backend origin metadata under decision 0035 item 3; no frame renders an origin mark (item 1); a Public layer stays on its official geography, and the `night_lights` layer on the frame cells that the public-data build aggregated it to (month key as for other monthly layers). The `fdi_projects` payload carries a credits object with exactly four fields, `publisher`, `gatherer`, `read_on` and `dashboard_url`. `publisher` and `gatherer`, each source row's attribution and publisher, each source category, and a feature's `name_segments`, are ordered lists of plain-text segments and reference segments; a plain-text segment that holds a digit (0–9 or Arabic-Indic) is refused with `numeral_in_plain_segment`, and the browser does not scan a string for numerals. A split category matches the source category only when each segment has the same kind and, for a reference segment, the same reference kind, value and record id. Each drawn record names a `source_id` that resolves to a source row, or the layer's `source_id` when the record omits one. A supplied class key maps one-to-one onto `--eii-seq-1` through `--eii-seq-5` (DES-19); an unknown class or direction key is refused and no break is computed. The four filters (sector, source country, period and stated location) hide list items by the supplied category keys, and the page shows no count of the filtered list; each legend count stays a supplied fact with its year, and a count whose year is blank is refused (`fdi_year_missing`) with no empty year supplied by the page. A `night_lights` or `land_prices` feature with no class or an empty class is refused (`night_class_missing`). Rail protection zones, health-centre catchments and parcels are 1 px outlines in `--eii-map-boundary` even when the geometry kind is fill. The page draws geometry only when a fact registry is supplied; otherwise the layer plate shows `registry_absent` and mounts no geometry. An announced date is a typed reference segment, and the announced-estimate label is required whenever a capex or jobs slot is present. A split handed to the layer plate renders its source, year and categories as typed segments and is never itself a layer. The live flow layer of the traffic provider is not a key of this list; it is served by the tile route below, and the satellite tiles of the imagery provider are served by a tile route of their own (BE-135). The home-to-work flows of talent available near this site come with the result of `workers_within_reach` (BE-132), not from this route. JSON, or Arrow when the client asks for it and the layer exceeds about 10,000 rows (document 10). |
 | `GET /api/traffic/flow-tiles/{z}/{x}/{y}` | none | a picture tile fetched by the API process from the traffic provider and passed on, only with `EII_TRAFFIC_PROVIDER=tomtom`, the key present and the presenter's offline control not set; otherwise `404 NOT_FOUND`. It carries no fact and nothing of it is stored (BE-129). The browser never holds the key. Not model-callable |
 | `GET /api/imagery/tiles/{z}/{x}/{y}` | none | a satellite picture tile fetched by the API process from the imagery provider and passed on, only with `ESRI_API_KEY` present and the presenter's offline control not set; otherwise `404 NOT_FOUND`. It carries no fact, and nothing of it is stored or cached (BE-135). The browser never holds the key. Not model-callable |
 | `POST /api/address-search` | `{text, lang}` exactly: the address the user typed in the ask bar or the place picker (1 to 200 characters), in the body, so that it stands in no URL | at most five results, each a label and a point, from the imagery provider's geocoding, passed on to the page and kept nowhere, under the conditions of the tile route; otherwise `404 NOT_FOUND`, and the page offers gazetteer places only (BE-136). Not model-callable |
-| `GET /api/photoreal/{path}` | `view` (the view id of BE-139) | the root tileset or a tile of the photorealistic 3D mode, fetched by the API process from the provider with `MAPTILE_API_KEY` added on the server and passed on, only with the key present, the presenter's offline control not set and the request within the project-wide count and the view budget; otherwise `404 NOT_FOUND` while the mode is off, or `429 PROVIDER_CAP_REACHED` with nothing sent. It carries no fact, and nothing of it is stored or cached (BE-139). The browser never holds the key. Not model-callable |
+| `GET /api/photoreal/{path}` | `view` (the view id of BE-139) | the root tileset or a tile of the photorealistic 3D mode, fetched by the API process from the provider with `MAPTILE_API_KEY` added on the server and passed on, only with the key present, the presenter's offline control not set and the request within the project-wide hard ceiling; otherwise `404 NOT_FOUND` while the mode is off, or `429 PROVIDER_CAP_REACHED` with nothing sent. It carries no fact, and nothing of it is stored or cached (BE-139). The browser never holds the key. Not model-callable |
 | `GET /api/proof/parity`, `GET /api/proof/survival`, `GET /api/trust` | none | parity report; the survival report with one aggregate row per parameter set (PRV-80); the signed attack report replay, verified at start-up as PRV-107 requires; rules text generated from `rules_version` and the tool registry |
 | `POST /api/proof/scene` | `{fixture_id: string}` exactly, with no other property; a fixture id is `scene:` followed by the lowercase SHA-256 already listed for its signed scene artefact in `manifest.artefacts` (PRV-119, BE-106) | `200`: the two pre-validated unit sets and area answers of that artefact's two prepared requests. `422 INVALID_ARGUMENT` for an extra property or a fixture id not of that form; `404 NOT_FOUND` for a well-formed id absent from `manifest.artefacts`. It is not one of the tools of section 6.2 and is not model-callable (PRV-100); it has no custodian-plane path |
 | `GET /api/presenter/state` | `X-EII-Presenter-Token` header | store, PostgreSQL state, ledger state; only when `EII_PRESENTER=1` and the per-session token is valid |
@@ -809,6 +877,24 @@ Cookie: eii_seat=<signed session value>
 202 {"answer_id": "uuid", "events_url": "/api/answers/uuid/events"}
 ```
 
+The S3-T24 Public mount implements only the existing release and fact-lineage
+GET contracts, with the closed projections in document 03 **Mounted Public
+transport (S3-T24)**. The API factory requires an explicit verified release folder
+and completed load receipt. Both GETs refuse a body or query, use the existing
+sanitized error envelope, and return JSON with `nosniff` and no permissive CORS.
+Unknown facts refuse rather than being reconstructed from identifier text.
+The emitted-fact index is process-local and populated only by the existing fixed
+layer/card readers before releasing their responses and by playbook answers
+before their event stream exists, with card and answer index admission only
+after the required ledger commit. On a mounted release, a playbook answer
+admits its caller's `eii_session` under the existing BE-109 policy (same
+cookie, cap and `RATE_LIMITED` refusal, after chain validation and inside the
+answer's transaction, so a refusal rolls the answer back; a failed commit also
+releases a session that this request newly admitted, never an existing one, so
+its cap slot is free again), and its facts resolve only for that session; the
+HTTP registry boundary
+adds no fields to Fact or the tool envelope. It makes no provider or model call.
+
 ### 8.2 The event stream
 
 The answer stream carries the event kinds that document 09 emits and document 10 consumes. The `answer_id` is the stream key that document 10 calls the brief id; the SSE `id` field is the per-answer sequence number. `data` is JSON.
@@ -817,7 +903,7 @@ The answer stream carries the event kinds that document 09 emits and document 10
 |---|---|---|
 | `plan_step` | plan step | `{step_id, tool, label_en, label_ar, state: "pending" or "running" or "done" or "failed"}` |
 | `stage` | stage directive | one object of the `stage` schema (section 6.2) |
-| `evidence` | evidence card | `{card_id, kind, status, fact_ids, facts, caveat_keys, template_key}` |
+| `evidence` | evidence card | `{card_id, kind, status, fact_ids, facts, caveat_keys, template_key}` plus `{area_id, area_role}` for Public context cards (`night_lights`, `population_age_sex`): `area_id` is the headline area's identifier, or null; `area_role` is `near` or `wider`. |
 | `receipt` | (application) | the privacy receipt with the accounting-gate result under "Checked before display" (BE-107), and a summary of egress records for this answer |
 | `narrative` | structured brief item | One validated item of document 09's brief schema, using `claim_key` and fact-id `slots` for Observed and Inferred items, or the pinned key and slots for another section. It carries no model-written prose. |
 | `withdrawn` | brief withdrawn | `{item_ids}`: model items withdrawn before a repaired or template brief replaces them |
@@ -845,7 +931,7 @@ A drawn shape enters from the browser. A traffic-aware drive-time area enters th
 
 | ID | Requirement |
 |---|---|
-| BE-117 | `POST /api/areas/shapes` is the only way a polygon drawn by the user enters the product; the one other polygon that enters is the traffic-aware drive-time area of BE-130. It accepts one GeoJSON polygon from the user's drawing, checks it with `eii_core.shapes` (simple, inside the mapped land area of [03](03_DATA_CONTRACTS.md) section 1.1, within the vertex and size limits fixed at the slice S2 gate), and stores its canonical form in the session store under a `shape_id` that is the SHA-256 of that form, bound to the session and seat. `make_area` accepts a `shape_id` only from the same session and seat. The route is not model-callable, and the model never writes a coordinate of a shape. Ledger rows and logs record the `shape_id` or the `area_id`, never the coordinates. |
+| BE-117 | `POST /api/areas/shapes` is the only way a polygon drawn by the user enters the product; the one other polygon that enters is the traffic-aware drive-time area of BE-130. It accepts one GeoJSON polygon from the user's drawing, checks it with `eii_core.shapes` (simple, inside the mapped land area of [03](03_DATA_CONTRACTS.md) section 1.1, within 500 vertices, a request body of at most 64 KiB, and at most 50 shapes held per session (decision 0061 item 5)), and stores its canonical form in the session store under a `shape_id` that is the SHA-256 of that form, bound to the session and seat. `make_area` accepts a `shape_id` only from the same session and seat. The route is not model-callable, and the model never writes a coordinate of a shape. Ledger rows and logs record the `shape_id` or the `area_id`, never the coordinates. |
 | BE-118 | `POST /api/cases/{case_key}/sample-file` is the only way a case sample file enters a session, and it takes a closed key, never a file (ASSUMPTION: version 1 receives no file from the browser, so no real record can enter; [02](02_ARCHITECTURE.md) ARC-128, [10](10_FRONTEND.md) FE-120). It accepts only the case keys `c3` and `c4` and a request body that is exactly `{sample_key}`, the closed key of one of that case's committed synthetic sample files (document 03 DAT-150). It refuses with `INVALID_ARGUMENT` another case key, an unknown sample key, an extra property and any body that carries a file in any encoding, a path or a URL, and it keeps nothing of a refused request. The server reads the file that the key names from the committed sample files shipped with the application ([13](13_DEPLOYMENT_AND_OPERATIONS.md) OPS-67), never from a location the request gives, and loads it only when its SHA-256 equals the committed value; a file whose SHA-256 differs, or that fails the case's closed column schema (document 03 section 12.2), is not loaded, nothing of it is kept, and the route returns `INTERNAL`; the log records the failure but no content of the file (BE-95). A loaded file is held in the session store for the session and seat that loaded it. `own_records` computes its facts with `eii_core.calc`: provenance `synthetic`, the caveat key `your_inputs`, evidence status `inferred`, marked as a sample file that stands for the company's own records, with a lineage that names the method card and the committed file's SHA-256. The file, its facts and any brief that uses them are never written to the release, a store, `app.brief`, `ledger_entry` (which records only the call, the case key and the status), `egress_record`, a log or the memo; they are never sent to the model (ASSUMPTION: the egress record keeps exact payloads beyond the session), so the template writer places their cards; and another seat receives 404 with the same body as for a case with no file. Saving such a brief returns `INVALID_ARGUMENT`. |
 
 ### 8.4 The imagery provider
@@ -860,11 +946,11 @@ A drawn shape enters from the browser. A traffic-aware drive-time area enters th
 
 ### 8.5 The photorealistic 3D mode
 
-[Decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 7 adds a third map mode, the photorealistic 3D tiles of Google's Map Tiles API, by the owner's own notes of 2026-11-13. It is the one paid service of that decision (item 14), and the owner caps its spend at USD 20 in total. The open map stays the default and the mode of the guided story, every test and every gate ([10](10_FRONTEND.md) FE-140).
+[Decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 7 adds a third map mode, the photorealistic 3D tiles of Google's Map Tiles API, by the owner's own notes of 2026-11-13. It is the one paid service of that decision (item 14), and the owner caps its total spend at `SPEND_CEILING_USD` (document 13, OPS-74). The open map stays the default and the mode of the guided story, every test and every gate ([10](10_FRONTEND.md) FE-140).
 
 | ID | Requirement |
 |---|---|
-| BE-139 | With `MAPTILE_API_KEY` present and the presenter's offline control not set, the API process, and only it, fetches the root tileset and the tiles of the photorealistic 3D mode from the provider and passes them on through `GET /api/photoreal/{path}` on its own origin, adding the key to each request on the server. It is a named exception to the outbound targets of the API process, beside the traffic provider of BE-129 and the imagery provider of BE-135 (ARC-35); the browser contacts only its own origin and never holds the key. The key is read only from the environment by `config` and held only in the API process's memory; it is never printed, logged, committed, placed in a logged URL, an error body (BE-91), a lineage record, a brief, a prompt, a work tree, a worker tool or a sandbox, and the provider's hosts are never on the fetcher allow-list. The route counts every billable request it sends in one count for the whole project, whatever session, seat, restart, release or reinstall it comes from; free use is ignored, as item 7 states. Once the count reaches 3,333 (USD 6.00 per 1,000 requests at the first paid tier), every request is refused; a higher price, read at the task that builds the mode, lowers that number so that the spend stays within USD 20. One view loads at most 600 tiles: each request names its view by an id that the API process issued to the session and seat (ASSUMPTION), and the route refuses a request beyond the 600th of one view. A refused request is not sent and returns `PROVIDER_CAP_REACHED`; a count that cannot be read or written refuses the request and never allows it. A tile is a picture: no numeral is read from it and it is no fact (BE-104). No tileset or tile is written to disk, the release, the database, the ledger, a log, the memo, a backup or the freeze bundle, and no route caches one; the count is the only thing the route keeps. The presenter's offline control switches the provider off together with the model provider (AI-73), and an unavailable provider turns the mode off for the page, which keeps the open map, never an error page. No test, gate, command, preflight, `./eii up`, freeze or guided story needs the mode, and no test or continuous-integration job calls the provider: the adapter's fixtures are made by hand in the provider's documented response format, read at the task that builds it. A planted call to the provider's hosts from a test fails, and so do a planted key in a log line or an error body, a planted request past the count and a planted request for the 601st tile of one view. |
+| BE-139 | With `MAPTILE_API_KEY` present and the presenter's offline control not set, the API process, and only it, fetches the root tileset and the tiles of the photorealistic 3D mode from the provider and passes them on through `GET /api/photoreal/{path}` on its own origin, adding the key to each request on the server. It is a named exception to the outbound targets of the API process, beside the traffic provider of BE-129 and the imagery provider of BE-135 (ARC-35); the browser contacts only its own origin and never holds the key. The key is read only from the environment by `config` and held only in the API process's memory; it is never printed, logged, committed, placed in a logged URL, an error body (BE-91), a lineage record, a brief, a prompt, a work tree, a worker tool or a sandbox, and the provider's hosts are never on the fetcher allow-list. The route counts every billable request it sends in one count for the whole project, whatever session, seat, restart, release or reinstall it comes from; free use is ignored, as item 7 states. Once the count reaches 3,333 (USD 6.00 per 1,000 requests at the first paid tier), every request is refused; a higher price, read at the task that builds the mode, lowers that number so that the spend stays within `SPEND_CEILING_USD`. There is no per-view budget: each request names its registered view for alias binding and disposal, without reducing its detail, area or duration to save requests. The availability meter reports the running billable total, request limit, exact server-computed spend and a warning at `WARNING_FRACTION` of the limit; the warning does not refuse requests. A refused request is not sent and returns `PROVIDER_CAP_REACHED`; a count that cannot be read or written refuses the request and never allows it. A tile is a picture: no numeral is read from it and it is no fact (BE-104). No tileset or tile is written to disk, the release, the database, the ledger, a log, the memo, a backup or the freeze bundle, and no route caches one; the count is the only thing the route keeps. The presenter's offline control switches the provider off together with the model provider (AI-73), and an unavailable provider turns the mode off for the page, which keeps the open map, never an error page. No test, gate, command, preflight, `./eii up`, freeze or guided story needs the mode, and no test or continuous-integration job calls the provider: the adapter's fixtures are made by hand in the provider's documented response format, read at the task that builds it. A planted call to the provider's hosts from a test fails, and so do a planted key in a log line or an error body, a planted request at the project-wide ceiling; a view making more than its former per-view allowance succeeds while below that ceiling. |
 
 ## 9. Seats and the ledger
 
@@ -970,12 +1056,12 @@ Model unavailability is not an error: it is reported as a `status` event with `w
 | `INVALID_ARGUMENT` | 422 | input fails its model |
 | `SEAT_FORBIDDEN` | 403 | a presenter route without `EII_PRESENTER=1`, a loopback request or a valid presenter token (BE-89); the oversight routes it also answered left with [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15 |
 | `NOT_FOUND` | 404 | unknown seat, answer or brief (including briefs not visible), a scene fixture id absent from the manifest (BE-106), a case sample file this session and seat did not load (BE-118), a route of the imagery provider while it is off (BE-135, BE-136), the tile route of the photorealistic 3D mode while it is off (BE-139), or a retired oversight path (BE-68) |
-| `PROVIDER_CAP_REACHED` | 429 | the photorealistic 3D mode reached its project-wide request count or the tile budget of one view; the request was not sent (BE-139) |
+| `PROVIDER_CAP_REACHED` | 429 | the photorealistic 3D mode reached its project-wide request ceiling; the request was not sent (BE-139) |
 | `BRIEF_STORE_PAUSED` | 503 | brief saving unavailable in embedded mode |
 | `STORE_UNAVAILABLE` | 503 | the selected store did not answer |
 | `QUERY_TIMEOUT` | 504 | statement exceeded its timeout |
 | `RELEASE_MISMATCH` | 503 | store release differs from the configured release |
-| `RATE_LIMITED` | 429 | seat exceeded its request rate |
+| `RATE_LIMITED` | 429 | seat exceeded its request rate, or the process holds its live-session cap (BE-109; decision 0061 item 6; L-1036 item 1) |
 | `INTERNAL` | 500 | anything else |
 
 | ID | Requirement |
@@ -1037,7 +1123,7 @@ The strategy, fixtures and CI layout are in [12 Testing and quality](12_TESTING_
 | `api/` | endpoint shapes, signed-cookie seat binding, presenter-token refusal, stream order and resumption (BE-65 to BE-69, BE-70, BE-89); no route or setting selects a parameter set (BE-103); the scene endpoint rejects an extra property, a malformed id and an unlisted id (BE-106); the brief is buffered until the accounting gate passes, a failed check sends the template writer's default answer, logs the failure and shows "Checked before display" (BE-107); the shape and case routes refuse every invalid input; the case route loads each closed sample-file key, refuses a file body in any encoding, a path, a URL, an extra property and an unknown key with nothing kept, and loads no committed file whose SHA-256 differs from its committed value; both routes return 404 to another seat, keep nothing in the ledger, egress record, logs, memo or `app.brief`, and lose every entry at restart (BE-109, BE-117, BE-118); the address-search route takes its text only in the body and keeps nothing of a request or a result in a file, the database, the ledger, an egress record, a log, the memo or the session store (BE-136); a retired oversight path returns 404 to every seat, and no route returns rows of the question log (BE-68, BE-76); `GET /api/layers/presence` and `GET /api/layers/flows` accept optional `split_kinds` (`age_band`, `gender` and `nationality_group`, empty by default), and each selected kind returns its own one-way output; an unknown kind, a crossed specification and `split_kinds` on another layer fail |
 | `traffic_provider/` | with the key unset, the switch `simulated`, or the offline control on, no connection is opened; with the key present and the switch `tomtom`, hand-made fixtures in the documented response format give a tile and a drive-time area, and nothing of either reaches disk, the release, the ledger, a log or the memo; a planted key in a log line, a lineage record or an error body fails the test; the area is bound to its session and seat and returns `INVALID_ARGUMENT` for another (BE-129 to BE-131) |
 | `imagery_provider/` | with the key unset or the offline control on, no connection is opened and both routes return `NOT_FOUND`; with the key present, hand-made fixtures give a tile and address results, and nothing of either reaches disk, the database, the ledger, an egress record, a log, the memo or the session store; no result reaches a model request; a planted request to the provider's hosts without the key fails, and so does a planted key in a log line or an error body (BE-135 to BE-137) |
-| `photoreal_tiles/` | with the key unset or the offline control on, no connection is opened and the route returns `NOT_FOUND`; with the key present, hand-made fixtures give a tileset and a tile, and nothing of either reaches disk, the database, the ledger, a log, the memo or the session store; the count survives a restart; a planted request past the count and a planted request for the 601st tile of one view return `PROVIDER_CAP_REACHED` with nothing sent, and a count that cannot be read refuses the request; a planted call to the provider's hosts from a test fails, and so does a planted key in a log line or an error body (BE-139) |
+| `photoreal_tiles/` | with the key unset or the offline control on, no connection is opened and the route returns `NOT_FOUND`; with the key present, hand-made fixtures give a tileset and a tile, and nothing of either reaches disk, the database, the ledger, a log, the memo or the session store; the count survives a restart; a planted request at the project-wide ceiling returns `PROVIDER_CAP_REACHED` with nothing sent; a view above its former per-view allowance continues below that ceiling, and a count that cannot be read refuses the request; a planted call to the provider's hosts from a test fails, and so does a planted key in a log line or an error body (BE-139) |
 | `ledger/` | idempotent replay, append-only, paused state, exact payload bytes; a call blocked for a planted registration number of the invented stand-in register writes one row holding only the proposed payload's hash, with the number in no column of it, in either ledger (BE-73 to BE-81); no ledger history is loaded, a planted row whose `origin` is not `live` is refused, and a planted route or event stream that returns rows of the question log fails (BE-76); the demand minimum left with the oversight seat (BE-75) |
 | `preflight`, presenter | store selection matrix, complete receipt, PostGIS version failure, no database start by `up`, no automatic switch (BE-87 to BE-90) |
 
@@ -1074,12 +1160,12 @@ ASSUMPTIONS made in this document (each also marked where it appears):
 27. The route `GET /api/traffic/flow-tiles/{z}/{x}/{y}` and the behaviour of an unavailable provider (the simulated layer is shown, no error page) are proposals; the free allowance is monthly, and nothing is stored (decision 0019 item 17).
 28. Each refresh finds the newest dated release of the public copy of `places_fsq` through its root listing and reads that release's own metadata file without an account. The actual release date is recorded in runtime registry evidence and carried on every eligible place, and every earlier dated snapshot is retained. `pub_place_fsq` is filled inside `./eii build-public`; de-duplication, reviewed mapping for every non-empty source category identifier and the complete real-name inventory run on each release, and its places are shown with the release date (decision 0064 item 14).
 29. The names of the three tools of [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) (`workers_within_reach`, which answers talent available near this site, `location_allocation` and `price_measures`) and their arguments (section 6.2) are fixed here, as document 07 asks for method cards C39 to C41; the closed lists of each card are fixed at the slices that build them. `location_allocation` returns `NO_DATA` when fewer than three candidates are eligible, a case that method card C40 does not state.
-30. The routes `GET /api/imagery/tiles/{z}/{x}/{y}`, `POST /api/address-search` and `GET /api/photoreal/{path}`, the limit of five address results (as `resolve` returns), the view id by which the photorealistic 3D route counts the tiles of one view, the error code `PROVIDER_CAP_REACHED` and the behaviour of an unavailable provider (the page keeps the open map and the gazetteer, no error page) are proposals (decision 0023 item 7).
+30. The routes `GET /api/imagery/tiles/{z}/{x}/{y}`, `POST /api/address-search` and `GET /api/photoreal/{path}`, the limit of five address results (as `resolve` returns), the registered view id by which the photorealistic 3D route binds and disposes aliases, the error code `PROVIDER_CAP_REACHED` and the behaviour of an unavailable provider (the page keeps the open map and the gazetteer, no error page) are proposals (decision 0023 item 7).
 31. The age profile of the people living here (decision 0023 item 11) is `population_age_sex` with `split` `none` on the area of the living block, in its own Public component after the two blocks, because no synthetic or protected record carries age; documents 01 (BRF-108) and 09 (AI-131 and its open questions) record the same assumption.
 
 OPEN items raised by decisions 0016 and 0017 that touch this document:
 
-- OPEN: the apportioning weight for drawn shapes (area, or a public population grid) is fixed in document 07 and confirmed at slice S2; the vertex and size limits of a drawn shape are fixed at the same gate (BE-117).
+- OPEN: the apportioning weight for drawn shapes (area, or a public population grid) is fixed in document 07 and confirmed at slice S2; the drawn-shape limits are now fixed by decision 0061 item 5 (BE-117).
 - OPEN: the closed criterion list of `area_ranking` is fixed at slice S2 (document 07, method card C11). Document 07 now fixes how a `situation`'s hours combine for a drive area (C25), the candidate kinds of `area_ranking` (C11), the criteria of `activity_fit` (C16), the area types of `similar_areas` (C17), the access scores and times of `reachable_access` (C12) and the projection method (C21).
 - Settled (decision 0023 item 10, PUB-108): `pub_tender` is the public source of tenders; `investment_context` gains a `tenders` topic that reads it once task S2-T19 has fetched the visitor-readable source and it passes its checks.
 - OPEN: the page structure of the FDI dashboard and of the agency's pages, and whether a project's location is a point or a city, are confirmed at slice S2 against a synthetic test page of the same shape.
@@ -1106,8 +1192,8 @@ OPEN items raised by [decision 0023](decisions/0023-ten-additions-and-the-data-r
 - Settled for its tables (raised by decision 0023): document 03 section 7.2 now lists `pub_property_quarter`, `pub_land_price` and `pub_bank_credit`, whose columns task S2-T19 confirms at the first fetch (document 03 open questions). Still OPEN: the Public series of each sector's growth that method card C41 reads joins document 03 when document 04 names it, and the aggregates of C41 that the columns of `pub_property_quarter` do not yet hold (the median over the deals of land without a building and the median deal price of each unit type, each with its deal count) are confirmed with those columns; until then `price_measures` returns `NO_DATA` for the measures that need them.
 - Settled (owner, OI-140, 2026-11-14): the qualified people per competing job within reach ratio of method card C39 (MTH-122) is computed from the two released tables as the one exception to PRV-30 and PRV-18 (item 1; BE-132, PRV-127).
 - OPEN (owner; OI-147): card C39 draws each commute line from a whole home municipality of `ha_home` to the site's catchment snapped on `ha_work_count`, as exact sums of published `home_area_share` rows (MTH-112; PRV-131). Whether that form meets the case "commute lines only as totals between district pairs" of decision 0023 item 1 is the owner's question; until he answers, no line is drawn in any other form.
-- Settled (BE-57; decision 0023): `pub_tender` is read by the `tenders` topic of `investment_context` once S2-T19 has fetched the visitor-readable source and it passes its checks (item 10, PUB-108). `pub_poi_comm`, `pub_address_point` and `pub_parcel` are read by `GET /api/layers/{layer}` under the layer keys of the next OPEN (S3-T12), and `pub_parcel` with `pub_address_point` also by site fit's plots (DAT-168, TST-247). `pub_district_cooling` is collected only and listed control-only until the session on value extraction of item 10 states its reader.
-- OPEN (decision 0023; task S3-T12): the closed layer list of `GET /api/layers/{layer}` gains layer keys for `pub_poi_comm` (commercial points), `pub_address_point` (address points), `pub_parcel` (land parcels) and the landmark names of the gazetteer, beside the keys already named for decision 0023, or this OPEN names each layer and S3-T12 as the task that fixes its key; document 10 aligns its Map layers rows with the keys chosen.
+- Settled (BE-57; decision 0023): `pub_tender` is read by the `tenders` topic of `investment_context` once S2-T19 has fetched the visitor-readable source and it passes its checks (item 10, PUB-108). `pub_poi_comm`, `pub_address_point` and `pub_parcel` are read by `GET /api/layers/{layer}` under `commercial_points`, `address_points` and `parcels` (settled by S3-T12), and `pub_parcel` with `pub_address_point` also by site fit's plots (DAT-168, TST-247). `pub_district_cooling` is collected only and listed control-only until the session on value extraction of item 10 states its reader.
+- Settled (task S3-T12): the closed layer list of `GET /api/layers/{layer}` gains `commercial_points` (`pub_poi_comm`), `address_points` (`pub_address_point`), `parcels` (`pub_parcel`) and `landmarks` (landmark names of `gazetteer` from the centre's landmarks layer). No key is added for official district and zone boundaries: that source is absent, and the map shows a catalogue sentence with no outline. Document 10 aligns its Map layers rows with these keys.
 - OPEN: the plot label "permitted by zoning and looks empty" and the zoning measure of method card C16 (task S6-T12), zoning as a criterion of card C11 (task S6-T11) and the distance to a planned station of card C41 (journeys D2 and D5) have no tool contract here yet. Their arguments, reads and statuses join `activity_fit`, `area_ranking` and `price_measures`, or a tool of their own, at those tasks, reading the Public layers of the national GIS centre (items 3 and 12). Until then no tool returns a plot, a zoning measure or a station distance, and no output ever calls a plot approved or available.
 - OPEN: the fixed before-and-after views of the GIS centre's imagery history (item 3; journey D6) are served by no route yet; the route, and whether `where_to_grow` stages them, are fixed with document 10 at task S3-T16. They are pictures derived under `data/` and never committed; they carry no fact, and no numeral is read from them.
 - OPEN: where the project-wide request count of the photorealistic 3D mode (BE-139) is kept, so that no restart, reinstall or new release resets it, and which of its requests the provider bills, read in the provider's current documentation, are fixed at the task that builds the mode (S3-T16, until the look's task S3-T15 enters TASKS.md), with documents 03 and 13; until then the mode stays off.
@@ -1140,3 +1226,186 @@ Every timing and size in this document that is attributed to the design research
 Under [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) items 4 and 5 (S2-T51), `POST /api/address-search/structured` accepts exactly string fields `zone`, `street`, `building`, with no text, language, limit, URL, utility account, PIN or person field. It reads only `pub_address_point` and returns bounded, feature-key-ordered candidates with published subtype/point and release/source lineage, and found, ambiguous, not-found or missing-source status. Duplicate triples remain ambiguous; nothing guesses a point. The request and result never enter a log, ledger, model payload or persisted query/result store. The fixed read `structured-address-v1` and composite index apply in both stores. The model has no callable tool for this route. Every displayed address numeral uses the Fact chip family.
 
 `GET /api/gis-imagery/{date}/{level}/{row}/{column}` serves only explicitly selected verified released pictures, with credits from `/api/gis-imagery/credit`; the page shows the selected date's publisher, service, retrieval date and terms/basis while imagery is visible (PUB-110). A missing snapshot remains missing coverage. No product reader imports custodian code, contacts the centre, reads the external root or infers a number from a tile. Level 11 and free text are refused by name before any send, with keys present/absent and offline control set/unset. This supplement leaves BE-135, BE-136, AI-130, FE-142, TST-248, TST-249, OPS-73 and the keyed provider unchanged.
+
+The structured-address fixed SQL strings and composite index definition live in
+`eii_product.store.structured_address_sql`; the API keeps the existing
+`prepare_read`, `StoredAddressSearch` and `INDEX_DDL` interfaces, with identical
+queries, typed bindings, candidate bounds and refusal behavior. This placement
+retains the S3-T22 guard against inline SQL in API modules.
+
+## S3-T16 Part A implementation boundary
+
+The in-progress Part A API mounts `GET /api/map-modes`,
+`GET /api/imagery/tiles/{z}/{x}/{y}`, `POST /api/photoreal/views` and
+`GET /api/photoreal/{path}` in the existing application factory. It reuses the
+address route's injected offline reader, opener boundary and in-memory response
+exchange. Availability returns `open`, `satellite` and `photoreal`, each with
+`available` and `reason`. The photoreal entry additionally carries `meter`: an
+object with `billable_requests`, `request_limit`, `spend_usd` (an exact plain
+decimal string) and `warning`, or null when the journal or pricing cannot be
+read safely. Refusal reasons are `no_key`, `offline`, `no_address`,
+`cap_reached` and `count_unavailable`; the client additionally recognizes
+`network`. Provider routes return `Cache-Control: no-store`.
+
+The satellite transport supplies the application response credit in
+`X-Attribution`; missing credit refuses the picture. Its extraction is described
+below. Part P rewrites native child references into query-free, view-bound
+aliases and renders invented nested tilesets through the pinned native loader.
+Native credit comes from visible GLB `asset.copyright`, not a response header.
+Disposal expires aliases, cancels requests and releases decoded images. The
+fixture qualification does not establish live compatibility. No provider was contacted.
+
+For BE-139 and OPS-74, the spend-count journal's fixed repository-relative path is
+`data/photoreal-count.log`. The implementation never initializes or truncates
+it. Tests supply a temporary journal starting with `ready:0`. Each exchange
+appends and syncs `pending` before sending and `ready` after a response. All
+provider success statuses count, including a root tileset and a success whose
+body is subsequently refused. If a successful status is known but reading the
+body fails, the journal completes with the incremented count before the route
+refuses the unusable response. Ordinary HTTP errors and redirected responses
+keep their unbillable treatment. In particular, a redirect refused by
+`NoRedirect` before a status is returned completes `pending:N` with `ready:N`:
+the route refuses that response, the meter stays available at the unchanged
+count, and a later view can send. The successful-status check takes precedence
+even when the subsequent body read raises `AddressFailure`. An indeterminate
+exchange leaves the pending
+entry unresolved: further views and requests are refused, including after a
+restart, and the availability meter is null with `count_unavailable`. Only a
+fixed, sanitized exception reaches the budget; no provider URL, key or header
+value is included. A missing file or malformed journal also refuses further use.
+An in-process prefix check detects replacement by an older journal. Under ruling L-721 item 2,
+operator rollback of a valid older journal after restart is a stated local-state
+limit. Document 13 section "S3-T16 Part A settings under implementation" gives
+the one-time operator creation step and the independent-budget backstop open
+item. Product actions must preserve the file; transition coverage remains
+incomplete for S3-T16 criterion 11.
+
+
+Under lead rulings L-1015 and L-1017 (owner decisions of 2026-11-18),
+`SPEND_CEILING_USD` is the single named total-spend ceiling in
+`photoreal_tiles/limit.py`; `billable_limit` and the availability meter use the
+same effective request limit. `EII_PHOTOREAL_LIMIT` may only lower it.
+`WARNING_FRACTION` is the named warning threshold (the lead default pending a
+measured showing). The warning is inclusive at that fraction, advisory only,
+and never changes rendering or request dispatch. Spend is billable count times
+the configured read price per thousand, calculated only with Python `Decimal`.
+The locked request transaction still refuses at the ceiling before appending
+or sending; `cap_reached` and `count_unavailable` remain closed refusals.
+There is no per-view request budget. Registration, view-bound aliases, native
+session expiry and disposal remain in place.
+
+The TypeScript availability parser accepts only the closed meter fields and
+performs no spend or warning calculation. Under lead ruling L-1020, the Stage
+controls now render the bilingual running total and server warning through the
+Fact chip family's typed `operational` form. The meter also supplies
+`ceiling_usd`, `price_per_thousand_usd`, `method_version` and
+`default_price_retrieved_on` for its operational explanation. Its source is the
+project's request journal and its method is `Budget.meter`, version `1`, never
+release lineage. The default price reading is recorded by document 04's
+`tiles3d_google` row; this date does not attest to an operator override. The
+pricing-page address is not recorded and displays "To record", proposed for
+the lead's open items. Existing availability responses refresh the meter;
+there is no additional polling or spending request. Null remains withheld
+with its reason; `cap_reached` retains its existing refusal copy. Arabic keys
+are pending native review.
+
+
+### Satellite metadata adapter in S3-T16 Part A
+
+The satellite pass-through reads `copyrightText` from the configured service's
+JSON response (`f=json`) before requesting a tile. It reuses the address-search
+exchange and redirect-refusing tile opener. Invalid metadata refuses the tile;
+provider echoes are checked before replacing any response header. The browser
+receives the credit in `X-Attribution`, which is an application response header,
+not a claimed native tile header. This adapter is tested against invented
+responses and is not verified against the live provider (PUB-109, OPS-73).
+
+
+### S3-T16 Part P native adapter fix pass
+
+For BE-139, child references require nonempty path segments, including in
+same-authority absolute and scheme-relative forms. This prevents an alternative
+spelling of the root from becoming a child alias. Session-echo refusal scans
+each distinct session value once per body. The damaged-journal regression uses
+the returned child alias and a stale availability result to exercise the budget
+transaction itself, requiring a refusal before another upstream call.
+
+### S3-T22 Public route implementation boundary
+
+Decision 0061's Public tools are mounted through `api/tools.py` and the exact
+section 6.1 result adapter. R2 reads a session without admitting one. A drawn
+shape is decoded only through that session's shape port; routing is the trusted
+application dependency. S3-T26 now passes this dependency to the playbook regardless of whether routing
+was configured, so a registered shape never loses its session context. Missing
+routing keeps the existing routing-unavailable refusal; no substitute is used.
+Public layer dispatch delegates to the fixed reads listed in document 03,
+**Fixed Public route reads (S3-T22)**. Existing financial-centre handling and
+its refusal bodies are preserved. The selected-use store in `land-use.ts` is
+shared by the overlay, feature list, selected panel and category legend. The
+initial category is the first payload group; only the closed category control
+changes it. All groups remain in the payload. After area submission, only
+Public point/listing layers are filtered by server-returned exact membership; classed and unclassed
+source-geography layers remain whole, including rail/protection geometry,
+health-centre catchments, zoning, parcels and property-price fills (L-1036
+item 3). The area cards continue to use the exact outline. Source geometry
+retains holes and every multipart island under document 03's Source-geometry
+extension (L-1060 item 2). Scoped parity cases execute the named reads, with
+a second-engine stand-in labelled as ownership/coverage evidence only.
+Mutation campaigns remain open as recorded in PROGRESS.md; this boundary
+asserts neither live two-store parity nor a slice-gate pass.
+
+### S3 re-cut exact membership integration
+
+The area-context factory binds a trusted callback to the same serving release's
+fixed Public layer reads. Only a successful `make_area` outline invokes it;
+invalid arguments never read the snapshot. The snapshot copies the emitted
+feature IDs and positions of the closed Public point/listing set. Missing
+context snapshots return unavailable membership, never browser geometry.
+The typed envelope and browser filter retain source-geography objects whole.
+The API/browser integration specimen and present/absent/injected snapshot plants
+are in `test_area_membership_http.py` and `area-membership-http.test.ts`.
+
+### S3-T25 offline gazetteer transport
+
+`POST /api/tools/resolve` uses the existing typed tool route, common envelope and
+section 12 refusal boundary. Its request is exactly section 6.2 `resolve`'s
+`text`, `lang` and `kind`. A retained `ResolveContext` reads the six existing
+named queries once per mounted store on first use. Matching still runs in the
+existing resolver. The HTTP projection checks the closed candidates again and
+emits no facts, blocks or privacy receipt. The ledger omits typed resolver text;
+neither this route nor its browser consumer invokes address search.
+
+The opening picker remains S3-T10's responsibility. Its consumer seam is
+`postResolve` followed by `submitPlaceArea(selected.key, preset.id)`, where the
+selection is a place candidate and the preset is from the existing distance,
+walk or drive catalogue. `assemblePlaceBody` sends only `place_key`, `mode` and
+`cutoff` to the existing `make_area` route. No candidate coordinate, guessed pin,
+new endpoint or official boundary is added. The drawing presentation consumes
+only the returned outline and exact Public membership. The area identifier
+remains the server's opaque identifier in the area response. Preset changes for
+a named choice reuse the selected key at this seam rather than synthesising a
+pin for the drawing controls. The summary says this is a preset around a chosen
+place, and `layers.boundaries.absent` remains visible. Preset numerals use the
+existing input Fact chip; identifiers and geometry remain non-text drawing
+metadata under BE-49. Candidate labels containing numerals fail the existing
+plain-label guard before a picker may display them; the no-facts resolver
+contract is not widened to carry invented label facts.
+
+The opt-in invented resolver fixture covers an in-cell place, an on-land place
+without a base cell, an outside-land place, an activity and no match in both
+languages. Null-cell areas retain their null anchor, empty unit lists and exact
+Public point context. `live_public_playbook.py` contributes mounted resolver
+and selected-key area cases, traces successful named-query executions per
+engine, and refuses an omitted query on either engine. Local embedded execution
+is tested separately; final real PostgreSQL/embedded evidence is the lead's
+S3-T24 run. This section records an implementation seam, not live parity,
+native-language approval or a slice gate.
+
+The key validator also accepts the frame builder's existing administrative
+namespaces (`district:`, `zone:` and `municipality:`), including their numeric
+or underscored identifier suffixes. It refuses foreign namespaces, path syntax
+and forbidden identifier digit runs before any read. The selected key still
+resolves only by the existing bound gazetteer query; no key is rewritten to a
+landmark key or converted to a client-supplied coordinate. This is a validator
+correction for the existing gazetteer-key input, with the make-area algorithm
+and its existing tests retained.

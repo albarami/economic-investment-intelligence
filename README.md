@@ -51,6 +51,7 @@ The authoritative command list and each command's conditions are in [AGENTS.md](
 ./eii up
 python3 scripts/check_docs.py
 python3 scripts/check_tree.py
+uv run --locked python scripts/export_web_catalogue.py
 uv lock --check
 uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -v
 uv run --locked ruff check .

@@ -1,0 +1,19 @@
+[[tables]]
+name = "zone"
+anchor = "docs/03_DATA_CONTRACTS.md section \"### 7.3 Columns\" row zone"
+key = ["zone_code"]
+
+[[tables.columns]]
+name = "zone_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_en"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = false

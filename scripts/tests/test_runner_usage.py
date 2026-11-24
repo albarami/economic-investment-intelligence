@@ -83,9 +83,14 @@ class RunnerUsage(unittest.TestCase):
         self.assertEqual(web.args[1], "spikes/performance/tests/run.node-test.mjs")
         spike = "spikes/glyphs/tests/*.node-test.mjs"
         performance = "spikes/performance/tests/*.node-test.mjs"
+        look = "spikes/look/tests/*.node-test.mjs"
         script_globs = tuple(word for word in words if word.endswith(".mjs"))
         self.assertIn(spike, script_globs)
         self.assertIn(performance, script_globs)
+        self.assertIn(look, script_globs)
+        self.assertEqual(
+            tuple(arg for arg in web.args if arg.endswith(".mjs")), script_globs
+        )
         expected = (
             "python-guards",
             "python-core",

@@ -1,0 +1,752 @@
+[
+  {
+    "id": "baseline-web",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts",
+      "tests/unit/opening-area.test.ts",
+      "tests/component/opening-reset.test.tsx",
+      "tests/component/mounted-opening-review.test.tsx",
+      "tests/unit/opening-fixture.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 0,
+    "summary": ["Test Files  5 passed (5)", "Tests  53 passed (53)"],
+    "log": "guard-removals/baseline-web.log"
+  },
+  {
+    "id": "baseline-python",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 0,
+    "summary": ["3 passed, 9 deselected in 12.65s"],
+    "log": "guard-removals/baseline-python.log"
+  },
+  {
+    "id": "W05",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "    frames.at(-1)?.kind !== 'done' ||\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > Public opening accounting boundary > refuses planted nonterminal-brief frames",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W05.log"
+  },
+  {
+    "id": "W07",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "frame.kind === 'error' ||\n        ",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > Public opening accounting boundary > refuses planted error frames",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W07.log"
+  },
+  {
+    "id": "W09",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "    brief.headline_key !== 'foundation_headline' ||\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > Public opening accounting boundary > refuses planted headline frames",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W09.log"
+  },
+  {
+    "id": "W10",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "brief.decision_template_key !== 'foundation_decision'",
+    "replacement": "false",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > Public opening accounting boundary > refuses planted decision frames",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W10.log"
+  },
+  {
+    "id": "W13",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "fact.provenance !== 'public' ||\n          JSON.stringify(fact.input_classes) !== '[\"public\"]'",
+    "replacement": "false",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses non-Public provenance even in evidence without a displayed card",
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses non-Public input-classes even in evidence without a displayed card",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 37 passed (39)"
+    ],
+    "log": "guard-removals/W13.log"
+  },
+  {
+    "id": "W14-keys",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "Object.keys(started).sort().join() !== 'answer_id,events_url' ||\n    ",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a planted start extra-key",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W14-keys.log"
+  },
+  {
+    "id": "W14-url",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "started.events_url !== '/api/answers/' + started.answer_id + '/events' ||\n    ",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a planted start foreign-events",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W14-url.log"
+  },
+  {
+    "id": "W15",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "!Array.isArray(body.facts) ||\n      JSON.stringify(body.facts.map((fact) => fact.fact_id).sort()) !==\n        JSON.stringify([...identities].sort())",
+    "replacement": "!Array.isArray(body.facts)",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a chain-valid tool fact-set replacement outside the accounted identities",
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a chain-valid tool fact-set addition outside the accounted identities",
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a chain-valid tool fact-set omission outside the accounted identities",
+      "Test Files  1 failed (1)",
+      "Tests  3 failed | 36 passed (39)"
+    ],
+    "log": "guard-removals/W15.log"
+  },
+  {
+    "id": "W16",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "      if (!contextAccepted(payload, registry)) throw new Error('story_refused');\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a chain-valid story card of the wrong metric before returning cards",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W16.log"
+  },
+  {
+    "id": "W17",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "  if (response.status !== 202) throw new Error('story_refused');\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a planted start status",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W17.log"
+  },
+  {
+    "id": "W18-namespace",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "!code?.startsWith('place:')",
+    "replacement": "!code",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > listed place namespace > accepts only a public place key: public / zone:INVENTED-a",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W18-namespace.log"
+  },
+  {
+    "id": "W18-kind",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "resolved.binding.fact.geography.kind !== 'public' ||\n    ",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > listed place namespace > accepts only a public place key: national / place:INVENTED-venue-a",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W18-kind.log"
+  },
+  {
+    "id": "W19",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/api/public-opening.ts",
+    "removed": "    if (!contextAccepted(payload, registry)) throw new Error('card_refused');\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "28889624b5aa2e931f5a37e07d2852d0683a5ddf3cf1199bdca4c8f8040a5f6e",
+    "summary": [
+      "FAIL  tests/unit/public-opening.test.ts > runPublicStory refusals > refuses a busyness entry bound to a chain-valid night-lights fact",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 38 passed (39)"
+    ],
+    "log": "guard-removals/W19.log"
+  },
+  {
+    "id": "W21-absent",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/opening-reset.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/stage/Stage.tsx",
+    "removed": "payload={quiet ? null : layerPayload}",
+    "replacement": "payload={layerPayload}",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "5317da151c526e7a4b06fa684f331b208c4789d329896aaac4076bade6d6d979",
+    "summary": [
+      "FAIL  tests/component/opening-reset.test.tsx > the quiet asset-absent stage also withholds its layer disclosure",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 2 passed (3)"
+    ],
+    "log": "guard-removals/W21-absent.log"
+  },
+  {
+    "id": "W21-ready",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/opening-reset.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/stage/Stage.tsx",
+    "removed": "payload={quiet ? null : layerPayload}",
+    "replacement": "payload={layerPayload}",
+    "occurrence": 2,
+    "verdict": "KILLED",
+    "restored_sha256": "5317da151c526e7a4b06fa684f331b208c4789d329896aaac4076bade6d6d979",
+    "summary": [
+      "FAIL  tests/component/opening-reset.test.tsx > the quiet opening withholds the selected overlay until the area scene",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 2 passed (3)"
+    ],
+    "log": "guard-removals/W21-ready.log"
+  },
+  {
+    "id": "W24",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-area.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/state/area-actions.ts",
+    "removed": "  if (generation !== requestGeneration) return;\n  selectedRequest =",
+    "replacement": "  selectedRequest =",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "5cf1aea9fa28807db3bfc84a45d4e052b7d4b2668a1de2715b1afd76c5f0879e",
+    "summary": [
+      "FAIL  tests/unit/opening-area.test.ts > a late area answer cannot remember an escaped selection before the next accepted area",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed | 3 passed (4)"
+    ],
+    "log": "guard-removals/W24.log"
+  },
+  {
+    "id": "W27",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/mounted-opening-review.test.tsx"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/app/MountedPublicShell.tsx",
+    "removed": "area.presented?.showLayers &&\n    story.selection === selectedAreaRequest()",
+    "replacement": "area.presented?.showLayers",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "d57d0a857fb51c7a680717b0a5a4d50efd3950e19062698c13862f16ee013b85",
+    "summary": [
+      "FAIL  tests/component/mounted-opening-review.test.tsx > replaces the selected area without retaining the previous story cards (en)",
+      "FAIL  tests/component/mounted-opening-review.test.tsx > replaces the selected area without retaining the previous story cards (ar)",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 4 passed (6)"
+    ],
+    "log": "guard-removals/W27.log"
+  },
+  {
+    "id": "W30",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-area.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/src/state/area-actions.ts",
+    "removed": "  if (event.type === 'escape' || event.type === 'select-tool')\n    selectedRequest = null;\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "5cf1aea9fa28807db3bfc84a45d4e052b7d4b2668a1de2715b1afd76c5f0879e",
+    "summary": [
+      "FAIL  tests/unit/opening-area.test.ts > escape forgets the request of an accepted area",
+      "FAIL  tests/unit/opening-area.test.ts > select-tool forgets the request of an accepted area",
+      "Test Files  1 failed (1)",
+      "Tests  2 failed | 2 passed (4)"
+    ],
+    "log": "guard-removals/W30.log"
+  },
+  {
+    "id": "P02-transport",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 1,
+    "file": "product/tests/public_opening_server.py",
+    "removed": "        transport_factory=denied,\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "00cf6668c4be54e72b52102ada5a89f6f4090e871d162ac19a0ae44336917c0d",
+    "summary": [
+      "FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_pins_no_provider",
+      "1 failed, 2 passed, 9 deselected in 13.29s"
+    ],
+    "log": "guard-removals/P02-transport.log"
+  },
+  {
+    "id": "P02-opener",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 1,
+    "file": "product/tests/public_opening_server.py",
+    "removed": "        opener=denied,\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "00cf6668c4be54e72b52102ada5a89f6f4090e871d162ac19a0ae44336917c0d",
+    "summary": [
+      "FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_pins_no_provider",
+      "1 failed, 2 passed, 9 deselected in 12.83s"
+    ],
+    "log": "guard-removals/P02-opener.log"
+  },
+  {
+    "id": "P03",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 1,
+    "file": "product/tests/public_opening_server.py",
+    "removed": "        offline_reader=lambda: True,\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "00cf6668c4be54e72b52102ada5a89f6f4090e871d162ac19a0ae44336917c0d",
+    "summary": [
+      "FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_pins_no_provider",
+      "1 failed, 2 passed, 9 deselected in 13.12s"
+    ],
+    "log": "guard-removals/P03.log"
+  },
+  {
+    "id": "P04-marker",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 1,
+    "file": "product/tests/public_opening_server.py",
+    "removed": "        with (work / \"egress-attempts.txt\").open(\"a\") as output:\n            output.write(\"provider_attempt\\n\")\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "00cf6668c4be54e72b52102ada5a89f6f4090e871d162ac19a0ae44336917c0d",
+    "summary": [
+      "FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_pins_no_provider",
+      "1 failed, 2 passed, 9 deselected in 12.93s"
+    ],
+    "log": "guard-removals/P04-marker.log"
+  },
+  {
+    "id": "P04-text",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 1,
+    "file": "product/tests/public_opening_server.py",
+    "removed": "            output.write(\"provider_attempt\\n\")",
+    "replacement": "            pass",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "00cf6668c4be54e72b52102ada5a89f6f4090e871d162ac19a0ae44336917c0d",
+    "summary": [
+      "FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_pins_no_provider",
+      "1 failed, 2 passed, 9 deselected in 12.83s"
+    ],
+    "log": "guard-removals/P04-text.log"
+  },
+  {
+    "id": "P05",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 1,
+    "file": "product/tests/public_opening_server.py",
+    "removed": "HOST = \"127.0.0.1\"",
+    "replacement": "HOST = \"0.0.0.0\"",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "00cf6668c4be54e72b52102ada5a89f6f4090e871d162ac19a0ae44336917c0d",
+    "summary": [
+      "FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_main_binds_only_loopback_and_closes[False]",
+      "FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_main_binds_only_loopback_and_closes[True]",
+      "2 failed, 1 passed, 9 deselected in 12.69s"
+    ],
+    "log": "guard-removals/P05.log"
+  },
+  {
+    "id": "P06",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 1,
+    "file": "product/tests/public_opening_server.py",
+    "removed": "        key_reader=lambda: None,\n",
+    "replacement": "",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "00cf6668c4be54e72b52102ada5a89f6f4090e871d162ac19a0ae44336917c0d",
+    "summary": [
+      "FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_pins_no_provider",
+      "1 failed, 2 passed, 9 deselected in 13.15s"
+    ],
+    "log": "guard-removals/P06.log"
+  },
+  {
+    "id": "B2-worker-recorder",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/opening-fixture.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 1,
+    "file": "web/tests/e2e/no-provider-attempts.ts",
+    "removed": "  if (existsSync(path.join(work, 'egress-attempts.txt')))\n    throw new Error('server_provider_attempt');",
+    "replacement": "  void work;",
+    "occurrence": 1,
+    "verdict": "KILLED",
+    "restored_sha256": "8c39ff101bdb393cdffbe3ea3e58ad1e2075df660d7c5887e0a3f6f3b2099eed",
+    "summary": [
+      "FAIL  tests/unit/opening-fixture.test.ts > the worker refuses a recorded provider attempt even after its exception was caught",
+      "Test Files  1 failed (1)",
+      "Tests  1 failed (1)"
+    ],
+    "log": "guard-removals/B2-worker-recorder.log"
+  },
+  {
+    "id": "restored-web",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts",
+      "tests/unit/opening-area.test.ts",
+      "tests/component/opening-reset.test.tsx",
+      "tests/component/mounted-opening-review.test.tsx",
+      "tests/unit/opening-fixture.test.ts"
+    ],
+    "cwd": "web",
+    "exit": 0,
+    "summary": ["Test Files  5 passed (5)", "Tests  53 passed (53)"],
+    "log": "guard-removals/restored-web.log"
+  },
+  {
+    "id": "restored-python",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "-k",
+      "pins_no_provider or main_binds"
+    ],
+    "cwd": ".",
+    "exit": 0,
+    "summary": ["3 passed, 9 deselected in 12.90s"],
+    "log": "guard-removals/restored-python.log"
+  }
+]

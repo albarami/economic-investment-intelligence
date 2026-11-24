@@ -1,0 +1,184 @@
+{
+  "year": "2024",
+  "release_id": "8fc39cf9750f722dc89e43c823552bf80c282202a6e6d4dc45b714a691f06cc1",
+  "source": {
+    "source_id": "src-fc-stand-in",
+    "publisher": "Sample Register Publisher",
+    "title": "Sample financial centre register page",
+    "licence": "Terms recorded for this sample",
+    "url": "https://example.invalid/fc-stand-in",
+    "retrieved_on": "2026-01-15",
+    "sha256": "0353b2550957f399c9229c96b4806cfa4815e8365ff657ded5c5f57869e40498"
+  },
+  "lineage": {
+    "lineage_id": "lin_pub_register_company",
+    "table_name": "pub_register_company",
+    "source_id": "src-fc-stand-in",
+    "input_class": "public",
+    "transform": "eii_core.calc.firms_per_tower@v1"
+  },
+  "gazetteer": [
+    {
+      "tower_or_building": "Invented Tower Aleph",
+      "place_code": "place:INV-TOWER-ALEPH"
+    },
+    {
+      "tower_or_building": "Invented Tower Bet",
+      "place_code": "place:INV-TOWER-BET"
+    },
+    {
+      "tower_or_building": "Invented Tower Gimel",
+      "place_code": "place:INV-TOWER-GIMEL",
+      "lon": "51.8",
+      "lat": "25.8"
+    },
+    {
+      "tower_or_building": "Invented Tower Dalet",
+      "place_code": "place:INV-TOWER-DALET"
+    }
+  ],
+  "districts": [
+    {
+      "district_key": "INV-NORTH",
+      "name": "Invented North District",
+      "ring": [
+        ["51.4", "25.2"],
+        ["51.6", "25.2"],
+        ["51.6", "25.4"],
+        ["51.4", "25.2"]
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "registration_key": "INV-FC-ALEPH-ONE",
+      "row_id": "row-aleph-one",
+      "tower_or_building": "Invented Tower Aleph",
+      "position_lon": "51.5",
+      "position_lat": "25.3",
+      "district_key": "INV-NORTH",
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House Aleph",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-ALEPH-TWO",
+      "row_id": "row-aleph-two",
+      "tower_or_building": "Invented Tower Aleph",
+      "position_lon": "51.5",
+      "position_lat": "25.3",
+      "district_key": "INV-NORTH",
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House Aleph Two",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-BET-ONE",
+      "row_id": "row-bet-one",
+      "tower_or_building": "Invented Tower Bet",
+      "position_lon": "51.6",
+      "position_lat": "25.4",
+      "district_key": null,
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House Bet",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-GIMEL-ONE",
+      "row_id": "row-gimel-one",
+      "tower_or_building": "Invented Tower Gimel",
+      "position_lon": null,
+      "position_lat": null,
+      "district_key": null,
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House Gimel",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-DALET-ONE",
+      "row_id": "row-dalet-one",
+      "tower_or_building": "Invented Tower Dalet",
+      "position_lon": "51.5",
+      "position_lat": "25.3",
+      "district_key": null,
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House Dalet",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-DALET-TWO",
+      "row_id": "row-dalet-two",
+      "tower_or_building": "Invented Tower Dalet",
+      "position_lon": "51.6",
+      "position_lat": "25.4",
+      "district_key": null,
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House Dalet Two",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-HE-ONE",
+      "row_id": "row-he-one",
+      "tower_or_building": "Invented Tower He",
+      "position_lon": "51.4",
+      "position_lat": "25.2",
+      "district_key": null,
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House He",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-DISTRICT-ONE",
+      "row_id": "row-district-one",
+      "tower_or_building": null,
+      "position_lon": null,
+      "position_lat": null,
+      "district_key": "INV-NORTH",
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House District",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-ZONE-FREE",
+      "row_id": "row-zone-free",
+      "tower_or_building": null,
+      "position_lon": null,
+      "position_lat": null,
+      "district_key": null,
+      "district_free_zone": true,
+      "card": {
+        "trade_name": "Invented House Open Zone",
+        "activity": "Sample finance activity"
+      }
+    },
+    {
+      "registration_key": "INV-FC-NOWHERE",
+      "row_id": "row-nowhere",
+      "tower_or_building": null,
+      "position_lon": null,
+      "position_lat": null,
+      "district_key": null,
+      "district_free_zone": false,
+      "card": {
+        "trade_name": "Invented House Nowhere",
+        "activity": "Sample finance activity"
+      }
+    }
+  ]
+}

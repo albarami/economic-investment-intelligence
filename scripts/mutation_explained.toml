@@ -5167,3 +5167,1151 @@ reason = "Every ShapeError raised here is caught by read_sheet itself as a Value
 module = "custodian/src/eii_custodian/publicdata/fetch/page_workbook.py"
 mutation = "--- src/eii_custodian/publicdata/fetch/page_workbook.py\n+++ src/eii_custodian/publicdata/fetch/page_workbook.py\n@@ -76,7 +76,7 @@\n                     elif kind not in {\"n\", \"str\"}:\n                         raise ShapeError(\"schema_missing\")\n                     if formula is not None and not value:\n-                        raise ShapeError(\"schema_missing\")\n+                        raise ShapeError(\"SCHEMA_MISSING\")\n                     cells[reference] = value\n                     row[column - 1] = value\n                 rows[row_number] = row"
 reason = "Every ShapeError raised here is caught by read_sheet itself as a ValueError and replaced by its final schema_missing refusal, so the internal message never changes a returned Sheet or the public refusal for any byte input."
+[[survivors]]
+module = "product/src/eii_product/store/resolve.py"
+mutation = "--- src/eii_product/store/resolve.py\n+++ src/eii_product/store/resolve.py\n@@ -10,7 +10,7 @@\n             continue\n         if alias in sources or alias in ambiguous:\n             ambiguous.add(alias)\n-            sources.pop(alias, None)\n+            sources.pop(None, None)\n             continue\n         sources[alias] = table.name\n     return sources, ambiguous"
+reason = "The alias is added to ambiguous on the line before this pop, and _resolve, the only reader of _scope, refuses an alias in ambiguous before it reads sources; leaving the alias in sources changes no resolution or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/resolve.py"
+mutation = "--- src/eii_product/store/resolve.py\n+++ src/eii_product/store/resolve.py\n@@ -7,7 +7,7 @@\n     \"\"\"\n     found: dict[str, _Node] = {}\n     current: _Node | None = select\n-    container: _Node | None = None\n+    container: _Node | None = \"\"\n     while current is not None:\n         if type(current).__name__ == \"Select\":\n             with_node = _with_clause(current)"
+reason = "Every SELECT on the walk sets container back to None at its end; a container of \"\" only reaches _record_visible with before=\"\", which no CTE node is, so _record_visible returns at its first guard and records nothing, as when the call is skipped."
+
+[[survivors]]
+module = "product/src/eii_product/store/resolve.py"
+mutation = "--- src/eii_product/store/resolve.py\n+++ src/eii_product/store/resolve.py\n@@ -16,7 +16,7 @@\n                     _record_visible(with_node, found, None)\n                 elif container is not None:\n                     _record_visible(with_node, found, container)\n-            container = None\n+            container = \"\"\n         elif type(current).__name__ == \"CTE\":\n             container = current\n         current = current.parent"
+reason = "A container of \"\" only reaches _record_visible with before=\"\", which no CTE node is, so _record_visible returns at its first guard and records nothing, as when the original skips the call because container is None."
+
+[[survivors]]
+module = "product/src/eii_product/store/resolve.py"
+mutation = "--- src/eii_product/store/resolve.py\n+++ src/eii_product/store/resolve.py\n@@ -17,7 +17,7 @@\n         if not isinstance(cte, _Node):\n             continue\n         if before is not None and cte is before:\n-            break\n+            return\n         name = _alias(cte)\n         if name == \"\" or name in found:\n             continue"
+reason = "The break leaves the last loop of _record_visible and nothing follows it in the function, so return and break end the call in the same state."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -3,7 +3,7 @@\n     return Context(\n         prec=_QUANTISE_PRECISION,\n         rounding=ROUND_HALF_EVEN,\n-        Emin=-_QUANTISE_EXPONENT,\n+        Emin=None,\n         Emax=_QUANTISE_EXPONENT,\n         capitals=1,\n         clamp=0,"
+reason = "Emin=None copies the default context's Emin, and every legal Emin is at most 0, so Etiny is at most -27 at precision 28; quantize to exponent -6 and the exact compare give the same int or Decimal for every finite input, including inputs below Emin."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -5,7 +5,7 @@\n         rounding=ROUND_HALF_EVEN,\n         Emin=-_QUANTISE_EXPONENT,\n         Emax=_QUANTISE_EXPONENT,\n-        capitals=1,\n+        capitals=None,\n         clamp=0,\n         flags=[],\n         traps=[],"
+reason = "capitals changes only how a context prints an exponent letter; the function returns an int or a Decimal, and a Decimal's printed form uses the thread context, never this owned context."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -6,7 +6,7 @@\n         Emin=-_QUANTISE_EXPONENT,\n         Emax=_QUANTISE_EXPONENT,\n         capitals=1,\n-        clamp=0,\n+        clamp=None,\n         flags=[],\n         traps=[],\n     )"
+reason = "clamp=None copies the default context's clamp, 0 or 1; clamp acts only on exponents above Emax-prec+1 = 999972, which no quantize to exponent -6 reaches, and to_integral_value returns an input of non-negative exponent unchanged without clamping."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -7,6 +7,6 @@\n         Emax=_QUANTISE_EXPONENT,\n         capitals=1,\n         clamp=0,\n-        flags=[],\n+        flags=None,\n         traps=[],\n     )"
+reason = "Flags only record signals and never change a result; traps=[] stays, so a fresh or copied flag map gives the same int or Decimal."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -3,7 +3,6 @@\n     return Context(\n         prec=_QUANTISE_PRECISION,\n         rounding=ROUND_HALF_EVEN,\n-        Emin=-_QUANTISE_EXPONENT,\n         Emax=_QUANTISE_EXPONENT,\n         capitals=1,\n         clamp=0,"
+reason = "An omitted Emin is None and copies the default context's Emin; every legal Emin is at most 0, so quantize to exponent -6 and the exact compare give the same result, as for Emin=None."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -5,7 +5,6 @@\n         rounding=ROUND_HALF_EVEN,\n         Emin=-_QUANTISE_EXPONENT,\n         Emax=_QUANTISE_EXPONENT,\n-        capitals=1,\n         clamp=0,\n         flags=[],\n         traps=[],"
+reason = "An omitted capitals copies the default; capitals changes only a context's printed exponent letter, and the returned int or Decimal does not carry this context."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -6,7 +6,6 @@\n         Emin=-_QUANTISE_EXPONENT,\n         Emax=_QUANTISE_EXPONENT,\n         capitals=1,\n-        clamp=0,\n         flags=[],\n         traps=[],\n     )"
+reason = "An omitted clamp copies the default, 0 or 1; clamp acts only on exponents above 999972, which neither quantize to exponent -6 nor to_integral_value reaches here."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -7,6 +7,5 @@\n         Emax=_QUANTISE_EXPONENT,\n         capitals=1,\n         clamp=0,\n-        flags=[],\n         traps=[],\n     )"
+reason = "An omitted flags gives a flag map that only records signals; with traps=[] no flag changes a result."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -6,7 +6,7 @@\n         Emin=-_QUANTISE_EXPONENT,\n         Emax=_QUANTISE_EXPONENT,\n         capitals=1,\n-        clamp=0,\n+        clamp=1,\n         flags=[],\n         traps=[],\n     )"
+reason = "clamp acts only on result exponents above Emax-prec+1 = 999972; quantize gives exponent -6 and to_integral_value returns an input of non-negative exponent unchanged, so clamp 1 and 0 give the same int or Decimal."
+
+[[survivors]]
+module = "product/src/eii_product/store/normalise.py"
+mutation = "--- src/eii_product/store/normalise.py\n+++ src/eii_product/store/normalise.py\n@@ -9,7 +9,7 @@\n         if not number.is_finite():\n             raise StoreRefusal(\"non-finite number\")\n         context = _quantise_context()\n-        if context.compare(number, number.to_integral_value(context=context)) == 0:\n+        if context.compare(number, number.to_integral_value(context=None)) == 0:\n             return int(number)\n         return context.quantize(number, QUANTUM)\n     if isinstance(value, str):"
+reason = "to_integral_value never applies precision and signals neither Inexact nor Rounded; for an integral input both contexts return an equal value, and for a non-integral input every rounding mode returns an integer unequal to the input, so the exact compare takes the same branch."
+
+[[survivors]]
+module = "product/src/eii_product/store/parity.py"
+mutation = "--- src/eii_product/store/parity.py\n+++ src/eii_product/store/parity.py\n@@ -58,7 +58,7 @@\n             results=tuple(results),\n             traces=traces,\n             scope=scope,\n-            release_id=stores[0].release_id,\n+            release_id=stores[1].release_id,\n             fixture_id=fixture_id,\n             pairs=tuple(pairs),\n         )"
+reason = "Unequal release ids are refused before the report is built, so stores[0].release_id and stores[1].release_id are the same string."
+
+[[survivors]]
+module = "product/src/eii_product/store/parity.py"
+mutation = "--- src/eii_product/store/parity.py\n+++ src/eii_product/store/parity.py\n@@ -21,6 +21,6 @@\n     if scope == \"control\":\n         payload[\"fixture_id\"] = fixture_id\n     destination.write_text(\n-        json.dumps(payload, ensure_ascii=False, sort_keys=True),\n+        json.dumps(payload, ensure_ascii=None, sort_keys=True),\n         encoding=\"utf-8\",\n     )"
+reason = "json.dumps reads ensure_ascii only for truth; None is false like False, so the same characters are written unescaped."
+
+[[survivors]]
+module = "product/src/eii_product/store/parity.py"
+mutation = "--- src/eii_product/store/parity.py\n+++ src/eii_product/store/parity.py\n@@ -22,5 +22,5 @@\n         payload[\"fixture_id\"] = fixture_id\n     destination.write_text(\n         json.dumps(payload, ensure_ascii=False, sort_keys=True),\n-        encoding=\"utf-8\",\n+        encoding=\"UTF-8\",\n     )"
+reason = "Python codec lookup normalises the encoding name; UTF-8 and utf-8 resolve to the same encoder and bytes."
+
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -9,7 +9,7 @@\n     for dialect in (\"postgres\", \"duckdb\"):\n         try:\n             parsed = sqlglot.parse(\n-                query.text, read=dialect, error_level=sqlglot.ErrorLevel.RAISE\n+                query.text, read=dialect, error_level=None\n             )\n         except SqlglotError:\n             raise StoreRefusal(\"parse invalid\") from None"
+reason = "_lint_one receives SQL text and catches SqlglotError as parse invalid: the pinned parser defaults None or an omitted error_level to IMMEDIATE, whereas RAISE checks accumulated errors at the end of each statement chunk. Both reject erroneous chunks, and speculative _try_parse uses IMMEDIATE in both modes, so the returned trees or complete refusal are unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -9,8 +9,7 @@\n     for dialect in (\"postgres\", \"duckdb\"):\n         try:\n             parsed = sqlglot.parse(\n-                query.text, read=dialect, error_level=sqlglot.ErrorLevel.RAISE\n-            )\n+                query.text, read=dialect, )\n         except SqlglotError:\n             raise StoreRefusal(\"parse invalid\") from None\n         if len(parsed) != 1 or parsed[0] is None or not isinstance(parsed[0], _Node):"
+reason = "_lint_one receives SQL text and catches SqlglotError as parse invalid: the pinned parser defaults None or an omitted error_level to IMMEDIATE, whereas RAISE checks accumulated errors at the end of each statement chunk. Both reject erroneous chunks, and speculative _try_parse uses IMMEDIATE in both modes, so the returned trees or complete refusal are unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -13,7 +13,7 @@\n             )\n         except SqlglotError:\n             raise StoreRefusal(\"parse invalid\") from None\n-        if len(parsed) != 1 or parsed[0] is None or not isinstance(parsed[0], _Node):\n+        if len(parsed) != 1 or parsed[0] is None and not isinstance(parsed[0], _Node):\n             raise StoreRefusal(\"parse invalid\")\n         trees.append(parsed[0])\n     for tree in trees:"
+reason = "_lint_one receives parser results consisting of Expression nodes or None; every Expression supplies the _Node protocol fields. Thus None satisfies both tests and every non-None parsed node satisfies neither, making the conjunction and disjunction equivalent here."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -8,7 +8,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            end = length if end < 0 else end\n+            end = length if end <= 0 else end\n             _hidden(sql[index:end])\n             index = end\n             continue"
+reason = "_lexical scans SQL from index zero forward; a newline found after a -- opener is at least index + 2, otherwise find returns -1. Zero and one cannot be the found position, so these thresholds select the same comment end."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -8,7 +8,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            end = length if end < 0 else end\n+            end = length if end < 1 else end\n             _hidden(sql[index:end])\n             index = end\n             continue"
+reason = "_lexical scans SQL from index zero forward; a newline found after a -- opener is at least index + 2, otherwise find returns -1. Zero and one cannot be the found position, so these thresholds select the same comment end."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -14,7 +14,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end <= 0:\n                 raise StoreRefusal(\"parse invalid\")\n             end += 2\n             _hidden(sql[index:end])"
+reason = "_lexical searches for a block closer starting at index + 2 with a nonnegative index. The result is -1 or at least 2, so the changed threshold preserves the refusal and scan."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -14,7 +14,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end < 1:\n                 raise StoreRefusal(\"parse invalid\")\n             end += 2\n             _hidden(sql[index:end])"
+reason = "_lexical searches for a block closer starting at index + 2 with a nonnegative index. The result is -1 or at least 2, so the changed threshold preserves the refusal and scan."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -16,7 +16,7 @@\n             continue\n         if sql[index].isalpha() or sql[index] == \"_\":\n             end = index + 1\n-            while end < length and (sql[end].isalnum() or sql[end] == \"_\"):\n+            while end < length and (sql[end].isalnum() or sql[end] == \"XX_XX\"):\n                 end += 1\n             word = sql[index:end]\n             cursor, saw_comment = _gap(sql, end)"
+reason = "_function_calls scans string characters: replacing the continuation underscore test splits a word only at underscores, and every resulting suffix starts with an underscore. No admitted call or grouping keyword contains an underscore, so a following parenthesis still gets the same refusal; strings without that split keep the same scan result."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -10,7 +10,7 @@\n             saw_comment = True\n             nxt = _skip_lexical(sql, index)\n             if nxt == index:\n-                break\n+                return\n             index = nxt\n             continue\n         break"
+reason = "_gap calls _skip_lexical in this branch only at a -- or /* opener. For those string inputs the helper advances beyond the opener or raises parse invalid, so nxt == index cannot reach either break or return."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -1,6 +1,6 @@\n def _dotted(sql: str, word_at: int) -> bool:\n     \"\"\"True when a dot, ignoring space, qualifies the word.\"\"\"\n     index = word_at - 1\n-    while index >= 0 and sql[index] in \" \\t\\r\\n\":\n+    while index > 0 and sql[index] in \" \\t\\r\\n\":\n         index -= 1\n     return index >= 0 and sql[index] == \".\""
+reason = "_dotted scans whitespace backwards from the supplied word position. The only extra iteration at index zero consumes whitespace, which cannot pass the final dot comparison; a dot at zero stops every version of the loop unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -1,6 +1,6 @@\n def _dotted(sql: str, word_at: int) -> bool:\n     \"\"\"True when a dot, ignoring space, qualifies the word.\"\"\"\n     index = word_at - 1\n-    while index >= 0 and sql[index] in \" \\t\\r\\n\":\n+    while index >= 1 and sql[index] in \" \\t\\r\\n\":\n         index -= 1\n     return index >= 0 and sql[index] == \".\""
+reason = "_dotted scans whitespace backwards from the supplied word position. The only extra iteration at index zero consumes whitespace, which cannot pass the final dot comparison; a dot at zero stops every version of the loop unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -1,5 +1,5 @@\n def _order(tree: _Node, query: QuerySpec) -> None:\n-    if type(tree).__name__ == \"Union\" or _outer_joins(tree):\n+    if type(None).__name__ == \"Union\" or _outer_joins(tree):\n         if not _recursive(tree):\n             raise StoreRefusal(\"order unproved\")\n     ordered = ("
+reason = "_order receives expression nodes; a Union never passes the later Select test and _one_row_aggregate also rejects it, so bypassing the early Union refusal still raises the same order unproved. Other expression kinds keep their original branch and result."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -1,5 +1,5 @@\n def _order(tree: _Node, query: QuerySpec) -> None:\n-    if type(tree).__name__ == \"Union\" or _outer_joins(tree):\n+    if type(tree).__name__ == \"XXUnionXX\" or _outer_joins(tree):\n         if not _recursive(tree):\n             raise StoreRefusal(\"order unproved\")\n     ordered = ("
+reason = "_order receives expression nodes; a Union never passes the later Select test and _one_row_aggregate also rejects it, so bypassing the early Union refusal still raises the same order unproved. Other expression kinds keep their original branch and result."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -1,5 +1,5 @@\n def _order(tree: _Node, query: QuerySpec) -> None:\n-    if type(tree).__name__ == \"Union\" or _outer_joins(tree):\n+    if type(tree).__name__ == \"union\" or _outer_joins(tree):\n         if not _recursive(tree):\n             raise StoreRefusal(\"order unproved\")\n     ordered = ("
+reason = "_order receives expression nodes; a Union never passes the later Select test and _one_row_aggregate also rejects it, so bypassing the early Union refusal still raises the same order unproved. Other expression kinds keep their original branch and result."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -1,5 +1,5 @@\n def _order(tree: _Node, query: QuerySpec) -> None:\n-    if type(tree).__name__ == \"Union\" or _outer_joins(tree):\n+    if type(tree).__name__ == \"UNION\" or _outer_joins(tree):\n         if not _recursive(tree):\n             raise StoreRefusal(\"order unproved\")\n     ordered = ("
+reason = "_order receives expression nodes; a Union never passes the later Select test and _one_row_aggregate also rejects it, so bypassing the early Union refusal still raises the same order unproved. Other expression kinds keep their original branch and result."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -1,5 +1,5 @@\n def _allowed_cast(node: _Node) -> bool:\n     dtype = node.args.get(\"to\")\n     token = getattr(dtype, \"this\", None)\n-    label = getattr(token, \"name\", \"\")\n+    label = getattr(token, \"name\", None)\n     return label in _CASTS"
+reason = "_allowed_cast uses the missing token.name default only in membership of _CASTS. Empty string, None and XXXX are all absent from that fixed set; a present name is unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -1,5 +1,5 @@\n def _allowed_cast(node: _Node) -> bool:\n     dtype = node.args.get(\"to\")\n     token = getattr(dtype, \"this\", None)\n-    label = getattr(token, \"name\", \"\")\n+    label = getattr(token, \"name\", \"XXXX\")\n     return label in _CASTS"
+reason = "_allowed_cast uses the missing token.name default only in membership of _CASTS. Empty string, None and XXXX are all absent from that fixed set; a present name is unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -7,7 +7,7 @@\n     select = cte.this if type(cte.this).__name__ == \"Select\" else None\n     if select is None or select.args.get(\"joins\"):\n         return None\n-    projection = None\n+    projection = \"\"\n     for expr in select.expressions:\n         if _alias(expr) == output_name:\n             projection = expr"
+reason = "_trace_unrenamed assigns a matching projection before using it; if no projection matches, an empty string fails the Column kind check and returns None just as the original unset projection does. This holds for every supplied expression list."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -23,7 +23,7 @@\n             index += 1\n             while index < len(chars):\n                 if (\n-                    chars[index] == \"'\"\n+                    chars[index] == \"XX'XX\"\n                     and index + 1 < len(chars)\n                     and chars[index + 1] == \"'\"\n                 ):"
+reason = "_mask blanks quoted spans in string input; treating a doubled quote as a closer immediately followed by an opener blanks exactly the same characters as consuming the pair together. The previous character has already been blanked, and a trailing pair also becomes two blanks, so none of these pair-recognition changes alters the returned mask."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -24,7 +24,7 @@\n             while index < len(chars):\n                 if (\n                     chars[index] == \"'\"\n-                    and index + 1 < len(chars)\n+                    and index + 2 < len(chars)\n                     and chars[index + 1] == \"'\"\n                 ):\n                     chars[index] = \" \""
+reason = "_mask blanks quoted spans in string input; treating a doubled quote as a closer immediately followed by an opener blanks exactly the same characters as consuming the pair together. The previous character has already been blanked, and a trailing pair also becomes two blanks, so none of these pair-recognition changes alters the returned mask."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -25,7 +25,7 @@\n                 if (\n                     chars[index] == \"'\"\n                     and index + 1 < len(chars)\n-                    and chars[index + 1] == \"'\"\n+                    and chars[index - 1] == \"'\"\n                 ):\n                     chars[index] = \" \"\n                     chars[index + 1] = \" \""
+reason = "_mask blanks quoted spans in string input; treating a doubled quote as a closer immediately followed by an opener blanks exactly the same characters as consuming the pair together. The previous character has already been blanked, and a trailing pair also becomes two blanks, so none of these pair-recognition changes alters the returned mask."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -25,7 +25,7 @@\n                 if (\n                     chars[index] == \"'\"\n                     and index + 1 < len(chars)\n-                    and chars[index + 1] == \"'\"\n+                    and chars[index + 1] == \"XX'XX\"\n                 ):\n                     chars[index] = \" \"\n                     chars[index + 1] = \" \""
+reason = "_mask blanks quoted spans in string input; treating a doubled quote as a closer immediately followed by an opener blanks exactly the same characters as consuming the pair together. The previous character has already been blanked, and a trailing pair also becomes two blanks, so none of these pair-recognition changes alters the returned mask."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -7,7 +7,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            index = length if end < 0 else end\n+            index = length if end <= 0 else end\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)"
+reason = "_parameters scans SQL with nonnegative indexes; a newline after -- is found at index + 2 or later, or find returns -1. The changed threshold therefore selects the same next index."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -7,7 +7,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            index = length if end < 0 else end\n+            index = length if end < 1 else end\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)"
+reason = "_parameters scans SQL with nonnegative indexes; a newline after -- is found at index + 2 or later, or find returns -1. The changed threshold therefore selects the same next index."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -11,7 +11,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end <= 0:\n                 raise StoreRefusal(\"parse invalid\")\n             index = end + 2\n             continue"
+reason = "_parameters searches for */ from index + 2 with a nonnegative index. Its result is -1 or at least 2, so these thresholds give the same parse refusal or advancement."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -11,7 +11,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end < 1:\n                 raise StoreRefusal(\"parse invalid\")\n             index = end + 2\n             continue"
+reason = "_parameters searches for */ from index + 2 with a nonnegative index. Its result is -1 or at least 2, so these thresholds give the same parse refusal or advancement."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -22,7 +22,7 @@\n             index = _quoted_end(sql, index)\n             continue\n         matched = _PLACEHOLDER.match(sql, index)\n-        preceded = index > 0 and (sql[index - 1].isalnum() or sql[index - 1] in \"_:\")\n+        preceded = index > 0 and (sql[index - 1].isalnum() or sql[index - 1] in \"XX_:XX\")\n         if matched and not preceded:\n             used.add(matched.group(1))\n             index = matched.end()"
+reason = "_parameters tests one preceding character; the only extra member of XX_:XX is X, already accepted by isalnum. Both expressions therefore identify exactly the same preceded placeholders for every SQL string."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -2,7 +2,7 @@\n     \"\"\"The resolved type of a bare projection with this output name, or empty.\"\"\"\n     for expr in tree.expressions:\n         column = expr\n-        output = expr.name if type(expr).__name__ == \"Column\" else \"\"\n+        output = expr.name if (type(expr).__name__ == \"Column\") or True else \"\"\n         if type(expr).__name__ == \"Alias\":\n             output = _alias(expr)\n             column = expr.this"
+reason = "_projected_type receives _Node expressions: Columns keep their name and Aliases overwrite output with their alias. Every other kind fails the subsequent Column check regardless of the initial output, so the resolved type or empty result is unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -2,7 +2,7 @@\n     \"\"\"The resolved type of a bare projection with this output name, or empty.\"\"\"\n     for expr in tree.expressions:\n         column = expr\n-        output = expr.name if type(expr).__name__ == \"Column\" else \"\"\n+        output = expr.name if type(expr).__name__ == \"Column\" else \"XXXX\"\n         if type(expr).__name__ == \"Alias\":\n             output = _alias(expr)\n             column = expr.this"
+reason = "_projected_type receives _Node expressions: Columns keep their name and Aliases overwrite output with their alias. Every other kind fails the subsequent Column check regardless of the initial output, so the resolved type or empty result is unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -2,7 +2,7 @@\n     \"\"\"The cast type is the word after AS in the query text, one of the four.\"\"\"\n     index = 0\n     length = len(sql)\n-    while index < length:\n+    while index <= length:\n         skipped = _skip_lexical(sql, index)\n         if skipped != index:\n             index = skipped"
+reason = "_cast_words at index == len(sql) calls _skip_lexical and _keyword_at, whose startswith and slice checks cannot find a region or CAST at that position. The extra iteration advances once and returns without changing any refusal or result."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -3,7 +3,7 @@\n     if as_at is None:\n         raise StoreRefusal(\"forbidden construct\")\n     cursor = _skip_space(inner, as_at + 2)\n-    if inner.startswith(\"/*\", cursor) or inner.startswith(\"--\", cursor):\n+    if inner.startswith(\"/*\", cursor) and inner.startswith(\"--\", cursor):\n         raise StoreRefusal(\"forbidden construct\")\n     matched = re.match(r\"[A-Za-z_][A-Za-z0-9_]*\", inner[cursor:])\n     if matched is None or matched.group(0).upper() not in _CAST_WORDS:"
+reason = "_require_cast_word rejects a comment opener after AS with forbidden construct; if this guard misses it, the immediately following type-word regex rejects the same opener with the identical message. A marker beginning XX parses as an unapproved type word and is also refused in both versions."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -3,7 +3,7 @@\n     if as_at is None:\n         raise StoreRefusal(\"forbidden construct\")\n     cursor = _skip_space(inner, as_at + 2)\n-    if inner.startswith(\"/*\", cursor) or inner.startswith(\"--\", cursor):\n+    if inner.startswith(\"XX/*XX\", cursor) or inner.startswith(\"--\", cursor):\n         raise StoreRefusal(\"forbidden construct\")\n     matched = re.match(r\"[A-Za-z_][A-Za-z0-9_]*\", inner[cursor:])\n     if matched is None or matched.group(0).upper() not in _CAST_WORDS:"
+reason = "_require_cast_word rejects a comment opener after AS with forbidden construct; if this guard misses it, the immediately following type-word regex rejects the same opener with the identical message. A marker beginning XX parses as an unapproved type word and is also refused in both versions."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -3,7 +3,7 @@\n     if as_at is None:\n         raise StoreRefusal(\"forbidden construct\")\n     cursor = _skip_space(inner, as_at + 2)\n-    if inner.startswith(\"/*\", cursor) or inner.startswith(\"--\", cursor):\n+    if inner.startswith(\"/*\", cursor) or inner.startswith(\"XX--XX\", cursor):\n         raise StoreRefusal(\"forbidden construct\")\n     matched = re.match(r\"[A-Za-z_][A-Za-z0-9_]*\", inner[cursor:])\n     if matched is None or matched.group(0).upper() not in _CAST_WORDS:"
+reason = "_require_cast_word rejects a comment opener after AS with forbidden construct; if this guard misses it, the immediately following type-word regex rejects the same opener with the identical message. A marker beginning XX parses as an unapproved type word and is also refused in both versions."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -2,7 +2,7 @@\n     \"\"\"Move past a comment, string or quoted identifier. Otherwise stay.\"\"\"\n     if sql.startswith(\"--\", index):\n         end = sql.find(\"\\n\", index)\n-        return len(sql) if end < 0 else end\n+        return len(sql) if end <= 0 else end\n     if sql.startswith(\"/*\", index):\n         end = sql.find(\"*/\", index + 2)\n         if end < 0:"
+reason = "_skip_lexical at a -- opener finds a newline only after the two opener characters, or returns -1 when absent. No found newline is zero, so the changed threshold returns the same end for string input and scanner positions."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -2,7 +2,7 @@\n     \"\"\"Move past a comment, string or quoted identifier. Otherwise stay.\"\"\"\n     if sql.startswith(\"--\", index):\n         end = sql.find(\"\\n\", index)\n-        return len(sql) if end < 0 else end\n+        return len(sql) if end < 1 else end\n     if sql.startswith(\"/*\", index):\n         end = sql.find(\"*/\", index + 2)\n         if end < 0:"
+reason = "_skip_lexical at a -- opener finds a newline only after the two opener characters, or returns -1 when absent. No found newline is zero, so the changed threshold returns the same end for string input and scanner positions."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -5,7 +5,7 @@\n         return len(sql) if end < 0 else end\n     if sql.startswith(\"/*\", index):\n         end = sql.find(\"*/\", index + 2)\n-        if end < 0:\n+        if end <= 0:\n             raise StoreRefusal(\"parse invalid\")\n         return end + 2\n     if index < len(sql) and sql[index] == \"'\":"
+reason = "_skip_lexical searches for */ after the two-character /* opener at the supplied scanner position. A found closer is at least 2 and absence is -1, making the changed thresholds equivalent."
+
+[[survivors]]
+module = "product/src/eii_product/store/lint.py"
+mutation = "--- src/eii_product/store/lint.py\n+++ src/eii_product/store/lint.py\n@@ -5,7 +5,7 @@\n         return len(sql) if end < 0 else end\n     if sql.startswith(\"/*\", index):\n         end = sql.find(\"*/\", index + 2)\n-        if end < 0:\n+        if end < 1:\n             raise StoreRefusal(\"parse invalid\")\n         return end + 2\n     if index < len(sql) and sql[index] == \"'\":"
+reason = "_skip_lexical searches for */ after the two-character /* opener at the supplied scanner position. A found closer is at least 2 and absence is -1, making the changed thresholds equivalent."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -7,7 +7,7 @@\n         contract_path = path.with_suffix(\".toml\")\n         if not contract_path.is_file():\n             raise StoreRefusal(\"query header invalid\")\n-        text = path.read_text(encoding=\"utf-8\")\n+        text = path.read_text(encoding=\"UTF-8\")\n         name, params, returns, order, body = _header(text, path.stem)\n         spec = QuerySpec(\n             name,"
+reason = "load_inventory reads query files with a Python text codec; UTF-8 and utf-8 normalise to the same codec name. Every file therefore yields the same text or decoding refusal regardless of locale."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -23,5 +23,5 @@\n         specs.append(spec)\n     seen = tuple(spec.name for spec in specs)\n     if len(seen) != len(set(seen)):\n-        raise StoreRefusal(\"query header invalid\")\n+        raise StoreRefusal(None)\n     return _inventory(tuple(specs))"
+reason = "load_inventory enumerates one folder with the nonrecursive *.sql glob, which yields each path once, and _header requires each name to equal that path stem and match the lowercase name grammar. Distinct accepted SQL paths thus have distinct names, making the duplicate-name refusal unreachable."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -23,5 +23,5 @@\n         specs.append(spec)\n     seen = tuple(spec.name for spec in specs)\n     if len(seen) != len(set(seen)):\n-        raise StoreRefusal(\"query header invalid\")\n+        raise StoreRefusal(\"XXquery header invalidXX\")\n     return _inventory(tuple(specs))"
+reason = "load_inventory enumerates one folder with the nonrecursive *.sql glob, which yields each path once, and _header requires each name to equal that path stem and match the lowercase name grammar. Distinct accepted SQL paths thus have distinct names, making the duplicate-name refusal unreachable."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -23,5 +23,5 @@\n         specs.append(spec)\n     seen = tuple(spec.name for spec in specs)\n     if len(seen) != len(set(seen)):\n-        raise StoreRefusal(\"query header invalid\")\n+        raise StoreRefusal(\"QUERY HEADER INVALID\")\n     return _inventory(tuple(specs))"
+reason = "load_inventory enumerates one folder with the nonrecursive *.sql glob, which yields each path once, and _header requires each name to equal that path stem and match the lowercase name grammar. Distinct accepted SQL paths thus have distinct names, making the duplicate-name refusal unreachable."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -6,5 +6,5 @@\n     try:\n         names = tuple(QueryName(spec.name, token) for spec in specs)\n     finally:\n-        _LOADER_OPEN = False\n+        _LOADER_OPEN = None\n     return Inventory(specs, token, names)"
+reason = "_inventory closes _LOADER_OPEN after minting names, and QueryName.__post_init__ reads this guard only through not. None and False both close it, so every later name construction has the same refusal and minted inventory contents are unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -9,7 +9,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            end = length if end < 0 else end\n+            end = length if end <= 0 else end\n             _refuse_hidden_placeholder(sql[index:end])\n             pieces.append(sql[index:end])\n             index = end"
+reason = "translate scans SQL with nonnegative indexes; a newline after -- is at least index + 2, or find returns -1. The changed thresholds preserve both the selected comment span and translated text."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -9,7 +9,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            end = length if end < 0 else end\n+            end = length if end < 1 else end\n             _refuse_hidden_placeholder(sql[index:end])\n             pieces.append(sql[index:end])\n             index = end"
+reason = "translate scans SQL with nonnegative indexes; a newline after -- is at least index + 2, or find returns -1. The changed thresholds preserve both the selected comment span and translated text."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -16,7 +16,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end <= 0:\n                 raise StoreRefusal(\"parse invalid\")\n             end += 2\n             _refuse_hidden_placeholder(sql[index:end])"
+reason = "translate searches for */ at index + 2 with a nonnegative index; a found closer is at least 2 and absence is -1. These thresholds cannot change the branch, and an absent closer is already refused by _refuse_dollar_quotes."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -16,7 +16,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end < 1:\n                 raise StoreRefusal(\"parse invalid\")\n             end += 2\n             _refuse_hidden_placeholder(sql[index:end])"
+reason = "translate searches for */ at index + 2 with a nonnegative index; a found closer is at least 2 and absence is -1. These thresholds cannot change the branch, and an absent closer is already refused by _refuse_dollar_quotes."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -17,7 +17,7 @@\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n             if end < 0:\n-                raise StoreRefusal(\"parse invalid\")\n+                raise StoreRefusal(None)\n             end += 2\n             _refuse_hidden_placeholder(sql[index:end])\n             pieces.append(sql[index:end])"
+reason = "translate calls _refuse_dollar_quotes before its rewriting scan; that helper traverses the same comments, strings and identifiers and refuses every unclosed block comment with parse invalid. Thus no SQL string reaches this later missing-closer message."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -17,7 +17,7 @@\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n             if end < 0:\n-                raise StoreRefusal(\"parse invalid\")\n+                raise StoreRefusal(\"XXparse invalidXX\")\n             end += 2\n             _refuse_hidden_placeholder(sql[index:end])\n             pieces.append(sql[index:end])"
+reason = "translate calls _refuse_dollar_quotes before its rewriting scan; that helper traverses the same comments, strings and identifiers and refuses every unclosed block comment with parse invalid. Thus no SQL string reaches this later missing-closer message."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -17,7 +17,7 @@\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n             if end < 0:\n-                raise StoreRefusal(\"parse invalid\")\n+                raise StoreRefusal(\"PARSE INVALID\")\n             end += 2\n             _refuse_hidden_placeholder(sql[index:end])\n             pieces.append(sql[index:end])"
+reason = "translate calls _refuse_dollar_quotes before its rewriting scan; that helper traverses the same comments, strings and identifiers and refuses every unclosed block comment with parse invalid. Thus no SQL string reaches this later missing-closer message."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -39,7 +39,7 @@\n             index += 2\n             continue\n         matched = _PLACEHOLDER.match(sql, index)\n-        preceded = index > 0 and (sql[index - 1].isalnum() or sql[index - 1] in \"_:\")\n+        preceded = index > 0 and (sql[index - 1].isalnum() or sql[index - 1] in \"XX_:XX\")\n         if matched and not preceded:\n             name = matched.group(1)\n             if engine == \"postgres\":"
+reason = "translate tests one preceding character against isalnum or the membership string; XX_:XX adds only X, which is already alphanumeric. The same placeholder positions are rewritten for every SQL string."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -13,7 +13,7 @@\n             raise StoreRefusal(\"result width invalid\")\n         values = tuple(\n             hold_geometry(value) if column.type_name == \"geometry\" else normalise(value)\n-            for value, column in zip(raw, spec.returns, strict=True)\n+            for value, column in zip(raw, spec.returns, strict=None)\n         )\n         for value, column in zip(values, spec.returns, strict=True):\n             if not _fits(value, column.type_name):"
+reason = "checked_result verifies each driver row has the same width as the return tuple before zipping, and normalisation creates one value for each pair. Both zips therefore have equal-length sequences, making strict True, False, None or omission yield identical values and type refusals."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -13,7 +13,7 @@\n             raise StoreRefusal(\"result width invalid\")\n         values = tuple(\n             hold_geometry(value) if column.type_name == \"geometry\" else normalise(value)\n-            for value, column in zip(raw, spec.returns, strict=True)\n+            for value, column in zip(raw, spec.returns, )\n         )\n         for value, column in zip(values, spec.returns, strict=True):\n             if not _fits(value, column.type_name):"
+reason = "checked_result verifies each driver row has the same width as the return tuple before zipping, and normalisation creates one value for each pair. Both zips therefore have equal-length sequences, making strict True, False, None or omission yield identical values and type refusals."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -13,7 +13,7 @@\n             raise StoreRefusal(\"result width invalid\")\n         values = tuple(\n             hold_geometry(value) if column.type_name == \"geometry\" else normalise(value)\n-            for value, column in zip(raw, spec.returns, strict=True)\n+            for value, column in zip(raw, spec.returns, strict=False)\n         )\n         for value, column in zip(values, spec.returns, strict=True):\n             if not _fits(value, column.type_name):"
+reason = "checked_result verifies each driver row has the same width as the return tuple before zipping, and normalisation creates one value for each pair. Both zips therefore have equal-length sequences, making strict True, False, None or omission yield identical values and type refusals."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -15,7 +15,7 @@\n             hold_geometry(value) if column.type_name == \"geometry\" else normalise(value)\n             for value, column in zip(raw, spec.returns, strict=True)\n         )\n-        for value, column in zip(values, spec.returns, strict=True):\n+        for value, column in zip(values, spec.returns, strict=None):\n             if not _fits(value, column.type_name):\n                 raise StoreRefusal(\"result types invalid\")\n         rows.append(values)"
+reason = "checked_result verifies each driver row has the same width as the return tuple before zipping, and normalisation creates one value for each pair. Both zips therefore have equal-length sequences, making strict True, False, None or omission yield identical values and type refusals."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -15,7 +15,7 @@\n             hold_geometry(value) if column.type_name == \"geometry\" else normalise(value)\n             for value, column in zip(raw, spec.returns, strict=True)\n         )\n-        for value, column in zip(values, spec.returns, strict=True):\n+        for value, column in zip(values, spec.returns, ):\n             if not _fits(value, column.type_name):\n                 raise StoreRefusal(\"result types invalid\")\n         rows.append(values)"
+reason = "checked_result verifies each driver row has the same width as the return tuple before zipping, and normalisation creates one value for each pair. Both zips therefore have equal-length sequences, making strict True, False, None or omission yield identical values and type refusals."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -15,7 +15,7 @@\n             hold_geometry(value) if column.type_name == \"geometry\" else normalise(value)\n             for value, column in zip(raw, spec.returns, strict=True)\n         )\n-        for value, column in zip(values, spec.returns, strict=True):\n+        for value, column in zip(values, spec.returns, strict=False):\n             if not _fits(value, column.type_name):\n                 raise StoreRefusal(\"result types invalid\")\n         rows.append(values)"
+reason = "checked_result verifies each driver row has the same width as the return tuple before zipping, and normalisation creates one value for each pair. Both zips therefore have equal-length sequences, making strict True, False, None or omission yield identical values and type refusals."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -7,7 +7,7 @@\n     keys: list[str] = []\n     values: dict[str, str] = {}\n     for line in lines[:4]:\n-        if not line.startswith(\"-- \") or \":\" not in line[3:]:\n+        if not line.startswith(\"-- \") or \":\" not in line[4:]:\n             raise StoreRefusal(\"query header invalid\")\n         key, raw = line[3:].split(\":\", 1)\n         key = key.strip()"
+reason = "_header accepts only its four nonempty header keys; their separator colon lies beyond index 3. A colon only at index 3 gives an empty key and the same query header invalid refusal, so excluding that position changes no header result."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -9,7 +9,7 @@\n     for line in lines[:4]:\n         if not line.startswith(\"-- \") or \":\" not in line[3:]:\n             raise StoreRefusal(\"query header invalid\")\n-        key, raw = line[3:].split(\":\", 1)\n+        key, raw = line[3:].rsplit(\":\", 1)\n         key = key.strip()\n         if key in values:\n             raise StoreRefusal(\"query header invalid\")"
+reason = "_header requires the four fixed keys and values composed only of names and closed type tokens, none containing a colon. One colon splits identically from either side; multiple colons fail the key or value validation with the same query header invalid refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -1,5 +1,5 @@\n def _returns(raw: str) -> tuple[ReturnSpec, ...]:\n-    if raw == \"\":\n+    if raw == \"XXXX\":\n         raise StoreRefusal(\"query header invalid\")\n     specs: list[ReturnSpec] = []\n     seen: set[str] = set()"
+reason = "_returns rejects both empty string and XXXX: the former has zero whitespace pieces and the latter one, so neither satisfies the two-piece requirement in the loop. Moving the early refusal between these strings changes no return tuple or message."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -8,7 +8,7 @@\n         if len(pieces) != 2:\n             raise StoreRefusal(\"query header invalid\")\n         name, type_name = pieces\n-        if type_name == \"bool\" or type_name not in RETURN_TYPES:\n+        if type_name == \"XXboolXX\" or type_name not in RETURN_TYPES:\n             raise StoreRefusal(\"query header invalid\")\n         if NAME_RE.fullmatch(name) is None or name in seen:\n             raise StoreRefusal(\"query header invalid\")"
+reason = "_returns admits only RETURN_TYPES, which contains neither bool, XXboolXX nor BOOL. The membership guard rejects each of those strings regardless of the redundant equality test, with the same complete refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -8,7 +8,7 @@\n         if len(pieces) != 2:\n             raise StoreRefusal(\"query header invalid\")\n         name, type_name = pieces\n-        if type_name == \"bool\" or type_name not in RETURN_TYPES:\n+        if type_name == \"BOOL\" or type_name not in RETURN_TYPES:\n             raise StoreRefusal(\"query header invalid\")\n         if NAME_RE.fullmatch(name) is None or name in seen:\n             raise StoreRefusal(\"query header invalid\")"
+reason = "_returns admits only RETURN_TYPES, which contains neither bool, XXboolXX nor BOOL. The membership guard rejects each of those strings regardless of the redundant equality test, with the same complete refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -1,5 +1,5 @@\n def _contract(path: Path) -> tuple[ContractTable, ...]:\n-    raw = path.read_text(encoding=\"utf-8\")\n+    raw = path.read_text(encoding=\"UTF-8\")\n     if \";\" in raw or \"select\" in raw.lower():\n         raise StoreRefusal(\"query header invalid\")\n     try:"
+reason = "_contract reads a file using the Python codec lookup, which normalises UTF-8 and utf-8 to the identical decoder. The text and subsequent contract validation are therefore identical for every file and locale."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -16,6 +16,6 @@\n     for node in tree.walk():\n         if type(node).__name__ != \"CTE\":\n             continue\n-        alias = getattr(node, \"alias\", None)\n+        alias = getattr(node, \"alias\", )\n         if isinstance(alias, str) and alias in contract:\n             raise StoreRefusal(\"query header invalid\")"
+reason = "_refuse_contract_cte obtains nodes from the pinned parser and accesses alias only after matching the CTE expression kind. Every such parser node inherits the alias property, so removing the unused getattr default leaves every alias and refusal unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -10,7 +10,7 @@\n     if len(spans) != len(spec.returns):\n         raise StoreRefusal(\"result columns invalid\")\n     pieces: list[str] = []\n-    previous = 0\n+    previous = None\n     for (start, end), column in zip(spans, spec.returns, strict=True):\n         pieces.append(body[previous:start])\n         item = body[start:end]"
+reason = "_wrap_geometry receives spans from _split_commas, whose first span starts at zero; body[0:0], body[None:0] and body[1:0] are all empty. After that first pair previous is always overwritten with end, so all subsequent pieces and the final SQL agree."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -10,7 +10,7 @@\n     if len(spans) != len(spec.returns):\n         raise StoreRefusal(\"result columns invalid\")\n     pieces: list[str] = []\n-    previous = 0\n+    previous = 1\n     for (start, end), column in zip(spans, spec.returns, strict=True):\n         pieces.append(body[previous:start])\n         item = body[start:end]"
+reason = "_wrap_geometry receives spans from _split_commas, whose first span starts at zero; body[0:0], body[None:0] and body[1:0] are all empty. After that first pair previous is always overwritten with end, so all subsequent pieces and the final SQL agree."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -11,7 +11,7 @@\n         raise StoreRefusal(\"result columns invalid\")\n     pieces: list[str] = []\n     previous = 0\n-    for (start, end), column in zip(spans, spec.returns, strict=True):\n+    for (start, end), column in zip(spans, spec.returns, strict=None):\n         pieces.append(body[previous:start])\n         item = body[start:end]\n         if column.type_name == \"geometry\":"
+reason = "_wrap_geometry checks len(spans) == len(spec.returns) before this zip; both are fixed sequences throughout the loop. Strictness cannot change any paired span, column or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -11,7 +11,7 @@\n         raise StoreRefusal(\"result columns invalid\")\n     pieces: list[str] = []\n     previous = 0\n-    for (start, end), column in zip(spans, spec.returns, strict=True):\n+    for (start, end), column in zip(spans, spec.returns, ):\n         pieces.append(body[previous:start])\n         item = body[start:end]\n         if column.type_name == \"geometry\":"
+reason = "_wrap_geometry checks len(spans) == len(spec.returns) before this zip; both are fixed sequences throughout the loop. Strictness cannot change any paired span, column or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -11,7 +11,7 @@\n         raise StoreRefusal(\"result columns invalid\")\n     pieces: list[str] = []\n     previous = 0\n-    for (start, end), column in zip(spans, spec.returns, strict=True):\n+    for (start, end), column in zip(spans, spec.returns, strict=False):\n         pieces.append(body[previous:start])\n         item = body[start:end]\n         if column.type_name == \"geometry\":"
+reason = "_wrap_geometry checks len(spans) == len(spec.returns) before this zip; both are fixed sequences throughout the loop. Strictness cannot change any paired span, column or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -20,7 +20,7 @@\n                 \".\" + column.name\n             ):\n                 raise StoreRefusal(\"forbidden construct\")\n-            pad = item.index(stripped)\n+            pad = item.rindex(stripped)\n             pieces.append(\n                 item[:pad]\n                 + _geometry_sql(engine, stripped, column.name, postgis_schema)"
+reason = "_wrap_geometry computes stripped by removing only surrounding whitespace and requires it to match the nonempty bare-column pattern. That entire stripped substring occurs exactly once in item, so index and rindex give the same padding."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -3,7 +3,7 @@\n     selects = [index for word, index in words if word == \"SELECT\"]\n     if len(selects) != 1:\n         raise StoreRefusal(\"forbidden construct\")\n-    froms = [index for word, index in words if word == \"FROM\" and index > selects[0]]\n+    froms = [index for word, index in words if word == \"FROM\" and index >= selects[0]]\n     if not froms:\n         raise StoreRefusal(\"forbidden construct\")\n     return selects[0] + len(\"SELECT\"), froms[0]"
+reason = "_outer_select_list receives SELECT and FROM positions from _depth0_keywords; those distinct whole tokens cannot begin at the same string position. Allowing equality therefore selects exactly the same FROM positions and bounds."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -6,7 +6,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            index = length if end < 0 else end\n+            index = length if end <= 0 else end\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)"
+reason = "_depth0_keywords scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -6,7 +6,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            index = length if end < 0 else end\n+            index = length if end < 1 else end\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)"
+reason = "_depth0_keywords scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -10,7 +10,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end <= 0:\n                 raise StoreRefusal(\"parse invalid\")\n             index = end + 2\n             continue"
+reason = "_depth0_keywords scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -10,7 +10,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end < 1:\n                 raise StoreRefusal(\"parse invalid\")\n             index = end + 2\n             continue"
+reason = "_depth0_keywords scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -7,7 +7,7 @@\n     while index < length:\n         if text.startswith(\"--\", index):\n             end = text.find(\"\\n\", index)\n-            index = length if end < 0 else end\n+            index = length if end <= 0 else end\n             continue\n         if text.startswith(\"/*\", index):\n             end = text.find(\"*/\", index + 2)"
+reason = "_split_commas scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -7,7 +7,7 @@\n     while index < length:\n         if text.startswith(\"--\", index):\n             end = text.find(\"\\n\", index)\n-            index = length if end < 0 else end\n+            index = length if end < 1 else end\n             continue\n         if text.startswith(\"/*\", index):\n             end = text.find(\"*/\", index + 2)"
+reason = "_split_commas scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -11,7 +11,7 @@\n             continue\n         if text.startswith(\"/*\", index):\n             end = text.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end <= 0:\n                 raise StoreRefusal(\"parse invalid\")\n             index = end + 2\n             continue"
+reason = "_split_commas scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -11,7 +11,7 @@\n             continue\n         if text.startswith(\"/*\", index):\n             end = text.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end < 1:\n                 raise StoreRefusal(\"parse invalid\")\n             index = end + 2\n             continue"
+reason = "_split_commas scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -5,7 +5,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            index = length if end < 0 else end\n+            index = length if end <= 0 else end\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)"
+reason = "_refuse_dollar_quotes scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -5,7 +5,7 @@\n     while index < length:\n         if sql.startswith(\"--\", index):\n             end = sql.find(\"\\n\", index)\n-            index = length if end < 0 else end\n+            index = length if end < 1 else end\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)"
+reason = "_refuse_dollar_quotes scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -9,7 +9,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end <= 0:\n                 raise StoreRefusal(\"parse invalid\")\n             index = end + 2\n             continue"
+reason = "_refuse_dollar_quotes scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/store/registry.py"
+mutation = "--- src/eii_product/store/registry.py\n+++ src/eii_product/store/registry.py\n@@ -9,7 +9,7 @@\n             continue\n         if sql.startswith(\"/*\", index):\n             end = sql.find(\"*/\", index + 2)\n-            if end < 0:\n+            if end < 1:\n                 raise StoreRefusal(\"parse invalid\")\n             index = end + 2\n             continue"
+reason = "_refuse_dollar_quotes scans strings with nonnegative indexes; a newline after -- or a */ found starting at index + 2 has position at least 2, while absence is -1. Therefore < 0, <= 0 and < 1 identify the same missing delimiter and preserve the scan result or refusal."
+
+[[survivors]]
+module = "core/src/eii_core/grid.py"
+mutation = "--- src/eii_core/grid.py\n+++ src/eii_core/grid.py\n@@ -2,7 +2,7 @@\n     \"\"\"Return the stored resolution-9 cell or its stored resolution-8 parent.\"\"\"\n     fine_text = h3.latlng_to_cell(latitude, longitude, 9)\n     fine = h3.str_to_int(fine_text)\n-    parent = h3.str_to_int(h3.cell_to_parent(fine_text, 8))\n+    parent = h3.str_to_int(h3.cell_to_parent(fine_text, None))\n     stored = {cell: resolution for cell, resolution in frame}\n     if fine in stored and stored[fine] == 9:\n         return fine"
+reason = "base_cell: the fine cell is always built at resolution 9 by the same function, and h3.cell_to_parent with no resolution, or None, returns the parent one resolution coarser, which is resolution 8, the same cell."
+
+[[survivors]]
+module = "core/src/eii_core/grid.py"
+mutation = "--- src/eii_core/grid.py\n+++ src/eii_core/grid.py\n@@ -2,7 +2,7 @@\n     \"\"\"Return the stored resolution-9 cell or its stored resolution-8 parent.\"\"\"\n     fine_text = h3.latlng_to_cell(latitude, longitude, 9)\n     fine = h3.str_to_int(fine_text)\n-    parent = h3.str_to_int(h3.cell_to_parent(fine_text, 8))\n+    parent = h3.str_to_int(h3.cell_to_parent(fine_text, ))\n     stored = {cell: resolution for cell, resolution in frame}\n     if fine in stored and stored[fine] == 9:\n         return fine"
+reason = "base_cell: the fine cell is always built at resolution 9 by the same function, and h3.cell_to_parent with no resolution, or None, returns the parent one resolution coarser, which is resolution 8, the same cell."
+
+[[survivors]]
+module = "core/src/eii_core/grid.py"
+mutation = "--- src/eii_core/grid.py\n+++ src/eii_core/grid.py\n@@ -4,6 +4,6 @@\n     if h3.get_resolution(text) != 8:\n         raise ValueError(\"resolution-8 cell required\")\n     children = tuple(\n-        sorted(h3.str_to_int(item) for item in h3.cell_to_children(text, 9))\n+        sorted(h3.str_to_int(item) for item in h3.cell_to_children(text, None))\n     )\n     return children"
+reason = "the caller has already refused any cell that is not resolution 8, and h3.cell_to_children with no resolution, or None, returns the children one resolution finer, which is resolution 9, the same cells."
+
+[[survivors]]
+module = "core/src/eii_core/grid.py"
+mutation = "--- src/eii_core/grid.py\n+++ src/eii_core/grid.py\n@@ -4,6 +4,6 @@\n     if h3.get_resolution(text) != 8:\n         raise ValueError(\"resolution-8 cell required\")\n     children = tuple(\n-        sorted(h3.str_to_int(item) for item in h3.cell_to_children(text, 9))\n+        sorted(h3.str_to_int(item) for item in h3.cell_to_children(text, ))\n     )\n     return children"
+reason = "the caller has already refused any cell that is not resolution 8, and h3.cell_to_children with no resolution, or None, returns the children one resolution finer, which is resolution 9, the same cells."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -1,7 +1,7 @@\n def canonical_ring(points: Sequence[tuple[object, object]]) -> Ring:\n     \"\"\"Return the canonical ring. See the module note for the spike rule.\"\"\"\n     ring = [exact_point(lat, lon) for lat, lon in points]\n-    while len(ring) > 1 and ring[-1] == ring[0]:\n+    while len(ring) >= 1 and ring[-1] == ring[0]:\n         ring.pop()\n     if len(ring) < 3:\n         raise ValueError(\"A polygon requires three vertices\")"
+reason = "the closing-vertex loop: an extra pop (>= 1) or a missing one (> 2) can differ only once fewer than three vertices remain, and the ring is then refused with the same three-vertex error in both programs."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -1,7 +1,7 @@\n def canonical_ring(points: Sequence[tuple[object, object]]) -> Ring:\n     \"\"\"Return the canonical ring. See the module note for the spike rule.\"\"\"\n     ring = [exact_point(lat, lon) for lat, lon in points]\n-    while len(ring) > 1 and ring[-1] == ring[0]:\n+    while len(ring) > 2 and ring[-1] == ring[0]:\n         ring.pop()\n     if len(ring) < 3:\n         raise ValueError(\"A polygon requires three vertices\")"
+reason = "the closing-vertex loop: an extra pop (>= 1) or a missing one (> 2) can differ only once fewer than three vertices remain, and the ring is then refused with the same three-vertex error in both programs."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -8,7 +8,7 @@\n     area = _shoelace(ring)\n     if area == 0:\n         raise ValueError(\"A polygon requires nonzero area\")\n-    if area < 0:\n+    if area <= 0:\n         ring = ring[:1] + list(reversed(ring[1:]))\n     start = min(range(len(ring)), key=lambda index: ring[index])\n     rotated = ring[start:] + ring[:start]"
+reason = "a zero area has already raised its own refusal above, so <= 0 and < 0 select the same rings."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -24,7 +24,7 @@\n         ):\n             return False\n     for left in range(count):\n-        for right in range(left + 1, count):\n+        for right in range(left + 2, count):\n             if _cycle_adjacent(left, right, count):\n                 continue\n             if _edges_share_point("
+reason = "the skipped index right = left + 1 is the adjacent edge, which the loop body skips with continue through the adjacent-edge check, so no comparison is lost."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -5,4 +5,4 @@\n         f\"{lat.numerator}/{lat.denominator},{lon.numerator}/{lon.denominator}\"\n         for lat, lon in ring\n     )\n-    return hashlib.sha256(body.encode(\"utf-8\")).hexdigest()\n+    return hashlib.sha256(body.encode(\"UTF-8\")).hexdigest()"
+reason = "canonical hash: the codec lookup lower-cases an encoding name before it searches, so \"UTF-8\" and \"utf-8\" name the one UTF-8 codec under every locale and UTF-8 mode; the same bytes result."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -8,7 +8,7 @@\n     boundary of the union is inside.\n     \"\"\"\n     closed = _closed(_as_ring(ring))\n-    unique = closed[:-1]\n+    unique = closed[:+1]\n     for vertex in unique:\n         if not point_in_land(vertex, land):\n             return False"
+reason = "polygon_inside_land: every vertex is an end of an edge that _segment_inside tests; a vertex outside the closed land has a neighbourhood outside it, so the piece of that edge after its last mark lies outside and its sampled midpoint fails; the vertex loop over fewer vertices returns the same result."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -8,7 +8,7 @@\n     boundary of the union is inside.\n     \"\"\"\n     closed = _closed(_as_ring(ring))\n-    unique = closed[:-1]\n+    unique = closed[:-2]\n     for vertex in unique:\n         if not point_in_land(vertex, land):\n             return False"
+reason = "polygon_inside_land: every vertex is an end of an edge that _segment_inside tests; a vertex outside the closed land has a neighbourhood outside it, so the piece of that edge after its last mark lies outside and its sampled midpoint fails; the vertex loop over fewer vertices returns the same result."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -7,8 +7,7 @@\n     \"\"\"\n     if (\n         len(text) < 2\n-        or len(text) % 2 != 0\n-        or any(character in \"abcdef\" for character in text)\n+        or len(text) % 2 != 0 and any(character in \"abcdef\" for character in text)\n         or any(character not in \"0123456789ABCDEF\" for character in text)\n     ):\n         raise GeometryTextError(GEOMETRY_REFUSED)"
+reason = "the hex gate: a string this weakened gate lets through (odd length, length 2, or lower-case letters) is still refused by bytes.fromhex or by the geometry parser with the same GEOMETRY_REFUSED error, and one it newly refuses (length 2) is a blob too short for the parser, refused with the same error."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -6,8 +6,7 @@\n     latitude. The first ring is the outer ring; later rings are holes.\n     \"\"\"\n     if (\n-        len(text) < 2\n-        or len(text) % 2 != 0\n+        len(text) < 2 and len(text) % 2 != 0\n         or any(character in \"abcdef\" for character in text)\n         or any(character not in \"0123456789ABCDEF\" for character in text)\n     ):"
+reason = "the hex gate: a string this weakened gate lets through (odd length, length 2, or lower-case letters) is still refused by bytes.fromhex or by the geometry parser with the same GEOMETRY_REFUSED error, and one it newly refuses (length 2) is a blob too short for the parser, refused with the same error."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -6,7 +6,7 @@\n     latitude. The first ring is the outer ring; later rings are holes.\n     \"\"\"\n     if (\n-        len(text) < 2\n+        len(text) <= 2\n         or len(text) % 2 != 0\n         or any(character in \"abcdef\" for character in text)\n         or any(character not in \"0123456789ABCDEF\" for character in text)"
+reason = "the hex gate: a string this weakened gate lets through (odd length, length 2, or lower-case letters) is still refused by bytes.fromhex or by the geometry parser with the same GEOMETRY_REFUSED error, and one it newly refuses (length 2) is a blob too short for the parser, refused with the same error."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -6,7 +6,7 @@\n     latitude. The first ring is the outer ring; later rings are holes.\n     \"\"\"\n     if (\n-        len(text) < 2\n+        len(text) < 3\n         or len(text) % 2 != 0\n         or any(character in \"abcdef\" for character in text)\n         or any(character not in \"0123456789ABCDEF\" for character in text)"
+reason = "the hex gate: a string this weakened gate lets through (odd length, length 2, or lower-case letters) is still refused by bytes.fromhex or by the geometry parser with the same GEOMETRY_REFUSED error, and one it newly refuses (length 2) is a blob too short for the parser, refused with the same error."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -8,7 +8,7 @@\n     if (\n         len(text) < 2\n         or len(text) % 2 != 0\n-        or any(character in \"abcdef\" for character in text)\n+        or any(character in \"XXabcdefXX\" for character in text)\n         or any(character not in \"0123456789ABCDEF\" for character in text)\n     ):\n         raise GeometryTextError(GEOMETRY_REFUSED)"
+reason = "the hex gate: the added letter X is never a hex digit, so a string it newly refuses is also refused by bytes.fromhex with the same GEOMETRY_REFUSED error."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -9,7 +9,7 @@\n         len(text) < 2\n         or len(text) % 2 != 0\n         or any(character in \"abcdef\" for character in text)\n-        or any(character not in \"0123456789ABCDEF\" for character in text)\n+        or any(character not in \"XX0123456789ABCDEFXX\" for character in text)\n     ):\n         raise GeometryTextError(GEOMETRY_REFUSED)\n     try:"
+reason = "the hex gate: a string with the letter X now passes the gate, and bytes.fromhex then refuses it with the same GEOMETRY_REFUSED error."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -15,7 +15,7 @@\n     try:\n         blob = bytes.fromhex(text)\n     except ValueError:\n-        raise GeometryTextError(GEOMETRY_REFUSED) from None\n+        raise GeometryTextError(None) from None\n     polygons, offset = _parse_value(blob, 0, allow_multi=True)\n     if offset != len(blob):\n         raise GeometryTextError(GEOMETRY_REFUSED)"
+reason = "the unmutated gate admits only an even-length string of the characters 0-9 and A-F, on which bytes.fromhex never raises, so this except branch is unreachable."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -1,6 +1,6 @@\n def _shoelace(ring: Sequence[Point]) -> Fraction:\n     total = Fraction(0)\n     wrapped = (*ring[1:], ring[0])\n-    for start, end in zip(ring, wrapped, strict=False):\n+    for start, end in zip(ring, wrapped, strict=None):\n         total += start[_LON] * end[_LAT] - end[_LON] * start[_LAT]\n     return total"
+reason = "the ring is zipped with its own rotation, which has the same length, so strict=True, strict=False, strict=None and no strict argument pair the same items and never raise."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -1,6 +1,6 @@\n def _shoelace(ring: Sequence[Point]) -> Fraction:\n     total = Fraction(0)\n     wrapped = (*ring[1:], ring[0])\n-    for start, end in zip(ring, wrapped, strict=False):\n+    for start, end in zip(ring, wrapped, ):\n         total += start[_LON] * end[_LAT] - end[_LON] * start[_LAT]\n     return total"
+reason = "the ring is zipped with its own rotation, which has the same length, so strict=True, strict=False, strict=None and no strict argument pair the same items and never raise."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -1,6 +1,6 @@\n def _shoelace(ring: Sequence[Point]) -> Fraction:\n     total = Fraction(0)\n     wrapped = (*ring[1:], ring[0])\n-    for start, end in zip(ring, wrapped, strict=False):\n+    for start, end in zip(ring, wrapped, strict=True):\n         total += start[_LON] * end[_LAT] - end[_LON] * start[_LAT]\n     return total"
+reason = "the ring is zipped with its own rotation, which has the same length, so strict=True, strict=False, strict=None and no strict argument pair the same items and never raise."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -1,4 +1,4 @@\n def _as_point(point: Point) -> Point:\n-    if type(point[0]) is Fraction and type(point[1]) is Fraction:\n+    if type(None) is Fraction and type(point[1]) is Fraction:\n         return point\n     return exact_point(point[0], point[1])"
+reason = "_as_point: type(None) is never Fraction, so the early return is skipped and the general path converts both coordinates to the same Fraction values the early return would have returned."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -1,4 +1,4 @@\n def _as_point(point: Point) -> Point:\n-    if type(point[0]) is Fraction and type(point[1]) is Fraction:\n+    if type(point[0]) is Fraction and type(None) is Fraction:\n         return point\n     return exact_point(point[0], point[1])"
+reason = "_as_point: type(None) is never Fraction, so the early return is skipped and the general path converts both coordinates to the same Fraction values the early return would have returned."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -1,6 +1,6 @@\n def _adjacent_overlap(start: Point, end: Point, far: Point) -> bool:\n     \"\"\"True when adjacent edges share more than their common vertex.\"\"\"\n-    if start == end or end == far:\n+    if start == end and end == far:\n         return True\n     if _on_segment(far, start, end):\n         return True"
+reason = "_adjacent_overlap: when start == end or end == far, the shared point is an end of the other segment, and _on_segment counts an end as on the segment, so the later checks return True as before."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -11,7 +11,7 @@\n     side_right = _orient(left, right, far)\n     side_near = _orient(near, far, left)\n     side_far = _orient(near, far, right)\n-    if side_left == 0 or side_right == 0 or side_near == 0 or side_far == 0:\n+    if side_left == 0 or side_right == 0 or side_near == 0 and side_far == 0:\n         return False\n     if (side_left > 0) == (side_right > 0):\n         return False"
+reason = "_edges_share_point: a zero side that the weakened test no longer catches has already passed the on-segment checks without a hit, so its straddle test below returns False, the result of the original."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -11,7 +11,7 @@\n     side_right = _orient(left, right, far)\n     side_near = _orient(near, far, left)\n     side_far = _orient(near, far, right)\n-    if side_left == 0 or side_right == 0 or side_near == 0 or side_far == 0:\n+    if side_left == 0 or side_right == 0 and side_near == 0 or side_far == 0:\n         return False\n     if (side_left > 0) == (side_right > 0):\n         return False"
+reason = "_edges_share_point: a zero side that the weakened test no longer catches has already passed the on-segment checks without a hit, so its straddle test below returns False, the result of the original."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -11,7 +11,7 @@\n     side_right = _orient(left, right, far)\n     side_near = _orient(near, far, left)\n     side_far = _orient(near, far, right)\n-    if side_left == 0 or side_right == 0 or side_near == 0 or side_far == 0:\n+    if side_left == 0 and side_right == 0 or side_near == 0 or side_far == 0:\n         return False\n     if (side_left > 0) == (side_right > 0):\n         return False"
+reason = "_edges_share_point: a zero side that the weakened test no longer catches has already passed the on-segment checks without a hit, so its straddle test below returns False, the result of the original."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -13,6 +13,6 @@\n     side_far = _orient(near, far, right)\n     if side_left == 0 or side_right == 0 or side_near == 0 or side_far == 0:\n         return False\n-    if (side_left > 0) == (side_right > 0):\n+    if (side_left >= 0) == (side_right > 0):\n         return False\n     return (side_near > 0) != (side_far > 0)"
+reason = "_edges_share_point: every case with a zero side has already returned at the zero test above, so on the remaining nonzero sides >= 0 and > 0 agree."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -13,6 +13,6 @@\n     side_far = _orient(near, far, right)\n     if side_left == 0 or side_right == 0 or side_near == 0 or side_far == 0:\n         return False\n-    if (side_left > 0) == (side_right > 0):\n+    if (side_left > 0) == (side_right >= 0):\n         return False\n     return (side_near > 0) != (side_far > 0)"
+reason = "_edges_share_point: every case with a zero side has already returned at the zero test above, so on the remaining nonzero sides >= 0 and > 0 agree."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -15,4 +15,4 @@\n         return False\n     if (side_left > 0) == (side_right > 0):\n         return False\n-    return (side_near > 0) != (side_far > 0)\n+    return (side_near >= 0) != (side_far > 0)"
+reason = "_edges_share_point: every case with a zero side has already returned at the zero test above, so on the remaining nonzero sides >= 0 and > 0 agree."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -15,4 +15,4 @@\n         return False\n     if (side_left > 0) == (side_right > 0):\n         return False\n-    return (side_near > 0) != (side_far > 0)\n+    return (side_near > 0) != (side_far >= 0)"
+reason = "_edges_share_point: every case with a zero side has already returned at the zero test above, so on the remaining nonzero sides >= 0 and > 0 agree."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -9,6 +9,6 @@\n             latitude - start[_LAT]\n         ) * (end[_LON] - start[_LON])\n         denominator = end[_LAT] - start[_LAT]\n-        if numerator == 0 or (numerator > 0) == (denominator > 0):\n+        if numerator == 0 or (numerator >= 0) == (denominator > 0):\n             inside = not inside\n     return inside"
+reason = "the ray count: a zero numerator has already been counted by the first clause."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -9,6 +9,6 @@\n             latitude - start[_LAT]\n         ) * (end[_LON] - start[_LON])\n         denominator = end[_LAT] - start[_LAT]\n-        if numerator == 0 or (numerator > 0) == (denominator > 0):\n+        if numerator == 0 or (numerator > 0) == (denominator >= 0):\n             inside = not inside\n     return inside"
+reason = "the ray count: a zero denominator is a horizontal edge, already skipped before this test."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -5,6 +5,6 @@\n     dy = end[_LAT] - start[_LAT]\n     if dx == 0 and dy == 0:\n         return None\n-    if abs(dx) >= abs(dy):\n+    if abs(dx) > abs(dy):\n         return (vertex[_LON] - start[_LON]) / dx\n     return (vertex[_LAT] - start[_LAT]) / dy"
+reason = "_vertex_t: when the two components are equal in size, the parameter computed from either one is the same for a point on the segment."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -7,7 +7,7 @@\n         if tee is not None:\n             marks.append(tee)\n         for vertex in (edge_start, edge_end):\n-            projected = _vertex_t(start, end, vertex)\n+            projected = None\n             if projected is not None:\n                 marks.append(projected)\n     ordered = sorted(set(marks))"
+reason = "_segment_inside: a land vertex on the segment where the inside state changes is also met by a non-collinear land edge, whose crossing parameter _segment_t adds as a mark, so the sampled sub-intervals change sides at the same marks."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -13,7 +13,7 @@\n     ordered = sorted(set(marks))\n     for left, right in itertools.pairwise(ordered):\n         if left == right:\n-            continue\n+            break\n         if not point_in_land(_lerp(start, end, (left + right) / 2), land):\n             return False\n     return True"
+reason = "_segment_inside: ordered is sorted(set(marks)), so no two neighbours are equal and the branch is unreachable."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -6,7 +6,7 @@\n             for start, end in itertools.pairwise(ring):\n                 if start == end:\n                     continue\n-                counts[(start, end)] = counts.get((start, end), 0) + 1\n+                counts[(start, end)] = counts.get((start, end), 1) + 1\n     kept: list[tuple[Point, Point]] = []\n     for edge, count in counts.items():\n         if count > counts.get((edge[1], edge[0]), 0):"
+reason = "boundary edge counts: every count of an edge and of its reverse is shifted or doubled alike, and the counts are only compared with each other (count > reverse) or with zero, so the same edges are kept."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -6,7 +6,7 @@\n             for start, end in itertools.pairwise(ring):\n                 if start == end:\n                     continue\n-                counts[(start, end)] = counts.get((start, end), 0) + 1\n+                counts[(start, end)] = counts.get((start, end), 0) + 2\n     kept: list[tuple[Point, Point]] = []\n     for edge, count in counts.items():\n         if count > counts.get((edge[1], edge[0]), 0):"
+reason = "boundary edge counts: every count of an edge and of its reverse is shifted or doubled alike, and the counts are only compared with each other (count > reverse) or with zero, so the same edges are kept."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -15,6 +15,6 @@\n         dot = land_lat * edge_lat + land_lon * edge_lon\n         if dot == 0:\n             continue\n-        interior_on_land = (dot > 0) == ccw\n+        interior_on_land = (dot >= 0) == ccw\n         return not interior_on_land\n     return False"
+reason = "_complement_inside: dot == 0 has already continued, so >= 0 and > 0 select the same edges."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -3,7 +3,7 @@\n ) -> tuple[tuple[Polygon, ...], int]:\n     if offset >= len(blob) or blob[offset] != 1:\n         raise GeometryTextError(GEOMETRY_REFUSED)\n-    if offset + 5 > len(blob):\n+    if offset + 6 > len(blob):\n         raise GeometryTextError(GEOMETRY_REFUSED)\n     type_code = struct.unpack_from(\"<I\", blob, offset + 1)[0]\n     cursor = offset + 5"
+reason = "the multipolygon header check: a blob that the wider check refuses is too short for the polygon body that follows, which the parser refuses with the same GEOMETRY_REFUSED error."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -3,7 +3,7 @@\n ) -> tuple[tuple[Polygon, ...], int]:\n     if offset >= len(blob) or blob[offset] != 1:\n         raise GeometryTextError(GEOMETRY_REFUSED)\n-    if offset + 5 > len(blob):\n+    if offset + 5 >= len(blob):\n         raise GeometryTextError(GEOMETRY_REFUSED)\n     type_code = struct.unpack_from(\"<I\", blob, offset + 1)[0]\n     cursor = offset + 5"
+reason = "the multipolygon header check: a blob that the wider check refuses is too short for the polygon body that follows, which the parser refuses with the same GEOMETRY_REFUSED error."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -5,7 +5,7 @@\n         raise GeometryTextError(GEOMETRY_REFUSED)\n     if offset + 5 > len(blob):\n         raise GeometryTextError(GEOMETRY_REFUSED)\n-    type_code = struct.unpack_from(\"<I\", blob, offset + 1)[0]\n+    type_code = struct.unpack_from(\"<i\", blob, offset + 1)[0]\n     cursor = offset + 5\n     if type_code == 3:\n         polygon, cursor = _parse_polygon_body(blob, cursor)"
+reason = "the type code: 3 and 6 read the same signed or unsigned, and any other code is refused with the same error either way."
+
+[[survivors]]
+module = "core/src/eii_core/shapes.py"
+mutation = "--- src/eii_core/shapes.py\n+++ src/eii_core/shapes.py\n@@ -2,6 +2,6 @@\n     count, cursor = _u32(blob, offset)\n     polygons: list[Polygon] = []\n     for _ in range(count):\n-        parsed, cursor = _parse_value(blob, cursor, allow_multi=False)\n+        parsed, cursor = _parse_value(blob, cursor, allow_multi=None)\n         polygons.extend(parsed)\n     return tuple(polygons), cursor"
+reason = "None is false, the same as False, for the only use of allow_multi, a truth test."
+
+[[survivors]]
+module = "product/src/eii_product/tools/areas.py"
+mutation = "--- src/eii_product/tools/areas.py\n+++ src/eii_product/tools/areas.py\n@@ -1,7 +1,7 @@\n def parse_area_id(area_id: str, release_id: str) -> dict[str, object]:\n     \"\"\"Return a request dict. Another release and a malformed id are refused.\"\"\"\n     pieces = area_id.split(\"/\")\n-    if len(pieces) < 3 or pieces[0] != \"ma1\":\n+    if len(pieces) <= 3 or pieces[0] != \"ma1\":\n         raise AreaIdError(INVALID_ARGUMENT)\n     prefix = pieces[1]\n     if _HEX.fullmatch(prefix) is None or prefix != release_id[:_PREFIX]:"
+reason = "decode_area: the identifier has exactly the fixed number of parts or it fails the later checks with the same refusal, so <= 3, < 4 and < 3 refuse the same identifiers."
+
+[[survivors]]
+module = "product/src/eii_product/tools/areas.py"
+mutation = "--- src/eii_product/tools/areas.py\n+++ src/eii_product/tools/areas.py\n@@ -1,7 +1,7 @@\n def parse_area_id(area_id: str, release_id: str) -> dict[str, object]:\n     \"\"\"Return a request dict. Another release and a malformed id are refused.\"\"\"\n     pieces = area_id.split(\"/\")\n-    if len(pieces) < 3 or pieces[0] != \"ma1\":\n+    if len(pieces) < 4 or pieces[0] != \"ma1\":\n         raise AreaIdError(INVALID_ARGUMENT)\n     prefix = pieces[1]\n     if _HEX.fullmatch(prefix) is None or prefix != release_id[:_PREFIX]:"
+reason = "decode_area: the identifier has exactly the fixed number of parts or it fails the later checks with the same refusal, so <= 3, < 4 and < 3 refuse the same identifiers."
+
+[[survivors]]
+module = "product/src/eii_product/tools/areas.py"
+mutation = "--- src/eii_product/tools/areas.py\n+++ src/eii_product/tools/areas.py\n@@ -1,6 +1,6 @@\n def format_six(value: Decimal) -> str:\n     \"\"\"Render a six-place decimal with a sign only when negative.\"\"\"\n-    text = format(value.copy_abs(), \"f\")\n+    text = format(value.copy_abs(), \"F\")\n     whole, _, fraction = text.partition(\".\")\n     fraction = (fraction + \"000000\")[:6]\n     sign = \"-\" if value < 0 else \"\""
+reason = "Decimal formatting: format(Decimal(x), \"F\") equals format(Decimal(x), \"f\") for every finite value, Infinity and NaN (checked on the pinned interpreter: 'Infinity', 'NaN', '-Infinity' unchanged), so the same text is written."
+
+[[survivors]]
+module = "product/src/eii_product/tools/areas.py"
+mutation = "--- src/eii_product/tools/areas.py\n+++ src/eii_product/tools/areas.py\n@@ -1,3 +1,3 @@\n def canonical_json(value: object) -> bytes:\n     \"\"\"Sorted keys, fixed separators, UTF-8. Decimals are written as numbers.\"\"\"\n-    return _dump(value).encode(\"utf-8\")\n+    return _dump(value).encode(\"UTF-8\")"
+reason = "canonical_json: the codec lookup lower-cases an encoding name before it searches, so \"UTF-8\" and \"utf-8\" name the one UTF-8 codec under every locale and UTF-8 mode; the same bytes result."
+
+[[survivors]]
+module = "product/src/eii_product/tools/areas.py"
+mutation = "--- src/eii_product/tools/areas.py\n+++ src/eii_product/tools/areas.py\n@@ -1,6 +1,6 @@\n def _dump(value: object) -> str:\n     if type(value) is Decimal:\n-        return format(value, \"f\")\n+        return format(value, \"F\")\n     if type(value) is str:\n         return json.dumps(value, ensure_ascii=False)\n     if type(value) is int and not isinstance(value, bool):"
+reason = "Decimal formatting: format(Decimal(x), \"F\") equals format(Decimal(x), \"f\") for every finite value, Infinity and NaN (checked on the pinned interpreter: 'Infinity', 'NaN', '-Infinity' unchanged), so the same text is written."
+
+[[survivors]]
+module = "product/src/eii_product/tools/areas.py"
+mutation = "--- src/eii_product/tools/areas.py\n+++ src/eii_product/tools/areas.py\n@@ -2,7 +2,7 @@\n     if type(value) is Decimal:\n         return format(value, \"f\")\n     if type(value) is str:\n-        return json.dumps(value, ensure_ascii=False)\n+        return json.dumps(value, ensure_ascii=None)\n     if type(value) is int and not isinstance(value, bool):\n         return str(value)\n     if value is None:"
+reason = "json.dumps reads ensure_ascii only by its truth value, in the compiled and in the pure Python encoder; None and False are both false, so the same encoder that keeps non-ASCII text is chosen."
+
+[[survivors]]
+module = "product/src/eii_product/tools/areas.py"
+mutation = "--- src/eii_product/tools/areas.py\n+++ src/eii_product/tools/areas.py\n@@ -13,7 +13,7 @@\n         return \"[\" + \",\".join(_dump(item) for item in value) + \"]\"\n     if isinstance(value, Mapping):\n         parts = [\n-            json.dumps(str(key), ensure_ascii=False) + \":\" + _dump(item)\n+            json.dumps(str(key), ensure_ascii=None) + \":\" + _dump(item)\n             for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))\n         ]\n         return \"{\" + \",\".join(parts) + \"}\""
+reason = "json.dumps reads ensure_ascii only by its truth value, in the compiled and in the pure Python encoder; None and False are both false, so the same encoder that keeps non-ASCII text is chosen."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -14,7 +14,7 @@\n     outline_body = _ring_outline(ring)\n     return _ok(\n         context,\n-        \"polygon\",\n+        None,\n         None,\n         None,\n         parsed.shape_id,"
+reason = "_shape_area: with a shape id, build_area_id ignores the mode and _record writes polygon itself, so the mode argument is unread."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -14,7 +14,7 @@\n     outline_body = _ring_outline(ring)\n     return _ok(\n         context,\n-        \"polygon\",\n+        \"XXpolygonXX\",\n         None,\n         None,\n         parsed.shape_id,"
+reason = "_shape_area: with a shape id, build_area_id ignores the mode and _record writes polygon itself, so the mode argument is unread."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -14,7 +14,7 @@\n     outline_body = _ring_outline(ring)\n     return _ok(\n         context,\n-        \"polygon\",\n+        \"POLYGON\",\n         None,\n         None,\n         parsed.shape_id,"
+reason = "_shape_area: with a shape id, build_area_id ignores the mode and _record writes polygon itself, so the mode argument is unread."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -25,7 +25,7 @@\n             None,\n             outline_body,\n             None,\n-            False,\n+            None,\n         )\n     selected, outline_body = _with_cell(\n         parsed, latitude, longitude, anchor, frame, context"
+reason = "_shape_area: with no anchor, selected is None and so cells is None, and the report flag is not read on that path."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -25,7 +25,7 @@\n             None,\n             outline_body,\n             None,\n-            False,\n+            True,\n         )\n     selected, outline_body = _with_cell(\n         parsed, latitude, longitude, anchor, frame, context"
+reason = "_shape_area: with no anchor, selected is None and so cells is None, and the report flag is not read on that path."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -1,4 +1,4 @@\n def _fetch(\n     store: object, inventory: Inventory, name: str, params: Mapping[str, object]\n ) -> QueryResult:\n-    return cast(_Fetcher, store).fetch(inventory.lookup(name), params)\n+    return cast(None, store).fetch(inventory.lookup(name), params)"
+reason = "_fetch: typing.cast returns its second argument unchanged at run time and ignores the type argument, so the same object is used."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -12,7 +12,7 @@\n ) -> MakeAreaResult:\n     area_id = build_area_id(\n         release_id=context.release_id,\n-        mode=None if shape_id is not None else mode,\n+        mode=None if (shape_id is not None) and False else mode,\n         cutoff=None if shape_id is not None else cutoff,\n         cell=anchor,\n         latitude=latitude,"
+reason = "with a shape id the mode and cutoff arguments are not used by the area build, so passing them through changes nothing."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -13,7 +13,7 @@\n     area_id = build_area_id(\n         release_id=context.release_id,\n         mode=None if shape_id is not None else mode,\n-        cutoff=None if shape_id is not None else cutoff,\n+        cutoff=None if (shape_id is not None) and False else cutoff,\n         cell=anchor,\n         latitude=latitude,\n         longitude=longitude,"
+reason = "with a shape id the mode and cutoff arguments are not used by the area build, so passing them through changes nothing."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -16,7 +16,7 @@\n         fives += 1\n     if denominator != 1:\n         raise ArgumentError(INVALID_ARGUMENT)\n-    if twos > fives:\n+    if twos >= fives:\n         numerator *= 5 ** (twos - fives)\n         places = twos\n     else:"
+reason = "equal counts multiply by a zero power, so the same value results."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -5,7 +5,7 @@\n     day_keys: frozenset[str],\n ) -> PinRequest:\n     if (\n-        not set(request) <= _PIN_KEYS\n+        not set(request) < _PIN_KEYS\n         or \"mode\" not in request\n         or \"cutoff\" not in request\n     ):"
+reason = "the request equal to the full key set is refused later in both programs, because a point key and a place key, or a situation and a clock, cannot both be present."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -1,7 +1,7 @@\n def _cutoff(mode: str, value: object, playbook_key: str | None) -> int:\n     if type(value) is not int or isinstance(value, bool):\n         raise ArgumentError(INVALID_ARGUMENT)\n-    if mode == \"drive\" and value > DRIVE_LIMIT_MINUTES:\n+    if mode == \"XXdriveXX\" and value > DRIVE_LIMIT_MINUTES:\n         raise ArgumentError(INVALID_ARGUMENT)\n     if mode == \"distance\" and value in DISTANCE_M:\n         return value"
+reason = "a cutoff past the drive limit is also absent from the allowed cutoff sets, so it is refused with the same error."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -1,7 +1,7 @@\n def _cutoff(mode: str, value: object, playbook_key: str | None) -> int:\n     if type(value) is not int or isinstance(value, bool):\n         raise ArgumentError(INVALID_ARGUMENT)\n-    if mode == \"drive\" and value > DRIVE_LIMIT_MINUTES:\n+    if mode == \"DRIVE\" and value > DRIVE_LIMIT_MINUTES:\n         raise ArgumentError(INVALID_ARGUMENT)\n     if mode == \"distance\" and value in DISTANCE_M:\n         return value"
+reason = "a cutoff past the drive limit is also absent from the allowed cutoff sets, so it is refused with the same error."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -1,5 +1,5 @@\n def _coordinate(value: object) -> Decimal:\n-    if type(value) is bool or value is None:\n+    if type(value) is bool and value is None:\n         raise ArgumentError(INVALID_ARGUMENT)\n     if type(value) is float:\n         if not math.isfinite(value):"
+reason = "a bool is not type int and still reaches the final raise with the same error; None still raises."
+
+[[survivors]]
+module = "product/src/eii_product/tools/make_area.py"
+mutation = "--- src/eii_product/tools/make_area.py\n+++ src/eii_product/tools/make_area.py\n@@ -1,5 +1,5 @@\n def _coordinate(value: object) -> Decimal:\n-    if type(value) is bool or value is None:\n+    if type(None) is bool or value is None:\n         raise ArgumentError(INVALID_ARGUMENT)\n     if type(value) is float:\n         if not math.isfinite(value):"
+reason = "a bool is not type int and still reaches the final raise with the same error; None still raises."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -16,7 +16,7 @@\n         \"polygons\": True,\n         \"costing_options\": {costing: {\"speed_types\": []}},\n     }\n-    answer = None\n+    answer = \"\"\n     try:\n         actor = valhalla.Actor(str(tile_folder / \"config.json\"))\n         answer = actor.isochrone(request)"
+reason = "accepted_ring refuses the empty string with the same routing refusal it gives None."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -21,7 +21,7 @@\n         actor = valhalla.Actor(str(tile_folder / \"config.json\"))\n         answer = actor.isochrone(request)\n     except (OSError, RuntimeError, ValueError, TypeError, KeyError):\n-        answer = None\n+        answer = \"\"\n     if answer is None:\n         raise RoutingTilesUnavailable(ROUTING_TILES_UNAVAILABLE)\n     return answer"
+reason = "accepted_ring refuses the empty string with the same routing refusal it gives None."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -1,6 +1,6 @@\n def _coordinate_pairs(value: object) -> list[tuple[object, object]]:\n     if type(value) is dict:\n-        return _pairs_from_engine(cast(dict[str, object], value))\n+        return _pairs_from_engine(cast(None, value))\n     if type(value) is not list and type(value) is not tuple:\n         raise TypeError(ROUTING_TILES_UNAVAILABLE)\n     return ["
+reason = "typing.cast returns its second argument unchanged at run time and ignores the type argument, so the same object is used."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -5,5 +5,5 @@\n         raise TypeError(ROUTING_TILES_UNAVAILABLE)\n     return [\n         _stored_pair(position)\n-        for position in cast(list[object] | tuple[object, ...], value)\n+        for position in cast(None, value)\n     ]"
+reason = "typing.cast returns its second argument unchanged at run time and ignores the type argument, so the same object is used."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -20,7 +20,7 @@\n     for position in ring:\n         if type(position) is not list:\n             raise TypeError(ROUTING_TILES_UNAVAILABLE)\n-        row = cast(list[object], position)\n+        row = cast(None, position)\n         if len(row) != 2:\n             raise ValueError(ROUTING_TILES_UNAVAILABLE)\n         longitude, latitude = row[0], row[1]"
+reason = "typing.cast returns its second argument unchanged at run time and ignores the type argument, so the same object is used."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -1,7 +1,7 @@\n def _stored_pair(position: object) -> tuple[object, object]:\n     if type(position) is not list and type(position) is not tuple:\n         raise TypeError(ROUTING_TILES_UNAVAILABLE)\n-    row = cast(list[object] | tuple[object, ...], position)\n+    row = cast(None, position)\n     if len(row) != 2:\n         raise ValueError(ROUTING_TILES_UNAVAILABLE)\n     latitude, longitude = row[0], row[1]"
+reason = "typing.cast returns its second argument unchanged at run time and ignores the type argument, so the same object is used."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -1,5 +1,5 @@\n def _engine_number(value: object) -> None:\n-    if type(value) is bool or (type(value) is not int and type(value) is not float):\n+    if type(None) is bool or (type(value) is not int and type(value) is not float):\n         raise TypeError(ROUTING_TILES_UNAVAILABLE)\n     if type(value) is float and not math.isfinite(value):\n         raise ValueError(ROUTING_TILES_UNAVAILABLE)"
+reason = "_engine_number: a bool still fails the int and float type test with the same TypeError, and an int or float still passes."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -1,5 +1,5 @@\n def _stored_number(value: object) -> None:\n-    if type(value) is bool:\n+    if type(None) is bool:\n         raise TypeError(ROUTING_TILES_UNAVAILABLE)\n     if type(value) is int:\n         return"
+reason = "_stored_number: a bool falls through to the same final TypeError."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -1,4 +1,4 @@\n def _as_list(value: object) -> list[object]:\n     if type(value) is not list:\n         raise TypeError(ROUTING_TILES_UNAVAILABLE)\n-    return cast(list[object], value)\n+    return cast(None, value)"
+reason = "typing.cast returns its second argument unchanged at run time and ignores the type argument, so the same object is used."
+
+[[survivors]]
+module = "product/src/eii_product/tools/routing.py"
+mutation = "--- src/eii_product/tools/routing.py\n+++ src/eii_product/tools/routing.py\n@@ -1,4 +1,4 @@\n def _as_dict(value: object) -> dict[str, object]:\n     if type(value) is not dict:\n         raise TypeError(ROUTING_TILES_UNAVAILABLE)\n-    return cast(dict[str, object], value)\n+    return cast(None, value)"
+reason = "typing.cast returns its second argument unchanged at run time and ignores the type argument, so the same object is used."
+
+# S3-T06j: supplied survivor order; equivalent rows rechecked against this HEAD.
+
+[[survivors]]
+module = "core/src/eii_core/facts.py"
+mutation = "--- src/eii_core/facts.py\n+++ src/eii_core/facts.py\n@@ -21,6 +21,6 @@\n         qualifiers=dict(qualifiers),\n     )\n     encoded = json.dumps(\n-        data, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False, allow_nan=False\n+        data, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=None, allow_nan=False\n     ).encode(\"utf-8\")\n     return \"f_\" + sha256(encoded).hexdigest()[:32]"
+reason = "fact_id uses ensure_ascii as a boolean switch in the JSON encoder: None and False both disable ASCII escaping for every serializable input, while all other arguments and refusals remain unchanged."
+
+[[survivors]]
+module = "core/src/eii_core/facts.py"
+mutation = "--- src/eii_core/facts.py\n+++ src/eii_core/facts.py\n@@ -21,6 +21,6 @@\n         qualifiers=dict(qualifiers),\n     )\n     encoded = json.dumps(\n-        data, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False, allow_nan=False\n+        data, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False, allow_nan=None\n     ).encode(\"utf-8\")\n     return \"f_\" + sha256(encoded).hexdigest()[:32]"
+reason = "fact_id uses allow_nan as a boolean switch in the JSON encoder: None and False both refuse nonfinite floats (including ill-typed callers) with the same message and serialize all other inputs identically."
+
+[[survivors]]
+module = "core/src/eii_core/facts.py"
+mutation = "--- src/eii_core/facts.py\n+++ src/eii_core/facts.py\n@@ -22,5 +22,5 @@\n     )\n     encoded = json.dumps(\n         data, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False, allow_nan=False\n-    ).encode(\"utf-8\")\n+    ).encode(\"UTF-8\")\n     return \"f_\" + sha256(encoded).hexdigest()[:32]"
+reason = "fact_id encodes its JSON string with the UTF-8 codec; Python normalizes utf-8 and UTF-8 to the identical codec, so bytes and encoding errors are unchanged for every string."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -7,7 +7,7 @@\n     all_national = _read(store, \"licence_national\")\n     residents = _read(store, \"residents\", geography=code)\n     ctx.block(\"national_density\", [])\n-    if not local or not totals or not national or not all_national:\n+    if not local or not totals or not national and not all_national:\n         ctx.block(\"licences\", [])\n         return\n     if any(len(rows) != 1 for rows in (local, totals, national, all_national)):"
+reason = "In _licences each read returns a list. An empty list missed by the weakened first condition is caught by the immediately following len(rows) != 1 guard, which emits the identical licences NO_DATA block and returns before measurement; all nonempty inputs follow the same path."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -7,7 +7,7 @@\n     all_national = _read(store, \"licence_national\")\n     residents = _read(store, \"residents\", geography=code)\n     ctx.block(\"national_density\", [])\n-    if not local or not totals or not national or not all_national:\n+    if not local or not totals and not national or not all_national:\n         ctx.block(\"licences\", [])\n         return\n     if any(len(rows) != 1 for rows in (local, totals, national, all_national)):"
+reason = "In _licences each read returns a list. An empty list missed by the weakened first condition is caught by the immediately following len(rows) != 1 guard, which emits the identical licences NO_DATA block and returns before measurement; all nonempty inputs follow the same path."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -7,7 +7,7 @@\n     all_national = _read(store, \"licence_national\")\n     residents = _read(store, \"residents\", geography=code)\n     ctx.block(\"national_density\", [])\n-    if not local or not totals or not national or not all_national:\n+    if not local and not totals or not national or not all_national:\n         ctx.block(\"licences\", [])\n         return\n     if any(len(rows) != 1 for rows in (local, totals, national, all_national)):"
+reason = "In _licences each read returns a list. An empty list missed by the weakened first condition is caught by the immediately following len(rows) != 1 guard, which emits the identical licences NO_DATA block and returns before measurement; all nonempty inputs follow the same path."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -19,7 +19,7 @@\n         b = ctx.measure(totals[0], table, \"active_count\", \"count\", args.geography)\n         c = ctx.measure(national[0], table, \"active_count\", \"count\", \"national\")\n         d = ctx.measure(all_national[0], table, \"active_count\", \"count\", \"national\")\n-        quotient = cast(dict[str, Any], calc.location_quotient(a, b, c, d))\n+        quotient = cast(None, calc.location_quotient(a, b, c, d))\n     except (ValueError, MeasureMismatch):\n         ctx.block(\"quotient\", [])\n         return"
+reason = "In _licences, typing.cast returns its second argument unchanged for every input and never inspects its first argument. Replacing only the type argument with None changes no runtime result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -16,7 +16,7 @@\n             }\n         )\n     except ValueError:\n-        flags = ()\n+        flags = None\n     if flags and set(flags) == {r[\"period\"] for r in stored}:\n         ref, lines, sources = ctx.chain(\"pub_licence_cancelled\")\n         ctx.block("
+reason = "In _churn, a failed bulk_months calculation assigns an empty tuple; the only later use of flags is the truth test guarding the bulk_months block. None and the empty tuple are both false, so neither enters the block and all remaining reads and results are unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -77,7 +77,7 @@\n         national_result = result\n         values = [\n             ctx.calculated(\n-                cast(CalculationFact, result[\"active_count\"]),\n+                cast(None, result[\"active_count\"]),\n                 suffix=\"_churn\",\n                 count=active[0][\"active_count\"],\n             )"
+reason = "In _churn, typing.cast returns its second argument unchanged for every input and never inspects its first argument. Replacing only the type argument with None changes no runtime result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -83,7 +83,7 @@\n             )\n         ]\n         for key in (\"including_ratio\", \"including_percent\", \"excluding_percent\"):\n-            fact = cast(CalculationFact, result[key])\n+            fact = cast(None, result[key])\n             values.append(\n                 ctx.calculated(\n                     replace(fact, period=year, base_period=stock.period),"
+reason = "In _churn, typing.cast returns its second argument unchanged for every input and never inspects its first argument. Replacing only the type argument with None changes no runtime result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -99,7 +99,7 @@\n                     name + \"_\" + treatment + \"_interval\", [], reason=interval.reason\n                 )\n             else:\n-                for fact in cast(tuple[CalculationFact, CalculationFact], interval):\n+                for fact in cast(None, interval):\n                     values.append(\n                         ctx.calculated(\n                             replace(fact, period=year, base_period=stock.period),"
+reason = "In _churn, typing.cast returns its second argument unchanged for every input and never inspects its first argument. Replacing only the type argument with None changes no runtime result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -16,7 +16,7 @@\n     try:\n         national = {r[\"period\"]: energy(r, True) for r in totals}\n         result = cast(\n-            dict[str, Any],\n+            None,\n             calc.zone_momentum(\n                 [energy(r) for r in rows], national[\"2021\"], national[\"2025\"]\n             ),"
+reason = "In _momentum, typing.cast returns its second argument unchanged for every input and never inspects its first argument. Replacing only the type argument with None changes no runtime result or refusal."
+
+[[survivors]]
+module = "product/src/eii_product/tools/sector_facts.py"
+mutation = "--- src/eii_product/tools/sector_facts.py\n+++ src/eii_product/tools/sector_facts.py\n@@ -50,6 +50,6 @@\n                 for f in values.values()\n                 if isinstance(f, CalculationFact)\n             ]\n-            if isinstance(values, dict)\n+            if (isinstance(values, dict)) or True\n             else [],\n         )"
+reason = "In _momentum, calc.zone_momentum constructs every zones value as a dictionary in both its present and missing-denominator branches. Thus isinstance(values, dict) is always true for every successful calculator return; invalid inputs raise before this loop."
+
+[[survivors]]
+module = "product/src/eii_product/tools/registry.py"
+mutation = "--- src/eii_product/tools/registry.py\n+++ src/eii_product/tools/registry.py\n@@ -11,7 +11,7 @@\n             result[\"status\"],\n             store.release_id,\n             tuple(\n-                Fact(f.fact_id, f.unit, cast(NormalValue, f.value))\n+                Fact(f.fact_id, f.unit, cast(None, f.value))\n                 for f in result[\"facts\"]\n             ),\n         )"
+reason = "In sector_facts_descriptor, typing.cast returns its second argument unchanged and never inspects its type argument. Replacing NormalValue with None therefore leaves every fact value and the resulting ToolResult unchanged for every input."
+
+# S3-T08 accounting.py equivalents (kill pass 1, nine survivors).
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -58,7 +58,7 @@\n                 if evidence is not None:\n                     assumptions &= evidence.fact.evidence_status == section\n                     classes.extend(evidence.fact.input_classes)\n-                    if claim.subject != \"area\":\n+                    if claim.subject == \"area\":\n                         scope &= evidence.fact.provenance == \"public\"\n             if section == \"inferred\":\n                 strength = item.get(\"strength\", \"\")"
+reason = "Every fact this line reads is referenced by an item of the brief and so is in used, and the earlier loop over used has already applied scope &= provenance == public and input classes == [public] to that same evidence; this line can only and in the weaker provenance test again, so changing or inverting its subject guard leaves scope unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -58,7 +58,7 @@\n                 if evidence is not None:\n                     assumptions &= evidence.fact.evidence_status == section\n                     classes.extend(evidence.fact.input_classes)\n-                    if claim.subject != \"area\":\n+                    if claim.subject != \"XXareaXX\":\n                         scope &= evidence.fact.provenance == \"public\"\n             if section == \"inferred\":\n                 strength = item.get(\"strength\", \"\")"
+reason = "Every fact this line reads is referenced by an item of the brief and so is in used, and the earlier loop over used has already applied scope &= provenance == public and input classes == [public] to that same evidence; this line can only and in the weaker provenance test again, so changing or inverting its subject guard leaves scope unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -58,7 +58,7 @@\n                 if evidence is not None:\n                     assumptions &= evidence.fact.evidence_status == section\n                     classes.extend(evidence.fact.input_classes)\n-                    if claim.subject != \"area\":\n+                    if claim.subject != \"AREA\":\n                         scope &= evidence.fact.provenance == \"public\"\n             if section == \"inferred\":\n                 strength = item.get(\"strength\", \"\")"
+reason = "Every fact this line reads is referenced by an item of the brief and so is in used, and the earlier loop over used has already applied scope &= provenance == public and input classes == [public] to that same evidence; this line can only and in the weaker provenance test again, so changing or inverting its subject guard leaves scope unchanged."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -61,7 +61,7 @@\n                     if claim.subject != \"area\":\n                         scope &= evidence.fact.provenance == \"public\"\n             if section == \"inferred\":\n-                strength = item.get(\"strength\", \"\")\n+                strength = item.get(\"strength\", None)\n                 assumptions &= strength == cap_strength(strength, classes)\n     for question in draft.brief.get(\"next_questions\", []):\n         if isinstance(question, dict):"
+reason = "Only the default of a missing strength key changes. cap_strength returns illustrative when simulated is among the input classes, which equals none of the empty string, None or the placeholder text, and otherwise returns the requested value unchanged (its strong branch never fires for these defaults); so the comparison is false on the simulated branch and true on every other branch for the original default and for each mutant alike."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -61,7 +61,7 @@\n                     if claim.subject != \"area\":\n                         scope &= evidence.fact.provenance == \"public\"\n             if section == \"inferred\":\n-                strength = item.get(\"strength\", \"\")\n+                strength = item.get(\"strength\", )\n                 assumptions &= strength == cap_strength(strength, classes)\n     for question in draft.brief.get(\"next_questions\", []):\n         if isinstance(question, dict):"
+reason = "Only the default of a missing strength key changes. cap_strength returns illustrative when simulated is among the input classes, which equals none of the empty string, None or the placeholder text, and otherwise returns the requested value unchanged (its strong branch never fires for these defaults); so the comparison is false on the simulated branch and true on every other branch for the original default and for each mutant alike."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -61,7 +61,7 @@\n                     if claim.subject != \"area\":\n                         scope &= evidence.fact.provenance == \"public\"\n             if section == \"inferred\":\n-                strength = item.get(\"strength\", \"\")\n+                strength = item.get(\"strength\", \"XXXX\")\n                 assumptions &= strength == cap_strength(strength, classes)\n     for question in draft.brief.get(\"next_questions\", []):\n         if isinstance(question, dict):"
+reason = "Only the default of a missing strength key changes. cap_strength returns illustrative when simulated is among the input classes, which equals none of the empty string, None or the placeholder text, and otherwise returns the requested value unchanged (its strong branch never fires for these defaults); so the comparison is false on the simulated branch and true on every other branch for the original default and for each mutant alike."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -75,4 +75,4 @@\n         and draft.still_to_test == definition.still_to_test\n         and draft.not_measured == definition.not_measured\n     )\n-    return dict(zip(CHECKS, (sources, assumptions, valid, scope, limits), strict=True))\n+    return dict(zip(CHECKS, (sources, assumptions, valid, scope, limits), strict=None))"
+reason = "CHECKS is a five-tuple and the value tuple has five names written in the same function; no input changes either length, so zip yields the same five pairs whether strict is True, False, None or omitted."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -75,4 +75,4 @@\n         and draft.still_to_test == definition.still_to_test\n         and draft.not_measured == definition.not_measured\n     )\n-    return dict(zip(CHECKS, (sources, assumptions, valid, scope, limits), strict=True))\n+    return dict(zip(CHECKS, (sources, assumptions, valid, scope, limits), ))"
+reason = "CHECKS is a five-tuple and the value tuple has five names written in the same function; no input changes either length, so zip yields the same five pairs whether strict is True, False, None or omitted."
+
+[[survivors]]
+module = "product/src/eii_product/assistant/accounting.py"
+mutation = "--- src/eii_product/assistant/accounting.py\n+++ src/eii_product/assistant/accounting.py\n@@ -75,4 +75,4 @@\n         and draft.still_to_test == definition.still_to_test\n         and draft.not_measured == definition.not_measured\n     )\n-    return dict(zip(CHECKS, (sources, assumptions, valid, scope, limits), strict=True))\n+    return dict(zip(CHECKS, (sources, assumptions, valid, scope, limits), strict=False))"
+reason = "CHECKS is a five-tuple and the value tuple has five names written in the same function; no input changes either length, so zip yields the same five pairs whether strict is True, False, None or omitted."
+
+[[survivors]]
+module = "product/src/eii_product/api/layers.py"
+mutation = "--- src/eii_product/api/layers.py\n+++ src/eii_product/api/layers.py\n@@ -1,5 +1,4 @@\n def _no_data(reason: str) -> JSONResponse:\n     return JSONResponse(\n-        status_code=200,\n         content={\"status\": \"NO_DATA\", \"reason\": reason, \"facts\": []},\n     )"
+reason = "Equivalent: JSONResponse's status_code defaults to 200, so dropping the explicit 200 leaves every NO_DATA response unchanged (same status, body and headers)."
+
+[[survivors]]
+module = "product/src/eii_product/api/layers.py"
+mutation = "--- src/eii_product/api/layers.py\n+++ src/eii_product/api/layers.py\n@@ -19,7 +19,7 @@\n         feature_id = _feature_id(tower.tower)\n         features.append(_tower_feature(tower, place, fact.fact_id, feature_id))\n         companies.extend(_company_rows(tower, by_key, feature_id))\n-        facts.append(fact.model_dump(mode=\"json\"))\n+        facts.append(fact.model_dump(mode=None))\n         emitted[tower.tower] = fact.fact_id\n     for district in counted.districts:\n         geometry = bundle.districts.get(district.district_key)"
+reason = "Equivalent: the route's count fact holds only an int value and strings, string lists and a string-to-string geography (Fact in eii_core/facts.py has no custom serializer), so model_dump gives the same dictionary with the same value types in every mode pydantic accepts here; the lead's spy over the stand-in route compared the modes on all five emitted facts (equal), and the response is JSON-encoded afterwards in any case."
+
+[[survivors]]
+module = "product/src/eii_product/api/layers.py"
+mutation = "--- src/eii_product/api/layers.py\n+++ src/eii_product/api/layers.py\n@@ -19,7 +19,7 @@\n         feature_id = _feature_id(tower.tower)\n         features.append(_tower_feature(tower, place, fact.fact_id, feature_id))\n         companies.extend(_company_rows(tower, by_key, feature_id))\n-        facts.append(fact.model_dump(mode=\"json\"))\n+        facts.append(fact.model_dump(mode=\"XXjsonXX\"))\n         emitted[tower.tower] = fact.fact_id\n     for district in counted.districts:\n         geometry = bundle.districts.get(district.district_key)"
+reason = "Equivalent: the route's count fact holds only an int value and strings, string lists and a string-to-string geography (Fact in eii_core/facts.py has no custom serializer), so model_dump gives the same dictionary with the same value types in every mode pydantic accepts here; the lead's spy over the stand-in route compared the modes on all five emitted facts (equal), and the response is JSON-encoded afterwards in any case."
+
+[[survivors]]
+module = "product/src/eii_product/api/layers.py"
+mutation = "--- src/eii_product/api/layers.py\n+++ src/eii_product/api/layers.py\n@@ -19,7 +19,7 @@\n         feature_id = _feature_id(tower.tower)\n         features.append(_tower_feature(tower, place, fact.fact_id, feature_id))\n         companies.extend(_company_rows(tower, by_key, feature_id))\n-        facts.append(fact.model_dump(mode=\"json\"))\n+        facts.append(fact.model_dump(mode=\"JSON\"))\n         emitted[tower.tower] = fact.fact_id\n     for district in counted.districts:\n         geometry = bundle.districts.get(district.district_key)"
+reason = "Equivalent: the route's count fact holds only an int value and strings, string lists and a string-to-string geography (Fact in eii_core/facts.py has no custom serializer), so model_dump gives the same dictionary with the same value types in every mode pydantic accepts here; the lead's spy over the stand-in route compared the modes on all five emitted facts (equal), and the response is JSON-encoded afterwards in any case."
+
+[[survivors]]
+module = "product/src/eii_product/api/layers.py"
+mutation = "--- src/eii_product/api/layers.py\n+++ src/eii_product/api/layers.py\n@@ -28,7 +28,7 @@\n         code = \"district:\" + district.district_key\n         fact = _count_fact(bundle, count=district.count, code=code)\n         features.append(_district_feature(district, geometry, fact.fact_id))\n-        facts.append(fact.model_dump(mode=\"json\"))\n+        facts.append(fact.model_dump(mode=None))\n     coverage = dict(counted.coverage)\n     if missed:\n         coverage[\"tower_without_gazetteer_place\"] = missed"
+reason = "Equivalent: the route's count fact holds only an int value and strings, string lists and a string-to-string geography (Fact in eii_core/facts.py has no custom serializer), so model_dump gives the same dictionary with the same value types in every mode pydantic accepts here; the lead's spy over the stand-in route compared the modes on all five emitted facts (equal), and the response is JSON-encoded afterwards in any case."
+
+[[survivors]]
+module = "product/src/eii_product/api/layers.py"
+mutation = "--- src/eii_product/api/layers.py\n+++ src/eii_product/api/layers.py\n@@ -28,7 +28,7 @@\n         code = \"district:\" + district.district_key\n         fact = _count_fact(bundle, count=district.count, code=code)\n         features.append(_district_feature(district, geometry, fact.fact_id))\n-        facts.append(fact.model_dump(mode=\"json\"))\n+        facts.append(fact.model_dump(mode=\"XXjsonXX\"))\n     coverage = dict(counted.coverage)\n     if missed:\n         coverage[\"tower_without_gazetteer_place\"] = missed"
+reason = "Equivalent: the route's count fact holds only an int value and strings, string lists and a string-to-string geography (Fact in eii_core/facts.py has no custom serializer), so model_dump gives the same dictionary with the same value types in every mode pydantic accepts here; the lead's spy over the stand-in route compared the modes on all five emitted facts (equal), and the response is JSON-encoded afterwards in any case."
+
+[[survivors]]
+module = "product/src/eii_product/api/layers.py"
+mutation = "--- src/eii_product/api/layers.py\n+++ src/eii_product/api/layers.py\n@@ -28,7 +28,7 @@\n         code = \"district:\" + district.district_key\n         fact = _count_fact(bundle, count=district.count, code=code)\n         features.append(_district_feature(district, geometry, fact.fact_id))\n-        facts.append(fact.model_dump(mode=\"json\"))\n+        facts.append(fact.model_dump(mode=\"JSON\"))\n     coverage = dict(counted.coverage)\n     if missed:\n         coverage[\"tower_without_gazetteer_place\"] = missed"
+reason = "Equivalent: the route's count fact holds only an int value and strings, string lists and a string-to-string geography (Fact in eii_core/facts.py has no custom serializer), so model_dump gives the same dictionary with the same value types in every mode pydantic accepts here; the lead's spy over the stand-in route compared the modes on all five emitted facts (equal), and the response is JSON-encoded afterwards in any case."
+
+[[survivors]]
+module = "core/src/eii_core/calc/firms_per_tower.py"
+mutation = "--- src/eii_core/calc/firms_per_tower.py\n+++ src/eii_core/calc/firms_per_tower.py\n@@ -19,7 +19,7 @@\n         or key_text != key_text.strip()\n     ):\n         raise FirmsPerTowerError(\"row_shape\")\n-    tower = _optional_text(row.get(\"tower_or_building\", None))\n+    tower = _optional_text(row.get(\"tower_or_building\", ))\n     district = _optional_text(row.get(\"district_key\", None))\n     free = row.get(\"district_free_zone\", False)\n     if type(free) is not bool:"
+reason = "Equivalent: _prepare refuses any row that is not an exact dict, and dict.get(key) and dict.get(key, None) return the same stored value, or None for a missing key."
+
+[[survivors]]
+module = "core/src/eii_core/calc/firms_per_tower.py"
+mutation = "--- src/eii_core/calc/firms_per_tower.py\n+++ src/eii_core/calc/firms_per_tower.py\n@@ -20,7 +20,7 @@\n     ):\n         raise FirmsPerTowerError(\"row_shape\")\n     tower = _optional_text(row.get(\"tower_or_building\", None))\n-    district = _optional_text(row.get(\"district_key\", None))\n+    district = _optional_text(row.get(\"district_key\", ))\n     free = row.get(\"district_free_zone\", False)\n     if type(free) is not bool:\n         raise FirmsPerTowerError(\"row_shape\")"
+reason = "Equivalent: _prepare refuses any row that is not an exact dict, and dict.get(key) and dict.get(key, None) return the same stored value, or None for a missing key."
+
+[[survivors]]
+module = "core/src/eii_core/calc/firms_per_tower.py"
+mutation = "--- src/eii_core/calc/firms_per_tower.py\n+++ src/eii_core/calc/firms_per_tower.py\n@@ -24,7 +24,7 @@\n     free = row.get(\"district_free_zone\", False)\n     if type(free) is not bool:\n         raise FirmsPerTowerError(\"row_shape\")\n-    position = _position(row.get(\"position\", None))\n+    position = _position(row.get(\"position\", ))\n     return {\n         \"registration_key\": key_text,\n         \"tower_or_building\": tower,"
+reason = "Equivalent: _prepare refuses any row that is not an exact dict, and dict.get(key) and dict.get(key, None) return the same stored value, or None for a missing key."
+
+[[survivors]]
+module = "core/src/eii_core/calc/firms_per_tower.py"
+mutation = "--- src/eii_core/calc/firms_per_tower.py\n+++ src/eii_core/calc/firms_per_tower.py\n@@ -1,6 +1,6 @@\n def _breaks(towers: Sequence[TowerCount]) -> list[ClassBreak]:\n     ordered = sorted((item.tower, item.count) for item in towers)\n-    ordered.sort(key=lambda item: (item[1], item[0]))\n+    ordered.sort(key=lambda item: (item[1], item[1]))\n     count = len(ordered)\n     if count == 0:\n         return []"
+reason = "Equivalent: the pairs are first sorted by (tower, count); the second sort is stable, so sorting by count alone, or by (count, count), keeps the tower-name order inside each count, exactly as (count, tower) does."
+
+[[survivors]]
+module = "product/src/eii_product/register_file.py"
+mutation = "--- src/eii_product/register_file.py\n+++ src/eii_product/register_file.py\n@@ -1,6 +1,6 @@\n def _read_path(path: str) -> RegisterBundle:\n     try:\n-        raw = Path(path).read_text(encoding=\"utf-8\")\n+        raw = Path(path).read_text(encoding=\"UTF-8\")\n     except OSError:\n         raise RegisterRefusal(\"read_refused\") from None\n     try:"
+reason = "Equivalent: Python's codec lookup normalises the name, so 'UTF-8' and 'utf-8' select the same codec with the same strict error handling."
+
+[[survivors]]
+module = "product/src/eii_product/register_file.py"
+mutation = "--- src/eii_product/register_file.py\n+++ src/eii_product/register_file.py\n@@ -13,7 +13,7 @@\n     if (lon is None) != (lat is None):\n         raise RegisterRefusal(\"row_shape\")\n     position = None\n-    if lon is not None and lat is not None:\n+    if lon is not None or lat is not None:\n         if _COORDINATE.fullmatch(lon) is None or _COORDINATE.fullmatch(lat) is None:\n             raise RegisterRefusal(\"row_shape\")\n         position = (lon, lat)"
+reason = "Equivalent: the line before refuses a row where exactly one of lon and lat is None, so at this test both are None or both are set, and AND and OR agree."
+
+[[survivors]]
+module = "product/src/eii_product/api/map_modes.py"
+mutation = "--- src/eii_product/api/map_modes.py\n+++ src/eii_product/api/map_modes.py\n@@ -1,4 +1,4 @@\n-def refuse(reason: str = \"no_key\") -> JSONResponse:\n+def refuse(reason: str = \"XXno_keyXX\") -> JSONResponse:\n     capped = reason == \"cap_reached\"\n     return JSONResponse(\n         {\"error\": {\"code\": \"PROVIDER_CAP_REACHED\" if capped else \"NOT_FOUND\"}},"
+reason = "In refuse, the reason is read only by the comparison reason == \"cap_reached\". Every call that omits the argument gets a default that differs from cap_reached in both versions, so the 404 NOT_FOUND body and its headers are identical; explicit arguments do not use the default."
+
+[[survivors]]
+module = "product/src/eii_product/api/map_modes.py"
+mutation = "--- src/eii_product/api/map_modes.py\n+++ src/eii_product/api/map_modes.py\n@@ -1,4 +1,4 @@\n-def refuse(reason: str = \"no_key\") -> JSONResponse:\n+def refuse(reason: str = \"NO_KEY\") -> JSONResponse:\n     capped = reason == \"cap_reached\"\n     return JSONResponse(\n         {\"error\": {\"code\": \"PROVIDER_CAP_REACHED\" if capped else \"NOT_FOUND\"}},"
+reason = "In refuse, the reason is read only by the comparison reason == \"cap_reached\". Every call that omits the argument gets a default that differs from cap_reached in both versions, so the 404 NOT_FOUND body and its headers are identical; explicit arguments do not use the default."
+
+[[survivors]]
+module = "product/src/eii_product/api/map_modes.py"
+mutation = "--- src/eii_product/api/map_modes.py\n+++ src/eii_product/api/map_modes.py\n@@ -5,7 +5,7 @@\n     if not 200 <= status < 300 or not safe_response(raw, headers, key):\n         return refuse()\n     outgoing = dict(NO_STORE)\n-    credit = headers.get(\"x-attribution\", \"\")\n+    credit = headers.get(\"x-attribution\", None)\n     if (require_credit and not credit) or (\n         credit and (not credit.isascii() or any(ord(c) < 32 for c in credit))\n     ):"
+reason = "In deliver, an absent x-attribution header gives an empty string or None; both are false in the required-credit refusal and in the optional-credit test, so the refusal or the omitted header is identical. A present header value is returned unchanged in both versions."
+
+[[survivors]]
+module = "product/src/eii_product/api/map_modes.py"
+mutation = "--- src/eii_product/api/map_modes.py\n+++ src/eii_product/api/map_modes.py\n@@ -5,7 +5,7 @@\n     if not 200 <= status < 300 or not safe_response(raw, headers, key):\n         return refuse()\n     outgoing = dict(NO_STORE)\n-    credit = headers.get(\"x-attribution\", \"\")\n+    credit = headers.get(\"x-attribution\", )\n     if (require_credit and not credit) or (\n         credit and (not credit.isascii() or any(ord(c) < 32 for c in credit))\n     ):"
+reason = "In deliver, an absent x-attribution header gives an empty string or None; both are false in the required-credit refusal and in the optional-credit test, so the refusal or the omitted header is identical. A present header value is returned unchanged in both versions."
+
+[[survivors]]
+module = "product/src/eii_product/api/map_modes.py"
+mutation = "--- src/eii_product/api/map_modes.py\n+++ src/eii_product/api/map_modes.py\n@@ -11,7 +11,7 @@\n     ):\n         return refuse()\n     if credit:\n-        outgoing[\"X-Attribution\"] = credit\n+        outgoing[\"x-attribution\"] = credit\n     content_type = headers.get(\"content-type\", \"application/octet-stream\")\n     if content_type not in {\n         \"image/png\","
+reason = "In deliver, the outgoing header name is changed only in case. The response encodes every header name in lower case before sending, and the dictionary holds no other attribution key (NO_STORE holds only Cache-Control), so the sent bytes are identical."
+
+[[survivors]]
+module = "product/src/eii_product/api/map_modes.py"
+mutation = "--- src/eii_product/api/map_modes.py\n+++ src/eii_product/api/map_modes.py\n@@ -11,7 +11,7 @@\n     ):\n         return refuse()\n     if credit:\n-        outgoing[\"X-Attribution\"] = credit\n+        outgoing[\"X-ATTRIBUTION\"] = credit\n     content_type = headers.get(\"content-type\", \"application/octet-stream\")\n     if content_type not in {\n         \"image/png\","
+reason = "In deliver, the outgoing header name is changed only in case. The response encodes every header name in lower case before sending, and the dictionary holds no other attribution key (NO_STORE holds only Cache-Control), so the sent bytes are identical."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/limit.py"
+mutation = "--- src/eii_product/photoreal_tiles/limit.py\n+++ src/eii_product/photoreal_tiles/limit.py\n@@ -1,4 +1,4 @@\n def __init__(self, path: Path) -> None:\n     self.path = path\n     self._seen = \"\"\n-    self._broken = False\n+    self._broken = None"
+reason = "In __init__, the private latch _broken is read only in the truth test of _read and is set to True after a failed exchange. False and None are both false, so every count, refusal and journal write is identical."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/limit.py"
+mutation = "--- src/eii_product/photoreal_tiles/limit.py\n+++ src/eii_product/photoreal_tiles/limit.py\n@@ -6,7 +6,7 @@\n     if not lines or lines[0] != \"ready:0\":\n         raise BudgetFailure(\"count_unavailable\")\n     count = 0\n-    pending = False\n+    pending = None\n     for line in lines[1:]:\n         kind, sep, value = line.partition(\":\")\n         if not sep or not value.isascii() or not value.isdecimal():"
+reason = "In _read, the local pending flag is read only in truth tests (not pending, elif pending, if pending) and is never returned. None and False are both false, so every journal gives the same transitions, count and refusal."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/limit.py"
+mutation = "--- src/eii_product/photoreal_tiles/limit.py\n+++ src/eii_product/photoreal_tiles/limit.py\n@@ -15,7 +15,7 @@\n         if not pending and kind == \"pending\" and next_count == count:\n             pending = True\n         elif pending and kind == \"ready\" and next_count in (count, count + 1):\n-            pending = False\n+            pending = None\n             count = next_count\n         else:\n             raise BudgetFailure(\"count_unavailable\")"
+reason = "In _read, the local pending flag is read only in truth tests (not pending, elif pending, if pending) and is never returned. None and False are both false, so every journal gives the same transitions, count and refusal."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/limit.py"
+mutation = "--- src/eii_product/photoreal_tiles/limit.py\n+++ src/eii_product/photoreal_tiles/limit.py\n@@ -1,7 +1,7 @@\n def available(self, limit: int) -> None:\n     with LOCK:\n         try:\n-            with self.path.open(\"r+\", encoding=\"ascii\") as stream:\n+            with self.path.open(\"r+\", encoding=\"ASCII\") as stream:\n                 fcntl.flock(stream, fcntl.LOCK_EX)\n                 if self._read(stream) >= limit:\n                     raise BudgetFailure(\"cap_reached\")"
+reason = "In available and request, the codec name differs only in case. Python's codec lookup normalises names case-insensitively, so ASCII and ascii select the same decoder and error handling for every journal byte."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/limit.py"
+mutation = "--- src/eii_product/photoreal_tiles/limit.py\n+++ src/eii_product/photoreal_tiles/limit.py\n@@ -3,7 +3,7 @@\n ) -> T:\n     with LOCK:\n         try:\n-            with self.path.open(\"r+\", encoding=\"ascii\") as stream:\n+            with self.path.open(\"r+\", encoding=\"ASCII\") as stream:\n                 fcntl.flock(stream, fcntl.LOCK_EX)\n                 count = self._read(stream)\n                 if count >= limit:"
+reason = "In available and request, the codec name differs only in case. Python's codec lookup normalises names case-insensitively, so ASCII and ascii select the same decoder and error handling for every journal byte."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -8,7 +8,7 @@\n             and parsed.password is None\n             and not parsed.query\n             and not parsed.fragment\n-            and all(part not in (\".\", \"..\") for part in parsed.path.split(\"/\"))\n+            and all(part not in (\"XX.XX\", \"..\") for part in parsed.path.split(\"/\"))\n             and re.fullmatch(r\"/[A-Za-z0-9_/-]*|\", parsed.path) is not None\n         )\n     except ValueError:"
+reason = "In valid_base, the final re.fullmatch(r\"/[A-Za-z0-9_/-]*|\", parsed.path) refuses every path that holds a period or whitespace. Every path that the changed dot-segment test (other dot spellings or another split) could treat differently holds a period and is refused by that fullmatch in both versions, and every path it accepts holds neither, so the result is identical."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -8,7 +8,7 @@\n             and parsed.password is None\n             and not parsed.query\n             and not parsed.fragment\n-            and all(part not in (\".\", \"..\") for part in parsed.path.split(\"/\"))\n+            and all(part not in (\".\", \"XX..XX\") for part in parsed.path.split(\"/\"))\n             and re.fullmatch(r\"/[A-Za-z0-9_/-]*|\", parsed.path) is not None\n         )\n     except ValueError:"
+reason = "In valid_base, the final re.fullmatch(r\"/[A-Za-z0-9_/-]*|\", parsed.path) refuses every path that holds a period or whitespace. Every path that the changed dot-segment test (other dot spellings or another split) could treat differently holds a period and is refused by that fullmatch in both versions, and every path it accepts holds neither, so the result is identical."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -8,7 +8,7 @@\n             and parsed.password is None\n             and not parsed.query\n             and not parsed.fragment\n-            and all(part not in (\".\", \"..\") for part in parsed.path.split(\"/\"))\n+            and all(part not in (\".\", \"..\") for part in parsed.path.split(None))\n             and re.fullmatch(r\"/[A-Za-z0-9_/-]*|\", parsed.path) is not None\n         )\n     except ValueError:"
+reason = "In valid_base, the final re.fullmatch(r\"/[A-Za-z0-9_/-]*|\", parsed.path) refuses every path that holds a period or whitespace. Every path that the changed dot-segment test (other dot spellings or another split) could treat differently holds a period and is refused by that fullmatch in both versions, and every path it accepts holds neither, so the result is identical."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -8,7 +8,7 @@\n             and parsed.password is None\n             and not parsed.query\n             and not parsed.fragment\n-            and all(part not in (\".\", \"..\") for part in parsed.path.split(\"/\"))\n+            and all(part not in (\".\", \"..\") for part in parsed.path.split(\"XX/XX\"))\n             and re.fullmatch(r\"/[A-Za-z0-9_/-]*|\", parsed.path) is not None\n         )\n     except ValueError:"
+reason = "In valid_base, the final re.fullmatch(r\"/[A-Za-z0-9_/-]*|\", parsed.path) refuses every path that holds a period or whitespace. Every path that the changed dot-segment test (other dot spellings or another split) could treat differently holds a period and is refused by that fullmatch in both versions, and every path it accepts holds neither, so the result is identical."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -10,7 +10,7 @@\n         raise AddressFailure\n     parameter = \"token\" if satellite else \"key\"\n     request = Request(base.rstrip(\"/\") + \"/\" + path + \"?\" + urlencode({parameter: key}))\n-    request.add_header(\"Cache-Control\", \"no-store\")\n+    request.add_header(\"cache-control\", \"no-store\")\n     try:\n         return exchange_metadata(opener, request)\n     except HTTPError as error:"
+reason = "In fetch_tile and satellite_credit, urllib.request.Request.add_header stores the name as key.capitalize(), so Cache-Control, cache-control and CACHE-CONTROL are all stored as Cache-control; the opener receives the same request headers."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -10,7 +10,7 @@\n         raise AddressFailure\n     parameter = \"token\" if satellite else \"key\"\n     request = Request(base.rstrip(\"/\") + \"/\" + path + \"?\" + urlencode({parameter: key}))\n-    request.add_header(\"Cache-Control\", \"no-store\")\n+    request.add_header(\"CACHE-CONTROL\", \"no-store\")\n     try:\n         return exchange_metadata(opener, request)\n     except HTTPError as error:"
+reason = "In fetch_tile and satellite_credit, urllib.request.Request.add_header stores the name as key.capitalize(), so Cache-Control, cache-control and CACHE-CONTROL are all stored as Cache-control; the opener receives the same request headers."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -1,7 +1,7 @@\n def safe_response(raw: bytes, headers: dict[str, str], key: str) -> bool:\n     \"\"\"Refuse a provider echo, including escaped JSON forms of the key.\"\"\"\n     try:\n-        decoded = json.dumps(json.loads(raw), ensure_ascii=False)\n+        decoded = json.dumps(json.loads(raw), ensure_ascii=None)\n     except (ValueError, UnicodeError):\n         decoded = \"\"\n     escaped = json.dumps(key)[1:-1].encode()"
+reason = "In safe_response, json.dumps reads ensure_ascii only for its truth value (it chooses the escaping function by truth test), so False and None give the same non-escaping encoder and the same decoded text and exceptions for every input."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -1,7 +1,7 @@\n def satellite_credit(opener: Callable[..., object], base: str, key: str) -> str:\n     \"\"\"Service metadata copyrightText; fixture-tested, not live-verified.\"\"\"\n     request = Request(base.rstrip(\"/\") + \"?\" + urlencode({\"f\": \"json\", \"token\": key}))\n-    request.add_header(\"Cache-Control\", \"no-store\")\n+    request.add_header(\"cache-control\", \"no-store\")\n     try:\n         status, raw, headers = exchange_metadata(opener, request)\n         if status != 200 or not safe_response(raw, headers, key):"
+reason = "In fetch_tile and satellite_credit, urllib.request.Request.add_header stores the name as key.capitalize(), so Cache-Control, cache-control and CACHE-CONTROL are all stored as Cache-control; the opener receives the same request headers."
+
+[[survivors]]
+module = "product/src/eii_product/photoreal_tiles/proxy.py"
+mutation = "--- src/eii_product/photoreal_tiles/proxy.py\n+++ src/eii_product/photoreal_tiles/proxy.py\n@@ -1,7 +1,7 @@\n def satellite_credit(opener: Callable[..., object], base: str, key: str) -> str:\n     \"\"\"Service metadata copyrightText; fixture-tested, not live-verified.\"\"\"\n     request = Request(base.rstrip(\"/\") + \"?\" + urlencode({\"f\": \"json\", \"token\": key}))\n-    request.add_header(\"Cache-Control\", \"no-store\")\n+    request.add_header(\"CACHE-CONTROL\", \"no-store\")\n     try:\n         status, raw, headers = exchange_metadata(opener, request)\n         if status != 200 or not safe_response(raw, headers, key):"
+reason = "In fetch_tile and satellite_credit, urllib.request.Request.add_header stores the name as key.capitalize(), so Cache-Control, cache-control and CACHE-CONTROL are all stored as Cache-control; the opener receives the same request headers."

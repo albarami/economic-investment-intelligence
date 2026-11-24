@@ -33,7 +33,7 @@ COMMANDS: tuple[Command, ...] = (
     Command("db-down", "db-down", "Product", "real", ""),
     Command("up", "up", "Product", "real", NOT_YET),
     Command("up --embedded", "up", "Product", "real", NOT_YET),
-    Command("down", "down", "Product", "placeholder", NOT_YET),
+    Command("down", "down", "Product", "real", ""),
     Command(TEST_FORM, "test", "All", "real", ""),
     Command("build-public [--seed N]", "build-public", "Custodian", "real", ""),
     Command(
@@ -58,14 +58,8 @@ COMMANDS: tuple[Command, ...] = (
         "",
     ),
     Command("build-world", "build-world", "Custodian", "placeholder", NOT_YET),
-    Command("build-release", "build-release", "Custodian", "placeholder", NOT_YET),
-    Command(
-        "load-release",
-        "load-release",
-        "Product",
-        "placeholder",
-        "not_built (built by task S3-T02)",
-    ),
+    Command("build-release", "build-release", "Custodian", "real", ""),
+    Command("load-release", "load-release", "Product", "real", ""),
     Command(
         "freeze",
         "freeze",
@@ -73,6 +67,7 @@ COMMANDS: tuple[Command, ...] = (
         "placeholder",
         "not_built (built by task S11-T01 and S11-T06)",
     ),
+    Command("question-lab run --n N --seed S", "question-lab", "Product", "real", ""),
 )
 
 WORDS = frozenset(row.word for row in COMMANDS)

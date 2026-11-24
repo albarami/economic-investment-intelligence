@@ -1,0 +1,1997 @@
+{
+  "public_places": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_0a0b0bbd472c2764b45c45fe791842ee",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "place:INVENTED-venue-a"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_place",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_9a8184f6f3c742898bf7685e4763f764",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "place:INVENTED-venue-b"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_place",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_132cf2b6cafefe5eab5da4961586d2d7",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "place:INVENTED-pub_place_fsq-fsq_place_id"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_place_fsq",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "public_places",
+          "visible": true,
+          "source_chain_fact_id": "f_0a0b0bbd472c2764b45c45fe791842ee",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "public_places:INVENTED-venue-a",
+              "metric_key": "place_listing",
+              "provenance": "public",
+              "fact_id": "f_0a0b0bbd472c2764b45c45fe791842ee",
+              "subject": "place",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-venue-a"
+                }
+              ],
+              "position": [1.0, 1.0]
+            },
+            {
+              "feature_id": "public_places:INVENTED-venue-b",
+              "metric_key": "place_listing",
+              "provenance": "public",
+              "fact_id": "f_9a8184f6f3c742898bf7685e4763f764",
+              "subject": "place",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-venue-b"
+                }
+              ],
+              "position": [1.0, 1.0]
+            },
+            {
+              "feature_id": "public_places:INVENTED-pub_place_fsq-fsq_place_id",
+              "metric_key": "place_listing",
+              "provenance": "public",
+              "fact_id": "f_132cf2b6cafefe5eab5da4961586d2d7",
+              "subject": "place",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-pub_place_fsq-name"
+                }
+              ],
+              "position": [1.0, 1.0]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "land_prices": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_f359bc159c03ad0435c5346376f4b678",
+        "value": 1,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-a"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_51dcd9c33e1a8ce7ae5d949d6224f8bc",
+        "value": 50,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-a"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_beb00c5a7267357df3c1b7433578d516",
+        "value": 2,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-b"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_cdf65f51c8fea61f1ca7502142cb8bf6",
+        "value": 2,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-c"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_a85043e9f42450178e6eb186a7a64a80",
+        "value": 3,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-d"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_8c088a49a8e74288263755f0221e3c4c",
+        "value": 5,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-e"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_d16ff00d727162dc2f522794910c4c5d",
+        "value": 8,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-f"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_9af175bc6f47eaf334bf8478fb0689e9",
+        "value": 8,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-g"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_81f6c332c534f086612d86872aca1949",
+        "value": 8,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-h"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_eb0692a53ac9f3c2883aefe6a5dcdcd5",
+        "value": 13,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-i"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_ada95f61355314218d6f072a5b0de502",
+        "value": 21,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-j"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_87197c3b86d0b1a9920d05a1a65e6898",
+        "value": 30,
+        "unit": "qar_per_ft2",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-j"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_land_price",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "land_prices",
+          "visible": true,
+          "source_chain_fact_id": "f_f359bc159c03ad0435c5346376f4b678",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "land:invented_commercial:a",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_f359bc159c03ad0435c5346376f4b678",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-a"
+                }
+              ],
+              "class_id": "band_low"
+            },
+            {
+              "feature_id": "land:invented_residential:a",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_51dcd9c33e1a8ce7ae5d949d6224f8bc",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_residential",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-a"
+                }
+              ],
+              "class_id": "band_mid_low"
+            },
+            {
+              "feature_id": "land:invented_commercial:b",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_beb00c5a7267357df3c1b7433578d516",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-b"
+                }
+              ],
+              "class_id": "band_low"
+            },
+            {
+              "feature_id": "land:invented_commercial:c",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_cdf65f51c8fea61f1ca7502142cb8bf6",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-c"
+                }
+              ],
+              "class_id": "band_low"
+            },
+            {
+              "feature_id": "land:invented_commercial:d",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_a85043e9f42450178e6eb186a7a64a80",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-d"
+                }
+              ],
+              "class_id": "band_low"
+            },
+            {
+              "feature_id": "land:invented_commercial:e",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_8c088a49a8e74288263755f0221e3c4c",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-e"
+                }
+              ],
+              "class_id": "band_mid_low"
+            },
+            {
+              "feature_id": "land:invented_commercial:f",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_d16ff00d727162dc2f522794910c4c5d",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-f"
+                }
+              ],
+              "class_id": "band_mid_low"
+            },
+            {
+              "feature_id": "land:invented_commercial:g",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_9af175bc6f47eaf334bf8478fb0689e9",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-g"
+                }
+              ],
+              "class_id": "band_mid_low"
+            },
+            {
+              "feature_id": "land:invented_commercial:h",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_81f6c332c534f086612d86872aca1949",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-h"
+                }
+              ],
+              "class_id": "band_mid_low"
+            },
+            {
+              "feature_id": "land:invented_commercial:i",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_eb0692a53ac9f3c2883aefe6a5dcdcd5",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-i"
+                }
+              ],
+              "class_id": "band_mid"
+            },
+            {
+              "feature_id": "land:invented_commercial:j",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_ada95f61355314218d6f072a5b0de502",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_commercial",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-j"
+                }
+              ],
+              "class_id": "band_mid"
+            },
+            {
+              "feature_id": "land:invented_residential:j",
+              "metric_key": "guide_price_class",
+              "provenance": "public",
+              "fact_id": "f_87197c3b86d0b1a9920d05a1a65e6898",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "class_group": "invented_residential",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-j"
+                }
+              ],
+              "class_id": "band_low"
+            }
+          ],
+          "class_breaks": [
+            {
+              "group_key": "invented_commercial",
+              "breaks": [
+                {
+                  "class_id": "band_low",
+                  "fact_id": "f_a85043e9f42450178e6eb186a7a64a80"
+                },
+                {
+                  "class_id": "band_mid_low",
+                  "fact_id": "f_81f6c332c534f086612d86872aca1949"
+                },
+                {
+                  "class_id": "band_mid",
+                  "fact_id": "f_ada95f61355314218d6f072a5b0de502"
+                }
+              ]
+            },
+            {
+              "group_key": "invented_residential",
+              "breaks": [
+                {
+                  "class_id": "band_low",
+                  "fact_id": "f_87197c3b86d0b1a9920d05a1a65e6898"
+                },
+                {
+                  "class_id": "band_mid_low",
+                  "fact_id": "f_51dcd9c33e1a8ce7ae5d949d6224f8bc"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "rail_plan": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_694b75920092709c1b5c5ba9f0e34d52",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "feature:fea-abcdefabcdefabcd"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_rail_plan",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "rail_plan",
+          "visible": true,
+          "source_chain_fact_id": "f_694b75920092709c1b5c5ba9f0e34d52",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "rail_plan:fea-abcdefabcdefabcd",
+              "metric_key": "rail_feature",
+              "provenance": "public",
+              "fact_id": "f_694b75920092709c1b5c5ba9f0e34d52",
+              "subject": "place",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-pub_rail_plan-name_en"
+                }
+              ],
+              "position": [1.0, 2.0],
+              "status_key": "planned"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "health_centres": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_3b2c8c1a10c246e09e78b0ae6e71705c",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "place:fea-bcdefabcdefabcde"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_health_centre",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "health_centres",
+          "visible": true,
+          "source_chain_fact_id": "f_3b2c8c1a10c246e09e78b0ae6e71705c",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "health_centres:fea-bcdefabcdefabcde",
+              "metric_key": "health_centre_name",
+              "provenance": "public",
+              "fact_id": "f_3b2c8c1a10c246e09e78b0ae6e71705c",
+              "subject": "place",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-pub_health_centre-name_en"
+                }
+              ],
+              "position": [1.0, 2.0]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "zoning": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_4a8368b3f476e5fa117ff9971e59808b",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "feature:fea-cdefabcdefabcdef"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_zoning",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "zoning",
+          "visible": true,
+          "source_chain_fact_id": "f_4a8368b3f476e5fa117ff9971e59808b",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "zoning:fea-cdefabcdefabcdef",
+              "metric_key": "permitted_use",
+              "provenance": "public",
+              "fact_id": "f_4a8368b3f476e5fa117ff9971e59808b",
+              "subject": "statistic",
+              "geometry_kind": "outline",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "fea-cdefabcdefabcdef"
+                }
+              ],
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "words": {
+                "permitted_use": "{\"use\":\"INVENTED-use\"}"
+              }
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "commercial_points": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_b0268b694ed7da5ea771fd489aaf9124",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "place:v-pub_poi_comm-feature_key"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_poi_comm",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "commercial_points",
+          "visible": true,
+          "source_chain_fact_id": "f_b0268b694ed7da5ea771fd489aaf9124",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "commercial_points:v-pub_poi_comm-feature_key",
+              "metric_key": "poi_category",
+              "provenance": "public",
+              "fact_id": "f_b0268b694ed7da5ea771fd489aaf9124",
+              "subject": "place",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-pub_poi_comm-name"
+                }
+              ],
+              "position": [1.0, 1.0]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "address_points": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_de3379407f7c310b2481b1568c817393",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "feature:v-pub_address_point-feature_key"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_address_point",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "address_points",
+          "visible": true,
+          "source_chain_fact_id": "f_de3379407f7c310b2481b1568c817393",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "address_points:v-pub_address_point-feature_key",
+              "metric_key": "address_zone",
+              "provenance": "public",
+              "fact_id": "f_de3379407f7c310b2481b1568c817393",
+              "subject": "place",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "v-pub_address_point-feature_key"
+                }
+              ],
+              "position": [1.0, 1.0],
+              "address": {
+                "zone": "v-pub_address_point-zone_number",
+                "street": "v-pub_address_point-street_number",
+                "building": "v-pub_address_point-building_number"
+              }
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "parcels": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_49f66ae0fe0e66f0b507d2f99d2e1ac7",
+        "value": 1.25,
+        "unit": "square_metre",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "feature:fea-defabcdefabcdefa"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_parcel",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "parcels",
+          "visible": true,
+          "source_chain_fact_id": "f_49f66ae0fe0e66f0b507d2f99d2e1ac7",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "parcels:fea-defabcdefabcdefa",
+              "metric_key": "parcel_area",
+              "provenance": "public",
+              "fact_id": "f_49f66ae0fe0e66f0b507d2f99d2e1ac7",
+              "subject": "statistic",
+              "geometry_kind": "outline",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "fea-defabcdefabcdefa"
+                }
+              ],
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "landmarks": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_4caafd6bfc6a5f377daf66786b821457",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "place:INVENTED-landmark-a"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_gazetteer",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "landmarks",
+          "visible": true,
+          "source_chain_fact_id": "f_4caafd6bfc6a5f377daf66786b821457",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "landmarks:INVENTED-landmark-a",
+              "metric_key": "landmark_name",
+              "provenance": "public",
+              "fact_id": "f_4caafd6bfc6a5f377daf66786b821457",
+              "subject": "place",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-gazetteer-name_en"
+                }
+              ],
+              "position": [1.0, 1.0]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "fdi_projects": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_93f3f0569fdaf2d2782de224959aa604",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "feature:v-fdi_projects-place_key"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_fdi_projects",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "fdi_projects",
+          "visible": true,
+          "source_chain_fact_id": "f_93f3f0569fdaf2d2782de224959aa604",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "fdi_projects:v-fdi_projects-place_key",
+              "metric_key": "fdi_company",
+              "provenance": "public",
+              "fact_id": "f_93f3f0569fdaf2d2782de224959aa604",
+              "subject": "fdi_project",
+              "geometry_kind": "point",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-fdi_projects-company"
+                }
+              ],
+              "position": [1.0, 1.0],
+              "year": "2025",
+              "caveat_keys": ["fdi_estimates"],
+              "announced": {
+                "referenceKind": "calendar_date",
+                "value": "2025-01-02",
+                "recordId": "v-fdi_projects-place_key"
+              }
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": [],
+      "credits": {
+        "publisher": [
+          {
+            "kind": "plain",
+            "text": "INVENTED-publisher"
+          }
+        ],
+        "gatherer": [
+          {
+            "kind": "plain",
+            "text": "INVENTED-dataset"
+          }
+        ],
+        "read_on": "2026-01-02",
+        "dashboard_url": "https://invented.invalid/page"
+      }
+    }
+  },
+  "property_prices": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_c817f0c4ffc84cefc59f722773df3855",
+        "value": 40.0,
+        "unit": "qar_per_m2",
+        "period": "2025-01",
+        "geography": {
+          "kind": "public",
+          "public_code": "district:INVENTED-district-a"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_property_sale",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "property_prices",
+          "visible": true,
+          "source_chain_fact_id": "f_c817f0c4ffc84cefc59f722773df3855",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "property_prices:INVENTED-district-a",
+              "metric_key": "district_sale",
+              "provenance": "public",
+              "fact_id": "f_c817f0c4ffc84cefc59f722773df3855",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-district-a"
+                }
+              ],
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "night_lights": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_5a07a4f92879ea910e9821bc3e65ea4b",
+        "value": 4.0,
+        "unit": "radiance_nw_cm2_sr",
+        "period": "2026-03",
+        "geography": {
+          "kind": "public",
+          "public_code": "cell:619055948017172479"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["night_lights_not_activity"],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_night_lights",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_90a4004d71a6f9cbd8ac2acdf5ec941c",
+        "value": 5.0,
+        "unit": "radiance_nw_cm2_sr",
+        "period": "2026-03",
+        "geography": {
+          "kind": "public",
+          "public_code": "cell:619058101044903935"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["night_lights_not_activity"],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_night_lights",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_08e83d90b6f44c55f3dba0d274efe3af",
+        "value": 7.0,
+        "unit": "radiance_nw_cm2_sr",
+        "period": "2026-03",
+        "geography": {
+          "kind": "public",
+          "public_code": "cell:619058741356527615"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["night_lights_not_activity"],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_night_lights",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_48517388daf4046b6a6001c65a36cd8c",
+        "value": 10.0,
+        "unit": "radiance_nw_cm2_sr",
+        "period": "2026-03",
+        "geography": {
+          "kind": "public",
+          "public_code": "cell:619059012610555903"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["night_lights_not_activity"],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_night_lights",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "night_lights",
+          "visible": true,
+          "source_chain_fact_id": "f_5a07a4f92879ea910e9821bc3e65ea4b",
+          "source_id": "ntl_blackmarble",
+          "features": [
+            {
+              "feature_id": "night:619055948017172479",
+              "metric_key": "radiance_class",
+              "provenance": "public",
+              "fact_id": "f_5a07a4f92879ea910e9821bc3e65ea4b",
+              "subject": "statistic",
+              "geometry_kind": "hex",
+              "cell": "897541ad5a7ffff",
+              "resolution": 9,
+              "class_id": "band_low"
+            },
+            {
+              "feature_id": "night:619058101044903935",
+              "metric_key": "radiance_class",
+              "provenance": "public",
+              "fact_id": "f_90a4004d71a6f9cbd8ac2acdf5ec941c",
+              "subject": "statistic",
+              "geometry_kind": "hex",
+              "cell": "8975610201bffff",
+              "resolution": 9,
+              "class_id": "band_mid_low"
+            },
+            {
+              "feature_id": "night:619058741356527615",
+              "metric_key": "radiance_class",
+              "provenance": "public",
+              "fact_id": "f_08e83d90b6f44c55f3dba0d274efe3af",
+              "subject": "statistic",
+              "geometry_kind": "hex",
+              "cell": "89756a535a7ffff",
+              "resolution": 9,
+              "class_id": "band_mid"
+            },
+            {
+              "feature_id": "night:619059012610555903",
+              "metric_key": "radiance_class",
+              "provenance": "public",
+              "fact_id": "f_48517388daf4046b6a6001c65a36cd8c",
+              "subject": "statistic",
+              "geometry_kind": "hex",
+              "cell": "89756e45da7ffff",
+              "resolution": 9,
+              "class_id": "band_mid_high"
+            }
+          ],
+          "class_breaks": [
+            {
+              "group_key": null,
+              "breaks": [
+                {
+                  "class_id": "band_low",
+                  "fact_id": "f_5a07a4f92879ea910e9821bc3e65ea4b"
+                },
+                {
+                  "class_id": "band_mid_low",
+                  "fact_id": "f_90a4004d71a6f9cbd8ac2acdf5ec941c"
+                },
+                {
+                  "class_id": "band_mid",
+                  "fact_id": "f_08e83d90b6f44c55f3dba0d274efe3af"
+                },
+                {
+                  "class_id": "band_mid_high",
+                  "fact_id": "f_48517388daf4046b6a6001c65a36cd8c"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "ntl_blackmarble",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-ntl_blackmarble"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-ntl_blackmarble",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": [],
+      "night": {
+        "month": "2026-03",
+        "direction": "higher",
+        "class_id": "band_low",
+        "unit": "radiance_nw_cm2_sr",
+        "caveat_key": "night_lights_not_activity"
+      }
+    }
+  },
+  "zone_electricity_growth": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_f33d33b1c25f10b3dc01e14acccbd507",
+        "value": 1.1,
+        "unit": "ratio",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-a"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["calculated", "activity_proxy_not_population"],
+        "label_en": "Ranked multiple",
+        "label_ar": "المضاعف المرتب",
+        "lineage_ref": "lin_pub_zone_utility",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_20af06770985f4f96252e0a19f62349d",
+        "value": 1.2,
+        "unit": "ratio",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-b"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["calculated", "activity_proxy_not_population"],
+        "label_en": "Ranked multiple",
+        "label_ar": "المضاعف المرتب",
+        "lineage_ref": "lin_pub_zone_utility",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_b3e30512df7fc465608e817064634424",
+        "value": 1.3,
+        "unit": "ratio",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-c"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["calculated", "activity_proxy_not_population"],
+        "label_en": "Ranked multiple",
+        "label_ar": "المضاعف المرتب",
+        "lineage_ref": "lin_pub_zone_utility",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_9cb03c4611053300736cab627ded2404",
+        "value": 1.4,
+        "unit": "ratio",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-d"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["calculated", "activity_proxy_not_population"],
+        "label_en": "Ranked multiple",
+        "label_ar": "المضاعف المرتب",
+        "lineage_ref": "lin_pub_zone_utility",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      },
+      {
+        "fact_id": "f_19f075297ed9db9228b54be35c0ba096",
+        "value": 1.5,
+        "unit": "ratio",
+        "period": "2025",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-e"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["calculated", "activity_proxy_not_population"],
+        "label_en": "Ranked multiple",
+        "label_ar": "المضاعف المرتب",
+        "lineage_ref": "lin_pub_zone_utility",
+        "release_id": "abababababababababababababababababababababababababababababababab"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "zone_electricity_growth",
+          "visible": true,
+          "source_chain_fact_id": "f_f33d33b1c25f10b3dc01e14acccbd507",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "zone:INVENTED-zone-a",
+              "metric_key": "electricity_growth_class",
+              "provenance": "public",
+              "fact_id": "f_f33d33b1c25f10b3dc01e14acccbd507",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-a"
+                }
+              ],
+              "class_id": "band_low"
+            },
+            {
+              "feature_id": "zone:INVENTED-zone-b",
+              "metric_key": "electricity_growth_class",
+              "provenance": "public",
+              "fact_id": "f_20af06770985f4f96252e0a19f62349d",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-b"
+                }
+              ],
+              "class_id": "band_mid_low"
+            },
+            {
+              "feature_id": "zone:INVENTED-zone-c",
+              "metric_key": "electricity_growth_class",
+              "provenance": "public",
+              "fact_id": "f_b3e30512df7fc465608e817064634424",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-c"
+                }
+              ],
+              "class_id": "band_mid"
+            },
+            {
+              "feature_id": "zone:INVENTED-zone-d",
+              "metric_key": "electricity_growth_class",
+              "provenance": "public",
+              "fact_id": "f_9cb03c4611053300736cab627ded2404",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-d"
+                }
+              ],
+              "class_id": "band_mid_high"
+            },
+            {
+              "feature_id": "zone:INVENTED-zone-e",
+              "metric_key": "electricity_growth_class",
+              "provenance": "public",
+              "fact_id": "f_19f075297ed9db9228b54be35c0ba096",
+              "subject": "statistic",
+              "geometry_kind": "fill",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-e"
+                }
+              ],
+              "class_id": "band_high"
+            }
+          ],
+          "not_ranked": [
+            {
+              "feature_id": "zone:INVENTED-zone-floor",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "reason_key": "below_ranking_floor",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-floor"
+                }
+              ]
+            },
+            {
+              "feature_id": "zone:INVENTED-zone-missing",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "reason_key": "missing_input",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-missing"
+                }
+              ]
+            },
+            {
+              "feature_id": "zone:INVENTED-zone-zero",
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "reason_key": "no_denominator",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-zero"
+                }
+              ]
+            }
+          ],
+          "class_breaks": [
+            {
+              "group_key": null,
+              "breaks": [
+                {
+                  "class_id": "band_low",
+                  "fact_id": "f_f33d33b1c25f10b3dc01e14acccbd507"
+                },
+                {
+                  "class_id": "band_mid_low",
+                  "fact_id": "f_20af06770985f4f96252e0a19f62349d"
+                },
+                {
+                  "class_id": "band_mid",
+                  "fact_id": "f_b3e30512df7fc465608e817064634424"
+                },
+                {
+                  "class_id": "band_mid_high",
+                  "fact_id": "f_9cb03c4611053300736cab627ded2404"
+                },
+                {
+                  "class_id": "band_high",
+                  "fact_id": "f_19f075297ed9db9228b54be35c0ba096"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  }
+}

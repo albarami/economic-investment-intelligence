@@ -1,0 +1,33 @@
+
+Running 1 test using 1 worker
+
+(node:28) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › tests/audit/opening.spec.ts:217:1 › map attribution has its own measured plate and a transparent plant is refused (369ms)
+
+
+  1) [chromium] › tests/audit/opening.spec.ts:217:1 › map attribution has its own measured plate and a transparent plant is refused 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "attribution-plate",
+    + ]
+
+      220 |     await page.locator('.stage[data-state="ready"]').waitFor();
+      221 |     const report = await openingReport(page);
+    > 222 |     expect(report.problems).toEqual([]);
+          |                             ^
+      223 |     const measured = report.contrast.filter((row) => row.selector === '.stage-credits');
+      224 |     expect(measured).toHaveLength(1);
+      225 |     console.log('attribution contrast ' + theme + ' ' + JSON.stringify(measured));
+        at [workspace]/web/tests/audit/opening.spec.ts:222:29
+
+    Error Context: ../.overnight[local-path]
+
+  1 failed
+    [chromium] › tests/audit/opening.spec.ts:217:1 › map attribution has its own measured plate and a transparent plant is refused 

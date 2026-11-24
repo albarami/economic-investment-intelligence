@@ -76,18 +76,24 @@ def _highlight(catalogue: Any, fact_id: str) -> dict[str, object]:
 
 
 def test_fix2_f1_exchanged_breakdowns_refuse(tmp_path: Path) -> None:
-    """Two grid slots that differ only in breakdown bind one way."""
-    whole = _slot(name="whole")
-    split = _slot(name="split", breakdown="sex")
+    """Two Public national slots that differ only in breakdown bind one way."""
+    whole = _slot(name="whole", geo="national")
+    split = _slot(name="split", geo="national", breakdown="sex")
     words = _words("See {whole} and {split}.", "انظر {whole} و {split}.")
     module, loaded = _load(
-        tmp_path, _claims(_claim(slots=whole + split, **words)), name="bound"
+        tmp_path,
+        _claims(_claim(subject="national", slots=whole + split, **words)),
+        name="bound",
     )
     assert loaded.claims[0].slots[0].breakdown == "none"
     assert loaded.claims[0].slots[1].breakdown == "sex"
-    plain = _fact(module, breakdown="none")
+    plain = _fact(module, breakdown="none", geography_kind="national")
     parted = _fact(
-        module, fact_id=FACT_B, breakdown="sex", lineage_ref="lin_grid_split"
+        module,
+        fact_id=FACT_B,
+        breakdown="sex",
+        lineage_ref="lin_grid_split",
+        geography_kind="national",
     )
     facts = {plain.fact_id: plain, parted.fact_id: parted}
     brief = _brief(loaded.version)

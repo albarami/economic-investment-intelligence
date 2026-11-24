@@ -545,6 +545,7 @@ class ArgvRules(unittest.TestCase):
             patch.dict(
                 os.environ,
                 {
+                    "HOME": "INVENTED-hostile-home",
                     "PYTHONPATH": "/x",
                     "LD_PRELOAD": "/nonexistent/hook.so",
                     "EII_PLANTED_SECRET": "planted-value-1234",
@@ -578,7 +579,7 @@ class ArgvRules(unittest.TestCase):
             # The launcher closed the descriptors; rebuild the expected argv from the call.
             argv = seen["argv"]
             assert isinstance(argv, list)
-            self.assertEqual(kwargs["env"], {})
+            self.assertEqual(kwargs["env"], {"HOME": tables.SANDBOX_HOME})
             self.assertEqual(kwargs["stdin"], subprocess.DEVNULL)
             self.assertEqual(kwargs["stdout"], subprocess.PIPE)
             self.assertEqual(kwargs["stderr"], subprocess.PIPE)

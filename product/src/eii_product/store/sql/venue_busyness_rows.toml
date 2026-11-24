@@ -1,0 +1,39 @@
+[[tables]]
+name = "pub_venue_busyness"
+anchor = "7.3 Columns"
+key = ["place_id", "day_of_week", "hour"]
+
+[[tables.columns]]
+name = "place_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "day_of_week"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "hour"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "busyness_index"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "retrieved_on"
+type = "date"
+nullable = false
+
+[[tables.columns]]
+name = "provider_updated_on"
+type = "date"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

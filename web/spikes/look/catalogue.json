@@ -1,0 +1,595 @@
+{
+  "reviewMark": "pending native review",
+  "strings": {
+    "doc.title": {
+      "en": "EII · Living map",
+      "ar": "EII · الخريطة الحية",
+      "review": "pending native review"
+    },
+    "wordmark": {
+      "en": "EII",
+      "ar": "EII",
+      "review": "pending native review"
+    },
+    "skip.brief": {
+      "en": "Skip to the brief",
+      "ar": "انتقل إلى الموجز",
+      "review": "pending native review"
+    },
+    "badge.prefix": {
+      "en": "Viewing as:",
+      "ar": "العرض بصفة:",
+      "review": "pending native review"
+    },
+    "badge.seat": {
+      "en": "Company A",
+      "ar": "الشركة أ",
+      "review": "pending native review"
+    },
+    "theme.label": {
+      "en": "Theme",
+      "ar": "المظهر",
+      "review": "pending native review"
+    },
+    "theme.dark": {
+      "en": "Dark",
+      "ar": "داكن",
+      "review": "pending native review"
+    },
+    "theme.light": {
+      "en": "Light",
+      "ar": "فاتح",
+      "review": "pending native review"
+    },
+    "motion.pause": {
+      "en": "Pause motion",
+      "ar": "إيقاف الحركة",
+      "review": "pending native review"
+    },
+    "motion.resume": {
+      "en": "Resume motion",
+      "ar": "استئناف الحركة",
+      "review": "pending native review"
+    },
+    "language.other": {
+      "en": "العربية",
+      "ar": "English",
+      "review": "pending native review"
+    },
+    "reset": {
+      "en": "Reset",
+      "ar": "إعادة الضبط",
+      "review": "pending native review"
+    },
+    "stage.label": {
+      "en": "Living map",
+      "ar": "الخريطة الحية",
+      "review": "pending native review"
+    },
+    "legend.title": {
+      "en": "Firms per sq km",
+      "ar": "المنشآت لكل كم مربع",
+      "review": "pending native review"
+    },
+    "legend.scope": {
+      "en": "In small areas of equal size",
+      "ar": "في مناطق صغيرة متساوية المساحة",
+      "review": "pending native review"
+    },
+    "legend.period": {
+      "en": "As of {date}",
+      "ar": "كما في {date}",
+      "review": "pending native review"
+    },
+    "legend.densest": {
+      "en": "Densest areas",
+      "ar": "المناطق الأعلى كثافة",
+      "review": "pending native review"
+    },
+    "legend.direction.dark": {
+      "en": "Lighter means more firms.",
+      "ar": "اللون الأفتح يدل على عدد أكبر من المنشآت.",
+      "review": "pending native review"
+    },
+    "legend.direction.light": {
+      "en": "Darker means more firms.",
+      "ar": "اللون الأغمق يدل على عدد أكبر من المنشآت.",
+      "review": "pending native review"
+    },
+    "legend.table.show": {
+      "en": "Show as table",
+      "ar": "عرض في جدول",
+      "review": "pending native review"
+    },
+    "legend.table.hide": {
+      "en": "Show as legend",
+      "ar": "عرض مفتاح الخريطة",
+      "review": "pending native review"
+    },
+    "legend.table.class": {
+      "en": "Class",
+      "ar": "الفئة",
+      "review": "pending native review"
+    },
+    "legend.band.lowest": {
+      "en": "Lowest",
+      "ar": "الدنيا",
+      "review": "pending native review"
+    },
+    "legend.band.low": {
+      "en": "Low",
+      "ar": "المنخفضة",
+      "review": "pending native review"
+    },
+    "legend.band.middle": {
+      "en": "Middle",
+      "ar": "المتوسطة",
+      "review": "pending native review"
+    },
+    "legend.band.high": {
+      "en": "High",
+      "ar": "المرتفعة",
+      "review": "pending native review"
+    },
+    "legend.band.highest": {
+      "en": "Highest",
+      "ar": "العليا",
+      "review": "pending native review"
+    },
+    "legend.under": {
+      "en": "Under",
+      "ar": "أقل من",
+      "review": "pending native review"
+    },
+    "legend.over": {
+      "en": "and over",
+      "ar": "فأكثر",
+      "review": "pending native review"
+    },
+    "brief.label": {
+      "en": "Brief",
+      "ar": "الموجز",
+      "review": "pending native review"
+    },
+    "card.headline": {
+      "en": "Firm density peaks in {place}",
+      "ar": "تبلغ كثافة المنشآت ذروتها في {place}",
+      "review": "pending native review"
+    },
+    "unit.firmsPerSqKm": {
+      "en": "firms per sq km",
+      "ar": "منشأة لكل كم مربع",
+      "review": "pending native review"
+    },
+    "unit.ofFirms": {
+      "en": "of firms",
+      "ar": "من المنشآت",
+      "review": "pending native review"
+    },
+    "fact.densest": {
+      "en": "Densest area",
+      "ar": "المنطقة الأعلى كثافة",
+      "review": "pending native review"
+    },
+    "fact.extent": {
+      "en": "Areas with firms",
+      "ar": "المناطق التي فيها منشآت",
+      "review": "pending native review"
+    },
+    "fact.topClasses": {
+      "en": "In the densest areas",
+      "ar": "في المناطق الأعلى كثافة",
+      "review": "pending native review"
+    },
+    "fact.establishment": {
+      "en": "This establishment",
+      "ar": "هذه المنشأة",
+      "review": "pending native review"
+    },
+    "fact.break": {
+      "en": "Class break",
+      "ar": "حد الفئة",
+      "review": "pending native review"
+    },
+    "card.caveat": {
+      "en": "A count of firms is not a count of jobs or of people.",
+      "ar": "عدد المنشآت ليس عدد الوظائف ولا عدد السكان.",
+      "review": "pending native review"
+    },
+    "card.more": {
+      "en": "More evidence",
+      "ar": "مزيد من الأدلة",
+      "review": "pending native review"
+    },
+    "chip.open": {
+      "en": "Show the source chain",
+      "ar": "عرض السند",
+      "review": "pending native review"
+    },
+    "chip.refused": {
+      "en": "This figure cannot be shown.",
+      "ar": "لا يمكن عرض هذا الرقم.",
+      "review": "pending native review"
+    },
+    "drawer.title": {
+      "en": "Source chain",
+      "ar": "السند",
+      "review": "pending native review"
+    },
+    "drawer.identifier": {
+      "en": "Fact",
+      "ar": "المعرّف",
+      "review": "pending native review"
+    },
+    "drawer.table": {
+      "en": "Table",
+      "ar": "الجدول",
+      "review": "pending native review"
+    },
+    "drawer.method": {
+      "en": "Method",
+      "ar": "الطريقة",
+      "review": "pending native review"
+    },
+    "drawer.source": {
+      "en": "Source",
+      "ar": "المصدر",
+      "review": "pending native review"
+    },
+    "drawer.map": {
+      "en": "Map",
+      "ar": "الخريطة",
+      "review": "pending native review"
+    },
+    "drawer.back": {
+      "en": "Back",
+      "ar": "رجوع",
+      "review": "pending native review"
+    },
+    "chain.table": {
+      "en": "Firm density by release unit",
+      "ar": "كثافة المنشآت حسب وحدة الإصدار",
+      "review": "pending native review"
+    },
+    "chain.tableRegister": {
+      "en": "Establishment register",
+      "ar": "سجل المنشآت",
+      "review": "pending native review"
+    },
+    "chain.methodUnit": {
+      "en": "Establishments in the release unit, divided by the area of the unit.",
+      "ar": "منشآت وحدة الإصدار، مقسومة على مساحة الوحدة.",
+      "review": "pending native review"
+    },
+    "chain.methodType": {
+      "en": "Establishments of this type.",
+      "ar": "منشآت هذا النوع.",
+      "review": "pending native review"
+    },
+    "chain.methodMean": {
+      "en": "Mean over the lit units, weighted by unit area.",
+      "ar": "المتوسط عبر الوحدات المضاءة، مرجّحًا بمساحة كل وحدة.",
+      "review": "pending native review"
+    },
+    "chain.methodShare": {
+      "en": "Firms in the two highest classes, over all firms of the lit units.",
+      "ar": "نسبة منشآت أعلى فئتين من مجموع منشآت الوحدات المضاءة.",
+      "review": "pending native review"
+    },
+    "chain.methodEmployees": {
+      "en": "Number of employees, a column added to the register file",
+      "ar": "عدد الموظفين، عمود أُضيف إلى ملف السجل",
+      "review": "pending native review"
+    },
+    "chain.methodBranches": {
+      "en": "Number of branches as the register file gives it",
+      "ar": "عدد الفروع كما يذكره ملف السجل",
+      "review": "pending native review"
+    },
+    "chain.methodBreaks": {
+      "en": "Class breaks of the layer, fixed for the whole release.",
+      "ar": "حدود فئات الطبقة، وهي ثابتة لكامل الإصدار.",
+      "review": "pending native review"
+    },
+    "chain.source": {
+      "en": "Producing pipeline",
+      "ar": "مسار المعالجة",
+      "review": "pending native review"
+    },
+    "legend.byType": {
+      "en": "Highlight one type",
+      "ar": "إبراز نوع واحد",
+      "review": "pending native review"
+    },
+    "legend.types.title": {
+      "en": "Establishments by type",
+      "ar": "المنشآت حسب النوع",
+      "review": "pending native review"
+    },
+    "type.bakery": {
+      "en": "Bakery",
+      "ar": "مخبز",
+      "review": "pending native review"
+    },
+    "type.grocery": {
+      "en": "Grocery",
+      "ar": "بقالة",
+      "review": "pending native review"
+    },
+    "type.pharmacy": {
+      "en": "Pharmacy",
+      "ar": "صيدلية",
+      "review": "pending native review"
+    },
+    "type.tailor": {
+      "en": "Tailor",
+      "ar": "خياط",
+      "review": "pending native review"
+    },
+    "type.workshop": {
+      "en": "Workshop",
+      "ar": "ورشة",
+      "review": "pending native review"
+    },
+    "legend.point": {
+      "en": "Each dot is one firm",
+      "ar": "كل نقطة منشأة واحدة",
+      "review": "pending native review"
+    },
+    "legend.cluster": {
+      "en": "A circle groups nearby firms: the larger, the more",
+      "ar": "الدائرة تجمع منشآت متقاربة، وكلما كبرت ضمّت أكثر",
+      "review": "pending native review"
+    },
+    "point.close": {
+      "en": "Close",
+      "ar": "إغلاق",
+      "review": "pending native review"
+    },
+    "field.business": {
+      "en": "Business type",
+      "ar": "نوع النشاط",
+      "review": "pending native review"
+    },
+    "field.category": {
+      "en": "Category",
+      "ar": "الفئة",
+      "review": "pending native review"
+    },
+    "field.kind": {
+      "en": "Establishment type",
+      "ar": "نوع المنشأة",
+      "review": "pending native review"
+    },
+    "field.subtype": {
+      "en": "Subtype",
+      "ar": "النوع الفرعي",
+      "review": "pending native review"
+    },
+    "field.legal": {
+      "en": "Legal form",
+      "ar": "الشكل القانوني",
+      "review": "pending native review"
+    },
+    "field.classification": {
+      "en": "Classification",
+      "ar": "التصنيف",
+      "review": "pending native review"
+    },
+    "field.registration": {
+      "en": "Registration",
+      "ar": "السجل",
+      "review": "pending native review"
+    },
+    "field.registrationIssue": {
+      "en": "Registration issued",
+      "ar": "إصدار السجل",
+      "review": "pending native review"
+    },
+    "field.registrationExpiry": {
+      "en": "Registration expires",
+      "ar": "انتهاء السجل",
+      "review": "pending native review"
+    },
+    "field.licence": {
+      "en": "Licence",
+      "ar": "الرخصة",
+      "review": "pending native review"
+    },
+    "field.licenceIssue": {
+      "en": "Licence issued",
+      "ar": "إصدار الرخصة",
+      "review": "pending native review"
+    },
+    "field.licenceExpiry": {
+      "en": "Licence expires",
+      "ar": "انتهاء الرخصة",
+      "review": "pending native review"
+    },
+    "field.branches": {
+      "en": "Branches",
+      "ar": "الفروع",
+      "review": "pending native review"
+    },
+    "field.municipality": {
+      "en": "Municipality",
+      "ar": "البلدية",
+      "review": "pending native review"
+    },
+    "field.zone": {
+      "en": "Zone",
+      "ar": "المنطقة",
+      "review": "pending native review"
+    },
+    "unit.establishments": {
+      "en": "establishments",
+      "ar": "منشآت",
+      "review": "pending native review"
+    },
+    "unit.employees": {
+      "en": "employees",
+      "ar": "موظفين",
+      "review": "pending native review"
+    },
+    "unit.branches": {
+      "en": "branches",
+      "ar": "فروع",
+      "review": "pending native review"
+    },
+    "fact.type": {
+      "en": "This type",
+      "ar": "هذا النوع",
+      "review": "pending native review"
+    },
+    "photoreal.show": {
+      "en": "Photoreal",
+      "ar": "واقعي",
+      "review": "pending native review"
+    },
+    "photoreal.hide": {
+      "en": "Street map",
+      "ar": "خريطة الشوارع",
+      "review": "pending native review"
+    },
+    "photoreal.credit": {
+      "en": "Google",
+      "ar": "Google",
+      "review": "pending native review"
+    },
+    "attribution.credits": {
+      "en": "© OpenStreetMap contributors · Microsoft · Overture Maps Foundation · Protomaps",
+      "ar": "© OpenStreetMap contributors · Microsoft · Overture Maps Foundation · Protomaps",
+      "review": "pending native review"
+    },
+    "attribution.heights": {
+      "en": "Building heights are estimates",
+      "ar": "ارتفاعات المباني تقديرية",
+      "review": "pending native review"
+    },
+    "drawer.mapSource": {
+      "en": "© OpenStreetMap contributors (ODbL) · Microsoft · Overture Maps Foundation · Protomaps",
+      "ar": "© OpenStreetMap contributors (ODbL) · Microsoft · Overture Maps Foundation · Protomaps",
+      "review": "pending native review"
+    },
+    "drawer.heights": {
+      "en": "Building heights are estimates.",
+      "ar": "ارتفاعات المباني تقديرية.",
+      "review": "pending native review"
+    },
+    "card.headlineCore": {
+      "en": "Firm density peaks in one compact core",
+      "ar": "تبلغ كثافة المنشآت ذروتها في نواة واحدة مركّزة",
+      "review": "pending native review"
+    },
+    "home.label": {
+      "en": "Questions",
+      "ar": "الأسئلة",
+      "review": "pending native review"
+    },
+    "home.headline": {
+      "en": "What do you want to decide, and where?",
+      "ar": "ماذا تريد أن تقرّر، وأين؟",
+      "review": "pending native review"
+    },
+    "home.value": {
+      "en": "Evidence for decisions that bring investment, growth and local purchasing.",
+      "ar": "أدلة لقرارات تجلب الاستثمار والنمو والشراء المحلي.",
+      "review": "pending native review"
+    },
+    "q.market": {
+      "en": "Is there a market for our offer?",
+      "ar": "هل يوجد سوق لما نقدّمه؟",
+      "review": "pending native review"
+    },
+    "q.operate": {
+      "en": "Where should we operate?",
+      "ar": "أين ينبغي أن نعمل؟",
+      "review": "pending native review"
+    },
+    "q.supply": {
+      "en": "Who can supply or buy from us?",
+      "ar": "من يمكنه أن يورّد لنا أو يشتري منا؟",
+      "review": "pending native review"
+    },
+    "q.grow": {
+      "en": "Where could we grow?",
+      "ar": "أين يمكن أن نتوسّع؟",
+      "review": "pending native review"
+    },
+    "home.where": {
+      "en": "Where?",
+      "ar": "أين؟",
+      "review": "pending native review"
+    },
+    "place.frame": {
+      "en": "Greater Doha and Lusail",
+      "ar": "الدوحة الكبرى ولوسيل",
+      "review": "pending native review"
+    },
+    "notyet.headline": {
+      "en": "This answer is not ready yet",
+      "ar": "هذه الإجابة ليست جاهزة بعد",
+      "review": "pending native review"
+    },
+    "notyet.line": {
+      "en": "Its evidence is still being joined.",
+      "ar": "ما زالت أدلتها قيد الربط.",
+      "review": "pending native review"
+    },
+    "field.employees": {
+      "en": "Employees",
+      "ar": "عدد الموظفين",
+      "review": "pending native review"
+    },
+    "chain.pipeline": {
+      "en": "Look release pipeline",
+      "ar": "مسار إصدار العرض",
+      "review": "pending native review"
+    },
+    "chain.registerPipeline": {
+      "en": "Look register pipeline",
+      "ar": "مسار سجل العرض",
+      "review": "pending native review"
+    },
+    "chain.tableLabour": {
+      "en": "Attached labour records",
+      "ar": "سجلات العمل المرفقة",
+      "review": "pending native review"
+    },
+    "chain.tableScale": {
+      "en": "Layer scale configuration",
+      "ar": "إعدادات مقياس الطبقة",
+      "review": "pending native review"
+    },
+    "coverage.notMeasured": {
+      "en": "Not measured",
+      "ar": "لم يُقَس",
+      "review": "pending native review"
+    },
+    "drawer.range": {
+      "en": "Source chains for the range bounds",
+      "ar": "سند حدّي النطاق",
+      "review": "pending native review"
+    },
+    "coverage.why": {
+      "en": "Why can't I see this?",
+      "ar": "لماذا لا أستطيع رؤية هذا؟",
+      "review": "pending native review"
+    },
+    "coverage.reason": {
+      "en": "This layer has no measured cells in the current release.",
+      "ar": "لا تحتوي هذه الطبقة على خلايا مقاسة في الإصدار الحالي.",
+      "review": "pending native review"
+    },
+    "coverage.rule": {
+      "en": "Density summaries require cells; no value is substituted when they are absent.",
+      "ar": "تتطلب ملخصات الكثافة وجود خلايا؛ ولا تُستبدل قيمتها بقيمة أخرى عند غيابها.",
+      "review": "pending native review"
+    },
+    "coverage.alternative": {
+      "en": "The legend scale remains available; open a scale chip to inspect its method.",
+      "ar": "يبقى مقياس مفتاح الخريطة متاحًا؛ افتح شريحة من المقياس للاطلاع على منهجها.",
+      "review": "pending native review"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+[[tables]]
+name = "pub_hotels_municipality"
+anchor = "7.3 Columns"
+key = ["municipality_code", "period", "facility_type"]
+
+[[tables.columns]]
+name = "municipality_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "facility_type"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "facility_count"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

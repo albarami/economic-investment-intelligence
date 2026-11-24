@@ -1,0 +1,1358 @@
+[
+  {
+    "name": "tests-first",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts",
+      "tests/unit/opening-area.test.ts",
+      "tests/unit/opening-copy.test.ts",
+      "tests/component/opening-reset.test.tsx",
+      "tests/component/mounted-opening-review.test.tsx",
+      "tests/component/context-deck.test.tsx"
+    ],
+    "exit": 1,
+    "seconds": 2.23,
+    "log": "checks/tests-first.txt",
+    "summary": [
+      "Test Files  4 failed | 2 passed (6)",
+      "Tests  13 failed | 44 passed (57)"
+    ]
+  },
+  {
+    "name": "attribution-red",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "map attribution has its own"
+    ],
+    "exit": 1,
+    "seconds": 19.09,
+    "log": "checks/attribution-red.txt",
+    "summary": ["1 failed"]
+  },
+  {
+    "name": "python-guard-baseline",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "-q",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "exit": 0,
+    "seconds": 47.55,
+    "log": "checks/python-guard-baseline.txt",
+    "summary": ["12 passed in 46.31s"]
+  },
+  {
+    "name": "export-catalogue",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/export_web_catalogue.py"
+    ],
+    "exit": 0,
+    "seconds": 0.21,
+    "log": "checks/export-catalogue.txt",
+    "summary": []
+  },
+  {
+    "name": "focused-green",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts",
+      "tests/unit/opening-area.test.ts",
+      "tests/unit/opening-copy.test.ts",
+      "tests/unit/opening-fixture.test.ts",
+      "tests/component/opening-reset.test.tsx",
+      "tests/component/mounted-opening-review.test.tsx",
+      "tests/component/context-deck.test.tsx",
+      "tests/unit/strings-parity.test.ts"
+    ],
+    "exit": 0,
+    "seconds": 0.94,
+    "log": "checks/focused-green.txt",
+    "summary": ["Test Files  8 passed (8)", "Tests  61 passed (61)"]
+  },
+  {
+    "name": "attribution-green",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "map attribution has its own"
+    ],
+    "exit": 0,
+    "seconds": 17.26,
+    "log": "checks/attribution-green.txt",
+    "summary": ["1 passed (16.9s)"]
+  },
+  {
+    "name": "formatter-web",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "src/app/MountedPublicShell.tsx",
+      "src/journeys/PublicStory.tsx",
+      "src/cards/PublicContextCard.tsx",
+      "src/styles/answer.css",
+      "src/i18n/en.json",
+      "src/i18n/ar.json",
+      "tests/unit/public-opening.test.ts",
+      "tests/unit/opening-area.test.ts",
+      "tests/unit/opening-copy.test.ts",
+      "tests/unit/opening-fixture.test.ts",
+      "tests/component/opening-reset.test.tsx",
+      "tests/component/mounted-opening-review.test.tsx",
+      "tests/component/context-deck.test.tsx",
+      "tests/e2e/opening-fixture.ts",
+      "tests/e2e/no-provider-attempts.ts",
+      "tests/audit/opening-audit.ts",
+      "tests/audit/opening.spec.ts"
+    ],
+    "exit": 0,
+    "seconds": 0.59,
+    "log": "checks/formatter-web.txt",
+    "summary": []
+  },
+  {
+    "name": "formatter-python",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "ruff",
+      "format",
+      "scripts/tests/test_public_opening_e2e.py",
+      "product/tests/public_opening_server.py"
+    ],
+    "exit": 0,
+    "seconds": 0.06,
+    "log": "checks/formatter-python.txt",
+    "summary": ["2 files reformatted"]
+  },
+  {
+    "name": "focused-baseline",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/unit/public-opening.test.ts",
+      "tests/unit/opening-area.test.ts",
+      "tests/unit/opening-copy.test.ts",
+      "tests/unit/opening-fixture.test.ts",
+      "tests/component/opening-reset.test.tsx",
+      "tests/component/mounted-opening-review.test.tsx",
+      "tests/component/context-deck.test.tsx",
+      "tests/unit/strings-parity.test.ts"
+    ],
+    "exit": 0,
+    "seconds": 1.17,
+    "log": "checks/focused-baseline.txt",
+    "summary": ["Test Files  8 passed (8)", "Tests  61 passed (61)"]
+  },
+  {
+    "name": "typecheck",
+    "cwd": "web",
+    "command": ["npm", "run", "typecheck"],
+    "exit": 0,
+    "seconds": 3.39,
+    "log": "checks/typecheck.txt",
+    "summary": []
+  },
+  {
+    "name": "lint",
+    "cwd": "web",
+    "command": ["npm", "run", "lint"],
+    "exit": 0,
+    "seconds": 7.7,
+    "log": "checks/lint.txt",
+    "summary": []
+  },
+  {
+    "name": "audit-matrix-red-green",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "opening audit 1440x900 ar dark"
+    ],
+    "exit": 1,
+    "seconds": 21.8,
+    "log": "checks/audit-matrix-red-green.txt",
+    "summary": ["1 failed"]
+  },
+  {
+    "name": "build",
+    "cwd": "web",
+    "command": ["npm", "run", "build"],
+    "exit": 0,
+    "seconds": 4.82,
+    "log": "checks/build.txt",
+    "summary": []
+  },
+  {
+    "name": "matrix-focused-green",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "opening audit 1440x900 ar dark"
+    ],
+    "exit": 0,
+    "seconds": 23.44,
+    "log": "checks/matrix-focused-green.txt",
+    "summary": ["1 passed (22.8s)"]
+  },
+  {
+    "name": "root-ruff",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "ruff", "check", "."],
+    "exit": 1,
+    "seconds": 0.11,
+    "log": "checks/root-ruff.txt",
+    "summary": []
+  },
+  {
+    "name": "root-ruff-format",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "ruff", "format", "--check", "."],
+    "exit": 0,
+    "seconds": 0.13,
+    "log": "checks/root-ruff-format.txt",
+    "summary": ["1050 files already formatted"]
+  },
+  {
+    "name": "web-format",
+    "cwd": "web",
+    "command": ["npm", "run", "format:check"],
+    "exit": 0,
+    "seconds": 3.82,
+    "log": "checks/web-format.txt",
+    "summary": ["All matched files use Prettier code style!"]
+  },
+  {
+    "name": "root-mypy",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "mypy"],
+    "exit": 1,
+    "seconds": 6.7,
+    "log": "checks/root-mypy.txt",
+    "summary": ["Found 1 error in 1 file (checked 539 source files)"]
+  },
+  {
+    "name": "catalogue-parity",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/export_web_catalogue.py",
+      "--check"
+    ],
+    "exit": 0,
+    "seconds": 0.21,
+    "log": "checks/catalogue-parity.txt",
+    "summary": []
+  },
+  {
+    "name": "withheld-zero",
+    "cwd": "web",
+    "command": [
+      "env",
+      "EII_WITHHELD_PLANT=zero",
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/public-context-levels.test.tsx"
+    ],
+    "exit": 1,
+    "seconds": 1.31,
+    "log": "checks/withheld-zero.txt",
+    "summary": ["Test Files  1 failed (1)", "Tests  6 failed | 27 passed (33)"]
+  },
+  {
+    "name": "withheld-empty",
+    "cwd": "web",
+    "command": [
+      "env",
+      "EII_WITHHELD_PLANT=empty",
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/public-context-levels.test.tsx"
+    ],
+    "exit": 1,
+    "seconds": 1.19,
+    "log": "checks/withheld-empty.txt",
+    "summary": ["Test Files  1 failed (1)", "Tests  6 failed | 27 passed (33)"]
+  },
+  {
+    "name": "python-final",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "product/tests/test_catalogue_foundations.py",
+      "product/tests/test_mounted_browser.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--hypothesis-seed=1541"
+    ],
+    "exit": 0,
+    "seconds": 72.01,
+    "log": "checks/python-final.txt",
+    "summary": ["66 passed in 71.63s (0:01:11)"]
+  },
+  {
+    "name": "format-repair-web",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "src/cards/PublicContextCard.tsx",
+      "tests/component/context-deck.test.tsx",
+      "tests/unit/public-opening.test.ts"
+    ],
+    "exit": 0,
+    "seconds": 0.31,
+    "log": "checks/format-repair-web.txt",
+    "summary": []
+  },
+  {
+    "name": "format-repair-python",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "ruff",
+      "format",
+      "scripts/tests/test_public_opening_e2e.py"
+    ],
+    "exit": 0,
+    "seconds": 0.06,
+    "log": "checks/format-repair-python.txt",
+    "summary": []
+  },
+  {
+    "name": "ruff-final",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "ruff", "check", "."],
+    "exit": 0,
+    "seconds": 0.09,
+    "log": "checks/ruff-final.txt",
+    "summary": ["All checks passed!"]
+  },
+  {
+    "name": "mypy-final",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "mypy"],
+    "exit": 0,
+    "seconds": 0.3,
+    "log": "checks/mypy-final.txt",
+    "summary": ["Success: no issues found in 539 source files"]
+  },
+  {
+    "name": "withheld-empty-final",
+    "cwd": "web",
+    "command": [
+      "env",
+      "EII_WITHHELD_PLANT=empty",
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/public-context-levels.test.tsx"
+    ],
+    "exit": 1,
+    "seconds": 2.84,
+    "log": "checks/withheld-empty-final.txt",
+    "summary": ["Test Files  1 failed (1)", "Tests  6 failed | 27 passed (33)"]
+  },
+  {
+    "name": "withheld-zero-final",
+    "cwd": "web",
+    "command": [
+      "env",
+      "EII_WITHHELD_PLANT=zero",
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/public-context-levels.test.tsx"
+    ],
+    "exit": 1,
+    "seconds": 2.98,
+    "log": "checks/withheld-zero-final.txt",
+    "summary": ["Test Files  1 failed (1)", "Tests  6 failed | 27 passed (33)"]
+  },
+  {
+    "name": "vitest-all",
+    "cwd": "web",
+    "command": ["npx", "--no-install", "vitest", "run"],
+    "exit": 0,
+    "seconds": 21.76,
+    "log": "checks/vitest-all.txt",
+    "summary": ["Test Files  80 passed (80)", "Tests  1163 passed (1163)"]
+  },
+  {
+    "name": "tree-initial",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_tree.py"],
+    "exit": 0,
+    "seconds": 0.08,
+    "log": "checks/tree-initial.txt",
+    "summary": ["checked 8 rules: OK"]
+  },
+  {
+    "name": "agent-parity",
+    "cwd": ".",
+    "command": ["cmp", "AGENTS.md", "CLAUDE.md"],
+    "exit": 0,
+    "seconds": 0.0,
+    "log": "checks/agent-parity.txt",
+    "summary": []
+  },
+  {
+    "name": "build-final",
+    "cwd": "web",
+    "command": ["npm", "run", "build"],
+    "exit": 0,
+    "seconds": 3.87,
+    "log": "checks/build-final.txt",
+    "summary": []
+  },
+  {
+    "name": "docs-initial",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 0,
+    "seconds": 4.17,
+    "log": "checks/docs-initial.txt",
+    "summary": ["checked 1713 text files, 128 Markdown files: OK"]
+  },
+  {
+    "name": "web-check",
+    "cwd": "web",
+    "command": ["npm", "run", "check"],
+    "exit": 0,
+    "seconds": 0.55,
+    "log": "checks/web-check.txt",
+    "summary": [
+      "checked 32 entries: OK",
+      "checked 42 specifiers: OK",
+      "checked 1002 references in 193 files: OK",
+      "checked 96 files: OK"
+    ]
+  },
+  {
+    "name": "web-check-dist",
+    "cwd": "web",
+    "command": ["npm", "run", "check:hosts:dist"],
+    "exit": 0,
+    "seconds": 0.36,
+    "log": "checks/web-check-dist.txt",
+    "summary": ["checked 168 files: OK"]
+  },
+  {
+    "name": "python-verified",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "product/tests/test_catalogue_foundations.py",
+      "product/tests/test_mounted_browser.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--hypothesis-seed=1541"
+    ],
+    "exit": 0,
+    "seconds": 72.03,
+    "log": "checks/python-verified.txt",
+    "summary": ["66 passed in 71.61s (0:01:11)"]
+  },
+  {
+    "name": "finishing-typecheck",
+    "cwd": "web",
+    "command": ["npm", "run", "typecheck"],
+    "exit": 0,
+    "seconds": 2.69,
+    "log": "checks/finishing-typecheck.txt",
+    "summary": []
+  },
+  {
+    "name": "finishing-format",
+    "cwd": "web",
+    "command": ["npm", "run", "format:check"],
+    "exit": 0,
+    "seconds": 4.57,
+    "log": "checks/finishing-format.txt",
+    "summary": ["All matched files use Prettier code style!"]
+  },
+  {
+    "name": "finishing-lint",
+    "cwd": "web",
+    "command": ["npm", "run", "lint"],
+    "exit": 0,
+    "seconds": 7.85,
+    "log": "checks/finishing-lint.txt",
+    "summary": []
+  },
+  {
+    "name": "git-task-branch",
+    "cwd": ".",
+    "command": ["git", "switch", "-c", "fix/s3-t10-review-round-1"],
+    "exit": 128,
+    "seconds": 0.0,
+    "log": "checks/git-task-branch.txt",
+    "summary": []
+  },
+  {
+    "name": "clean-diff",
+    "cwd": ".",
+    "command": ["git", "diff", "--check"],
+    "exit": 0,
+    "seconds": 0.0,
+    "log": "checks/clean-diff.txt",
+    "summary": []
+  },
+  {
+    "name": "unchanged-pins",
+    "cwd": ".",
+    "command": [
+      "git",
+      "diff",
+      "--exit-code",
+      "--",
+      "pins.toml",
+      "uv.lock",
+      "web/package-lock.json",
+      "pyproject.toml",
+      "web/package.json",
+      "AGENTS.md",
+      "CLAUDE.md"
+    ],
+    "exit": 0,
+    "seconds": 0.0,
+    "log": "checks/unchanged-pins.txt",
+    "summary": []
+  },
+  {
+    "name": "restored-ui-component",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "tests/component/mounted-opening-review.test.tsx"
+    ],
+    "exit": 0,
+    "seconds": 1.49,
+    "log": "checks/restored-ui-component.txt",
+    "summary": ["Test Files  1 passed (1)", "Tests  6 passed (6)"]
+  },
+  {
+    "name": "docs-records",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 0,
+    "seconds": 4.57,
+    "log": "checks/docs-records.txt",
+    "summary": ["checked 1713 text files, 128 Markdown files: OK"]
+  },
+  {
+    "name": "withheld-layout-red",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.answer.config.ts",
+      "tests/audit/answer.spec.ts",
+      "--grep",
+      "S3-T10 negative context"
+    ],
+    "exit": 1,
+    "seconds": 4.01,
+    "started_utc": "2026-11-20T12:27:53.661703+00:00",
+    "log": "checks/withheld-layout-red.txt",
+    "summary": ["1 failed"]
+  },
+  {
+    "name": "layout-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "src/cards/public-context.css",
+      "tests/audit/answer.spec.ts"
+    ],
+    "exit": 0,
+    "seconds": 0.9,
+    "started_utc": "2026-11-20T12:28:26.864391+00:00",
+    "log": "checks/layout-format.txt",
+    "summary": []
+  },
+  {
+    "name": "withheld-layout-green",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.answer.config.ts",
+      "tests/audit/answer.spec.ts",
+      "--grep",
+      "S3-T10 negative context"
+    ],
+    "exit": 0,
+    "seconds": 5.05,
+    "started_utc": "2026-11-20T12:28:25.695190+00:00",
+    "log": "checks/withheld-layout-green.txt",
+    "summary": ["1 passed (3.8s)"]
+  },
+  {
+    "name": "proof-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "tests/audit/evidence/S3-T10/fix1/guard-removals/manifest.json",
+      "tests/audit/evidence/S3-T10/fix1/ui-removals/manifest.json"
+    ],
+    "exit": 0,
+    "seconds": 0.52,
+    "started_utc": "2026-11-20T12:31:34.229291+00:00",
+    "log": "checks/proof-format.txt",
+    "summary": []
+  },
+  {
+    "name": "proof-docs",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 1,
+    "seconds": 4.83,
+    "started_utc": "2026-11-20T12:32:09.307653+00:00",
+    "log": "checks/proof-docs.txt",
+    "summary": []
+  },
+  {
+    "name": "proof-docs-clean",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 0,
+    "seconds": 4.95,
+    "started_utc": "2026-11-20T12:34:55.154691+00:00",
+    "log": "checks/proof-docs-clean.txt",
+    "summary": ["checked 1716 text files, 129 Markdown files: OK"]
+  },
+  {
+    "name": "checks-aggregate",
+    "cwd": "web",
+    "command": ["npm", "run", "test:checks"],
+    "exit": 1,
+    "seconds": 1160.29,
+    "log": "checks/checks-aggregate.txt",
+    "summary": [
+      "2 failed",
+      "67 passed (5.2m)",
+      "# tests 1158",
+      "# pass 1157",
+      "# fail 1",
+      "# cancelled 0",
+      "# skipped 0",
+      "# todo 0",
+      "# duration_ms 1160197.718042"
+    ]
+  },
+  {
+    "name": "e2e-wording-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "tests/e2e/opening.spec.ts"
+    ],
+    "exit": 0,
+    "seconds": 0.61,
+    "started_utc": "2026-11-20T12:37:57.419168+00:00",
+    "log": "checks/e2e-wording-format.txt",
+    "summary": []
+  },
+  {
+    "name": "e2e-projection-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "tests/e2e/opening.spec.ts"
+    ],
+    "exit": 0,
+    "seconds": 0.31,
+    "started_utc": "2026-11-20T12:38:20.284930+00:00",
+    "log": "checks/e2e-projection-format.txt",
+    "summary": []
+  },
+  {
+    "name": "build-verified",
+    "cwd": "web",
+    "command": ["npm", "run", "build"],
+    "exit": 0,
+    "seconds": 3.3,
+    "started_utc": "2026-11-20T12:38:25.641675+00:00",
+    "log": "checks/build-verified.txt",
+    "summary": []
+  },
+  {
+    "name": "layer-browser-verified",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "Public layers and venue context use mounted chains"
+    ],
+    "exit": 0,
+    "seconds": 35.18,
+    "started_utc": "2026-11-20T12:37:58.081947+00:00",
+    "log": "checks/layer-browser-verified.txt",
+    "summary": ["2 passed (34.4s)"]
+  },
+  {
+    "name": "final-typecheck",
+    "cwd": "web",
+    "command": ["npm", "run", "typecheck"],
+    "exit": 0,
+    "seconds": 2.29,
+    "started_utc": "2026-11-20T12:39:36.953060+00:00",
+    "log": "checks/final-typecheck.txt",
+    "summary": []
+  },
+  {
+    "name": "final-format",
+    "cwd": "web",
+    "command": ["npm", "run", "format:check"],
+    "exit": 0,
+    "seconds": 3.97,
+    "started_utc": "2026-11-20T12:39:38.113958+00:00",
+    "log": "checks/final-format.txt",
+    "summary": ["All matched files use Prettier code style!"]
+  },
+  {
+    "name": "final-lint",
+    "cwd": "web",
+    "command": ["npm", "run", "lint"],
+    "exit": 0,
+    "seconds": 6.87,
+    "started_utc": "2026-11-20T12:39:35.791166+00:00",
+    "log": "checks/final-lint.txt",
+    "summary": []
+  },
+  {
+    "name": "python-final-verified",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "product/tests/test_catalogue_foundations.py",
+      "product/tests/test_mounted_browser.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--hypothesis-seed=1541"
+    ],
+    "exit": 0,
+    "seconds": 65.23,
+    "started_utc": "2026-11-20T12:39:34.632013+00:00",
+    "log": "checks/python-final-verified.txt",
+    "summary": ["66 passed in 64.91s (0:01:04)"]
+  },
+  {
+    "name": "ruff-format-verified",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "ruff", "format", "--check", "."],
+    "exit": 0,
+    "seconds": 0.07,
+    "started_utc": "2026-11-20T12:41:33.204536+00:00",
+    "log": "checks/ruff-format-verified.txt",
+    "summary": ["1050 files already formatted"]
+  },
+  {
+    "name": "ruff-verified",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "ruff", "check", "."],
+    "exit": 0,
+    "seconds": 0.07,
+    "started_utc": "2026-11-20T12:41:33.211810+00:00",
+    "log": "checks/ruff-verified.txt",
+    "summary": ["All checks passed!"]
+  },
+  {
+    "name": "catalogue-verified",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/export_web_catalogue.py",
+      "--check"
+    ],
+    "exit": 0,
+    "seconds": 0.23,
+    "started_utc": "2026-11-20T12:41:33.204274+00:00",
+    "log": "checks/catalogue-verified.txt",
+    "summary": []
+  },
+  {
+    "name": "mypy-verified",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "mypy"],
+    "exit": 0,
+    "seconds": 1.34,
+    "started_utc": "2026-11-20T12:41:33.202672+00:00",
+    "log": "checks/mypy-verified.txt",
+    "summary": ["Success: no issues found in 539 source files"]
+  },
+  {
+    "name": "vitest-final",
+    "cwd": "web",
+    "command": ["npx", "--no-install", "vitest", "run"],
+    "exit": 0,
+    "seconds": 19.01,
+    "started_utc": "2026-11-20T12:41:33.203330+00:00",
+    "log": "checks/vitest-final.txt",
+    "summary": ["Test Files  80 passed (80)", "Tests  1163 passed (1163)"]
+  },
+  {
+    "name": "packet-source-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "tests/audit/evidence/S3-T10/fix1/source-hashes.json"
+    ],
+    "exit": 0,
+    "seconds": 0.29,
+    "started_utc": "2026-11-20T12:52:18.029422+00:00",
+    "log": "checks/packet-source-format.txt",
+    "summary": []
+  },
+  {
+    "name": "credit-stacking-red",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "opening audit 360x640 ar dark"
+    ],
+    "exit": 1,
+    "seconds": 23.51,
+    "started_utc": "2026-11-20T12:56:49.606534+00:00",
+    "log": "checks/credit-stacking-red.txt",
+    "summary": ["1 failed"]
+  },
+  {
+    "name": "credit-stacking-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "src/styles/answer.css",
+      "tests/audit/opening.spec.ts"
+    ],
+    "exit": 0,
+    "seconds": 0.49,
+    "started_utc": "2026-11-20T12:58:07.176899+00:00",
+    "log": "checks/credit-stacking-format.txt",
+    "summary": []
+  },
+  {
+    "name": "credit-stacking-green",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.opening.config.ts",
+      "--grep",
+      "opening audit 360x640 ar dark"
+    ],
+    "exit": 0,
+    "seconds": 26.87,
+    "started_utc": "2026-11-20T12:58:07.732711+00:00",
+    "log": "checks/credit-stacking-green.txt",
+    "summary": ["1 passed (26.4s)"]
+  },
+  {
+    "name": "stacking-typecheck",
+    "cwd": "web",
+    "command": ["npm", "run", "typecheck"],
+    "exit": 0,
+    "seconds": 5.08,
+    "started_utc": "2026-11-20T12:59:16.957048+00:00",
+    "log": "checks/stacking-typecheck.txt",
+    "summary": []
+  },
+  {
+    "name": "stacking-format",
+    "cwd": "web",
+    "command": ["npm", "run", "format:check"],
+    "exit": 0,
+    "seconds": 10.43,
+    "started_utc": "2026-11-20T12:59:18.135982+00:00",
+    "log": "checks/stacking-format.txt",
+    "summary": ["All matched files use Prettier code style!"]
+  },
+  {
+    "name": "stacking-lint",
+    "cwd": "web",
+    "command": ["npm", "run", "lint"],
+    "exit": 0,
+    "seconds": 14.35,
+    "started_utc": "2026-11-20T12:59:15.796121+00:00",
+    "log": "checks/stacking-lint.txt",
+    "summary": []
+  },
+  {
+    "name": "stacking-vitest",
+    "cwd": "web",
+    "command": ["npx", "--no-install", "vitest", "run"],
+    "exit": 143,
+    "seconds": null,
+    "counts": null,
+    "note": "Execution session ended with status 143 before the logging wrapper produced a completion record; its output contains RUN only. Cause unproved; another web aggregate was active.",
+    "log": "checks/stacking-vitest.txt",
+    "summary": []
+  },
+  {
+    "name": "checks-final",
+    "cwd": "web",
+    "command": ["npm", "run", "test:checks"],
+    "exit": 0,
+    "seconds": 1198.09,
+    "started_utc": "2026-11-20T12:42:42.166780+00:00",
+    "log": "checks/checks-final.txt",
+    "summary": [
+      "# tests 1158",
+      "# pass 1158",
+      "# fail 0",
+      "# cancelled 0",
+      "# skipped 0",
+      "# todo 0",
+      "# duration_ms 1198008.559509"
+    ]
+  },
+  {
+    "name": "matrix-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "tests/audit/evidence/S3-T10/fix1/matrix.json",
+      "tests/audit/evidence/S3-T10/fix1/contrast.json",
+      "tests/audit/evidence/S3-T10/fix1/source-hashes.before-stacking.json"
+    ],
+    "exit": 0,
+    "seconds": 0.32,
+    "started_utc": "2026-11-20T13:04:14.036250+00:00",
+    "log": "checks/matrix-format.txt",
+    "summary": []
+  },
+  {
+    "name": "matrix-docs",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 1,
+    "seconds": 5.62,
+    "started_utc": "2026-11-20T13:04:14.411306+00:00",
+    "log": "checks/matrix-docs.txt",
+    "summary": []
+  },
+  {
+    "name": "vitest-delivery",
+    "cwd": "web",
+    "command": ["npx", "--no-install", "vitest", "run"],
+    "exit": 0,
+    "seconds": 21.14,
+    "started_utc": "2026-11-20T13:04:38.048985+00:00",
+    "log": "checks/vitest-delivery.txt",
+    "summary": ["Test Files  80 passed (80)", "Tests  1163 passed (1163)"]
+  },
+  {
+    "name": "build-delivery",
+    "cwd": "web",
+    "command": ["npm", "run", "build"],
+    "exit": 0,
+    "seconds": 2.96,
+    "started_utc": "2026-11-20T13:06:20.438725+00:00",
+    "log": "checks/build-delivery.txt",
+    "summary": []
+  },
+  {
+    "name": "pytest-delivery",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "-m",
+      "pytest",
+      "scripts/tests/test_public_opening_e2e.py",
+      "product/tests/test_catalogue_foundations.py",
+      "product/tests/test_mounted_browser.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--hypothesis-seed=1541"
+    ],
+    "exit": 0,
+    "seconds": 74.83,
+    "started_utc": "2026-11-20T13:07:37.152246+00:00",
+    "log": "checks/pytest-delivery.txt",
+    "summary": ["66 passed in 74.43s (0:01:14)"]
+  },
+  {
+    "name": "encoding-docs",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 0,
+    "seconds": 6.48,
+    "started_utc": "2026-11-20T13:09:53.077858+00:00",
+    "log": "checks/encoding-docs.txt",
+    "summary": ["checked 1721 text files, 130 Markdown files: OK"]
+  },
+  {
+    "name": "packet-final-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "tests/audit/evidence/S3-T10/fix1/matrix.json",
+      "tests/audit/evidence/S3-T10/fix1/contrast.json",
+      "tests/audit/evidence/S3-T10/fix1/source-hashes.json",
+      "tests/audit/evidence/S3-T10/fix1/commands.json"
+    ],
+    "exit": 0,
+    "seconds": 0.31,
+    "started_utc": "2026-11-20T13:20:14.324689+00:00",
+    "log": "checks/packet-final-format.txt",
+    "summary": []
+  },
+  {
+    "name": "captures-delivery",
+    "cwd": ".",
+    "command": ["python3", ".overnight/tmp/package_captures.py"],
+    "exit": 1,
+    "seconds": 0.15,
+    "started_utc": "2026-11-20T13:21:28.546649+00:00",
+    "log": "checks/captures-delivery.txt",
+    "summary": []
+  },
+  {
+    "name": "capture-encoding-refresh",
+    "cwd": ".",
+    "command": ["python3", ".overnight/tmp/package_captures.py"],
+    "exit": 1,
+    "seconds": null,
+    "counts": null,
+    "note": "Final capture refresh rejected a container whose level-nine default-strategy recompression still had an email-shaped compressed-byte collision. Assertion and guard retained; fixed RLE lossless encoding used for final packaging.",
+    "log": "checks/capture-encoding-refresh.txt",
+    "summary": []
+  },
+  {
+    "name": "captures-guard-parity",
+    "cwd": ".",
+    "command": ["python3", ".overnight/tmp/package_captures.py"],
+    "exit": 0,
+    "seconds": 0.84,
+    "started_utc": "2026-11-20T13:23:38.364000+00:00",
+    "log": "checks/captures-guard-parity.txt",
+    "summary": []
+  },
+  {
+    "name": "image-packet-docs",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 0,
+    "seconds": 5.84,
+    "started_utc": "2026-11-20T13:24:41.206527+00:00",
+    "log": "checks/image-packet-docs.txt",
+    "summary": ["checked 1802 text files, 131 Markdown files: OK"]
+  },
+  {
+    "name": "handoff-rules",
+    "cwd": ".",
+    "command": ["cmp", "AGENTS.md", "CLAUDE.md"],
+    "exit": 0,
+    "seconds": 0.0,
+    "started_utc": "2026-11-20T13:25:53.028898+00:00",
+    "log": "checks/handoff-rules.txt",
+    "summary": []
+  },
+  {
+    "name": "handoff-ruff-format",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "ruff", "format", "--check", "."],
+    "exit": 0,
+    "seconds": 0.07,
+    "started_utc": "2026-11-20T13:25:53.030992+00:00",
+    "log": "checks/handoff-ruff-format.txt",
+    "summary": ["1050 files already formatted"]
+  },
+  {
+    "name": "handoff-ruff",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "ruff", "check", "."],
+    "exit": 0,
+    "seconds": 0.07,
+    "started_utc": "2026-11-20T13:25:53.030620+00:00",
+    "log": "checks/handoff-ruff.txt",
+    "summary": ["All checks passed!"]
+  },
+  {
+    "name": "handoff-tree",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_tree.py"],
+    "exit": 0,
+    "seconds": 0.1,
+    "started_utc": "2026-11-20T13:25:53.028378+00:00",
+    "log": "checks/handoff-tree.txt",
+    "summary": ["checked 8 rules: OK"]
+  },
+  {
+    "name": "handoff-mypy",
+    "cwd": ".",
+    "command": ["uv", "run", "--locked", "mypy"],
+    "exit": 0,
+    "seconds": 0.35,
+    "started_utc": "2026-11-20T13:25:53.028167+00:00",
+    "log": "checks/handoff-mypy.txt",
+    "summary": ["Success: no issues found in 539 source files"]
+  },
+  {
+    "name": "checks-delivery",
+    "cwd": "web",
+    "command": ["npm", "run", "test:checks"],
+    "exit": 0,
+    "seconds": 1195.82,
+    "started_utc": "2026-11-20T13:09:51.902759+00:00",
+    "log": "checks/checks-delivery.txt",
+    "summary": [
+      "# tests 1158",
+      "# pass 1158",
+      "# fail 0",
+      "# cancelled 0",
+      "# skipped 0",
+      "# todo 0",
+      "# duration_ms 1195735.0175"
+    ]
+  },
+  {
+    "name": "final-packet-format",
+    "cwd": "web",
+    "command": [
+      "npx",
+      "--no-install",
+      "prettier",
+      "--write",
+      "--no-editorconfig",
+      "tests/audit/evidence/S3-T10/fix1/matrix.json",
+      "tests/audit/evidence/S3-T10/fix1/contrast.json",
+      "tests/audit/evidence/S3-T10/fix1/source-hashes.json",
+      "tests/audit/evidence/S3-T10/fix1/commands.json"
+    ],
+    "exit": 0,
+    "seconds": 0.33,
+    "started_utc": "2026-11-20T13:31:55.514183+00:00",
+    "log": "checks/final-packet-format.txt",
+    "summary": []
+  },
+  {
+    "name": "handoff-diff",
+    "cwd": ".",
+    "command": ["git", "diff", "--check"],
+    "exit": 0,
+    "seconds": 0.04,
+    "started_utc": "2026-11-20T13:32:09.044548+00:00",
+    "log": "checks/handoff-diff.txt",
+    "summary": []
+  },
+  {
+    "name": "handoff-catalogue",
+    "cwd": ".",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/export_web_catalogue.py",
+      "--check"
+    ],
+    "exit": 0,
+    "seconds": 0.22,
+    "started_utc": "2026-11-20T13:32:09.045501+00:00",
+    "log": "checks/handoff-catalogue.txt",
+    "summary": []
+  },
+  {
+    "name": "handoff-web-format",
+    "cwd": "web",
+    "command": ["npm", "run", "format:check"],
+    "exit": 0,
+    "seconds": 4.54,
+    "started_utc": "2026-11-20T13:32:09.045361+00:00",
+    "log": "checks/handoff-web-format.txt",
+    "summary": ["All matched files use Prettier code style!"]
+  },
+  {
+    "name": "handoff-docs",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 0,
+    "seconds": 6.04,
+    "started_utc": "2026-11-20T13:32:09.046415+00:00",
+    "log": "checks/handoff-docs.txt",
+    "summary": ["checked 1813 text files, 131 Markdown files: OK"]
+  },
+  {
+    "name": "delivery-packet-diff",
+    "cwd": ".",
+    "command": ["git", "diff", "--check"],
+    "exit": 0,
+    "seconds": 0.03,
+    "started_utc": "2026-11-20T13:34:31.456859+00:00",
+    "log": "checks/delivery-packet-diff.txt",
+    "summary": []
+  },
+  {
+    "name": "delivery-packet-web-format",
+    "cwd": "web",
+    "command": ["npm", "run", "format:check"],
+    "exit": 0,
+    "seconds": 4.11,
+    "started_utc": "2026-11-20T13:34:31.456827+00:00",
+    "log": "checks/delivery-packet-web-format.txt",
+    "summary": ["All matched files use Prettier code style!"]
+  },
+  {
+    "name": "delivery-packet-docs",
+    "cwd": ".",
+    "command": ["python3", "scripts/check_docs.py"],
+    "exit": 0,
+    "seconds": 5.61,
+    "started_utc": "2026-11-20T13:34:31.457037+00:00",
+    "log": "checks/delivery-packet-docs.txt",
+    "summary": ["checked 1818 text files, 131 Markdown files: OK"]
+  }
+]

@@ -9,6 +9,8 @@ import sys
 from pathlib import Path
 from typing import NoReturn
 
+from eii_core.reasons import reason
+
 from .build import build
 from .contracts import RegisterError, refuse
 from .intake import from_environment, read_file
@@ -52,10 +54,10 @@ def main(argv: list[str]) -> int:
         )
         build(Path(args.output), args.release_kind, frame, current, history)
     except RegisterError as error:
-        print(str(error), file=sys.stderr)
+        print(reason(error), file=sys.stderr)
         return 1
-    except Exception:
-        print("register_verification_failed", file=sys.stderr)
+    except Exception as error:
+        print(reason(error), file=sys.stderr)
         return 1
     print("register_inputs_validated")
     return 0

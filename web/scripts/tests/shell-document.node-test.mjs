@@ -65,7 +65,12 @@ function assertShell(html) {
 
 function assertMain(source) {
   if (!source.includes("getElementById('root')")) throw new Error('id');
-  if (!source.includes('throw new Error')) throw new Error('throw');
+  if (
+    !/if\s*\(\s*container\s*===\s*null\s*\)\s*\{\s*throw new Error\b/.test(
+      source,
+    )
+  )
+    throw new Error('missing-root-throw');
 }
 
 function assertApp(source) {

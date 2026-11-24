@@ -760,6 +760,7 @@
 - DONE SO FAR: The section "Confirmations assigned to this task" of `web/REFERENCE_NOTES.md` records, from runs of 2026-11-12, that the two Fontsource packages (version 5.3.0 each, the version `pins.toml` pins) hold the files of the normal style at the weights 400, 500 and 600, as woff2 and woff files, in six subsets for IBM Plex Sans and four for IBM Plex Sans Arabic, and that the package `@carbon/icons` 11.92.0 names the licence Apache-2.0 in its metadata and holds a licence file that begins with the words of the Apache License, Version 2.0, as the licence file of the repository does (page read the same day); no weight is missing and the licence is the one the pack assumes. Nothing was looked at about glyph coverage, font features (the tabular figures that docs/10_FRONTEND.md, section "Bilingual and right-to-left rules", asks to check at slice S1) or the icons themselves (grid and stroke). Proved by the rules `weights` and `icon-licence`, by `test_font_weights`, `test_icon_licence` and `test_real_notes_pass`, and by the second reader's comparison of each font row with its package. The registry metadata of the package @carbon/icons 11.92.0 lists an install script that runs a telemetry command (read on 2026-11-12 with a registry query in a scratch folder); the slice that adds the package decides how it is installed and vendored. The glyph spike of task S1-T01 serves weight 400 only, of the two Plex and the two Noto packages; the other weights, tabular figures, glyph coverage beyond its five names and the icon package are not settled by it.
 - OPTIONS: **Recommendation:** pin the icon package and vendor its files with the licence text in the first slice that uses an icon, and re-run the confirmation there. Alternative: add the icon package to `pins.toml` now.
 - NEEDED BY: the first slice that serves a font file or an icon (slice S3 for fonts, FE-97).
+- Ruling L-1363 (c) (2026-11-21, lead; `.overnight/IN/ruling-L1363.txt`): `web/package.json` holds no icon package and the S3 interface uses no icon, so OI-89's own recommendation applies (pin and vendor the icon package in the first slice that uses an icon); the fonts are local Fontsource imports, so S3-T09 box 6's icon half is recorded as not used in S3 and its fonts half as met.
 
 ## OI-90 — Hook framework, scanner version and the set of hooks
 
@@ -2438,6 +2439,10 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 - OPTIONS: **Default:** Assign packaging and an installed-layout test to the application archive owner; keep this separate from declaring PyYAML.
 - NEEDED BY: Application archive integration.
 
+- UPDATE (2026-11-19, S3-T07 fix round 1, L-1097 finding 3): closed with executable non-editable installation evidence. The YAML assets live inside `eii_product.assistant.catalogue/assets`; the original repository paths are relative links to the same files, and discovery uses `importlib.resources`. `CleanEnvironment.test_installed_catalogue_assets_load_outside_source_workspace` runs Python with `-I` from a temporary working directory outside the copied source workspace, loads and validates all four files from `site-packages`, and checks their hashes, combined version and entry counts against the source. The focused installed test passed (exit 0); the complete clean-environment suite passed 17 tests (exit 0), offline. Evidence: PROGRESS.md heading "S3-T07 — Catalogue review L-1097 fix round 1" and `.overnight/tmp/green-f3.log`, `.overnight/tmp/clean-environment.log`.
+
+- CORRECTION (2026-11-19, S3-T07 fix round 1b, ruling L-1101): the earlier relative-link layout is superseded. The four unchanged YAML files now live only under `product/src/eii_product/assistant/catalogue/assets/`; both empty old folders are removed. Tests and current contract paths use this sole source. Package discovery remains `importlib.resources`; the existing uv_build package-data behavior needs no configuration change. The installed-layout evidence is refreshed in PROGRESS.md heading "S3-T07 — Catalogue packaging ruling L-1101 fix round 1b". OI-249 remains closed; the lead still owns staging and independent review.
+
 ## OI-250 — Native Arabic review
 
 - ID: OI-250
@@ -3010,6 +3015,7 @@ Revision-2 record dispositions (sources: S2-T08B pass reviews, fix5 return/confi
 - EVIDENCE: Decision 0071 says both "a tunnel to a fixed loopback port" and "promotion switches which … port the route serves". S3-T20 has a single entry on port 8088 and refuses a second public port. These need to be reconciled.
 - NEEDED: The owner and lead reconcile the fixed entry with promotion's release and port switch under AGENTS.md rule 46 before implementation. This item chooses no routing design and authorizes no second public port.
 - NEEDED BY: S3-T28's reviewed operational plan, before first service or promotion.
+- RESOLUTION (2026-11-21): Closed by [decision 0082](docs/decisions/0082-one-fixed-public-entry-promotion-switches-the-served-release.md), items 1 to 4, recording the owner's approval of 2026-11-21, conditional on no quality effect. The built promotion path matches the approved default: one fixed loopback entry at 8088; promotion and rollback switch the served release and internal backend behind it, never a second public port. Decision 0071 item 4's "and port" means that internal backend port. Existing evidence and the implementation's chronology remain preserved; reruns and separate red/restored-green plants are recorded in PROGRESS.md, **S3-T28 box 7 — fixed-entry reconciliation, 2026-11-21**. Actual public handover remains S3-T20's post-gate operation.
 
 ## OI-348 — Priority answers and the guided story's existing scene order
 
@@ -6255,6 +6261,566 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - CLOSED (2026-11-21, S2-P32 round 2, S2 gate item 14 and only the C12 part of item 15; lead ruling L-1320): owner's decision of 2026-11-21 05:34 (.overnight/IN/OWNER-YES.md; .overnight/IN/PROOFS.md items 14 and 15) carries S2-T12 box 2 word for word into a new unticked S3-T12 box and only the card C12, MTH-46 part of S2-T35 box 1 into the new unticked S6-T13 box. The whole original S2-T35 first box remains unticked, word for word and in its original place, retaining PUB-71 and every other unpinned-value criterion; the exact notice says only its C12 part moved. S2-T12's notice and both target boxes stay as round 1 wrote them. scripts/tests/test_moved_boxes.py guards source retention, exact target wording, unticked status, C12 scope and notices; removing the S2-T35 source box in scratch fails (exit 1). Closure concerns the stated requirements transfer only; the rest of S2 gate item 15 is not closed here and S2-T35 box 2 is unchanged. The round-2 full unittest command also exits 1 (979 tests, seven test_clean_environment failures; both sync failures report the offline pyyaml 6.0.3 wheel absent); this environment limitation remains unresolved for the lead, without retry, fetch, skip or weakened test. Evidence: PROGRESS.md S2-P32 row and .overnight/RETURN.md.
 
 - OI-285 UPDATE 2026-11-22 — **CLOSED by [decision 0086](docs/decisions/0086-custodian-part-limit-and-watch.md), which supersedes this item's former 600-second remedy.** The advisor's hosted readings were part 1 at 342 and 528 seconds on the same tests, and part 2 at 428, 452 and 516 seconds, followed by no result within 600 seconds on the main run; the earlier OI-285 reading was 569 seconds. The three-part local build measured 208.69, 287.77 and 237.97 seconds and 3,690 + 3,533 + 3,552 = 10,775 passing cases. The owner-approved response keeps three parts, raises only their limit to 1,200 seconds everywhere and watches green hosted times above 720 seconds for a further recorded split. No green hosted result of this new head is asserted; its timing remains follow-up evidence, not a condition for reopening this superseded item.
+### S3-T13 fix1 — P6 renderer-import timing record
+
+- Status: PROPOSED for lead confirmation; no green rerun alone closes this record.
+- On base `25f0d5ec59e7e6f59bc7914d3347592a69d20bb5` plus the geometry fixes, the concurrent final web checks produced one P6 failure: 105 tests passed and one failed while waiting for the initial overlay (expected one mount, received none); the map was already ready. The earlier run of those 106 tests passed. Full failure evidence is retained in the worker return artifacts.
+- Reading `Stage` shows that readiness precedes the separate asynchronous renderer import. The P6 fixture stubbed the map but loaded the actual renderer, so its initial-overlay wait also depended on renderer loading during concurrent checks. This is the identified fixture dependency; no production timing or performance claim follows.
+- The fixture now stubs that renderer module as well, preserving every map-start, overlay-update and focus assertion and the unchanged timeout. `map-renderer.test.ts` separately exercises the renderer handle and exactly-once overlay removal. Final check evidence is appended to PROGRESS.md. The lead should confirm the diagnosis and disposition with the independent review; this worker does not mark the timing record closed.
+
+### S3-T13 fix2 — carried confirmation notes
+
+- Status: OPEN for lead disposition; outside accepted findings A/B under L-1116.
+- Confirmation nit N-a: area-actions invalidates a pending request on any session change, including crosshair movement that leaves the submitted pin unchanged. The reviewer describes this as safe but over-broad. Fix2 leaves this logic unchanged; the requested restriction to submitted geometry and its test need a separate ruling/task.
+- The confirmation notes that no production caller yet supplies MakeAreaContext.public_points. A future live area route must supply the Public point snapshot matching its release/layer snapshot; without it the documented null-membership behaviour hides Public points after an area answer. This statement rests on the supplied confirmation and reading the existing contract, not a live integration run. The lead must assign and record the wiring task.
+- The existing P6 timing record remains open. Fix2's three consecutive concurrent-file runs pass, but the lead's whole test with a fresh seed and diagnosis confirmation are still required. Different-maker confirmation and train ledger obligations remain with the lead.
+
+
+### S3-T13 fix3 — confirmation and workspace prerequisite
+
+- Status: OPEN for lead confirmation; this worker makes no slice-approval claim.
+- Scope: `.overnight/BRIEF.md`, S3-T13 fix round 3. The original F4 failure and both added missing-input cases are reproduced before the guard change; final web evidence is appended to PROGRESS.md. Different-maker review and the lead's whole-project verification remain required.
+- The first full web suite failed the deterministic fixture-port-bundle prerequisite because web/dist did not exist. The unchanged test requires built JavaScript files. An offline `npm run build` supplied them, and the final full suite passed all 492 tests. This is a recorded preparation failure with an identified cause, not closure of any random-failure item.
+- The existing P6 renderer-import timing record and fix2 confirmation notes remain open, with no disposition inferred from this run. No new product choice or assumption was needed for this fix.
+
+
+### S3-T13 fix4 — finding C confirmation
+
+- Status: OPEN for lead confirmation; no slice approval is claimed.
+- Scope: `.overnight/BRIEF.md`, fix round 4, and `.overnight/IN/CONF2-RETURN.md`, finding C. R1 reproduces the closed-ring knob-zero tap-move regression before production edits, then passes with the open-ring closure guard. PROGRESS.md records the red/green commands and required checks.
+- Different-maker confirmation and the lead's whole-project verification remain required. Existing P6 timing, fix2 notes and fix3 confirmation records retain their status. The reviewer's non-blocking N-1/N-2/N-3 observations remain outside this one-finding brief; no disposition is inferred from these checks. No new product choice or assumption was needed.
+
+### S3-T13 fix5 — finding D confirmation
+
+- Status: OPEN for lead confirmation; no slice approval is claimed.
+- Authority: `.overnight/BRIEF.md`, fix round 5, and `.overnight/IN/CONF3-RETURN.md`, finding D. The two S cases reproduce stale mounted geometry when registry or payload turns null at base `0fe64298bc854ad8650dea6b31294eac055976ee`; both pass after the exact proposed Stage fix. PROGRESS.md records commands, exits, counts and evidence. Existing F4 and never-drawn missing-input cases remain unchanged.
+- Independent maker confirmation and the lead's whole-project verification remain required. Existing P6 timing and fix2 integration notes retain their status. CONF3's carried non-blocking N-1/N-2 observations remain outside this brief; no disposition follows from these checks. No new product choice or assumption was needed.
+- Append-only update to fix3/fix4 delivery records: Git history now contains rounds 3 and 4 at `69bf84db07247a98c0e6e08f5901ad095841af0f` and `0fe64298bc854ad8650dea6b31294eac055976ee`, respectively. CONF3 found round 4's C fix proven and rejected the joined head for round 3's newly introduced D regression; this fix remains subject to confirmation rather than treating a green run as approval.
+
+### PO-S3-T16P-transition — Intermittent native re-entry fixture failure
+
+- TYPE: OPEN
+- CONCERNS: S3-T16 Part P browser qualification.
+- EVIDENCE: The disposal audit's browser run failed waiting for the second invented GLB request after open, photoreal and satellite transitions. The following diagnostic run passed with unchanged production code. Image disposal itself passed after forcing ImageBitmap decoding and closing decoded images. A green subsequent run does not close the transition failure (AGENTS rule 39).
+- NEEDED: Reproduce and determine the transition timing cause before independent approval. Native appearance, Arabic, device performance and live compatibility remain owner review items under N3.
+
+- CORRECTION (Part P pass 3): The root can finish after Tile3DLayer clears activeViewports, leaving a stationary viewport without initial traversal. Root completion now starts selection on the layer's current viewport. The reproduction passed five cases after the fix; suppressing that start fails the dedicated late-root unit regression. The delayed browser-root plant alone survived and is not claimed as a deterministic kill. The earlier draw assertion also raced credit publication; the fixture now waits for tileDrawn before checking decoded output. Satellite renderer exit explicitly clears credit. Independent review remains required.
+
+
+### S3-T16 Part P fix pass: retained verification limits
+
+The supplied security review reports an initial `npm run test:checks` failure
+with two unnamed failing tests, followed by a green run. Their connection to
+the shared-output race is unproved. The closure test now builds in memory, but
+that change and later green runs do not close the unexplained earlier failure
+under AGENTS rule 39. The performance production test still builds and reads
+shared output; the lead's brief requires it to remain unchanged in this pass.
+
+The brief refers to a singular Basis notice row and other remaining rows;
+the supplied tree actually has two Basis rows. Both are removed, as required
+by security finding F6, and every non-Basis row remains byte-identical.
+Independent other-maker review, live compatibility and native Arabic/appearance
+review remain the lead's follow-up; fixture tests establish none of these.
+
+The fix-pass whole test (seed `1794868628`) exited 1 with 30 Python-guard
+failures and one web-script import failure. The Python output includes Ruff
+thread-pool allocation errors (`Resource temporarily unavailable`) and missing
+ledger pin headings; these are not waived or fixed by this pass. The web failure
+was a direct Vite import in the new asset test. The test now invokes the build
+API through a child process and its focused guard/build tests pass. The completed
+whole-test result remains failed; the return records the later standalone runs
+separately. The resource failures require the lead's diagnosis under rule 39.
+
+
+### S3-T16 Part P fix pass 2: deferred reference grammar
+
+Security confirmation finding F11 remains open under lead ruling L-804 item (e).
+Some child-reference spellings are normalised instead of refused, including
+relative empty path segments and case variants of the root name. The accepted
+reference still stays on the configured origin and under the fixed prefix,
+according to the supplied security confirmation. This pass makes no server
+or reference-grammar change. The lead must scope and review any later hardening.
+The earlier unexplained test failures recorded above remain open; passing
+fixture regressions in fix pass 2 do not close them.
+
+
+### S3-T16 Part P fix pass 2: verification setup and retained failures
+
+The initial verification attempt selected a read-only system temporary directory.
+The focused browser wrapper reproduced `EROFS` before its assertions. Python
+fell back to the workspace, leaving generated test artifacts which the subsequent
+documentation and lint checks scanned. The artifacts were removed after that run,
+and a writable task temporary directory in the permitted external cache was
+verified before corrected verification. No check or test was changed for this
+setup error. The initial failed results remain in the task return evidence.
+
+The initial whole test, seed `1794900201`, exited 1 with 19 Python-guard failures;
+its other five suites passed, including 938 web checks and 313 web unit tests.
+Both initial standalone web-check runs exited 1 with 97 failures each; the focused
+browser failure was the read-only temporary directory. The standalone Python
+checks exited 1 with two failures and one setup error. The pin-ruling failure is
+the brief's known missing-ledger-heading issue; this pass does not add those
+headings. Attribution of every other guard failure is not established by these
+aggregate counts. Corrected run results belong in the return and lead's ledger;
+no subsequent green run erases these observations or the earlier open failures.
+
+
+The corrected whole-test Python guards, seed `1794902451`, reported 925 passed
+and 10 failed. An isolated clean-documentation commit-hook test then passed
+without a source change. That result does not explain or close the whole-suite
+failure; the lead must diagnose the differing execution conditions. The task
+return retains both observations and the remaining corrected command results.
+
+
+CORRECTION after the corrected whole-test command completed: its detailed output
+still lists eight `test_clean_environment.py` setup errors, together with the
+pin-ruling failure. The aggregate guard count alone did not establish that those
+setup errors were resolved. The isolated commit-hook pass concerns the initial
+attempt's hook failure; it does not establish the cause of the corrected run's
+remaining failures. The corrected whole test exited 1 with 6895 passed and 10
+failed; all other suites passed, including 938 web checks and 313 web unit tests.
+
+
+### S3-T16 Part P fix P1: commit blocked by workspace permissions
+
+The accepted F1 fix and its route-level tests are present as workspace changes.
+The managed sandbox makes this clone's Git metadata read-only: `git add` exits
+128 because it cannot create `.git/index.lock`. No permission workaround, index
+relocation, alternate object store, commit, push or merge was attempted. The lead
+must commit the reviewed changes from a workspace that permits Git metadata
+writes, using the subject and trailer required by the task brief. Evidence is
+in the task return and `.overnight/tmp/git-add.log`. Independent review by
+another maker remains with the lead under ruling L-1110; builder self-review
+is not that approval. No product rule or test was weakened.
+
+Closing note: the lead committed P1 as a93e982f
+(`a93e982fc131d99be05c19642be7b42af49419dc`) and P2 as 992e3a78
+(`992e3a783797258317d192d80ba29ff0935bef93`), and another maker confirmed both.
+
+
+### S3-T16 Part P fix P2: patch delivery and independent confirmation
+
+Finding 1 of the supplied P1 confirmation is addressed by the redirect-specific
+transport handling and route plants. Full product tests and static checks pass
+as recorded in PROGRESS.md; this is builder evidence, not another maker's
+approval. The lead must obtain independent confirmation of this P2 change.
+
+`git add` exited 128 because the workspace cannot create the Git index lock
+(read-only Git metadata; `.overnight/tmp/p2-git-add.log`). The change is delivered
+as `.overnight/OUT/P2.patch` under the brief's explicit fallback. No Git metadata
+workaround, push or merge was attempted. Base and unchanged HEAD are
+`a93e982fc131d99be05c19642be7b42af49419dc`. The lead must apply and commit it in a
+writable clone with subject `fix(product): S3-T16 part P fix pass P2`.
+The earlier P1 delivery-blocker entry records the earlier workspace state;
+the current P2 base already includes P1. No prior random failure or unrelated
+open item is closed by these checks.
+
+Closing note: the lead committed P1 as a93e982f
+(`a93e982fc131d99be05c19642be7b42af49419dc`) and P2 as 992e3a78
+(`992e3a783797258317d192d80ba29ff0935bef93`), and another maker confirmed both.
+
+
+### PO-S3-T16P-decoder-allocation — Decoder allocation bound remains open
+
+- CONCERNS: S3-T16 Part P, `validateGLB` in
+  `web/src/stage/photoreal-loader.ts`. The validation does not bound declared
+  lengths that the pinned parser allocates.
+- EVIDENCE: security confirmation cfS4, round-3 observation 1, supplied in
+  `.overnight/IN/CFS4-RETURN.md` under "Round-3 observations: open item or not";
+  whole-range security review `.overnight/IN/PSEC-R2-RETURN.md`, F2 item (i).
+- NEEDED (owner: lead): scope and obtain independent review of a decoder
+  allocation bound, with a planted excessive-allocation declaration. This P4
+  pass records the limitation and makes no loader change. No green run closes it.
+
+
+### PO-S3-T16P-rendering-warning — Library warning on a tile that renders
+
+- CONCERNS: S3-T16 Part P. The repeated library warning
+  `glTF file error: Could not find` can include a tile string while the tile
+  still renders. The supplied security review reports no key or alias path
+  in that warning; this pass does not establish a broader absence of leakage.
+- EVIDENCE: security confirmation cfS4, round-3 observation 3, supplied in
+  `.overnight/IN/CFS4-RETURN.md` under "Round-3 observations: open item or not"
+  (two plants reproduced it); whole-range security review
+  `.overnight/IN/PSEC-R2-RETURN.md`, C1 limitation and F2 item (ii).
+- NEEDED (owner: lead): resolve the reading of the item-2 fixed-message
+  requirement and scope any warning-path fix and independent confirmation.
+  No green run closes it.
+
+
+### PO-S3-T16P-mutation-campaigns — Photoreal mutation campaigns not run
+
+- CONCERNS: S3-T16 Part P. The web mutation campaign over
+  `web/src/stage/photoreal-loader.ts`, `web/src/stage/photoreal.ts` and
+  `web/src/stage/photoreal-session.ts`, and a mutation run of
+  `product/src/eii_product/photoreal_tiles/limit.py`, were not run.
+- EVIDENCE: whole-range security review `.overnight/IN/PSEC-R2-RETURN.md`,
+  F2 item (iii), identified the missing campaign records. The corrective lead
+  statement in `.overnight/BRIEF.md` says the queued web campaign was cancelled
+  before it started on 2026-11-17: `scripts/mutation_web.py` admits only
+  `web/spikes/performance/` modules (`listed_web_module`). Thus no completed
+  campaign exit or mutant counts are available; the earlier extract's
+  "exit 143 kept open" is not a completed campaign result. The brief also
+  attributes the stop on mutation testing until after go-live to decision 0055.
+  That decision record is not present in this checkout; its instruction is
+  sourced here to the supplied brief, not to an independently read record.
+- NEEDED (owner: lead): retain the cancellation record and decision authority,
+  and schedule the web and money-calculation campaigns after go-live under
+  that authority with the appropriate runner scope and recorded results. P4's
+  four isolated reverse plants are guard evidence, not those campaigns.
+  No green run closes it.
+
+
+### S3-T14 — Levels fix pass 3 handoff
+
+- The brief's L1–L3 correction is built and checked; another-maker review and commit remain with the lead (AGENTS.md, rules 35 and 40). No independent verdict is claimed here.
+- The supplied lead whole-test failure records `test_manifest_catalogue` and `test_pin_rulings` stack drift. The fix-pass brief assigns both to the lead at the train join; neither guard nor its expectations was changed or rerun here. This fix does not establish a green whole-test run. Evidence: `.overnight/IN/LEAD-WHOLE-FAILURE-L3.txt`, the S3-T14 levels fix-pass-3 PROGRESS.md entry and `.overnight/RETURN.md`.
+
+### OI-265 — A source year for undated FDI announcements
+
+- ID: OI-265
+- Status: OPEN; CONSULT from S3-T12 fix5, within S3-T22's producer/renderer contract.
+- Source: document 03 section **7.3 Columns** permits both `fdi_projects.announced` and `project_year` to be null; FE-116 requires a year on every FDI chip. The invented `undated` route case in `product/tests/public_layer_render_fixture.py` and mounted test in `web/tests/component/layers.fix5.test.tsx` demonstrate the mismatch; no real release was read to determine whether it contains such a row.
+- Current behavior: the producer preserves the absence and all other available fields; the browser keeps `fdi_year_missing`. No year is copied from a retrieval date, padded or invented, and no year is inferred from the retrieval date, the current date, another project or a default. This is contract evidence only; no real release or fetched source was read in fix5.
+- Minimal decision requested: authorize an explicit unknown-year catalogue treatment for a published announcement whose source supplies no year, or require a source-published year as a release precondition. Until that decision, this nullable case remains undisplayable; all dated cases and unplaced dated projects retain the tested full-field transport.
+
+
+## S3-T15 fix round 6 — verification and maker routing
+
+- Status: OPEN; raised by the fix-round builder on 2026-11-19 against base `cd12ac226c6d26a4178f7aa5d410b49bb03483a5`.
+- The focused F1 to F5 regressions pass, but full acceptance remains unverified: the local PMTiles executable and the headless browser are unavailable to the offline workspace. The full look command has 169 passes and 3 failures; the browser assertions have not run. The lead must provide the permitted local tools and rerun the unchanged required command and both browser modes before claiming acceptance.
+- The actual builder is OpenAI GPT-6 through Codex, rather than the maker anticipated by supplied ruling L-1113. An OpenAI confirmation would not satisfy the different-maker rule for these changes. The lead must arrange review by another maker; self-review does not replace it.
+- The approved S3-T15 task section and decision 0022 are absent from this checkout. The supplied brief and ruling authorize the scoped fixes and the invented stand-in; they do not recover broader acceptance criteria. Original audit minors, native Arabic approval, continuation approval and the earlier EXDEV issue remain unresolved as the supplied review states.
+- Additional observation, left unchanged outside the browser-harness fix: `web/spikes/look/tests/buildings.node-test.mjs`, the building-range test, still starts the server with default environment/key options. That Node test could inherit an ambient register setting. Final verification cleared those settings; a separate test-isolation task should force its inputs as well.
+- Public metadata tests establish completeness and a matching local content hash using an invented file and invented publisher metadata. They do not verify any external publisher, licence or dataset. Configured-source and Public-attribution rendering remain untested with real inputs under the no-network/no-real-input constraints.
+
+## S3-T15 fix round 7 — correction to the verification gap
+
+- Raised by the fix-round builder on 2026-11-19; base `4815205865853bfa9eb0d441ea85e301738fc065`. This appends to the round-6 record above without rewriting it.
+- The local-tool and executed-browser portion of that gap is RESOLVED: the final `npm run test:spike:look` exits 0 with all 172 Node tests passing, including all 103 browser tests with the extract and all 103 against the bare root. Lint, typecheck and format checks also exit 0. Evidence and the diagnosed intermediate failures are recorded in PROGRESS.md under "S3-T15 fix round 7" and in `.overnight/tmp/fix7-final-look.log`.
+- The regression was the harness's unconditional cross-root stand-in, followed by test fixtures that still assumed empty coverage had summary facts. Both causes are addressed without restoring absent measurements or reducing guard thresholds, attack sizes or test coverage. The intermediate missing closing brace in the new helper is fixed and typechecked. No unexplained random failure was observed or closed by an unchanged rerun.
+- Independent review by another maker, the prior visual/native-language/continuation approvals, the absent task/recovery records, the prior EXDEV issue, the separate building-range test's ambient-input observation and real Public-source truth verification remain OPEN as recorded above. This task adds no new product decision.
+- Git metadata is read-only: staging exits 128. Delivery uses the brief's authorized `.overnight/OUT/changes.patch`; the lead must apply and review that patch before committing or merging it.
+
+- Fix-round-8 note N1 (OPEN): the round-7 confirmation's note N1 reports that the default browser group selects the checkout's invented stand-in and needs the basemap extract. Without that extract the default group has populated units but `basemap: false`, contrary to the variant test's no-extract expectation. The explicit bare-root group remains the empty-coverage proof. No workflow currently runs `test:spike:look`, despite the README describing a hosted checkout without the extract. This task records the dependency only; changing the default fixture or hosted workflow needs a separate scoped task. Source: `.overnight/IN/CONF7-RETURN.md`, Notes, N1.
+
+
+## S3 re-cut f1 — confirmations and lead records remain open
+
+The forced differences of S3-T05, S3-T13, S3-T14, S3-T16 and S3-T22 in the f1 forced-difference inventory need their own task confirmations by another maker. No independent approval is asserted. Under L-1143, the existing 16 pin-guard faults belong to the lead ledger records commit; the guard and pin rows are unchanged. The PMTiles command-line converter is missing. The look default runner supplies populated stand-in cells in an extract-absent context; the explicit empty-root browser run passes. This unchanged task fixture/prerequisite mismatch remains for its owner. The ambient browser-path override points to a nonexistent location and is removed only in the diagnostic subprocess. Full command exits and remaining environment failures are recorded in the f1 return report. The isolated worker default uv cache is unavailable/read-only, producing 11 setup errors and a CLI usage subcase failure; the relevant failure-path code matches main. The required web suite hit its unchanged 1800-second deadline, so its final counts are unavailable. The slowdown and any workload-scheduling contribution remain unresolved; the prior direct performance pass does not close this timeout. No failure or pending source-use evidence is closed by a green rerun alone.
+
+
+## S3 re-cut f2 — confirmation and lead integration remain open
+
+The independent task-own review of `07e6bbb9529358dda922c215be8529032c5c9b43` approved S3-T05, S3-T13 and S3-T14. S3-T22's missing datetime-path plants and S3-T16's repeated ceiling and shared reference-language change are corrected in f2 and require new task-own confirmation by another maker. Git metadata is read-only (authorized branch switch exit 128); task patches require application by the lead. The lead retains full-suite and exact merge-result verification. Existing f1 pin-ruling and environmental open points remain open. An incidental unfiltered scratch web probe also encountered the absent production-bundle prerequisite; the required focused tests pass, but no bundle-prerequisite closure is asserted. This section is deliberately unnumbered for the lead ledger. Source: the independent review findings and the f2 command results recorded in PROGRESS.md.
+
+
+### OI-324 — Joined Public opening web checks remain red
+
+- ID: OI-324
+- Status: OPEN; joined source head `632ebf85e07307ae4b4d7a6171a091cb534bcdda` is not merge-ready. Owner: lead, with the respective S3-T24, S3-T27 and spike/test owners and another maker's confirmation.
+- Evidence: S3J's required `npm run test:checks` exited one: 1153 tests, 1148 passed, five failed, zero skipped, cancelled or todo. The complete command output and classification are in the S3J handoff. No test, timeout, attack size, tolerance, skip, retry or baseline changed.
+- The older shell-document guard rejects useState/useEffect in App. Its unchanged predicate passes the moved base, rejects the supplied T24 head and rejects the joined head; this is a deterministic contract conflict with the approved mounted bootstrap, not a new join-only runtime failure. The older empty-root browser test expects asset-absent and no tile request, while T27 requires the mounted extract at that root. The lead must resolve fixture/guard ownership explicitly while preserving the mounted-release and map proofs; this worker does not weaken either assertion.
+- The invented-footprints test cannot load the absent local spatial extension. No tool installation, cache read or download was attempted; the lead must provide the permitted prerequisite and execute the unchanged test.
+- The unchanged default look spike fails ten missing-basemap assertions. Its populated stand-in plus absent extract is already recorded under the fix-round-8 N1 note and S3 re-cut f1 above. The explicit bare-root browser group passes. This join neither adds a real extract nor changes that fixture/prerequisite contract.
+- The unchanged performance spike has 54 browser passes and one full-street-load readiness timeout. The cause remains unresolved. Its earlier suite-time issue is recorded under S3 re-cut f1; no unchanged rerun, altered readiness bound or optimistic environment explanation closes it.
+- Closure requires the responsible owners' scoped corrections or permitted prerequisites, the unchanged affected guards passing with causal evidence, and another maker's task-specific confirmation. The lead still owns fresh-seed whole-test, live-store, hosted-check and merge-result evidence. No gate is closed here.
+
+
+### OI-342 — S3FX-a: the web checks ran about 2026 s against their 1800 s budget
+
+- Status: proposed for the lead; not an approved decision or a closed gate.
+- Evidence base: d7e88ef7e304888b8e78ebc6504c89fa86d833ca..94d4a013ce24a436da039ef5c9d00449fa554935 (592f1a0f, 94d4a013). The final direct npm run test:checks exited 0, with 1157 passed and no failed/skipped tests, but its reported duration was 2025802.180012 ms. The configured web-checks budget in scripts/run_tests.py remains 1800 seconds. The prior full run took 931774.793939 ms and failed the now-corrected answer-wrapper cache setup. Timing variance remains unexplained.
+- Required follow-up: the lead runs the actual bounded whole test with a fresh seed on the exact merged result and investigates the timing observation under the existing budget. No budget, test, assertion, retry, skip or baseline is relaxed. A green rerun alone does not explain or close the observation. This worker did not run `./eii test` and claims no bounded whole-test or slice-gate pass.
+- Ownership: shared verification/performance follow-up discovered by S3-T15's assigned full web-checks command; the S3FX-a handoff proposes it without changing any performance implementation.
+
+### OI-349 — S3-T18: the size test measured the answer drawer during its slide
+
+- Status: the drawer-rest wait fixes (985b0d0c, c3059f75) and the wrong-side poll wait (b4ac8785, ruling L-1225) were confirmed by another maker. The lead's whole test of b4ac8785 (S3FX-J3.v1; seed 1322888434) passed with exit 0: 16172 passed, 0 failed, 0 skipped in 7 suites. OPEN as a recorded random failure until the next whole tests of the S3 train pass without it; a green rerun alone does not close it (rule 39).
+- Occurrence: the lead's whole test of b26c4c7b with seed 3243881894 (S3FX-J.v5) exited 1 with one failure, `S3-T18 controls hold at 3840x2160 (ar)`: `.drawer-close` had `within: false`. The same test passed in the run of the same head with seed 3753134459.
+- Cause: the drawer enters with the `drawer-in` animation (400 ms, `inset-inline-end` from minus the drawer width to zero). The test measured after `scrollIntoViewIfNeeded`, whose stability check passes when the box holds still for two frames; it does not wait for the animation to end. Planted: the unchanged test with the animation held at 10 ms reproduces the same failure (`.drawer-close`, `within: false`, at 1366x768 en and 3840x2160 ar); held at 200 ms the close control is already inside and it passes. That a loaded machine held the animation still for two frames is the lead's assumption; it was not reproduced under load.
+- Fix: the test waits for every animation of `.drawer` to finish before measuring its resting place. No size, selector, tolerance or assertion changed; a drawer that never comes to rest now fails by the test's time limit (planted: the animation paused, the fixed test fails at its 30 s limit).
+
+### S3-T28 — Proposed verification and integration items for the lead
+
+- Status: PROPOSED, unnumbered for the lead's ledger; no task approval or gate closure. OI-347 and OI-353 remain owner-open under the supplied L-1238 rulings and decision 0072.
+- Git metadata is read-only. The builder could not create its task branch, stage the changed ignore/example inventories, or commit. The real root tree check therefore reports the staged-content mismatch and dependent ignore/example failures. Apply and stage the complete candidate in a writable checkout, rerun the unchanged tree check, and obtain another maker's review; no checker exemption is proposed.
+- Superseded by lead ruling L-1256: S3-T28 adds no claim, fragment or template text; operations output is structural evidence only; the semantic review of catalogue claims stays with the catalogue's owning review. The existing shape-versus-semantics test remains evidence of that distinction. The catalogue review owns semantic claims; no keyword scan certifies this row.
+- The controls-off corpus proves the selected runtime-setting, isolation, kind, application-role, inventory, parity, interruption, public-exposure, evidence, readiness, log-result, durability and executable-policy refusals. It is not a claim that every semicolon-separated plant in the supplied specification has an independent controls-off proof. Complete that reconciliation before acceptance, including the full network-attempt tripwire across the production sequence and the remaining inherited-guard cases.
+- Public build input is the documented, reviewed `assembly/release.json` envelope and matching review, bound to the existing final audit. The native invented-fixture sandbox proof exercises this contract. This task did not read a real Public cache or establish that the upstream assembly currently emits this envelope; the lead must confirm the producer/adapter and real input completeness before using the command on its cache. Missing input refuses without substitution.
+- No real PostgreSQL service was contacted, started or stopped. The lead retains the permitted live two-store and tamper proofs, a clean committed-source archive, six hosted checks, another maker's APPROVED and the fresh-seed whole test on the exact merge result. The native archive fixture uses an explicitly invented commit label and supplies no such approval.
+
+
+### S3-T28 round two — proposed limits and remaining lead evidence
+
+- Status: PROPOSED, unnumbered for the lead; this appends to the round-one record and closes no acceptance box or owner decision.
+- The round-one bullet asking to complete the controls-off reconciliation and the full network-attempt tripwire is superseded by the round-two matrix reconciliation. Lens A's local-relay and listen-without-bind limits were subsequently repaired in the fix-one candidate; the new plants and native verification, rather than the earlier blanket wording, carry that evidence.
+- Rule-24 review ownership under L-1256: `Matrix.test_ac8_rule24_catalogue_shape_does_not_certify_semantics` still loads otherwise valid closed fixtures containing the prohibited meanings, which grammar/slot checks accept. This shape evidence stays unchanged. The semantic review belongs to the catalogue's owning review under AGENTS rule 24 and supplied decision 0071 item 6; S3-T28 adds no claim, fragment or template text. No keyword scan is claimed as semantic certification.
+- Assembly producer/adapter: tracked code names the envelope reader and invented test producer only. No production producer/adapter is established by `custodian/src/eii_custodian/release/assembly.py`, `scripts/sandbox_inside/public_release.py` or the tracked-code search. Its upstream integration remains proposed, not built. No real cache was read, no substitute source row was invented and the final audit was not bypassed. The lead must identify a reviewed producer or assign that adapter before using the consumer on its source assembly.
+- Round-two local guard evidence does not supply real PostgreSQL parity/tamper results, a clean committed-main archive, six hosted checks, different-maker APPROVED or the lead's fresh-seed whole test on the exact merge result. Those obligations remain. The full return maps each matrix row and explicitly identifies shared component proofs versus native/dispatcher evidence; no actual deployment is inferred from interface stand-ins.
+- The read-only Git restriction remains, so this worker creates no task commit or push. Correction to the round-one integration note: the lead's base commit now contains the earlier ignore/example changes, and the current tree check can pass without an exemption. The final check exits are appended in PROGRESS.md. OI-347 and OI-353 remain owner-open; S3-T20 and S11-T09 keep their original ownership and gates.
+
+### S3-T28 fix one — root decision and bounded repair evidence
+
+- Status: PROPOSED, unnumbered for the lead; not full task acceptance or an independent other-maker approval.
+- Lens B F-01: the serving Parquet projection now retains registry `kind`/`origin` and lineage `input_class` for the shared Public-chain guard. Real-Parquet plants rebind all file/schema/release hashes and refuse before either loader stage; removing the serving call kills the tests. This closes the declared-generated-metadata serving bypass locally, not the truth of an unmarked source or the whole L-1238 ruling.
+- Lens A F1/F2: the tripwire records DNS, unowned/other loopback destinations, out-of-scratch Unix relays, implicit listen and AF_UNSPEC wildcard bind. Native/sequence zero-attempt assertions remain. Its kernel routing IPC exception is only NETLINK_ROUTE to kernel PID zero without multicast, needed to configure sandbox loopback. The check covers accidental attempts, not an adversarial sockaddr/path race. A loopback bind or listen from a non-leader thread failed socket inspection (pidfd_open on a thread id, EINVAL on kernel 6.6) and could deadlock the tracer's cleanup; this is repaired by the thread-group pidfd and a reap-all loop that runs in a dedicated tracer process, so the caller's own children are never waited for or reaped (review N2, N4).
+- Lens A F5 remains PARTIAL. Early durable sibling identity reservation is implemented and tested, but `verify_peers` still cannot find unrelated deployment parents. The retained disjoint-parent shared-database plant remains admitted. The lead must decide the single-root configuration contract and its marker authority; a new required root setting also changes the closed setting inventories beyond the brief's named repair files. The explicit-root option was raised during this run; no answer is recorded. The concrete proposal and failing probe are retained with the return. Do not mark AC2 database separation complete.
+- L-1256 keeps semantic catalogue claims with the catalogue's owning review. The existing shape-versus-semantics test is unchanged in name and assertions; S3-T28 adds no claim, fragment or template text. Operations output is structural evidence only; no keyword scan certifies semantics.
+- The envelope producer is a separate job on this base; this repair neither supplies nor approves it. Required integration/lead evidence remains: real two-store/diverge/tamper proofs, the clean committed-source archive, hosted checks, different-maker APPROVED and the fresh-seed whole test on the exact merge result. OI-347 and OI-353 remain owner-open.
+- The original CLAIM-AUDIT and verification-matrix files named by the lenses were absent from the supplied input set. Corrected overlays are retained with the return for reconciliation with the lead's originals; the earlier returns and PROGRESS evidence remain intact.
+
+- CLOSED — S3-T28 lens A F5, local database-separation repair under L-1260: the declined deployment-root proposal is superseded by parsed, case-insensitive `_staging`/`_live` namespaces with neither permitted for development. Direct construction, peer records, preflight and legacy development loading apply the same refusal before store access; disjoint-parent, case, query and encoded-name plants are recorded red then green in PROGRESS.md, S3-T28 fix two. This closes F5's configuration gap only; independent approval and the existing lead integration evidence remain required.
+### S3-T28 Part C — real-cache assembly and independent review
+
+- Status: PROPOSED, unnumbered for the lead's ledger. This appends to the earlier producer-gap records without rewriting their evidence. The tracked producer and build hook now exist and are tested only on invented inputs; no real-cache release or slice gate is claimed.
+- Owner: lead. From the lead's own shell, bind the actual stored S2 outputs and their selected receipt/body hashes in `review/release_spec.json`, with the reviewed typed schemas and common build metadata described in document 13 **S3-T28 Public assembly producer**. The spec contains no replacement rows or invented source citations. This worker was forbidden to inspect the real cache and cannot confirm that these bindings are complete or that every real output matches its release schema.
+- The first Public `build-release` prepares `assembly/release_candidate.json` and refuses without approval. Obtain a different maker's review of those exact inputs and canonical candidate bytes; put the exact approval in `review/release_approval.json`. Then run the unchanged Public build command from the lead's shell, retaining its exit, complete release identity and source-chain evidence. Missing inputs or a pending final audit must remain refusals; no source row, schema field or approval may be fabricated to pass.
+- Implementation review by another maker, actual PostgreSQL evidence, hosted checks and the lead's fresh-seed whole test on the exact merge result remain separate obligations. The tree is left changed and uncommitted under the brief's read-only-Git authority. Existing semantic-classifier, owner-decision and protected-release limits remain open.
+
+- Random failure, 2026-11-20, review of fe47090b: product/tests/test_mounted_browser.py::test_built_browser_uses_mounted_http timed out (30 s) waiting for [data-action="guided-story"] in the full Python command under heavy machine load; passed alone and in a second full run. Not closed by the green re-run; cause unproved.
+- Interruption, 2026-11-20, S3-T10 review round one: an extra full vitest run ended with status 143 before counts while a web aggregate was active; cause unproved; a later isolated pass does not close it.
+
+### S3-T21 review round one follow-ups
+
+- S3-T21: broad `npm run test:checks` failure count varied 14 → 13 → 10 over 1160 tests across the builder's runs; the first difference is unexplained; a green re-run does not close it.
+- S3-T21: the lab's production change `web/src/brief/catalogue.ts` (`answerAccepted` rejects extra top-level properties) is outside the lab's stated scope; record its acceptance or split it.
+- S3-T21: the lab Python tests are pytest functions; `python -m unittest scripts.tests.test_question_lab*` runs 0 tests (exit 5); use the pytest form.
+
+## PO-S3-RECUT-B1 — stand-in re-cut confirmations and prerequisites, 2026-11-21
+
+Local tested code head `df53de9dbcd87b8dafc351459bc3fbdad0c7c73d` is a stand-in re-cut on e912140a, not the main S2 will leave. The assigned re-cut report and proof enumerate all 62 mappings and every forced file difference. Required: actual-main replay; task-specific other-maker confirmation for changed code/test/configuration (including foundation address/factory work, T02 catalogue, T22 SQL placement, T27/T28 tooling and receipt-kind boundaries, T10 startup fixture, T21 command union, and affected S2 boundary ownership); the joined-head confirmation, hosted checks and lead whole test under AGENTS rule 33. No independent approval or gate closure is claimed.
+
+Final checks retain failures for unavailable built web surfaces, Playwright/Prettier/Vitest, gitleaks and engine extensions/native sandbox enforcement. The full command logs and intermediate corrections remain in the task evidence. These are not waived or converted to skips, and the brief forbids fetching or reading the excluded inputs. Re-run in the lead-authorized prepared environment before acceptance. The two observed API/import isolation conflicts and the unread-body variants are locally reproduced and reconciled without altering their existing guards; broader native/security/browser proof remains pending. No unexplained random failure is closed by a green rerun.
+
+## OI-370 — S3 re-cut: web tests/audit/opening.spec.ts first-fixture timeout under broad load
+
+- Status: OPEN as a recorded random failure (rule 39); a green re-run alone does not close it.
+- Owner task: S3-T10 (bilingual Public opening); setup work is reduced by job S3-recut.b3.
+- Evidence anchor: PROGRESS.md, "S3 re-cut onto main 7ef9dc96, 2026-11-21"; confirmation S3-recut.cf2 record 1. The clean broad `npm run test:checks` gave 1164 passed, 1 failed (first-fixture 30 s timeout of `tests/audit/opening.spec.ts`), exit 1; three runs of the file alone passed. None of the re-cut forced commits touches it.
+- Next step: S3-recut.b3 removes setup work from the first fixture; the next broad runs must pass without the timeout before closure. No timeout, assertion or retry is relaxed.
+
+## OI-371 — S3 re-cut: test_f4 process_identity_mismatch (scripts/operations/process.py)
+
+- Status: OPEN as a recorded random failure (rule 39); cause unproved; a green re-run does not close it.
+- Owner task: S3-T28 (offline supervisor startup, `test_s3_t28_fix1`).
+- Evidence anchor: confirmation S3-recut.cfB, section 2: `test_f4_native_foreign_pid_and_owned_entry_shutdown` failed with `process_identity_mismatch` in 1 of 6 parallel inner runs and in 1 of 2 full runs of the same command; the pick under review does not touch that module or test.
+- Next step: the S3-T28 owner finds the cause (process identity read under parallel load) and the unchanged test passes repeatedly under the same parallel load.
+
+## OI-372 — S3-T28 / pick 56: the base registry adds register_file and company_web receipt kinds
+
+- Status: OPEN; decision needed from the S3-T28 owner.
+- Owner task: S3-T28 (Public assembly producer), with S2 owners of the registry.
+- Evidence anchor: confirmation S3-recut.cfB, RECORDS item 3. The base registry adds `register_file` and `company_web`, so the unchanged `PUBLIC_RECEIPT_KINDS` set now accepts both as Public receipt kinds (already true at re-cut pick 56). `cdse_backup` and `citation_only` stay excluded. A `company_web` receipt should still be refused later at `approve_url`, because its address is empty.
+- Next step: decide whether to exclude both kinds by name, and if so add the refusal with a planted test; record the decision in a decision record if it amends a rule.
+- Resolution (2026-11-21): CLOSED by the S3-T28 Part C receipt-kind repair. `PUBLIC_RECEIPT_KINDS` is now the closed literal frozenset of the twelve approved kinds in finding F1; fetch `KINDS` is unchanged. Receipts of kind `register_file` and `company_web` refuse with `producer_non_public` before their bodies are read. The exact-set and unread-body tests fail when the derived expression is restored; dropping `awards_intake` also fails the exact-set test. Decisions 0074 items 1 and 8, 0076 items 2 and 5 to 7 and its **Consequences and change triggers**, and CLAUDE.md rule 3 grant no release admission for either kind; no rule amendment is made. Actual exits and remaining independent-review limits are recorded in PROGRESS.md, **S3-T28 Part C repair — closed receipt kinds (OI-372)**.
+
+## OI-373 — advisory: guard that each scripts/tests module collects alone under -P
+
+- Status: OPEN, advisory only; no task gate depends on it.
+- Owner task: the lead's test-runner owner (S0-T05 runner lineage).
+- Evidence anchor: confirmation S3-recut.cf2, point 3. The five forced commits needed import fixes because the `-P` runner dates from S0-T05; the files probably collected on their own task branches through a module that sorted earlier and put the root on the path.
+- Next step: add a guard that each `scripts/tests` module collects alone under `-P`, with a planted order-dependent import that it must catch, so such imports are found before a join.
+
+## OI-374 — S3-T22 A22: the L-1077 item 3c fast-check conflict was never entered (rule 39 gap)
+
+- Status: CLOSED by ruling L-1079 and the fix pass 4 confirmation S3-T22-cf4A; recorded here because the conflict itself was never entered while it was open (a rule 39 gap).
+- Owner task: S3-T22 (source geometry, A22).
+- Ruling L-1079 (2026-11-19 08:00; `.overnight/IN/ruling-L1079.txt`): L-1077 item 3c named fast-check, which is not a dependency of `web/`; adding it would change the lockfile outside the fix's scope. The seeded 512-ring property test of fix pass 4 (rings from subnormal to the largest coordinates, seed recorded, independent radix-two rational oracle) meets item 3c; no new dependency is added.
+- Different-maker confirmation of fix pass 4 (`.overnight/IN/S3-T22-cf4A.md`): APPROVED commit `46387fe`, maker Moonshot AI, model Kimi K3.1 Pro; findings none; C1 to C4 MET.
+- On those two facts the TASKS.md A22 box is ticked: the confirmation covers every requirement of the box text (the RFC 7946 kinds and bounds, ring closure and orientation checks, retention of every island, hole, ring order and source vertex value without rounding, repair or simplification, all seven plant kinds with browser rendering cases, and DAT-146's drawn-area restriction unchanged), and the ruling closes the one item the confirmation could not (the item 3c property-test requirement).
+
+- Correction (2026-11-21, after the records review of package R by another maker, finding F1): the confirmation `S3-T22-cf4A` and ruling L-1079 first appear in the history in this package's own commit `e07ea792`, and the commit that confirmation approved, `46387fe`, is not an ancestor of this head (three of its six files differ here because later work changed them). The A22 box is therefore restored to unticked. It stays open until an appended record holds the confirmation text, the commit it approved is reachable from the head (or its changes are shown byte-identical there), and that text is shown to meet the A22 box. The bullets above are kept unchanged.
+
+## PO-S3-R3-1 — S3-T26 A5 left open: the joined browser story is not rerun by package R3 (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join).
+- Box: S3-T26 A5, "stage directives and the Public context card calls in the joined browser story use the chosen area, with any distinct wider context clearly identified; ... a planted card request for the default area's ID fails". The gate pack section 2 marks it MET.
+- Evidence found in package R3: the backend tests `test_selected_outline_cards_stage_and_repeat`, `test_public_card_metric_binding_keeps_existing_calculator_keys` and the actual `run_card` argument checks of `product/tests/test_selected_area_playbook.py` pass (203 passed with the other T26 files) and decide the stage directives and the card calls at the API. No test run in this pass drives the joined browser story with a chosen area: that proof is the S3-T10 EN/AR opening story (gate pack G1 waits for the lead's live release run) and S3-T26 box 7.
+- Reason for leaving it open: the box text names the joined browser story, and the strict reading is that a backend test does not decide a browser statement. Next step: tick it when the S3-T10 selected-area story has run in the browser with the chosen area, or when the lead rules that the backend directive and card-call tests decide the box (rule 46).
+
+## PO-S3-R3-2 — package R3 process notes (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join).
+- S3-T19 A1 and its siblings need the built bundle: before `npm run build` four real-tree tests of `scripts/tests/test_audience_origin.py` fail on the absent surface `web.dist.document`; after it, 105 passed. The standing check is therefore green only with a build, as the S3-T27 task log already notes.
+- S3-T19 A8 is ticked on the file lists of the five S3-T19 commits (no privacy, custodian or gate file), not on a test, as the gate pack classified it.
+- `git checkout FILE` fails here (the git metadata is read-only), so plants were restored with `git show HEAD:FILE > FILE` and `git diff --quiet`; the byte-exact restore held for every plant. A first combined background run of the S3-T28 tests produced no result (its process ended without an exit line); the boxes rest on the file-by-file runs, whose shell loop printed the exit of `tail`, so the pass lines are the record.
+- Several ticked boxes carry a cited plant from an earlier PROGRESS row for the box's own guard, and this pass's plant for a different guard of the same task (marked in each line); the lead may ask for the box's own plant to be rerun at the gate.
+
+### PO-S3-R3-3 — S3-T19 box 8 and S3-T14 box 2 reopened by the review of package R3
+
+- ID: PO-S3-R3-3
+- TYPE: OPEN
+- RAISED BY: review S3-R3.rv1 (OpenAI GPT-6 via Codex), 2026-11-21; recorded by the lead
+- CONCERNS: TASKS.md S3-T19 acceptance box 8; S3-T14 acceptance box 2; PROGRESS.md "Correction to the S3 closure package R3"
+- EVIDENCE: S3-T19 box 8 was decided by commit file lists, not a test. S3-T14 box 2's named tests did not cover the pixel-to-frame-cell mean; the existing `test_night_mth109` does (pixel-mean-to-sum plant red, exit 1; restored green, exit 0).
+- NEEDED: S3-T14 box 2: a closure record naming `test_night_mth109` with its own red and green exits, reviewed. S3-T19 box 8: a deciding test of the unchanged controls, or a decision on its evidence requirement.
+- UPDATE (2026-11-21, S3 closure package R4): S3-T14 box 2 is ticked in TASKS.md on this pass's plants (pixel mean to sum, exit 1 then restored exit 0; both area means to a sum, each exit 1 then restored exit 0). The tick is submitted for another maker's review; this update does not approve it. S3-T19 box 8 stays open: no committed deciding test covers the five S3-T19 commits. The test that would decide it would be `scripts/tests/test_audience_origin_controls.py`, pinning the controls those paths state or invoke and failing on a planted change of one of them. PO-S3-R3-3 stays OPEN for box 8. Commands and exits: PROGRESS.md, "S3 closure package R4".
+## PO-S3-R2-1 — S3 closure package R2: proof limits of the 40 ticked boxes (proposed, 2026-11-21)
+
+- Status: proposed; the lead renumbers it at the join. No box is left open by package R2; this item records what the tick evidence does not prove, so the gate reviewer can rule on it (rules 37 and 39). It is not a random failure.
+- Scope: the ticks of S3-T01 A1 and A3, S3-T02 A1, A4, A5 and A8, S3-T03 A1 and A2, S3-T04 A1 to A6, S3-T05 A1 to A3, S3-T06 A2 to A4, S3-T08 A1 to A4, S3-T09 A1 to A4, S3-T12 A1, A3 to A8 and A10, and S3-T13 A1 to A4, recorded in PROGRESS.md under "S3 closure records — package R2, 2026-11-21".
+- Limits: (1) S3-T04 A4: two cell-order plants did not turn `test_units_whole_and_deterministic` red, because its invented fixture selects one cell; only the whole-unit plant bit, and determinism rests on `test_same_request_twice_is_byte_identical` unplanted. (2) S3-T12: every plant turned red only `layers.test.ts` "plants every refusal code"; the component tests named per box are green evidence but not plant-proven one by one. (3) S3-T01 A3: the deciding test `test_forbidden_construct_is_refused` stayed green under the lint plant; three sibling tests turned red. (4) S3-T02 A8: the deciding tests cover the receipt function and the `freeze` command; the install-side register refusals of `scripts/operations/install.py` have no plant in this pass. (5) Every tick is local: no hosted run, live two-store load, browser visual run or merged-result test backs it, and S3-T02 A2, A3, A6, A7, S3-T04, S3-T13 A5 and the remaining S3 boxes stay with their own waits. (6) The worktree's git index is read-only, so plants were restored with `git show HEAD:FILE > FILE`, checked by `git diff --quiet HEAD`; the brief's `git checkout FILE` was not possible.
+- Proposed disposition: the gate reviewer opens each named test at the merged commit and may unmark any box it finds weaker than its text; no code or test change is proposed here.
+
+## PO-S3-INV-1 — offline inventory guards added for S3-T25/S3-T26; live A7 evidence still pending (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join).
+- Finding F-1 of the forced-join review (FJ48-CONFIRM) is closed offline: `product/tests/test_selected_area_playbook.py::test_declared_live_inventories_are_named_queries_and_execute` asserts every `SELECTED_QUERIES` and `RESOLVE_ROUTE_QUERIES` name resolves as a PACKAGED named query and appears in the embedded route traces, so a restored `sector_facts_lineage` in the resolver inventory and an invented name each fail offline. Ruling L-1405 point 3 is closed offline by the widened `evidence_complete`.
+- Residual: a name that is wrong for its declared list yet still executes is not detectable offline — `sector_facts_lineage` does execute inside the selected route through the sector_facts tool, so planting it in `SELECTED_QUERIES` passes every offline assertion. Only the lead's live two-store proof distinguishes declared coverage there. A7 of S3-T24, S3-T25 and S3-T26 stays the lead's live run; this entry does not narrow the pending CONCERNS/NEEDED item that names "S3-T25 resolver queries".
+
+## PO-S3-CTL-1 — limits of the decision-0035 control pin (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join). PO-S3-R3-3 stays OPEN. This pin does not tick S3-T18 or S3-T19.
+- The pin is the snapshot of checkout `9c27f7d675ddb05d435c1af6714d01b08ca71e81`. A later commit that changes a declaration and the pin together still matches. The walker stores declarations. It does not hash the bodies of the enforcing functions.
+- `min_full_month_days` and `situation_windows` have no value on this checkout and stay out of the value pin. Origin-label wording outside the suppression terms stays out. Suppression `allow_contexts` is in the pin, and a missing list is stored as null.
+- The retired-name scan allows those spellings only in the privacy check and its test. The pin stores `RETIRED_CODES` as a count and a sha256, and assertion quotations of that set use stand-ins `retired-code-N` in sorted order. The fixture file contains none of the spellings.
+- `scripts/tests/test_decision_0035_controls.py` is 1696 lines. Decision 0018 item 14 keeps the 500-line target from being a reject. The plan's two tracked additions are this module and the pin, so the module stays one file.
+- On this worktree `web/dist` is absent and `node` is v24.22.1. The finished `scripts/tests` suite therefore exits 1 on the audience real-tree tests and the version tests. PO-S3-R3-2 already records that the audience tests need a build. This pass did not run `npm run build` and did not change the toolchain. Commands and exits: PROGRESS.md, "Decision 0035 unchanged-controls pin".
+
+## PO-S3-CTL-2 — code review cr1 of the decision-0035 control pin: records and residual limits (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join). Raised by code review cr1 (OpenAI GPT-6 via Codex) of `a115ba51`, and by its fix pass (Anthropic Claude Opus 5.5). F1 and F2 are fixed in the test only. Commands and exits: PROGRESS.md, "Decision 0035 control pin, code review cr1 fixes (S3-CTL r2, 2026-11-21)".
+- Count: the historical comparison recorded 16 transition records across 15 distinct paths. `audience_retained.absent` changes in both `daca0266` and `7347dcd3`. Earlier records stay as written (rule 38).
+- PO-S3-R3-3 stays OPEN, and the S3-T18 and S3-T19 preservation boxes stay unticked. After another maker reviews the fixed guard, a record names its exact candidate hash and the reviewed historical and enforcement evidence. Only then may a completion conclusion be drawn (PLAN2 section 4).
+- Environment failures stay recorded beside any later green run (rules 36, 39). Review cr1 reproduced four `scripts/tests/test_audience_origin.py::TestTheRealTree` failures caused by an absent `web/dist`. The lead reported an earlier clean-environment run that failed with ENOSPC, and a later 21/21 result once TMPDIR was set on disk. Neither the reviewer nor this pass reran that incident. This pass ran with TMPDIR on disk under `.overnight/tmp`.
+- Residual limits of the static write census. The walker covers only writes it can see statically in the declaring module. These forms are not refused:
+  - a projected container changed in place through another name (for example `_P = TASK_UNITS` and then `_P["k"] = v`), or through a function argument;
+  - a write from another module (`rules_config.WINDOW_MAX = 24` in an importer);
+  - a mutating method outside the closed `_MUTATORS` list.
+  The pinned values that are mutable in source are the dicts `TASK_RULE_SETS`, `TASK_UNITS`, `CHILDREN`, `_CLOSED`, `_FLAGS` and `INSIDE_LINES`; the others are tuples, frozensets, strings or numbers. Closing these needs alias or whole-program analysis. That is a lead decision, not part of this fix (rule 46).
+- Update, 2026-11-21 (S3-CTL r3, after confirmation cf2): the in-place write census of the declaring file is now an allow-list, so the first and third residual limits above are closed. A mutable projected value (`TASK_RULE_SETS`, `TASK_UNITS`, `CHILDREN`, `_CLOSED`, `_FLAGS`, `INSIDE_LINES`, the patterns `_CLAIM`, `_ARABIC_MARKS` and `_ALEF`, and `CASES` and `PROFILES`, whose items are dataclass instances) may appear only in a read-only use. Every other appearance is refused with exit 2: an alias, a call argument, starred or keyword passing, a return, a container element, any other attribute or method (`__init__` included), and an unbound method. `_MUTATORS` is gone. Only one residual limit remains: a write from another module (`rules_config.WINDOW_MAX = 24` in an importer). Confirmation cf2 accepted that limit as a recorded boundary, and enforcement changes still need their own review. Commands and exits: PROGRESS.md, "Decision 0035 control pin, confirmation cf2 fixes (S3-CTL r3, 2026-11-21)".
+- Update, 2026-11-21 (S3-CTL r4, after confirmation cf3): in-file redirects of an admitted form are now refused: a relied-on builtin rebound in any scope, the builtins module named, the value as any comparison operand but the container of one unchained `in`, and any use of a live `.items()` view but direct iteration. The one residual limit is restated: a write from another module, and a reach from the declaring file into another module's namespace (the builtins module included) by a name computed at run time, which the static census cannot see. Commands and exits: PROGRESS.md, "Decision 0035 control pin, confirmation cf3 fixes (S3-CTL r4, 2026-11-21)".
+- Update, 2026-11-21 (S3-CTL r5, after confirmation cf4): a same-module reach to the declaring module's own namespace object is now refused by an allow-list: any naming of `sys.modules`, `globals`, `vars`, `locals`, `setattr`, `delattr`, `getattr`, `__dict__`, `__globals__`, `__self__`, `importlib`, `__import__`, frame globals or locals, the builtins module and the other tokens of `_NAMESPACE`, and every form of `sys` but the real read-only ones. The one residual limit is unchanged and not widened: a write from another module, and a reach into another module's namespace by a name computed at run time. Commands and exits: PROGRESS.md, "Decision 0035 control pin, confirmation cf4 fix (S3-CTL r5, 2026-11-21)".
+- Update, 2026-11-21 (S3-CTL r6, after confirmation cf5): a declaring file may now hold only the imports the real tree's declaring files hold today (a frozen literal the test checks against the census), never one of its own module, and no in-place change may have a protected name, an import-bound name or any alias of one as receiver. The one residual limit is unchanged and not widened: a write from another module, and a reach into another module's runtime object by a name or alias computed at run time. Commands and exits: PROGRESS.md, "Decision 0035 control pin, confirmation cf5 fix (S3-CTL r6, 2026-11-21)".
+- Update, 2026-11-21 (S3-CTL r7, after confirmation cf6): the class of routes that run or rebind behaviour without a protected name or an import is swept and written in the guard's module docstring. Added and refused: code objects (CF6's `__code__` rewrite and the other code-object reaches), `__subclasses__` (a walk from `object` to an import loader that returns the module itself, proven to empty `TASK_UNITS`), and any module read outside the real tree's census of `module.attribute` loads (`string.Formatter().get_field`, proven to rebind `CASES`). Function attributes, class hooks, `object.__setattr__`, `compile`, `type(f)` and `__reduce_ex__` are not added; each has a test that runs it and shows the pinned value unchanged. Remaining limits, recorded and not closed: (1) the accepted residual stays unchanged: a cross-module runtime-computed alias; (2) chains through objects returned by admitted calls or from-imported names (for example an attribute of an object a census function returns) are checked only by the token list, not by a census; (3) process-level writes, for example writing the interpreter's own memory through a file handle, are outside a source walker, as `ctypes` was before it was named. Items 2 and 3 are a lead decision.
+
+## PO-S3-T26-C1 — S3-T26 A1 stays open on three guards without a guard-local assertion red (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join).
+- Every parent red of the A2 to A6 deciding tests is a setup red (PROGRESS.md, "S3-T26 closure — boxes A1 and A5", A1 table). Head reverts under L-1406 Q3 gave an assertion red for every guard except: (1) A2 closed projection of a shape (`test_closed_projection_accepts_existing_area_alternatives[polygon]`): the pass-through has no line to revert short of removing the method; (2) A4 cross-session refusal (`test_selected_shape_boundary_refuses_atomically[session]`): reverting the cookie-keyed lookup leaves the absent-seat layer refusing, so the session layer is not shown alone; (3) the A5 card metric-key binding (`test_public_card_metric_binding_keeps_existing_calculator_keys`): not reverted in this pass.
+- Needed: a ruling whether a layered guard (2) may count the absent-seat revert as its red, and a head revert for (1) and (3), before A1 is ticked.
+- A5 note: the new on-screen string `story.contextArea` (EN, AR) is flagged `pending-native-review` like its neighbours; native Arabic approval stays under OI-09; the design audit of the new line is the reviewer's gate (L-1406 Q2).
+
+## PO-S3-T26-C2 — S3-T26 A5 open: the wider context ring is not drawn (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join). RAISED BY: review S3-T26 RV1 F3; recorded by the A5 round-2 builder.
+- The rings stage directive reaches the browser as area identifiers only; the stage binds no story directive (`data-directive="none"`) and no route returns an area outline by identifier, so a distinct context ring cannot be drawn. Round 2 removed the line that claimed one (F3) and set the A5 box back to open; F1, F2, F4 and F5 are fixed (PROGRESS.md, "S3-T26 A5 round 2").
+- Needed: either a contract change that carries the context area's outline to the stage (document 08 §6.2 `make_area` outputs and the stage directive binding, a new task scope) so the ring and its identification appear together, or a ruling that the A5 phrase "any distinct wider context clearly identified" is met without an on-screen ring. Native Arabic approval of `story.chosenArea` stays under OI-09.
+
+## PO-S3-T26-C3 — S3-T26 A5 round 3: confirmation CF1 findings R2-F1 and R2-F2 (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join). RAISED BY: confirmation S3-T26 CF1; recorded by the A5 round-3 builder.
+- R2-F1: `story.chosenArea` now reads "This card is for the area you chose." and "هذه البطاقة تخص المنطقة التي اخترتها.", true of a ready and a no-data area card alike; the Arabic stays flagged `pending-native-review` and its native approval stays under OI-09. R2-F2: each area-mismatch negative case now starts from a passing control of its own family and state. Evidence: PROGRESS.md, "S3-T26 A5 round 3". A5 stays open on PO-S3-T26-C2.
+
+
+## PO-S3-T26-C4 — S3-T26 A5 round 4: the wider context ring and proposed decision 0087 (proposed, 2026-11-21)
+
+- Status: PROPOSED (the lead renumbers at the join). RAISED BY: the A5 round-4 builder, answering PO-S3-T26-C2 by its first option (a contract change).
+- Change: `make_area` gains the `{area_id}` input alternative (proposed decision 0087; document 08 section 6.2 and the S3-T26 paragraph of section 7; document 03 section 9.2). The story draws the wider area as a dashed, labelled ring only when its documented role differs from the chosen area; TASKS.md S3-T26 A5 is ticked for another maker's review. Evidence: PROGRESS.md, "S3-T26 A5 round 4".
+- Needed: the lead's review and the owner's confirmation of decision 0087 (it widens a model-callable tool's closed input surface, rule 46); the S3-T24 live two-store query inventory names the new input when that box closes. Native Arabic approval of `story.widerArea` ("الخط المتقطّع يحدّد منطقة السياق الأوسع.") stays under OI-09.
+- Observation: a named place chosen with a walk preset is registered as a session shape (round 2 behaviour), so its story has no wider area and draws no ring by role; a ruling is needed if a named-place walk should keep its pin's wider drive context.
+- Observation: `product/tests/test_mounted_browser.py` needs a built `web/dist`; on a fresh checkout it fails with a locator timeout until `npm run build` runs (seen once in this pass, then exit 0 after the build).
+## OI-374 — S3-T03 box 3: lead ruling on digits in resolver output
+
+- Status: RULED by the lead on 2026-11-21 in the package P2 brief (`.overnight/BRIEF.md`, LEAD RULING for the digits question); applied by package P2, and the reading below awaits the lead's confirmation.
+- Owner task: S3-T03 (`resolve`); S3-T25 uses the same identifier exception.
+- Ruling: register codes and classification codes (`commerce_code`, `isic_class`) and digits inside a proper name are identifiers under the existing identifier exception that S3-T25 uses. They are allowed only as strings in their named identifier fields. Any other numeral in a returned value is refused.
+- Reading applied (to confirm): the identifier fields are `key` (every candidate); `commerce_code`, `isic_class` and `place_category` (activity candidates); and `label_en` and `label_ar` of a place candidate, which hold a gazetteer proper name. An activity's labels are descriptive names, not proper names, so a numeral there refuses the whole result (`INVALID_ARGUMENT`). A numeral is any Unicode Nd, Nl or No character. The bare eight- and eleven-digit key refusal is unchanged.
+- Evidence anchor: PROGRESS.md **S3 close package P2 — FE-42 class check, numeral lexicons, resolver numerals, 2026-11-21**.
+- Next step: the lead confirms or narrows the reading (in particular `place_category`, and activity labels as non-names). If narrowed, the guard and its tests change in their own commit.
+
+## OI-375 — AI-38 lexicon scan: unit words and a fixed Arabic compound held as exemptions
+
+- Status: OPEN; ruling needed from the lead (rule 23).
+- Owner task: S3-T09 (decision 0064 item 43).
+- Evidence anchor: the first scan of the new lexicons over the string catalogues found four hits: `unit.usd_million` ("Million US dollars"), `unit.percent` ("%"), `operational.priceUnit` ("USD per thousand requests", Arabic "ألف") and the Arabic word for radius, "نصف قطر" (`draw.radius`, `draw.summary.radius`). `web/scripts/check-answer.mjs` now holds a closed `UNIT_TERMS` map. Each of the three unit keys may hold only its own term, and only the Fact chip family renders those keys (`unitLabel` and the operational meter in `FactChip.tsx`). The Arabic lexicon lists "نصف قطر" and "نصف القطر" as `!` fixed compounds. Tests prove the following still fail: the same term under another key, another term under a unit key, and a bare "نصف".
+- Next step: the lead rules whether these unit words are part of the Fact chip family under rule 23, or whether the strings must change. The native reviewer confirms the compound (OI-09).
+
+## OI-376 — AI-38 Arabic numeral lexicon: native review and matching heuristics
+
+- Status: OPEN; pending native review (OI-09, AI-86).
+- Owner task: S3-T09; reviewer: the owner's native Arabic reviewer.
+- Evidence anchor: `product/assistant/lexicons/numerals.ar.txt` version 1. The scanner matches an Arabic term after the following steps: it removes diacritics and tatweel, unifies the alef forms, accepts the proclitics و ف ب ك ل ال لل and accepts the endings ا ان ين ة ات. Two bare forms are left out because they are common words that are not numbers: "ضعف" (also "weakness") and "مرة" (also "time" or "again"). Their dual and plural forms are listed instead. Matching is a heuristic and has not been checked against a native corpus.
+- Next step: the native reviewer checks coverage against the English lexicon and checks the false-positive risk. Any change is a new lexicon version.
+
+## OI-377 — the catalogue digit check sees only Nd characters
+
+- Status: OPEN, proposed; outside package P2's frozen scope.
+- Owner task: S3-T09 / FE-40.
+- Evidence anchor: `digitsOutsidePlaceholders` in `web/scripts/check-answer.mjs` tests `\p{Nd}` only. Document 09 AI-51 asks the build-time scanner tests to cover every Unicode Nd, Nl and No character. A string catalogue entry holding "½" or "Ⅳ" passes that check today. The resolver guard of package P2 covers all three categories.
+- Next step: widen the check to `[\p{Nd}\p{Nl}\p{No}]` with a planted Nl and a planted No string. First confirm that no current string holds one.
+
+## OI-378 — AI-38 date and time lexicons and the AI-107 advice lexicon are not built
+
+- Status: OPEN, proposed; outside the decision 0064 item 43 box built by package P2.
+- Owner task: S3-T09, or the task that owns the AI-38 and AI-107 build-time scans.
+- Evidence anchor: AI-38 also names versioned date and time term lexicons, exempting only the closed situation labels. AI-107 adds a lexicon of advice and verdict wording. Neither exists in `product/assistant/lexicons/`. The scanner reads any added `.txt` file there.
+- Next step: the lead assigns them.
+
+## OI-379 — random failure: test_mounted_browser under parallel load
+
+- Status: OPEN as a recorded random failure (rule 39); cause unproved; a green re-run does not close it.
+- Owner task: the owner of `product/tests/test_mounted_browser.py` (S3-T10 / S3-T22 lineage).
+- Evidence anchor: package P2 ran the 32 product test modules that name `resolve` while `npm run test:checks` ran at the same time. The result was `1 failed, 765 passed`, and the failure was `test_built_browser_uses_mounted_http`. The same module run alone passed (exit 0). The failure detail was not kept because the batch output was filtered.
+- Next step: rerun the batch under the same parallel load with full output kept, and find the cause.
+
+## OI-380 — npm run test:checks in parallel worktrees: port collision and the absent headless shell
+
+- Status: OPEN; two environment failures are recorded under rule 39, and a green re-run does not close either.
+- Owner task: the lead's build-machine runner (S0-T05 lineage) and the owner of the look spike (`web/spikes/look/`).
+- Evidence anchor: package P2 ran `npm run test:checks` twice in this worktree while other S3 close packages ran on the same machine.
+  - Run 1: exit 1 (`1187 of 1191 pass`, 4 failed). `answer browser specs` failed because `http://127.0.0.1:41731 is already used`. `skip markers` failed on a P2 test title, which was then renamed. The two look browser suite cases failed.
+  - Run 2, after the rename: exit 1 (`1189 of 1191 pass`). Only the two look browser suite cases failed. Each fails in a few milliseconds, which is consistent with the headless shell being absent from this worktree's uncommitted `data/tools/playwright/`; that folder is off-limits to a worker (rule 13) and was not read.
+- Next step: the lead runs `npm run test:checks` on the joined head in a checkout that has the installed headless shell, with no parallel run on port 41731, and records the exit.
+## OI-374 — S3-T12 box 12: the release contract of `pub_register_company` carries no card field but the establishment nationality
+
+- Status: OPEN; decision needed from the lead and the S2-T49 owner. Number proposed by package S3-P3; the lead renumbers at the join if another package took it.
+- Owner task: S3-T12 (box 12, card), with S2-T49 (register table contract).
+- Evidence anchor: document 03 section 7.3 lists for `pub_register_company` only `registration_number`, `registered_cell`, `establishment_nationality` and `source_id`, and defers "the fields of the register's public card" to document 04; the custodian's `CARD_COLUMNS` (`custodian/src/eii_custodian/publicdata/registers/contracts.py`) write many more. The named query of a product read is checked against the section 7.3 columns, so `layer_company_points` reads only those four, and the card shows the nationality alone. The box asks for "every field the register publishes, person names excluded".
+- Next step: a contract revision (DAT-120) names the published card columns in section 7.3 (with identifier-bearing fields such as licence and tax numbers decided explicitly); then the query, the closed card-field list on both sides and the plants extend to them, and the box can be ticked on that test.
+
+## OI-375 — S3-T12 box 12: no product read of `register_company_list` for a full release
+
+- Status: OPEN; decision needed from the lead. Number proposed by package S3-P3.
+- Owner task: S3-T12 (box 12), with the owner of the protected release path (decision 0022; DAT-140).
+- Evidence anchor: the application serves `public_only` releases only (`product/src/eii_product/api/release.py` `Summary.release_kind`), so the card shows the employee count as absent with the reason `protected_not_in_public_release`, and both seals refuse any other count state. The box's "employee count from `register_company_list` only" has no code path today.
+- Next step: when a protected release can be served, add the named read of `register_company_list`, a `register_company`-slot Synthetic count fact (DAT-145), the withheld state with `CARRIED_FORWARD` and never a zero, and their plants.
+
+## OI-376 — firms-per-tower facts are not registered with the mounted release
+
+- Status: OPEN; advisory, for the S3-T17 owner. Number proposed by package S3-P3.
+- Owner task: S3-T17 (financial-centre firms per tower).
+- Evidence anchor: `fc_firms_per_tower` is served by `product/src/eii_product/api/layers.py` from the register file, not through `MountedRelease.layer`, so its facts are never placed in `mount.emitted`, and `GET /api/facts/{fact_id}/lineage` would answer 404 for them. Package S3-P3 proves a successful firms chain through that route for the register's establishment points (`test_success_chain_through_production_fact_chain_route`), from the loaded invented register; the builder-audit item may be read either way.
+- Next step: the lead rules whether the audit item is closed by the establishment-point chain, or whether the firms-per-tower facts must also resolve through the route (which needs their lineage in the release, since they come from a file outside it).
+
+## OI-377 — order-dependent: `test_catalogue_package_does_not_import_the_gateway` in a whole-suite run
+
+- Status: OPEN as a recorded failure (rule 39); a green re-run does not close it. Number proposed by package S3-P3.
+- Owner task: the owner of the typed-decision gateway boundary (rule 26), with the test-runner owner.
+- Evidence anchor: package S3-P3 ran `uv run --locked python -m pytest product/tests core/tests scripts/tests -q -p no:cacheprovider` in one process (not `./eii test`); this test failed because `eii_gateway` was already in `sys.modules`, presumably imported by an earlier `scripts/tests` module in the same process. Run alone with the touched modules it passes (exit 0). The package's files do not import the gateway.
+- Next step: decide whether the assertion should check a fresh interpreter (subprocess) rather than the shared `sys.modules`, and plant an import to prove it.
+
+## OI-378 — timing under load: `test_interrupt_kills_the_process_group`
+
+- Status: OPEN as a recorded random failure (rule 39). Number proposed by package S3-P3.
+- Owner task: the test-runner owner (`scripts/tests/test_runner_failures.py`).
+- Evidence anchor: in the same whole-suite run, with several other sessions' test runs on the machine, the inner suite gave `FAIL timeout: fx-intr: no result within 30 s` instead of `FAIL interrupted`; run alone it passes (exit 0, 0.73 s).
+- Next step: the owner checks whether the pid-file wait races the 30 s inner timeout under load; no tolerance is changed by this record.
+
+## OI-379 — S3-T12 box 12: a digit-bearing card field of a register company has no fact to bind
+
+- Status: OPEN; decision needed from the lead, with OI-374. Number proposed by package S3-P3 (review round 2); the lead renumbers at the join if another package took it.
+- Owner task: S3-T12 (box 12, card), with S2-T49 (register table contract).
+- Evidence anchor: review round 2 finding F2. Both seals now refuse a card reference that does not bind a fact (rules 7 and 23), and the Fact identity list holds no field metric for a card field of `pub_register_company` (only `register_company_point`, a source-retrieval date). The reader therefore cannot emit a bound reference: a published card value that holds a digit refuses the whole `company_points` response (`card_reference_unbound`; `test_digit_bearing_card_field_is_refused_by_the_production_read`). The one card field carried today, the establishment nationality, is a closed list, so no valid release is expected to meet this; the wider card of OI-374 (address and licence fields) would.
+- Next step: with the contract revision of OI-374, decide the field fact of a card field (a closed metric beside `fdi_field`'s pattern, bound per field with unit `published_text` and the value itself), register it with the mount, and replace the whole-response refusal by bound references, with their plants.
+## PO-S3-P4-1 — S3-T03 A7: the ask-bar half needs a split decision record
+
+- Status: PROPOSED, unnumbered for the lead's ledger; no task approval or gate closure is claimed.
+- Owner task: S8-T16 holds the ask-bar half of the decision 0023 item A7 criterion; the S3-T03 A7 box stays unticked.
+- Evidence anchor: `.overnight/IN/PLAN-S3-close.md` §3 package P4 and §4 row for S3-T03 A7; package P4 built only the picker half, decided by `web/tests/component/resolve-picker.test.tsx`.
+- Next step: splitting the A7 criterion — picker half in S3-T03, ask-bar half in S8-T16 — needs a decision record under rule 46 before either half ticks the box.
+- The new string `draw.addressResult` joins OI-09's pending native review; it is marked `pending-native-review` in `web/src/i18n/ar.json`.
 - PO-S2-P38-01 — **PROPOSED OPEN ITEM** (2026-11-21), S2-P38. LIVE-S2.r16 stopped on `trade_ext/qatar-imports-2014-2018` with period_form/NO_DATA (`.overnight/IN/live-fail.txt`). The lead's supplied portal probe (`.overnight/IN/lead-probe.txt`, 2026-11-21) evidences four-digit text in the export, distinct from the grouped-record date rendering. The local correction pins year_text and 2014..2018, preserves both 644486 count bounds and all other source fields, and has streamed red/green and old-date/other-form refusal proof (PROGRESS.md, S2-P38; `.overnight/RETURN.md`). NEEDED: independent maker review and the lead's resumed live intake before claiming this live failure resolved; no source fetch was run by this worker. Also retain the required full-suite failure in `custodian/tests/test_build_resume.py::test_reuse_log_survives_later_terms_exception` (1 failed, 2136 passed, seed 380022, exit 1). The same test fails on the exact starting HEAD archive (exit 1); it expects a failed build after a terms exception but receives failure=None. It predates this period correction and needs a separate lead disposition; no green rerun, skip, weakened assertion or unrelated fix closes it here. No acceptance box is ticked.
 
 - UPDATE (2026-11-21, S2-T14 keyless build), OI-103: `custodian/tests/test_night_lights.py::test_night_absent_key_build_succeeds` now shows a keyless build-public run exit 0 with one OMIT line, no ntl_blackmarble request, no grids and the OMIT in the build log, using the existing `Production.fetch_archive` seam; three plants red. Pending independent review; the two older no-key tests keep exit 1 and are unchanged.
@@ -6283,6 +6849,8 @@ A second reader of another maker (SpaceXAI Grok 4.7, read-only) checked the same
 - 2026-11-21 S2-GW — PO-S2-129: stays OPEN for its retained readiness-margin follow-up (its assertion part remains closed by decision 0073 item 3). Carried by decision 0085 item 2 with S2-T44 criterion 1 to the same backlog row; outside S2-T10's criteria 3 and 4 under that task's exclusion line.
 - 2026-11-21 S2-GW — OI-360: stays OPEN. Carried by decision 0085 item 3 with the tenders own run of decision 0084: it is settled on that run's evidence before the S7-T09 start check of decision 0084 item 6, never by a green run alone. Its NEEDED text is unchanged.
 - No other item is carried by decision 0085. These lines close nothing and rewrite no earlier line.
+- PO-S3-P1A-1 — **PROPOSED OPEN ITEM** (2026-11-22), S3-P1a round 3. `web/scripts/tests/photoreal-assets.node-test.mjs` keeps one non-literal `import()` whose argument is the template `data:text/javascript,${encodeURIComponent(changed)}`; the scripts builtin-import guard names that file and that form as a narrow exception with reason that the transformed worker source runs as a data URL, and every other non-literal `import()` or `require()`, including `import(new URL(...))`, is refused with `non-literal-module-load`. The test was not moved: `from '../photoreal-assets.mjs'` does not resolve from `web/tests/node/` unchanged. NEEDED: the lead's disposition — move it with a path edit, or keep the named exception.
+- PO-S3-P1A-2 — **PROPOSED OPEN ITEM** (2026-11-22), confirmation CF10 of S3-J1 (Anthropic Claude Opus 5.5), finding N1. `tokenize` in `web/scripts/import-tokenizer.mjs` has no branch for regex literals (older than S3-P1a, since S0-T03): a regex literal holding a backtick or a quote desynchronises it, and no `import`, `require` or `from` after it in the file is checked. Affected: `web/scripts/tests/photoreal-assets.node-test.mjs` from about line 185 and `web/scripts/photoreal-assets.mjs` from about line 97. Three escaping plants exit 0: `import leftPad from 'left-pad';` appended to the photoreal test; a non-literal `import(new URL(...))` appended to the same test; the same call appended to `web/scripts/photoreal-assets.mjs`. So PO-S3-P1A-1's sentence "every other non-literal import() or require() ... is refused" does not hold for these two files. NEEDED: follow-up task S3-J2 teaches `tokenize` regex literals (a `/` starts a regex when the previous significant token is not a word, a number, `)` or `]`, or is a keyword such as `return`, `typeof` or `case`), with a planted case (a regex holding a backtick, then `import x from 'left-pad'`, must give `non-node-import`) and a guard assertion that no token of a real `web/scripts` file runs past its own line unless it is a template; and PO-S3-P1A-1 gains "one occurrence per file" (CF10 N2), optionally pinned by a count of 1 with a negative case. NEEDED BY: the S3 gate.
 
 ## PO-S2-P40 — Tender binding requires live terms proof and decision review
 
@@ -6470,6 +7038,18 @@ Random failure, recorded under rule 39. The hosted "Run all tests" job of 2026-1
 - PO-S2-19-05 — OPEN, 2026-11-22 (S2-RDP H1): ten place keys of the flagship and showcase lists stay null because no single normalised name match exists in the receipted cache. An alias list is needed to fill them, and none is invented.
 - PO-S2-19-06 — RECORDED, 2026-11-22 (slice S3 environment): the browser suite of `web/` fails on the round-8 control head and on the S3 base in the same way ("Playwright Test did not expect test() to be called here"), so it is not introduced by S3-J2 or S3-P09.
 - PO-S2-19-07 — RECORDED, 2026-11-22 (slice S5 stack): 13 tests fail on the local S5 base `6da11f9e` (`test_release_registry` 4, `test_employment_swap` 9). They fail the same way before and after S5-T06, so they belong to the S5 stack, not to that task.
+
+## S3-P02 Part A — verification and independent review (2026-11-22)
+
+- PO-S3-P02A-1 — **PROPOSED OPEN ITEM**. The required full scripts discovery reported absent `web.dist.document`/`web.dist.accessible` and unavailable offline psycopg-binary/pyvalhalla wheels. No source-host access, download, skipped test or weaker assertion is authorised by this worker brief. NEEDED: the lead supplies the existing pinned local build/cache prerequisites and obtains green whole-command evidence on the reviewed artifact. See PROGRESS.md **S3-T11 early round S3-P02 Part A — local implementation candidate** and the worker return. This is not classified as a verified baseline defect.
+- PO-S3-P02A-2 — **PROPOSED OPEN ITEM**. The first full discovery hit `process_identity_mismatch` in `test_f4_native_foreign_pid_and_owned_entry_shutdown`. NEEDED: the lead investigates the original failure and records its cause; a green rerun alone does not close it (rule 39). No process identity predicate, wait bound or test was weakened.
+- PO-S3-P02A-3 — **PROPOSED OPEN ITEM**. Different-maker implementation review is pending for this early S3-T11 round. NEEDED: review the exact bundle commits, all Part-A D rows, reason vocabulary, admission-oriented guard removals, exit-8 contract, and the unresolved full-discovery evidence. Parts B/C and the final S3-T11 follow-up remain outside this delivery.
+
+S3-P02A follow-up evidence: final full discovery ran 1,303 tests and exited 1 with 15 failures, limited to absent built web surfaces and missing pinned offline installation artifacts. The final native process tests passed; the earlier failures in `test_f4_native_foreign_pid_and_owned_entry_shutdown` and the two `test_n6_*pid*` ownership checks remain unexplained. PO-S3-P02A-1, PO-S3-P02A-2 and PO-S3-P02A-3 remain open; a green rerun alone does not close the native failures. No ownership predicate, test size or timing limit was changed.
+
+## S3-P02 Part A round two — outside-scope exception-output inventory
+
+- PO-S3-P02A-R2-1 — **PROPOSED OPEN ITEM**. A structural scan of tracked Python files found 224 direct caught-name output matches outside the Part-A modules, across 102 files; no Part-A match remained. These include raw exception formatting, exception chaining, class-name diagnostics and explicit rethrows; they are candidates for review, not 224 confirmed disclosures. No outside module was changed. NEEDED: the lead assigns the applicable owners to verify each sink under BE-91/BE-95; the complete per-file/function inventory is in the round-two return and `.overnight/evidence/tree-leaks.json`. The Part-A `check(ROOT)` is empty. Existing Part-B/C ownership and PO-S3-P02A-1 through PO-S3-P02A-3 remain unchanged.
 
 ## S2-CI — hosted tests as parallel suites (2026-11-22)
 
@@ -6857,3 +7437,12 @@ introduced.
 - NEEDED: the lead appends the counted number as a dated note to the decision record's notes heading, if it has one, in the same train.
 - NEEDED BY: train S2-27.
 - 2026-11-24, lead: S2-P78.rv1 counted 27 module files in the loaded-module digest of the seeded path, among them `review/graph.py`, `singles/families.py` and `gis/layers.py`, which decision 0081 lists as unbound. Decision 0081 has no notes heading, so the record is not edited here (an approved decision is amended only by a new record, rule 46); this item stays open for a dated amendment record of the count.
+
+
+## S3-1 move two — uncommitted merge handoff (2026-11-24)
+
+- PO-S3-1-M2-01 — **OPEN, merge metadata handoff.** The original linked-worktree Git metadata is read-only outside the worker workspace. The requested merge exited 128 before entering merge state. Resolved working files and the complete local index/merge state are prepared under `.overnight/tmp/merge.git`, with train HEAD `98d81c36cd50990e2375aeb4861f9ad7d6523d69` and MERGE_HEAD `1dba941bcfcdc742af5e737953aa2cc34c0f0796`. NEEDED: the lead adopts that state in writable metadata before committing; an ordinary commit against the original metadata would omit the incoming main parent. No worker commit or push was made.
+- PO-S3-1-M2-02 — **OPEN, unchanged-control projection integration.** The retained decision-0035 control test expects twelve CI plant cases while main's merged declaration has seventeen; a direct projection comparison also differs at `gates.section_5[2].evidence`, `gates.assertions.TST-198`, `gates.assertions.TST-196` and the CI case sequence. The initial focused command reports seventeen control-test failures. NEEDED: the lead reviews the source changes and assigns the exact forced integration under rule 33; no control fixture, baseline, cardinality, requirement, attack or tolerance was refreshed or weakened by this worker. See `.overnight/tmp/control-differences.log` and the final return for command results. No baseline-defect classification is claimed.
+- PO-S3-1-M2-03 — **OPEN, built audience surfaces absent.** The retained real-tree audience check reports `coverage web.dist.document: surface-absent` and `coverage web.dist.accessible: surface-absent`. NEEDED: the lead supplies the existing pinned local build prerequisites and verifies the built surfaces; no audience coverage requirement or scanner was relaxed, and no network install was made. This is observed workspace evidence, not a verified baseline defect.
+
+- PO-S3-1-M2-04 — **OPEN, clean-environment offline prerequisites.** The required full unittest discovery exited 1 after 1502 tests with sixteen failure reports: four audience-surface reports (including two subtests), one stale workflow-helper failure subsequently repaired, and eleven clean-environment reports. The clean fixture's offline wheel cache lacks `pyvalhalla==3.9.1`; package and FastAPI import controls and installed-package inventory checks then fail. NEEDED: the lead supplies the existing pinned offline wheel/build prerequisites and reruns the retained whole discovery on the final merge; no package requirement, fixture assertion or offline policy was loosened. See `.overnight/tmp/discovery.log` and `.overnight/RETURN.md`. No baseline-defect classification is claimed, and no random process-identity failure occurred in this run.

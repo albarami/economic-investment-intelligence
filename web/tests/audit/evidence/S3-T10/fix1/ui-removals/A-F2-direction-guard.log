@@ -1,0 +1,29 @@
+
+Running 1 test using 1 worker
+
+(node:365368) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+attribution contrast [{"selector":".stage-credits","foreground":"rgb(230, 234, 235)","background":"rgb(43, 55, 71)","ratio":9.960669285697975}]
+  ✘  1 [chromium] › tests/audit/opening.spec.ts:24:7 › opening audit 1440x900 ar dark (3.7s)
+
+
+  1) [chromium] › tests/audit/opening.spec.ts:24:7 › opening audit 1440x900 ar dark ────────────────
+
+    Error: expect(received).toContain(expected) // indexOf
+
+    Expected value: "wrong-caveat-direction"
+    Received array: []
+
+      150 |         if (lang === 'ar') {
+      151 |           await caveat.evaluate((node) => node.setAttribute('dir', 'ltr'));
+    > 152 |           expect(await openingProblems(page)).toContain(
+          |                                               ^
+      153 |             'wrong-caveat-direction',
+      154 |           );
+      155 |           await caveat.evaluate((node) => node.removeAttribute('dir'));
+        at [workspace]/.overnight[local-path]
+
+    Error Context: ../.overnight[local-path]
+
+  1 failed
+    [chromium] › tests/audit/opening.spec.ts:24:7 › opening audit 1440x900 ar dark ─────────────────

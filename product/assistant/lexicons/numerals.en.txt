@@ -1,0 +1,119 @@
+# AI-38 numeral lexicon, English. Version 1, 2026-11-21.
+# One term per line; a line that starts with # is a comment.
+# Scanned by web/scripts/check-answer.mjs as whole words in en.json and ar.json (FE-40).
+# Groups: cardinals, ordinals through nineteenth with the tens, hundred and thousand forms,
+# fractions, multiplicatives (with first, once and thrice) and percentage terms.
+# cardinals
+zero
+one
+two
+three
+four
+five
+six
+seven
+eight
+nine
+ten
+eleven
+twelve
+thirteen
+fourteen
+fifteen
+sixteen
+seventeen
+eighteen
+nineteen
+twenty
+thirty
+forty
+fifty
+sixty
+seventy
+eighty
+ninety
+hundred
+hundreds
+thousand
+thousands
+million
+millions
+billion
+billions
+trillion
+trillions
+dozen
+dozens
+# ordinals
+first
+second
+third
+fourth
+fifth
+sixth
+seventh
+eighth
+ninth
+tenth
+eleventh
+twelfth
+thirteenth
+fourteenth
+fifteenth
+sixteenth
+seventeenth
+eighteenth
+nineteenth
+twentieth
+thirtieth
+fortieth
+fiftieth
+sixtieth
+seventieth
+eightieth
+ninetieth
+hundredth
+thousandth
+millionth
+billionth
+# fractions
+half
+halves
+thirds
+quarter
+quarters
+fourths
+fifths
+sixths
+sevenths
+eighths
+ninths
+tenths
+hundredths
+thousandths
+# multiplicatives
+once
+twice
+thrice
+double
+doubled
+triple
+tripled
+quadruple
+twofold
+threefold
+fourfold
+fivefold
+tenfold
+hundredfold
+# percentage terms
+percent
+per cent
+percentage
+percentages
+percentile
+percentiles
+pct
+per mille
+permille
+%

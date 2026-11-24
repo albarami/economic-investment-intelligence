@@ -1,0 +1,140 @@
+version: 1
+fragments:
+  - fragment_key: foundation_headline
+    kind: headline
+    template_en: "What the area shows"
+    template_ar: "ما تظهره المنطقة"
+  - fragment_key: foundation_decision
+    kind: decision
+    lead_en: "The figures are the ones the tools returned."
+    lead_ar: "الأرقام هي التي أعادتها الأدوات"
+    cheapest_test_en: "Read the source chain of each figure."
+    cheapest_test_ar: "اقرأ سلسلة المصدر لكل قيمة"
+  - fragment_key: night_lights
+    kind: headline
+    template_en: "Night-time radiance"
+    template_ar: "الإشعاع الضوئي الليلي"
+  - fragment_key: venue_busyness
+    kind: headline
+    template_en: "BestTime relative busyness"
+    template_ar: "مؤشر الانشغال النسبي من BestTime"
+  - fragment_key: population_age_sex
+    kind: headline
+    template_en: "Population by age and sex"
+    template_ar: "السكان حسب العمر والجنس"
+  - fragment_key: night_lights_not_activity
+    kind: headline
+    template_en: "NASA Black Marble. Night-time light is not a measure of business activity."
+    template_ar: "الضوء الليلي من NASA Black Marble ليس مقياسًا للنشاط التجاري."
+  - fragment_key: relative_busyness_not_people
+    kind: headline
+    template_en: "An index relative to this venue's own busier times; not a count of people or a comparison between venues."
+    template_ar: "مؤشر نسبي لأوقات الانشغال في هذا المكان نفسه؛ ليس عددا للأشخاص ولا مقارنة بين الأماكن."
+  - fragment_key: grid_cells_summed
+    kind: headline
+    template_en: "WorldPop modelled estimates. Whole cells whose centres lie inside the area are summed, including boundary centres. No cell is split. Display only."
+    template_ar: "تقديرات نمذجة من WorldPop. تجمع الخلايا الكاملة التي تقع مراكزها داخل المنطقة، بما فيها المراكز على الحدود، دون تقسيم أي خلية. للعرض فقط."
+  - fragment_key: context_no_data
+    kind: headline
+    template_en: "No figure is available for this selection."
+    template_ar: "لا تتوفر قيمة لهذا الاختيار."
+  - fragment_key: context_no_forecast
+    kind: headline
+    template_en: "The provider publishes no figure for this venue."
+    template_ar: "لا ينشر المزود قيمة لهذا المكان."
+  - fragment_key: context_retrieved
+    kind: headline
+    template_en: "Retrieved"
+    template_ar: "تاريخ الاسترجاع"
+  - fragment_key: context_updated
+    kind: headline
+    template_en: "Provider update"
+    template_ar: "تحديث المزود"
+  - fragment_key: context_update_not_stated
+    kind: headline
+    template_en: "Update date not stated"
+    template_ar: "تاريخ التحديث غير مذكور"
+  - fragment_key: context_source
+    kind: headline
+    template_en: "Source chain and attribution"
+    template_ar: "سلسلة المصدر والإسناد"
+  - fragment_key: context_level_answer
+    kind: headline
+    template_en: "Answer"
+    template_ar: "الإجابة"
+  - fragment_key: context_level_comparison
+    kind: headline
+    template_en: "Comparison"
+    template_ar: "المقارنة"
+  - fragment_key: context_level_evidence
+    kind: headline
+    template_en: "Evidence and method"
+    template_ar: "الأدلة والمنهج"
+  - fragment_key: context_compare_night_lights
+    kind: headline
+    template_en: "No benchmark is available for this figure in this release."
+    template_ar: "لا يتوفر معيار مرجعي لهذه القيمة في هذا الإصدار."
+  - fragment_key: context_compare_venue_busyness
+    kind: headline
+    template_en: "This relative index is not a level to compare between venues."
+    template_ar: "هذا المؤشر النسبي ليس مستوى للمقارنة بين الأماكن."
+  - fragment_key: context_compare_population_age_sex
+    kind: headline
+    template_en: "This figure is display only and is not used for comparison."
+    template_ar: "هذه القيمة للعرض فقط ولا تستخدم للمقارنة."
+  - fragment_key: context_withheld_reason
+    kind: headline
+    template_en: "This figure is withheld under the release's disclosure rules."
+    template_ar: "حجبت هذه القيمة بموجب قواعد الإفصاح في الإصدار."
+  - fragment_key: context_all_ages
+    kind: headline
+    template_en: "All age bands"
+    template_ar: "جميع الفئات العمرية"
+  - fragment_key: context_age_band
+    kind: headline
+    template_en: "Source age category"
+    template_ar: "الفئة العمرية في المصدر"
+  - fragment_key: context_female
+    kind: headline
+    template_en: "Female"
+    template_ar: "إناث"
+  - fragment_key: context_male
+    kind: headline
+    template_en: "Male"
+    template_ar: "ذكور"
+  - fragment_key: context_none
+    kind: headline
+    template_en: "Both sexes"
+    template_ar: "كلا الجنسين"
+  - fragment_key: context_monday
+    kind: headline
+    template_en: "Monday"
+    template_ar: "الاثنين"
+  - fragment_key: context_tuesday
+    kind: headline
+    template_en: "Tuesday"
+    template_ar: "الثلاثاء"
+  - fragment_key: context_wednesday
+    kind: headline
+    template_en: "Wednesday"
+    template_ar: "الأربعاء"
+  - fragment_key: context_thursday
+    kind: headline
+    template_en: "Thursday"
+    template_ar: "الخميس"
+  - fragment_key: context_friday
+    kind: headline
+    template_en: "Friday"
+    template_ar: "الجمعة"
+  - fragment_key: context_saturday
+    kind: headline
+    template_en: "Saturday"
+    template_ar: "السبت"
+  - fragment_key: context_sunday
+    kind: headline
+    template_en: "Sunday"
+    template_ar: "الأحد"
+  - fragment_key: opening_electricity_unavailable
+    kind: headline
+    template_en: "The electricity figure for the opening screen is unavailable in this release."
+    template_ar: "مؤشر الكهرباء في شاشة البداية غير متاح في هذا الإصدار."

@@ -340,6 +340,20 @@ Decision 0035 removes the class word and origin underline from this sketch. Its 
 | DES-77 | Chrome carries no visible numerals: the story stepper shows dots and the scene title, the dial shows situation names, and counts of steps or attempts are not displayed. The one exception is the time controls: the hour labels of the Hour control, the month labels of the Month selector and a retrieval date in a source line are `reference` chips, formatted as DES-30 sets, with the month always a word. Digits that belong to an identifier or a code (a release identifier, a brief identifier, a rules version, an activity or classification code) are rendered by the `reference` variant, which carries no provenance line. Labels drawn inside the map canvas follow the basemap-label rule of [10_FRONTEND.md](10_FRONTEND.md). That document's section "5. The Fact chip rule" includes codes, rules versions, time-control labels and retrieval dates in the `reference` variant. |
 | DES-169 | A chip of a figure from the portal datasets added by [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), of an official Public split, of an announced investment project, of the population by age and sex (its year), of night-time radiance (its month) or of relative busyness (the month of its retrieval date) shows its reference year or month without a class word (decision 0035) on every variant and size, `inline` and `compact` included, because the age of these figures varies from one dataset to the next. The card or list that holds them names the source and its geography under its title and gives the retrieval date in its footer source line (DES-82). |
 
+The `operational` form, authorised by lead ruling L-1020 for S3-T16 part P,
+adds one typed member to the Fact chip family for the live photoreal spend
+meter. It takes only the closed server meter, never a release fact identifier
+or free text, and uses the family's formatters and bidi isolation for requests,
+request limit, exact USD spend and `SPEND_CEILING_USD`. Its open explanation
+identifies operational state, the project's request journal, `Budget.meter`
+and its server version, the named price setting and its recorded default read
+date; an unrecorded pricing page says "To record". No release lineage or
+publisher licence is claimed for the count. The server warning is shown as
+words, without browser arithmetic or a polling request; null is withheld with
+its reason, never zero. English and Arabic use closed keys, with Arabic pending
+native review. This is the operational exception to the release-only wording
+of DES-71, DES-74, DES-75 and DES-77; release-fact forms keep their contracts.
+
 ### 9.3 Standing marks withdrawn by decision 0035; seat badge retained
 
 | ID | Requirement |
@@ -519,6 +533,7 @@ The English source text of the caveat keys of [09_AI_ASSISTANT.md](09_AI_ASSISTA
 | `deal_count_shown` | "A median of the recorded deals, shown with their count. Where deals are few, the median moves with each deal." (item A8) |
 | `register_dates_as_published` | "Counted from the registration and cancellation dates as the register publishes them. A register date may differ from the day a business opened or closed its doors." (item 12; DES-172; dates route only) |
 | `register_snapshots_between` | "Companies newly present or no longer present between the named snapshots. Not a claim that a registration or cancellation date falls in the month." (item 12; DAT-164, card C22; DES-172) |
+| `zone_without_district` | "These firms sit in a zone the boundary source lists with no district. They are not drawn on a tower, and no neighbouring district stands in." |
 
 | ID | Requirement |
 |---|---|

@@ -1,0 +1,7 @@
+{
+  "header": "This fixture is invented. It names no real place, no real business and no real public dataset.",
+  "edges": ["-0.09375", "-0.03125", "0.03125", "0.09375"],
+  "gap": [2, 2],
+  "hole_in": "SYN-M6",
+  "multipolygon": "SYN-M0"
+}

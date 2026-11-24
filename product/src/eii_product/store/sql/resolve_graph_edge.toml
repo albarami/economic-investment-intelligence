@@ -1,0 +1,24 @@
+[[tables]]
+name = "graph_edge"
+anchor = "docs/03_DATA_CONTRACTS.md section \"## 10. The economic graph\" row graph_edge"
+key = ["edge_id"]
+
+[[tables.columns]]
+name = "edge_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "edge_type"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "from_node_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "to_node_id"
+type = "string"
+nullable = false

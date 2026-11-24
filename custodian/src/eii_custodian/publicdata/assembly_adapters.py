@@ -185,6 +185,17 @@ class Production:
                 "method_version": "1",
                 "source_chain": chain,
                 **value,
+                **(
+                    {
+                        "table_sources": {
+                            name: sorted(keys)
+                            for name, keys in self.table_sources.items()
+                            if name in value["tables"]
+                        }
+                    }
+                    if "tables" in value
+                    else {}
+                ),
             },
         )
         self.files.update(result)

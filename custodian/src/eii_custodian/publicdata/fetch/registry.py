@@ -41,6 +41,23 @@ KINDS = frozenset(
         "company_web",
     }
 )
+# Release admission is closed independently of the fetch registry's kinds.
+PUBLIC_RECEIPT_KINDS = frozenset(
+    {
+        "awards_intake",
+        "besttime",
+        "comtrade_api",
+        "https_file",
+        "paged_cards",
+        "paged_layer",
+        "portal_dataset",
+        "public_dataset",
+        "public_document",
+        "public_page",
+        "reviewed_config",
+        "terms_page",
+    }
+)
 # S2-T08 part B, mismatch class 4: the only row whose export wraps its polygon
 # in a GeoJSON Feature (live shape pack of 2026-11-18, Mismatches item 4).
 FEATURE_POLYGON_SOURCES = frozenset({"bnd_muni_2025"})

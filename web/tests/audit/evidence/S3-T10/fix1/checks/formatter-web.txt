@@ -1,0 +1,17 @@
+src/app/MountedPublicShell.tsx 68ms (unchanged)
+src/journeys/PublicStory.tsx 11ms
+src/cards/PublicContextCard.tsx 33ms
+src/styles/answer.css 67ms (unchanged)
+src/i18n/en.json 11ms (unchanged)
+src/i18n/ar.json 8ms (unchanged)
+tests/unit/public-opening.test.ts 23ms
+tests/unit/opening-area.test.ts 6ms
+tests/unit/opening-copy.test.ts 2ms
+tests/unit/opening-fixture.test.ts 2ms
+tests/component/opening-reset.test.tsx 8ms
+tests/component/mounted-opening-review.test.tsx 12ms
+tests/component/context-deck.test.tsx 4ms (unchanged)
+tests/e2e/opening-fixture.ts 5ms (unchanged)
+tests/e2e/no-provider-attempts.ts 1ms (unchanged)
+tests/audit/opening-audit.ts 13ms
+tests/audit/opening.spec.ts 11ms

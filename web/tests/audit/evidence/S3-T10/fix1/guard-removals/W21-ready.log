@@ -1,0 +1,136 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/component/opening-reset.test.tsx (3 tests | 1 failed) 125ms
+   × the quiet opening withholds the selected overlay until the area scene 41ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/component/opening-reset.test.tsx > the quiet opening withholds the selected overlay until the area scene
+AssertionError: expected <details …(2)>…(2)</details> to be null
+
+- Expected:
+null
+
++ Received:
+<details
+  class="layer-inspector"
+  dir="ltr"
+>
+  <summary>
+    Map evidence
+  </summary>
+  <div
+    class="layer-plate"
+    data-labels="shown"
+    data-part="public-layers"
+    dir="ltr"
+    lang="en"
+  >
+    <p
+      data-part="boundaries"
+    >
+      Official boundaries are not available
+    </p>
+    <ul
+      data-part="line-samples"
+    >
+      <li
+        class="layer-sample"
+        data-colour="var(--eii-map-boundary)"
+        data-pattern="hatch-lock"
+      >
+        <span
+          class="mark"
+          data-mark="withheld"
+          data-shape="lock"
+        >
+          <svg
+            aria-hidden="true"
+            class="mark-glyph"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M8 11 V8 a4 4 0 0 1 8 0 V11 H8 Z M6 11 H18 V21 H6 Z"
+            />
+          </svg>
+          <span
+            class="mark-word"
+          >
+            Suppressed
+          </span>
+        </span>
+      </li>
+    </ul>
+    <p
+      data-note="listings"
+    >
+      Open listings are incomplete
+    </p>
+    <p
+      data-credit="public_places"
+      data-retrieved="2024-03-14"
+      data-source="src_places"
+    >
+      <bdi>
+        Sample overture credit
+      </bdi>
+      <span
+        data-credit-field="source-publisher"
+      >
+        <bdi>
+          Sample Publisher
+        </bdi>
+      </span>
+      <span
+        class="chip"
+        data-fact-chip="reference"
+        data-kind="calendar_date"
+        data-record="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+        data-state="ready"
+      >
+        <bdi
+          class="chip-num"
+          dir="auto"
+          lang="en"
+        >
+          March 14, 2024
+        </bdi>
+      </span>
+    </p>
+    <button
+      aria-label="Listed item"
+      data-feature="feat_place_aleph"
+      type="button"
+    >
+      <bdi>
+        Listed item
+      </bdi>
+    </button>
+    <button
+      data-action="source-chain"
+      data-layer="public_places"
+      data-scope="layer"
+      type="button"
+    >
+      Open the source chain
+    </button>
+  </div>
+</details>
+
+ ❯ tests/component/opening-reset.test.tsx:68:60
+     66|   );
+     67|   expect(overlay).not.toHaveBeenCalled();
+     68|   expect(view.container.querySelector('.layer-inspector')).toBeNull();
+       |                                                            ^
+     69|   expect(
+     70|     view.container.querySelector('[data-action="source-chain"]'),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  12:10:38
+   Duration  609ms (environment 41%, tests 22%, transform 21%, import 15%)
+

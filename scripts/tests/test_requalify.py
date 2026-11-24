@@ -550,7 +550,7 @@ class PinRulingTest(unittest.TestCase):
         self.assertEqual(pins["confirm_at"], "slice S1")
         for row in pins["component"]:
             if row["name"] in ("pmtiles", "@protomaps/basemaps"):
-                self.assertEqual(row["first_use"], "slice S3")
+                self.assertEqual(row["first_use"], "S3-T09")
             if row["name"] == "typed-decision-provider":
                 self.assertEqual(row["state"], "recorded")
 

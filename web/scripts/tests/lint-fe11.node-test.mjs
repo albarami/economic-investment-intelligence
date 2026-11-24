@@ -91,7 +91,7 @@ function makeCopy() {
   for (const name of JUDGED_TOP_FILES) {
     fs.copyFileSync(path.join(WEB, name), path.join(copy, name));
   }
-  for (const dir of ['src', 'scripts']) {
+  for (const dir of ['src', 'scripts', 'eslint-rules']) {
     fs.cpSync(path.join(WEB, dir), path.join(copy, dir), { recursive: true });
   }
   fs.symlinkSync(

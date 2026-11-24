@@ -1,0 +1,171 @@
+/*
+ * Tokens copied from the merged look. Values are unchanged.
+ * Photoreal mark colours and unused fly and skyline tokens are omitted.
+ */
+:root {
+  --eii-space-1: 4px;
+  --eii-space-2: 8px;
+  --eii-space-3: 12px;
+  --eii-space-4: 16px;
+  --eii-space-5: 24px;
+  --eii-space-6: 32px;
+  --eii-space-7: 48px;
+  --eii-space-8: 64px;
+  --eii-radius-s: 6px;
+  --eii-radius-m: 12px;
+  --eii-radius-l: 20px;
+  --eii-dur-base: 250ms;
+  --eii-dur-slow: 400ms;
+  /* DES-59 scene transition. */
+  --eii-dur-scene: 800ms;
+  --eii-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --eii-brief-width: 706px;
+  --eii-target-min: 44px;
+  --eii-button-height: 56px;
+  --eii-focus-ring: 4px;
+  --eii-focus-offset: 4px;
+  --eii-edge: 1px;
+  --eii-thread: 2px;
+  --eii-z-overlay: 1;
+  --eii-z-tools: 2;
+  --eii-z-drawer: 3;
+  --eii-font-latin: 'IBM Plex Sans', 'IBM Plex Sans Arabic', sans-serif;
+  --eii-font-arabic: 'IBM Plex Sans Arabic', 'IBM Plex Sans', sans-serif;
+}
+
+:root,
+:lang(en) {
+  --eii-type-display: 600 72px/80px var(--eii-font-latin);
+  --eii-type-title: 600 40px/48px var(--eii-font-latin);
+  --eii-type-body: 400 32px/44px var(--eii-font-latin);
+  --eii-type-label: 500 28px/36px var(--eii-font-latin);
+  --eii-type-caption: 400 28px/36px var(--eii-font-latin);
+  --eii-num-hero: 500 120px/120px var(--eii-font-latin);
+  --eii-num-large: 600 64px/68px var(--eii-font-latin);
+  --eii-num-standard: 600 40px/48px var(--eii-font-latin);
+  --eii-num-compact: 500 28px/36px var(--eii-font-latin);
+  --eii-type-tracking: 0;
+}
+
+:lang(ar) {
+  --eii-type-display: 600 81px/130px var(--eii-font-arabic);
+  --eii-type-title: 600 45px/72px var(--eii-font-arabic);
+  --eii-type-body: 400 36px/58px var(--eii-font-arabic);
+  --eii-type-label: 500 31px/50px var(--eii-font-arabic);
+  --eii-type-caption: 400 31px/50px var(--eii-font-arabic);
+  --eii-type-tracking: 0;
+}
+
+/* Laptop sizes, document 11 section 5.1, for 1200–1599 px (DES-01). Brief 448 px at 1440, section 6. */
+@media (max-width: 1599px) {
+  :root,
+  :lang(en) {
+    --eii-type-display: 600 40px/48px var(--eii-font-latin);
+    --eii-type-title: 600 22px/28px var(--eii-font-latin);
+    --eii-type-body: 400 16px/24px var(--eii-font-latin);
+    --eii-type-label: 500 14px/20px var(--eii-font-latin);
+    --eii-type-caption: 400 14px/20px var(--eii-font-latin);
+    --eii-num-hero: 500 64px/64px var(--eii-font-latin);
+    --eii-num-large: 600 36px/40px var(--eii-font-latin);
+    --eii-num-standard: 600 22px/28px var(--eii-font-latin);
+    --eii-brief-width: 448px;
+    --eii-focus-ring: 3px;
+    --eii-focus-offset: 3px;
+  }
+
+  :lang(ar) {
+    --eii-type-display: 600 45px/72px var(--eii-font-arabic);
+    --eii-type-title: 600 25px/40px var(--eii-font-arabic);
+    --eii-type-body: 400 18px/29px var(--eii-font-arabic);
+    --eii-type-label: 500 16px/26px var(--eii-font-arabic);
+    --eii-type-caption: 400 16px/26px var(--eii-font-arabic);
+  }
+}
+
+/* A window 1600 px or wider outside presenter mode keeps the wall column and the laptop sizes (DES-01). */
+@media (min-width: 1600px) {
+  :root,
+  :lang(en) {
+    --eii-type-display: 600 40px/48px var(--eii-font-latin);
+    --eii-type-title: 600 22px/28px var(--eii-font-latin);
+    --eii-type-body: 400 16px/24px var(--eii-font-latin);
+    --eii-type-label: 500 14px/20px var(--eii-font-latin);
+    --eii-type-caption: 400 14px/20px var(--eii-font-latin);
+    --eii-num-hero: 500 64px/64px var(--eii-font-latin);
+    --eii-num-large: 600 36px/40px var(--eii-font-latin);
+    --eii-num-standard: 600 22px/28px var(--eii-font-latin);
+    --eii-focus-ring: 3px;
+    --eii-focus-offset: 3px;
+  }
+
+  :lang(ar) {
+    --eii-type-display: 600 45px/72px var(--eii-font-arabic);
+    --eii-type-title: 600 25px/40px var(--eii-font-arabic);
+    --eii-type-body: 400 18px/29px var(--eii-font-arabic);
+    --eii-type-label: 500 16px/26px var(--eii-font-arabic);
+    --eii-type-caption: 400 16px/26px var(--eii-font-arabic);
+  }
+}
+
+/* Tablet sizes, section 5.1, for 768–1199 px (DES-01). The 1199 cut stays. */
+@media (max-width: 1199px) {
+  :root,
+  :lang(en) {
+    --eii-type-display: 600 32px/40px var(--eii-font-latin);
+    --eii-type-title: 600 20px/28px var(--eii-font-latin);
+    --eii-type-body: 400 16px/24px var(--eii-font-latin);
+    --eii-type-label: 500 14px/20px var(--eii-font-latin);
+    --eii-type-caption: 400 14px/20px var(--eii-font-latin);
+    --eii-num-hero: 500 56px/56px var(--eii-font-latin);
+    --eii-num-large: 600 32px/36px var(--eii-font-latin);
+    --eii-num-standard: 600 20px/28px var(--eii-font-latin);
+    --eii-focus-ring: 3px;
+    --eii-focus-offset: 3px;
+  }
+
+  :lang(ar) {
+    --eii-type-display: 600 36px/58px var(--eii-font-arabic);
+    --eii-type-title: 600 22px/35px var(--eii-font-arabic);
+    --eii-type-body: 400 18px/29px var(--eii-font-arabic);
+    --eii-type-label: 500 16px/26px var(--eii-font-arabic);
+    --eii-type-caption: 400 16px/26px var(--eii-font-arabic);
+  }
+}
+
+:root[data-theme='dark'],
+[data-theme='dark'] {
+  --eii-bg: #10151c;
+  --eii-surface-1: #18202b;
+  --eii-surface-2: #212b38;
+  --eii-surface-3: #2b3747;
+  --eii-line: #445266;
+  --eii-line-strong: #8492a3;
+  --eii-text: #e6eaeb;
+  --eii-text-2: #c2cad3;
+  --eii-text-3: #9aa5b1;
+  --eii-accent: #e69f00;
+  --eii-map-land: #1e2630;
+  --eii-map-water: #121b24;
+  --eii-scrim: rgba(16, 21, 28, 0.72);
+  --eii-shadow-2: 0 8px 24px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'],
+[data-theme='light'] {
+  --eii-bg: #d8d5ce;
+  --eii-surface-1: #e2dfd9;
+  --eii-surface-2: #ebe9e4;
+  --eii-surface-3: #ebe9e4;
+  --eii-line: #afaca4;
+  --eii-line-strong: #6a675f;
+  --eii-text: #14181d;
+  --eii-text-2: #363d46;
+  --eii-text-3: #4e5660;
+  --eii-accent: #a85400;
+  --eii-map-land: #e4e1db;
+  --eii-map-water: #c3ced6;
+  --eii-scrim: rgba(20, 24, 29, 0.4);
+  --eii-shadow-2: 0 4px 16px rgba(20, 24, 29, 0.18);
+  color-scheme: light;
+}

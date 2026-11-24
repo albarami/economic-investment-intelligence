@@ -3,8 +3,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { after, test } from 'node:test';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { collectReferences, tokenize } from '../import-tokenizer.mjs';
+import { nonLiteralModuleLoadViolations } from '../non-literal-module-load.mjs';
 
 const root = fs.mkdtempSync(
   path.join(os.tmpdir(), 'eii-test-scripts-use-only-node-builtins-'),
@@ -35,11 +36,12 @@ const REQUIRED_SPAWN_NAMES = [
   'exec',
 ];
 
-function scriptFiles() {
-  return fs
-    .readdirSync(SCRIPTS)
-    .filter((name) => name.endsWith('.mjs'))
-    .map((name) => path.join(SCRIPTS, name));
+function scriptFiles(directory = SCRIPTS) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) return scriptFiles(file);
+    return entry.name.endsWith('.mjs') ? [file] : [];
+  });
 }
 
 function testFiles() {
@@ -166,19 +168,48 @@ function markerPattern() {
   );
 }
 
-function importViolations(text) {
-  const { references } = collectReferences(text);
-  return references.filter(
-    (item) =>
-      !item.specifier.startsWith('node:') && !item.specifier.startsWith('.'),
+function importReason(item, file, scripts) {
+  if (item.specifier.startsWith('node:')) return null;
+  if (!item.specifier.startsWith('.')) return 'non-node-import';
+  // Resource URLs do not import modules; retain their existing checks.
+  if (item.form === 'new URL()') return null;
+  let target;
+  try {
+    target = fs.realpathSync(new URL(item.specifier, pathToFileURL(file)));
+    if (!fs.statSync(target).isFile()) return 'relative-import-unresolved';
+  } catch {
+    return 'relative-import-unresolved';
+  }
+  const relative = path.relative(fs.realpathSync(scripts), target);
+  if (
+    relative === '..' ||
+    relative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relative)
+  )
+    return 'relative-import-outside-scripts';
+  return null;
+}
+
+function importViolations(
+  text,
+  file = fileURLToPath(import.meta.url),
+  scripts = SCRIPTS,
+) {
+  const found = collectReferences(text);
+  const fromReferences = found.references.flatMap((item) => {
+    const reason = importReason(item, file, scripts);
+    return reason ? [{ ...item, reason }] : [];
+  });
+  return fromReferences.concat(
+    nonLiteralModuleLoadViolations(found.nonLiteral, file, scripts),
   );
 }
 
 test('imports', () => {
-  const found = [...scriptFiles(), ...testFiles()];
+  const found = scriptFiles();
   assert.ok(found.length > 0);
   for (const file of found) {
-    const bad = importViolations(fs.readFileSync(file, 'utf8'));
+    const bad = importViolations(fs.readFileSync(file, 'utf8'), file);
     assert.deepEqual(bad, [], file);
   }
   const samples = [
@@ -189,12 +220,208 @@ test('imports', () => {
     `${REQ}('left-pad');\n`,
   ];
   for (const sample of samples)
-    assert.ok(importViolations(sample).length > 0, sample);
+    assert.deepEqual(
+      importViolations(sample).map((item) => item.reason),
+      ['non-node-import'],
+      sample,
+    );
   assert.deepEqual(importViolations("import fs from 'node:fs';\n"), []);
 });
 
+// These fixtures differ only in the module specifier; all target modules exist.
+const FIXTURE_SCRIPTS = path.join(root, 'web/scripts');
+const FIXTURE_IMPORTERS = ['entry.mjs', 'tests/entry.node-test.mjs'];
+for (const name of ['scripts/tests', 'scripts/nested', 'scripts-peer', 'tests'])
+  fs.mkdirSync(path.join(root, 'web', name), { recursive: true });
+for (const name of [
+  'scripts/kept.mjs',
+  'scripts-peer/kept.mjs',
+  'tests/kept.mjs',
+])
+  fs.writeFileSync(path.join(root, 'web', name), 'export {};\n');
+fs.symlinkSync('../tests/kept.mjs', path.join(FIXTURE_SCRIPTS, 'escape.mjs'));
+
+function moduleForms(specifier) {
+  const quoted = JSON.stringify(specifier);
+  return [
+    `${IMP} x ${FROM} ${quoted};`,
+    `${IMP} ${quoted};`,
+    `export { x } ${FROM} ${quoted};`,
+    `export * ${FROM} ${quoted};`,
+    `${IMP}(${quoted});`,
+    `${REQ}(${quoted});`,
+  ];
+}
+
+function importReasons(source, file) {
+  return importViolations(source, file, FIXTURE_SCRIPTS).map(
+    (item) => item.reason,
+  );
+}
+
+test('relative module imports stay inside scripts from scripts and tests', () => {
+  for (const importer of FIXTURE_IMPORTERS) {
+    const file = path.join(FIXTURE_SCRIPTS, importer);
+    const prefix = importer.startsWith('tests/') ? '../' : './';
+    for (const source of moduleForms(`${prefix}kept.mjs`))
+      assert.deepEqual(importReasons(source, file), []);
+    for (const target of [
+      '../tests/kept.mjs',
+      '../scripts-peer/kept.mjs',
+      '../tests/kept.mjs?fixture#module',
+      '../%74ests/kept.mjs',
+      'escape.mjs',
+    ]) {
+      for (const source of moduleForms(`${prefix}${target}`))
+        assert.deepEqual(importReasons(source, file), [
+          'relative-import-outside-scripts',
+        ]);
+    }
+  }
+});
+
+test('relative module imports must resolve to files', () => {
+  const file = path.join(FIXTURE_SCRIPTS, 'entry.mjs');
+  for (const specifier of ['./absent.mjs', './nested/', './%2fkept.mjs']) {
+    for (const source of moduleForms(specifier))
+      assert.deepEqual(importReasons(source, file), [
+        'relative-import-unresolved',
+      ]);
+  }
+});
+
+const NON_LITERAL_MODULE_LOAD = 'non-literal-module-load';
+const NEW_URL_IMPORT =
+  "import(new URL('../tests/credit-place/credit-place-dom.mjs', import.meta.url));\n";
+
+function loadReasons(source, file = path.join(FIXTURE_SCRIPTS, 'entry.mjs')) {
+  return importViolations(source, file, FIXTURE_SCRIPTS).map(
+    (item) => item.reason,
+  );
+}
+
+test('import(new URL) is a non-literal module load', () => {
+  assert.deepEqual(loadReasons(NEW_URL_IMPORT), [NON_LITERAL_MODULE_LOAD]);
+  assert.deepEqual(
+    importViolations(
+      NEW_URL_IMPORT,
+      path.join(SCRIPTS, 'tests/check-dev-server.node-test.mjs'),
+      SCRIPTS,
+    ).map((item) => item.reason),
+    [NON_LITERAL_MODULE_LOAD],
+  );
+});
+
+test('a non-literal require is a non-literal module load', () => {
+  assert.deepEqual(loadReasons('require(name);\n'), [NON_LITERAL_MODULE_LOAD]);
+  assert.deepEqual(
+    importViolations(
+      'require(name);\n',
+      path.join(SCRIPTS, 'tests/photoreal-assets.node-test.mjs'),
+      SCRIPTS,
+    ).map((item) => item.reason),
+    [NON_LITERAL_MODULE_LOAD],
+  );
+});
+
+test('a substituted import template is a non-literal module load', () => {
+  const devTemplate =
+    'import(`${pathToFileURL(SCRIPT).href}?timed=${t.name}`);\n';
+  const otherTemplate =
+    'import(`${pathToFileURL(SCRIPT).href}?other=${t.name}`);\n';
+  const devFile = path.join(SCRIPTS, 'tests/check-dev-server.node-test.mjs');
+  assert.deepEqual(loadReasons('import(`${name}`);\n'), [
+    NON_LITERAL_MODULE_LOAD,
+  ]);
+  assert.deepEqual(
+    importViolations(devTemplate, path.join(SCRIPTS, 'entry.mjs'), SCRIPTS).map(
+      (item) => item.reason,
+    ),
+    [NON_LITERAL_MODULE_LOAD],
+  );
+  assert.deepEqual(
+    importViolations(otherTemplate, devFile, SCRIPTS).map(
+      (item) => item.reason,
+    ),
+    [NON_LITERAL_MODULE_LOAD],
+  );
+  assert.deepEqual(importViolations(devTemplate, devFile, SCRIPTS), []);
+  const photo =
+    'import(`data:text/javascript,${encodeURIComponent(changed)}`);\n';
+  const photoFile = path.join(SCRIPTS, 'tests/photoreal-assets.node-test.mjs');
+  assert.deepEqual(importViolations(photo, photoFile, SCRIPTS), []);
+  assert.deepEqual(
+    importViolations(photo, devFile, SCRIPTS).map((item) => item.reason),
+    [NON_LITERAL_MODULE_LOAD],
+  );
+});
+
+test('non-literal module-load shapes keep their reason', () => {
+  const file = path.join(FIXTURE_SCRIPTS, 'entry.mjs');
+  const refused = [
+    NEW_URL_IMPORT,
+    "import(\nnew URL('../tests/credit-place/credit-place-dom.mjs', import.meta.url)\n);\n",
+    'import(`${name}`);\n',
+    'require(name);\n',
+    'require(new URL("../tests/a.mjs", import.meta.url));\n',
+    'import();\n',
+    'import(new URL(`../tests/${name}.mjs`, import.meta.url));\n',
+  ];
+  const allowed = [
+    '',
+    "import('node:fs');\n",
+    "import('./kept.mjs');\n",
+    'import(`./kept.mjs`);\n',
+    "new URL('../tests/kept.mjs');\n",
+    'new URL(`../tests/${name}.mjs`);\n',
+    "// import(new URL('../tests/a.mjs', import.meta.url));\n",
+    'const text = "import(new URL(\'../tests/a.mjs\', import.meta.url))";\n',
+  ];
+  for (const source of allowed)
+    assert.deepEqual(loadReasons(source, file), [], source);
+  for (const source of refused)
+    assert.deepEqual(
+      loadReasons(source, file),
+      [NON_LITERAL_MODULE_LOAD],
+      source,
+    );
+  const doubled = `${NEW_URL_IMPORT}${NEW_URL_IMPORT}`;
+  assert.deepEqual(loadReasons(doubled, file), [
+    NON_LITERAL_MODULE_LOAD,
+    NON_LITERAL_MODULE_LOAD,
+  ]);
+  assert.deepEqual(
+    loadReasons(`require(name);\nimport(\`\${name}\`);\n`, file),
+    [NON_LITERAL_MODULE_LOAD, NON_LITERAL_MODULE_LOAD],
+  );
+});
+
+test('relative module resolution is invariant under neutral path segments', () => {
+  let prefixes = ['./'];
+  for (let depth = 0; depth < 4; depth += 1) {
+    prefixes = prefixes.flatMap((prefix) => [
+      `${prefix}./`,
+      `${prefix}nested/../`,
+    ]);
+    for (const prefix of prefixes) {
+      for (const [target, expected] of [
+        ['kept.mjs', []],
+        ['%6bept.mjs?fixture#module', []],
+        ['../tests/kept.mjs', ['relative-import-outside-scripts']],
+      ]) {
+        const sources = moduleForms(`${prefix}${target}`);
+        for (const source of sources)
+          assert.deepEqual(
+            importReasons(source, path.join(FIXTURE_SCRIPTS, 'entry.mjs')),
+            expected,
+          );
+      }
+    }
+  }
+});
+
 test('process env', () => {
-  for (const file of [...scriptFiles(), ...testFiles()]) {
+  for (const file of scriptFiles()) {
     assert.deepEqual(envViolations(fs.readFileSync(file, 'utf8')), [], file);
   }
   const proc = 'process' + '.env';
@@ -222,7 +449,7 @@ test('spawn name list is complete', () => {
 });
 
 test('spawn calls carry env', () => {
-  for (const file of [...scriptFiles(), ...testFiles()]) {
+  for (const file of scriptFiles()) {
     assert.deepEqual(spawnViolations(fs.readFileSync(file, 'utf8')), [], file);
   }
   for (const name of SPAWN_NAMES) {

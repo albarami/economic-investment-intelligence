@@ -1,0 +1,2 @@
+scripts/tests/test_public_opening_e2e.py:68: error: Module "product.tests.public_opening_server" does not explicitly export attribute "uvicorn"  [attr-defined]
+Found 1 error in 1 file (checked 539 source files)

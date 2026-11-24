@@ -6,14 +6,23 @@ reader accepts exactly the published zone, street and building strings.
 
 from __future__ import annotations
 
+import json
+import logging
 import re
-from collections.abc import Mapping, Sequence
+import time
+import uuid
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import asdict, dataclass
-from datetime import date
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Literal, Protocol
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import JSONResponse
+
+from eii_product.imagery_provider.address import MAX_LOCATIONS, AddressHit
+from eii_product.store.structured_address_sql import _EMBEDDED, _POSTGRES
+from eii_product.store.structured_address_sql import INDEX_DDL as INDEX_DDL
 
 _NUMBER = re.compile(r"[0-9]{1,7}")
 _HASH = re.compile(r"[a-f0-9]{64}")
@@ -153,12 +162,6 @@ class AddressIndex:
         return _result(self._rows.get((query.zone, query.street, query.building), ()))
 
 
-_COLUMNS = "feature_key, zone_number, street_number, building_number, building_subtype, lon, lat"
-_POSTGRES = f"SELECT {_COLUMNS} FROM app.pub_address_point WHERE zone_number = %s AND street_number = %s AND building_number = %s ORDER BY feature_key LIMIT 6"
-_EMBEDDED = f"SELECT {_COLUMNS} FROM app.pub_address_point WHERE zone_number = ? AND street_number = ? AND building_number = ? ORDER BY feature_key LIMIT 6"
-INDEX_DDL = "CREATE INDEX pub_address_point_structured ON app.pub_address_point (zone_number, street_number, building_number, feature_key)"
-
-
 def prepare_read(engine: str, query: AddressQuery) -> tuple[str, tuple[str, str, str]]:
     if engine not in {"postgres", "embedded"}:
         raise AddressRefusal("engine_refused")
@@ -238,3 +241,134 @@ def address_router(search: Search) -> APIRouter:
         return asdict(result)
 
     return router
+
+
+LOGGER = logging.getLogger("eii.address_search")
+_TEXT_LIMIT = 200
+_LANGS = frozenset({"en", "ar"})
+_LOG_FIELDS = (
+    "answer_id",
+    "duration_ms",
+    "engine",
+    "error_code",
+    "error_id",
+    "event",
+    "level",
+    "release_id",
+    "seat_key",
+    "status",
+    "tool",
+    "ts",
+)
+Transport = Callable[[str, str, str], tuple[AddressHit, ...]]
+Opener = Callable[..., object]
+TransportFactory = Callable[[Opener], Transport]
+
+
+def offline_unset() -> bool:
+    """The presenter's offline control is unset until a reader is injected."""
+    return False
+
+
+def build_router(
+    key_reader: Callable[[], str | None],
+    offline_reader: Callable[[], bool],
+    transport_factory: TransportFactory,
+    opener: Opener,
+) -> APIRouter:
+    """Routes for the address search. Nothing is stored."""
+    router = APIRouter()
+
+    @router.post("/api/address-search")
+    async def address_search(request: Request) -> JSONResponse:
+        started = time.monotonic()
+        parsed = _parse_body(await request.body())
+        if parsed is None:
+            return _invalid(started)
+        text, lang = parsed
+        key = key_reader()
+        offline = offline_reader()
+        if type(key) is not str or key == "" or offline is not False:
+            return _not_found(started)
+        transport = transport_factory(opener)
+        try:
+            hits = transport(text, lang, key)
+        except Exception:
+            return _not_found(started)
+        kept = hits[:MAX_LOCATIONS]
+        if not kept:
+            return _not_found(started)
+        return _ok(started, kept)
+
+    return router
+
+
+def _parse_body(raw: bytes) -> tuple[str, str] | None:
+    try:
+        body = json.loads(raw)
+    except ValueError:
+        return None
+    if type(body) is not dict or set(body) != {"text", "lang"}:
+        return None
+    text = body["text"]
+    lang = body["lang"]
+    if type(text) is not str or not 1 <= len(text) <= _TEXT_LIMIT:
+        return None
+    if type(lang) is not str or lang not in _LANGS:
+        return None
+    return text, lang
+
+
+def _invalid(started: float) -> JSONResponse:
+    error_id = _log("INVALID_ARGUMENT", "INVALID_ARGUMENT", started)
+    return JSONResponse(
+        status_code=422,
+        content=_error("INVALID_ARGUMENT", "invalid_argument", error_id),
+    )
+
+
+def _not_found(started: float) -> JSONResponse:
+    error_id = _log("NOT_FOUND", "NOT_FOUND", started)
+    return JSONResponse(
+        status_code=404,
+        content=_error("NOT_FOUND", "address_search_not_found", error_id),
+    )
+
+
+def _ok(started: float, hits: tuple[AddressHit, ...]) -> JSONResponse:
+    _log("OK", None, started)
+    results = [
+        {
+            "label": hit.label,
+            "point": {"longitude": hit.longitude, "latitude": hit.latitude},
+        }
+        for hit in hits
+    ]
+    return JSONResponse(status_code=200, content={"results": results})
+
+
+def _error(code: str, message_key: str, error_id: str) -> dict[str, dict[str, str]]:
+    return {"error": {"code": code, "message_key": message_key, "error_id": error_id}}
+
+
+def _log(status: str, error_code: str | None, started: float) -> str:
+    error_id = uuid.uuid4().hex
+    duration_ms = int((time.monotonic() - started) * 1000)
+    record = {
+        "ts": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "level": "info",
+        "event": "address_search",
+        "answer_id": None,
+        "seat_key": None,
+        "tool": None,
+        "engine": None,
+        "release_id": None,
+        "status": status,
+        "duration_ms": duration_ms,
+        "error_code": error_code,
+        "error_id": error_id,
+    }
+    if tuple(sorted(record)) != _LOG_FIELDS:
+        raise RuntimeError("log fields drifted")
+    LOGGER.info("%s", json.dumps(record, sort_keys=True))
+    return error_id

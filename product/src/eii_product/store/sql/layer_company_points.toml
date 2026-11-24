@@ -1,0 +1,24 @@
+[[tables]]
+name = "pub_register_company"
+anchor = "7.3 Columns"
+key = ["registration_number"]
+
+[[tables.columns]]
+name = "registration_number"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "registered_cell"
+type = "cell"
+nullable = true
+
+[[tables.columns]]
+name = "establishment_nationality"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

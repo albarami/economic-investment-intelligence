@@ -1,0 +1,1 @@
+Capture packaging exited 1 at the post-encoding email-pattern assertion. No pixel or baseline change is accepted; final packaging uses a different fixed lossless encoding strategy with identical decoded-data/chunk assertions.

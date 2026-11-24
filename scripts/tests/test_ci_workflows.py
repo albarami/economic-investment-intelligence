@@ -169,6 +169,22 @@ class WorkflowRules(unittest.TestCase):
                 problems = rules.rule_problems(rule, folder)
                 self.assertTrue(problems, rule)
 
+    def test_public_release_load_steps(self) -> None:
+        text = (support.WORKFLOW_DIR / "ci.yml").read_text(encoding="utf-8")
+        self.assertEqual(public_load_problems(text), [])
+        planted = text.replace('test "$code" -eq 3\n', "CREATE DATABASE planted;\n", 1)
+        self.assertIn(
+            "workflow creates a database or extension", public_load_problems(planted)
+        )
+        conditional = text.replace(
+            "      - name: Load the public release\n",
+            "      - name: Load the public release\n        if: false\n",
+            1,
+        )
+        self.assertIn("step or job condition", public_load_problems(conditional))
+        serviced = text.replace("  tests:\n", "  tests:\n    services: {}\n", 1)
+        self.assertIn("service block", public_load_problems(serviced))
+
     def test_malformed_workflow_refuses(self) -> None:
         home = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, home, True)
@@ -176,6 +192,44 @@ class WorkflowRules(unittest.TestCase):
         (folder / "ci.yml").write_text("jobs: [", encoding="utf-8")
         problems = rules.validate(folder)
         self.assertTrue(any("not valid YAML" in item for item in problems))
+
+
+def public_load_problems(text: str) -> list[str]:
+    """Problems in the public-load steps of a workflow copy."""
+    problems: list[str] = []
+    if text.count("./eii test") != 1:
+        problems.append("test command count")
+    start = text.find("name: Run one suite")
+    tail = text[start:] if start != -1 else ""
+    secret = tail.find("\n  web-spikes:")
+    block = tail[:secret] if secret != -1 else tail
+    for name in (
+        "name: Start the database service",
+        "name: Create the owner role",
+        "name: Load the public release",
+        "name: Load the public release with a planted difference",
+    ):
+        if name not in block:
+            problems.append(f"missing {name}")
+    if "ci.yml: step or job condition" in rules.check_no_weakeners({"ci.yml": text}):
+        problems.append("step or job condition")
+    if re.search(r"(?m)^\s*services:\s*", text):
+        problems.append("service block")
+    if "CREATE DATABASE" in text or "CREATE EXTENSION" in text:
+        problems.append("workflow creates a database or extension")
+    if "POSTGRES_PASSWORD=" in text:
+        problems.append("password on a command line")
+    digest = (
+        "postgis/postgis@sha256:"
+        "4a43e3c3e5d55b9208240fc71db543b79c638766280c625a425bd0a2390989c4"
+    )
+    if digest not in text:
+        problems.append("image digest")
+    if "127.0.0.1:55440:5432" not in text:
+        problems.append("loopback port")
+    if "--diverge" not in block or 'test "$code" -eq 3' not in block:
+        problems.append("diverge exit")
+    return problems
 
 
 class PilotWorkflowRules(unittest.TestCase):

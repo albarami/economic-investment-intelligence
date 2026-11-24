@@ -5,7 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Callable
-from pathlib import Path
+from importlib.resources import files
+from importlib.resources.abc import Traversable
 
 import yaml
 
@@ -44,17 +45,12 @@ _TOP = {
 }
 
 
-def catalogue_directory() -> Path:
-    """Return the shipped catalogue folder beside the product package."""
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        candidate = parent / "assistant" / "catalogue"
-        if (candidate / "claims.yaml").is_file():
-            return candidate
-    raise FileNotFoundError("catalogue folder not found")
+def catalogue_directory() -> Traversable:
+    """Resolve package data in both a source checkout and an installed wheel."""
+    return files("eii_product.assistant.catalogue") / "assets"
 
 
-def catalogue_version(folder: Path) -> str:
+def catalogue_version(folder: Traversable) -> str:
     """SHA-256 of the name-ordered file hashes, as canonical JSON."""
     pairs: list[dict[str, str]] = []
     for name in FILE_NAMES:
@@ -66,7 +62,7 @@ def catalogue_version(folder: Path) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def load_catalogue(folder: Path) -> Catalogue | Refusal:
+def load_catalogue(folder: Traversable) -> Catalogue | Refusal:
     """Load one catalogue folder, or the first refusal."""
     documents: dict[str, dict[str, object]] = {}
     for name in FILE_NAMES:
@@ -100,7 +96,7 @@ def load_catalogue(folder: Path) -> Catalogue | Refusal:
     )
 
 
-def _read(path: Path, file_name: str) -> dict[str, object] | Refusal:
+def _read(path: Traversable, file_name: str) -> dict[str, object] | Refusal:
     text = path.read_text(encoding="utf-8")
     duplicate = _duplicate_key(text, file_name)
     if duplicate is not None:

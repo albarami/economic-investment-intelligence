@@ -1,0 +1,54 @@
+[[tables]]
+name = "gazetteer"
+anchor = "7.3 Columns"
+key = ["place_key"]
+
+[[tables.columns]]
+name = "place_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "kind"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_en"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "aliases"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "lon"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "lat"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "cell"
+type = "cell"
+nullable = true
+
+[[tables.columns]]
+name = "showcase_verified"
+type = "bool"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

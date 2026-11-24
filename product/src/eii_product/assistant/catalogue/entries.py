@@ -17,6 +17,7 @@ from eii_product.assistant.catalogue.schema import (
     PLAYBOOKS,
     PROVENANCE_ALLOWED,
     QUESTION_FIELDS,
+    REGISTER_COMPANY_METRICS,
     SECTIONS,
     SLOT_FIELDS,
     STRENGTHS,
@@ -90,6 +91,29 @@ def _claim(row: dict[str, object], path: str, key: str) -> Claim | Refusal:
     )
     if isinstance(fields, Refusal):
         return fields
+    # Context displays have one closed metric slot. No rank/feature/people slot
+    # may be added, even when its provenance is Public.
+    context = {
+        "night_lights": ("night_lights_radiance", "night_lights_not_activity", "area"),
+        "venue_busyness": (
+            "venue_busyness_index",
+            "relative_busyness_not_people",
+            "place_public",
+        ),
+        "population_age_sex": ("population_grid_people", "grid_cells_summed", "area"),
+    }
+    for family, (metric, caveat, required_subject) in context.items():
+        if key == family or any(slot.metric_key == metric for slot in slots):
+            if (
+                key != family
+                or len(slots) != 1
+                or slots[0].metric_key != metric
+                or subject != required_subject
+                or section != "observed"
+                or slots[0].allowed_provenance != ("public",)
+                or caveat not in caveats
+            ):
+                return Refusal("SLOT_METRIC", f"{path}.slots")
     return Claim(key, section, subject, slots, caveats, companions, strengths, fields)
 
 
@@ -183,6 +207,16 @@ def _questions(value: object) -> tuple[Question, ...] | Refusal:
         slots = _slots(row["slots"], f"{path}.slots", None)
         if isinstance(slots, Refusal):
             return slots
+        if any(
+            slot.metric_key
+            in {
+                "population_grid_people",
+                "venue_busyness_index",
+                "night_lights_radiance",
+            }
+            for slot in slots
+        ):
+            return Refusal("SLOT_METRIC", f"{path}.slots")
         fields = _rendered(
             row,
             path,
@@ -261,7 +295,7 @@ def _slot(row: dict[str, object], path: str, subject: str | None) -> Slot | Refu
     if breakdown not in BREAKDOWNS:
         return Refusal("BREAKDOWN", f"{path}.breakdown")
     if subject is None:
-        if metric == "employee_count":
+        if metric in REGISTER_COMPANY_METRICS:
             return Refusal("QUESTION_METRIC", f"{path}.metric_key")
         if breakdown != "none":
             return Refusal("BREAKDOWN", f"{path}.breakdown")
@@ -276,6 +310,8 @@ def _slot(row: dict[str, object], path: str, subject: str | None) -> Slot | Refu
             metric,
             unit,
             provenances,
+            geography=geography,
+            geography_path=f"{path}.geography_role",
             metric_path=f"{path}.metric_key",
             unit_path=f"{path}.unit",
             provenance_path=f"{path}.allowed_provenance",

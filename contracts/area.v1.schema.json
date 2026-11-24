@@ -1,0 +1,127 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "area_id",
+    "release_id",
+    "shape",
+    "request",
+    "anchor_cell",
+    "requested_shape",
+    "traffic"
+  ],
+  "properties": {
+    "area_id": {"type": "string"},
+    "release_id": {"type": "string"},
+    "shape": {"enum": ["polygon", "radius", "walk", "drive"]},
+    "anchor_cell": {"oneOf": [{"const": null}, {"type": "string"}]},
+    "requested_shape": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "coordinates"],
+          "properties": {
+            "type": {"const": "Polygon"},
+            "coordinates": {}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "coordinates", "radius_m"],
+          "properties": {
+            "type": {"const": "Circle"},
+            "coordinates": {},
+            "radius_m": {"enum": [250, 500, 1000]}
+          }
+        }
+      ]
+    },
+    "traffic": {"const": "free_flow"},
+    "request": {"type": "object"}
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "shape": {"const": "polygon"},
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["shape_id"],
+          "properties": {"shape_id": {"type": "string"}}
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "shape": {"const": "radius"},
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["point", "radius_m"],
+          "properties": {
+            "point": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["latitude", "longitude"],
+              "properties": {
+                "latitude": {"type": "string"},
+                "longitude": {"type": "string"}
+              }
+            },
+            "radius_m": {"enum": [250, 500, 1000]}
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "shape": {"const": "walk"},
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["point", "minutes"],
+          "properties": {
+            "point": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["latitude", "longitude"],
+              "properties": {
+                "latitude": {"type": "string"},
+                "longitude": {"type": "string"}
+              }
+            },
+            "minutes": {"enum": [5, 10, 15]}
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "shape": {"const": "drive"},
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["point", "minutes"],
+          "properties": {
+            "point": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["latitude", "longitude"],
+              "properties": {
+                "latitude": {"type": "string"},
+                "longitude": {"type": "string"}
+              }
+            },
+            "minutes": {"enum": [5, 10, 15, 20, 30]}
+          }
+        }
+      }
+    }
+  ]
+}

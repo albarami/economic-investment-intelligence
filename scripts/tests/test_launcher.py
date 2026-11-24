@@ -56,6 +56,14 @@ class Launcher(unittest.TestCase):
                 self.assertEqual(proc.returncode, 7, proc.stdout + proc.stderr)
                 lines = proc.stdout.splitlines()
                 self.assertIn("--locked", lines)
+                self.assertIn("--offline", lines)
+                self.assertIn("--quiet", lines)
+                if word in {"build-public", "build-world", "build-release"}:
+                    self.assertIn("eii-custodian", lines)
+                    self.assertNotIn("eii-product", lines)
+                elif word != "test":
+                    self.assertIn("eii-product", lines)
+                    self.assertNotIn("eii-custodian", lines)
                 self.assertIn(extra, lines)
                 if word == "test":
                     self.assertIn("scripts/run_tests.py", lines)

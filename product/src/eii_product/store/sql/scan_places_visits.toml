@@ -1,0 +1,54 @@
+[[tables]]
+name = "pub_venue_visits"
+anchor = "7.3 Columns"
+key = ["venue_key", "period", "indicator"]
+
+[[tables.columns]]
+name = "venue_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "place_id"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "venue_kind"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_en"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "region"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "indicator"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "value"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "unit"
+type = "string"
+nullable = false

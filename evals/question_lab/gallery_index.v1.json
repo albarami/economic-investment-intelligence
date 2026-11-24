@@ -1,0 +1,12 @@
+{
+  "version": "question-lab.gallery.v1",
+  "status": "waiting",
+  "reason": "local_browser_assets_and_approved_CI_baselines_required",
+  "required_curated_captures": 30,
+  "captures": [],
+  "sealed_captures_allowed": false,
+  "packet_registry": "ledger.jsonl",
+  "filters": ["question", "judgement", "language", "theme", "size", "state"],
+  "owner_review": "waiting",
+  "independent_design_review": "waiting"
+}

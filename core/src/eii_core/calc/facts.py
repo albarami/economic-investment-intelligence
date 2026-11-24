@@ -539,6 +539,8 @@ def compare_public_facts(
     if not sides:
         raise ValueError("both comparison inputs missing")
     for side in sides:
+        if not isinstance(side, (CalculationFact, WithheldInput)):
+            raise TypeError("comparison requires calculation inputs")
         side.__post_init__()
         if isinstance(side, CalculationFact) and (
             side.provenance != "public" or "user_input" in side.input_classes

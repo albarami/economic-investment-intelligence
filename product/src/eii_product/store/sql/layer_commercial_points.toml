@@ -1,0 +1,44 @@
+[[tables]]
+name = "pub_poi_comm"
+anchor = "7.3 Columns"
+key = ["feature_key"]
+
+[[tables.columns]]
+name = "feature_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "category"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "lon"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "lat"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "cell"
+type = "cell"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

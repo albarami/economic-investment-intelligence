@@ -1,0 +1,9 @@
+
+Running 1 test using 1 worker
+
+(node:34) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+attribution contrast [{"selector":".stage-credits","foreground":"rgb(230, 234, 235)","background":"rgb(43, 55, 71)","ratio":9.960669285697975}]
+  ✓  1 [chromium] › tests/audit/opening.spec.ts:24:7 › opening audit 360x640 ar dark (4.1s)
+
+  1 passed (26.4s)

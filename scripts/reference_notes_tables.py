@@ -129,6 +129,8 @@ PREFIX = {
 }
 OFFICIAL = (
     ("maplibre.org", "/maplibre-gl-js/docs/"),
+    ("maplibre.org", "/maplibre-style-spec/glyphs"),
+    ("docs.protomaps.com", "/pmtiles/"),
     ("github.com", "/maplibre/"),
     ("raw.githubusercontent.com", "/maplibre/"),
     ("deck.gl", "/docs/"),

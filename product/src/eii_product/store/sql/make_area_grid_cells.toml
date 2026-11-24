@@ -1,0 +1,14 @@
+[[tables]]
+name = "grid_cell"
+anchor = "docs/03_DATA_CONTRACTS.md section \"### 7.3 Columns\" row grid_cell"
+key = ["cell"]
+
+[[tables.columns]]
+name = "cell"
+type = "cell"
+nullable = false
+
+[[tables.columns]]
+name = "resolution"
+type = "int"
+nullable = false

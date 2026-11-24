@@ -1,0 +1,24 @@
+[[tables]]
+name = "pub_night_lights"
+anchor = "7.3 Columns"
+key = ["cell", "period"]
+
+[[tables.columns]]
+name = "cell"
+type = "cell"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "radiance"
+type = "decimal(14,4)"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

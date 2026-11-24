@@ -1,0 +1,30 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/unit/opening-copy.test.ts (2 tests | 1 failed) 5ms
+   × keeps the reviewed Arabic opening instructions and captions exactly 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/opening-copy.test.ts > keeps the reviewed Arabic opening instructions and captions exactly
+AssertionError: expected 'لمس الموضع الجديد لنقل الرأس المحدد.' to be 'المس الموضع الجديد لنقل النقطة المحدد…' // Object.is equality
+
+Expected: "المس الموضع الجديد لنقل النقطة المحددة."
+Received: "لمس الموضع الجديد لنقل الرأس المحدد."
+
+ ❯ tests/unit/opening-copy.test.ts:7:41
+      5|
+      6| it('keeps the reviewed Arabic opening instructions and captions exactl…
+      7|   expect(ar.strings['draw.moveVertex']).toBe(
+       |                                         ^
+      8|     'المس الموضع الجديد لنقل النقطة المحددة.',
+      9|   );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  12:15:08
+   Duration  94ms (transform 60%, import 24%, tests 11%, worker 5%)
+

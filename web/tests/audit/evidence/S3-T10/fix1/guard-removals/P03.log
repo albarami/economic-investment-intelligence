@@ -1,0 +1,26 @@
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+____________________ test_opening_fixture_pins_no_provider _____________________
+
+tmp_path = PosixPath('[workspace]/.overnight[local-path]')
+
+    def test_opening_fixture_pins_no_provider(tmp_path: Path) -> None:
+        with patch.object(public_opening_server, "create_app") as create:
+            _app, store, ledger = build_fixture_app(tmp_path, Path("web/dist"))
+        try:
+            pins = create.call_args.kwargs
+>           assert {
+                "key_reader",
+                "offline_reader",
+                "transport_factory",
+                "opener",
+            } <= pins.keys()
+E           AssertionError: assert {'key_reader'...port_factory'} <= dict_keys(['s...ting_reader'])
+E             
+E             Extra items in the left set:
+E             'offline_reader'
+
+scripts/tests/test_public_opening_e2e.py:39: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_pins_no_provider
+1 failed, 2 passed, 9 deselected in 13.12s

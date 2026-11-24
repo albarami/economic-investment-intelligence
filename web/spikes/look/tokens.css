@@ -1,0 +1,255 @@
+/*
+ * Design tokens of docs/11_DESIGN_DIRECTION.md, for the wall (presenter mode,
+ * 1920 x 1080 CSS pixels). This file is the only place on the page that holds
+ * a literal colour, size or duration (DES-02); style.css and the scripts read
+ * these properties by name. tests/sources.node-test.mjs compares every value
+ * of section 4.1 with this file.
+ */
+
+:root {
+  /* Section 6: space and radius. */
+  --eii-space-1: 4px;
+  --eii-space-2: 8px;
+  --eii-space-3: 12px;
+  --eii-space-4: 16px;
+  --eii-space-5: 24px;
+  --eii-space-6: 32px;
+  --eii-space-7: 48px;
+  --eii-space-8: 64px;
+  --eii-space-9: 96px;
+  --eii-radius-s: 6px;
+  --eii-radius-m: 12px;
+  --eii-radius-l: 20px;
+  /* The photoreal mark, in the publisher's own colours. */
+  --eii-mark-blue: #4285f4;
+  --eii-mark-red: #ea4335;
+  --eii-mark-yellow: #fbbc05;
+  --eii-mark-green: #34a853;
+
+  /* Section 7: motion. */
+  --eii-dur-fast: 150ms;
+  --eii-dur-base: 250ms;
+  --eii-dur-slow: 400ms;
+  --eii-dur-scene: 800ms;
+  --eii-dur-fly-short: 1200ms;
+  --eii-dur-fly-medium: 2500ms;
+  --eii-dur-fly-long: 3500ms;
+  --eii-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --eii-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+  --eii-ease-move: cubic-bezier(0.65, 0, 0.35, 1);
+  --eii-stagger: 60ms;
+  /* 24 px a second, linear. No moving dash is drawn on this page. */
+  --eii-dash-speed: 24px;
+
+  /* DES-139: the wall's CSS viewport. */
+  --eii-wall-width: 1920px;
+  --eii-wall-height: 1080px;
+
+  /* Section 6 table, wall column. */
+  --eii-safe-inline: 96px;
+  --eii-safe-block: 54px;
+  --eii-column: 122px;
+  --eii-gutter: 24px;
+  --eii-topbar-height: 72px;
+  --eii-brief-width: 706px;
+  --eii-card-padding: 24px;
+  --eii-card-gap: 16px;
+  --eii-target-min: 44px;
+  --eii-button-height: 56px;
+  --eii-focus-ring: 4px;
+  --eii-focus-offset: 4px;
+  --eii-edge: 1px;
+  /* DES-45: icons on the wall are 40 px with a 3 px stroke. */
+  --eii-glyph: 40px;
+  /* The thread of the source chain: a 2 px neutral line. */
+  --eii-thread: 2px;
+
+  /* DES-61: release-unit fills at 0.85 opacity with a 1 px separator.
+     DES-57: buildings at 0.9 opacity, extruded from zoom 14. */
+  --eii-unit-opacity: 0.85;
+  --eii-unit-separator: 1px;
+  --eii-building-opacity: 0.9;
+  --eii-building-zoom: 14;
+  /* DES-57 and FE-52: a building without a height in the basemap counts as
+     one storey of 3.5 m on the map (the estimation rule of slice S1 is not
+     set; this is the page's assumption, stated behind "More evidence"). */
+  --eii-building-default-height: 3.5;
+  /* Section 8, preset "midday": light azimuth, polar angle, colour and
+     intensity. */
+  --eii-map-light-azimuth: 180;
+  --eii-map-light-polar: 25;
+  --eii-map-light: #ebebeb;
+  --eii-map-light-intensity: 0.3;
+  /* DES-56: map labels at label size with a 2 px halo and no blur. Major
+     places show from the zoom where the City framing begins (ruling L-119
+     item 5: no street or district label). */
+  --eii-map-label-size: 28px;
+  --eii-map-label-halo: 2px;
+  --eii-map-label-zoom: 10;
+  /* V4 of round 5: district names and road names, a step below the place
+     labels; English district names in capitals tracked 0.08 em, Arabic never
+     tracked. */
+  --eii-map-district-size: 24px;
+  --eii-map-road-label-size: 22px;
+  --eii-map-district-tracking: 0.08;
+  /* V5 of round 5: roads and buildings take their street colours from this
+     zoom; below it the map keeps the quiet colours of section 4.1. */
+  --eii-map-street-zoom: 13;
+  /* V7 of round 5: the zoom past which the Brief and the legend fold, and
+     the zoom at which they come back. */
+  --eii-fold-zoom: 13.5;
+  --eii-unfold-zoom: 12;
+  /* Ruling L-143 item 3: the City framing searches no higher than a city
+     scale, at or below the unfold zoom, so the answer opens on the city with
+     the Brief and the legend open. */
+  --eii-city-max-zoom: 12;
+  /* Establishment clusters are drawn from district zoom, points from 14. */
+  --eii-cluster-zoom: 12;
+  /* The skyline of the home: West Bay at street zoom. */
+  --eii-skyline-zoom: 15.3;
+  --eii-skyline-pitch: 50;
+  /* Gap between neighbouring legend swatches and their height. */
+  --eii-swatch-gap: 2px;
+  --eii-swatch-height: 24px;
+
+  /* Fonts chained across scripts, so that Arabic words on the English page
+     and Latin words and punctuation on the Arabic page never fall back to a
+     system face. */
+  --eii-font-latin: 'IBM Plex Sans', 'IBM Plex Sans Arabic', sans-serif;
+  --eii-font-arabic: 'IBM Plex Sans Arabic', 'IBM Plex Sans', sans-serif;
+}
+
+/* Section 5.1, wall column; numerals are IBM Plex Sans in both languages
+   (DES-31), so the number tokens are declared here only. Scoped by :lang,
+   so that a Latin run on the Arabic page keeps its own script's metrics. */
+:root,
+:lang(en) {
+  --eii-type-display: 600 72px/80px var(--eii-font-latin);
+  --eii-type-title: 600 40px/48px var(--eii-font-latin);
+  --eii-type-body: 400 32px/44px var(--eii-font-latin);
+  --eii-type-label: 500 28px/36px var(--eii-font-latin);
+  --eii-type-caption: 400 28px/36px var(--eii-font-latin);
+  --eii-num-hero: 500 120px/120px var(--eii-font-latin);
+  --eii-num-large: 600 64px/68px var(--eii-font-latin);
+  --eii-num-standard: 600 40px/48px var(--eii-font-latin);
+  --eii-num-compact: 500 28px/36px var(--eii-font-latin);
+  --eii-type-tracking: 0;
+}
+
+/* DES-28: Arabic at 1.12 times the Latin size, rounded to a whole pixel, with
+   a line height of 1.6 times its own size. DES-37: zero letter spacing. */
+:lang(ar) {
+  --eii-type-display: 600 81px/130px var(--eii-font-arabic);
+  --eii-type-title: 600 45px/72px var(--eii-font-arabic);
+  --eii-type-body: 400 36px/58px var(--eii-font-arabic);
+  --eii-type-label: 500 31px/50px var(--eii-font-arabic);
+  --eii-type-caption: 400 31px/50px var(--eii-font-arabic);
+  --eii-type-tracking: 0;
+  /* Round 5g, finding 3: the map's labels take the same factor (28, 24 and
+     22 times 1.12, rounded); the page sets lang on the root before the map
+     reads them. */
+  --eii-map-label-size: 31px;
+  --eii-map-district-size: 27px;
+  --eii-map-road-label-size: 25px;
+}
+
+/* Section 4.1, dark theme: the default. */
+:root[data-theme='dark'] {
+  --eii-bg: #10151c;
+  --eii-surface-1: #18202b;
+  --eii-surface-2: #212b38;
+  --eii-surface-3: #2b3747;
+  --eii-line: #445266;
+  --eii-line-strong: #8492a3;
+  --eii-text: #e6eaeb;
+  --eii-text-2: #c2cad3;
+  --eii-text-3: #9aa5b1;
+  --eii-accent: #e69f00;
+  --eii-role-work: #56b4e9;
+  --eii-role-live: #009e73;
+  --eii-role-visit: #cc79a7;
+  --eii-housing-family: #009e73;
+  --eii-housing-labour: #5ebf9a;
+  --eii-seq-1: #2f4a5e;
+  --eii-seq-2: #3f6f86;
+  --eii-seq-3: #5e97a6;
+  --eii-seq-4: #9cc4bb;
+  --eii-seq-5: #ebe3b0;
+  --eii-map-land: #1e2630;
+  --eii-map-water: #121b24;
+  --eii-map-road-minor: #27313d;
+  --eii-map-road-major: #3a4757;
+  --eii-map-building: #364252;
+  --eii-map-boundary: #66758a;
+  --eii-map-label-1: #d5dbe0;
+  --eii-map-label-2: #a3aeba;
+  /* Street zoom (V5): a road hierarchy and buildings with an edge. */
+  --eii-map-street-major: #55667a;
+  --eii-map-street-minor: #354251;
+  --eii-map-street-casing: #131920;
+  --eii-map-street-building: #3b4859;
+  --eii-map-street-edge: #4f5f73;
+  /* The lowest class at full strength in the dark theme. */
+  --eii-unit-opacity-1: 0.85;
+  /* Round 5g, findings 1, 18 and 19: an establishment dot is ink (the text
+     neutral, never a ramp colour) with a ring of the ground's colour. */
+  --eii-map-point: var(--eii-text);
+  --eii-map-point-ring: var(--eii-bg);
+  --eii-scrim: rgba(16, 21, 28, 0.72);
+  /* DES-43 level 2. */
+  --eii-shadow-2: 0 8px 24px rgba(0, 0, 0, 0.45);
+  /* Level-1 plates over the dark map need no shadow: the surface is
+     darker than the land and the edge parts them. */
+  --eii-plate-shadow: none;
+  color-scheme: dark;
+}
+
+/* Section 4.1, light theme: projectors and bright rooms. */
+:root[data-theme='light'] {
+  --eii-bg: #d8d5ce;
+  --eii-surface-1: #e2dfd9;
+  --eii-surface-2: #ebe9e4;
+  --eii-surface-3: #ebe9e4;
+  --eii-line: #afaca4;
+  --eii-line-strong: #6a675f;
+  --eii-text: #14181d;
+  --eii-text-2: #363d46;
+  --eii-text-3: #4e5660;
+  --eii-accent: #a85400;
+  --eii-role-work: #0072b2;
+  --eii-role-live: #00735a;
+  --eii-role-visit: #9c3f7a;
+  --eii-housing-family: #00735a;
+  --eii-housing-labour: #0e6b4c;
+  --eii-seq-1: #cbc48e;
+  --eii-seq-2: #93ad9b;
+  --eii-seq-3: #63899a;
+  --eii-seq-4: #3f6680;
+  --eii-seq-5: #27425a;
+  --eii-map-land: #e4e1db;
+  --eii-map-water: #c3ced6;
+  --eii-map-road-minor: #d6d2ca;
+  --eii-map-road-major: #c2beb5;
+  --eii-map-building: #d3cfc7;
+  --eii-map-boundary: #75716a;
+  --eii-map-label-1: #22282f;
+  --eii-map-label-2: #4e5660;
+  /* Street zoom (V5): white roads on cased edges and buildings a step darker
+     than the ground with a drawn edge, so both part from the ground. */
+  --eii-map-street-major: #fdfcfa;
+  --eii-map-street-minor: #f5f3ef;
+  --eii-map-street-casing: #aaa49a;
+  --eii-map-street-building: #cdc7bc;
+  --eii-map-street-edge: #9f998d;
+  /* DES-61: the lowest class at 0.85, as in the dark theme, so it keeps about
+     1.3:1 against the land (DES-20). */
+  --eii-unit-opacity-1: 0.85;
+  --eii-map-point: var(--eii-text);
+  --eii-map-point-ring: var(--eii-surface-2);
+  --eii-scrim: rgba(20, 24, 29, 0.4);
+  --eii-shadow-2: 0 4px 16px rgba(20, 24, 29, 0.18);
+  /* The light surface and the light land are almost equal in tone, so the
+     plates take the level-2 shadow of DES-43 to stand off the map. */
+  --eii-plate-shadow: var(--eii-shadow-2);
+  color-scheme: light;
+}

@@ -1,0 +1,1204 @@
+{
+  "fixture": "invented loaded Public-only release; separate visual withheld fixture",
+  "not_a_visual_baseline": true,
+  "captures": [
+    {
+      "path": "captures/opening-360x640-en-dark.png",
+      "sha256": "119e38d5f03148607ac97fb4edfa626b3ba18f75c296965b5414893229478e3a"
+    },
+    {
+      "path": "captures/area-360x640-en-dark.png",
+      "sha256": "ae283f415d58c88ab27b3ba736b0e34e06f82ca523ec9436877e6b341ca23a1e"
+    },
+    {
+      "path": "captures/answer-360x640-en-dark.png",
+      "sha256": "fe627ad497aebc648e5cd6a08e95da4a403b7df46347f6b24d658c1230ee719b"
+    },
+    {
+      "path": "captures/comparison-360x640-en-dark.png",
+      "sha256": "fd71c0cc18b63dad61d322cdcc58520bd0f35a5a5fa2bad7e67d9a85fcb0af23"
+    },
+    {
+      "path": "captures/evidence-360x640-en-dark.png",
+      "sha256": "01820faa6a3055f98b6610922390ec758668881316e451291078857fbcec66cb"
+    },
+    {
+      "path": "captures/drawer-360x640-en-dark.png",
+      "sha256": "159786052d8e6a94c4d942042062ab29471b382da4f150982f1db62f38919ca6"
+    },
+    {
+      "path": "captures/opening-360x640-en-light.png",
+      "sha256": "274d25be36febcf33c831f25736290361dd3984cd14d65ead05c398999dbdbc8"
+    },
+    {
+      "path": "captures/area-360x640-en-light.png",
+      "sha256": "49466f2c6ce2338750f6aa915c30703893650f6ed86242474e3d6024279c7184"
+    },
+    {
+      "path": "captures/answer-360x640-en-light.png",
+      "sha256": "3e3cb8bc3e2afcbf238a12cd35745663db5892680c6b8615e33f70f069059ee3"
+    },
+    {
+      "path": "captures/comparison-360x640-en-light.png",
+      "sha256": "79e17847a407229972a50ab949936c3f5e549a75d9bbff34ed6fc91d26e7b328"
+    },
+    {
+      "path": "captures/evidence-360x640-en-light.png",
+      "sha256": "2ece21c7aa75bc7de8db46fa0860d6467fa0335a9ed6b9ef271e746650280612"
+    },
+    {
+      "path": "captures/drawer-360x640-en-light.png",
+      "sha256": "24c3b6aef3400dc43d348f43c84a1d5cb22064ca567f6c6e73520610ac2c6bed"
+    },
+    {
+      "path": "captures/opening-360x640-ar-dark.png",
+      "sha256": "0873ca018165593e504f9fc9a45bd92bcf90fef9bb3b8a69b5f63a0d560a4dc5"
+    },
+    {
+      "path": "captures/area-360x640-ar-dark.png",
+      "sha256": "54a737086087ee3f7d75ea7dfa64d402b21e2de3c209ceb7ed9e129cc9a25041"
+    },
+    {
+      "path": "captures/answer-360x640-ar-dark.png",
+      "sha256": "58f7758d9a11bb0283ad573e19effb0580a6137a0f4d58fc04654f6926118fb9"
+    },
+    {
+      "path": "captures/comparison-360x640-ar-dark.png",
+      "sha256": "5229feea0c879917765f5d0b397c2660f2d7aa8c2f04f1dafd0ae29091e08b66"
+    },
+    {
+      "path": "captures/evidence-360x640-ar-dark.png",
+      "sha256": "0b052490bcf4dc56854207447f593ae869efd41ec3dc6f4e15dbe38e632a96c3"
+    },
+    {
+      "path": "captures/drawer-360x640-ar-dark.png",
+      "sha256": "f359b03a5a5e1ef18a3308017b3528df5b86a5d096f2c3b523db2d80c26e7d23"
+    },
+    {
+      "path": "captures/opening-360x640-ar-light.png",
+      "sha256": "05b031f8baf4bee68c9664e3936bc47993161322d4ff5c316bf3fe9006812181"
+    },
+    {
+      "path": "captures/area-360x640-ar-light.png",
+      "sha256": "5a71e97b83f4b02fdc3a01766add9bcb1b6760d503ea49564f4e3a9f1adec8d1"
+    },
+    {
+      "path": "captures/answer-360x640-ar-light.png",
+      "sha256": "39b10880e801c87fed813547e21e2ecd6052675e19da89bdc1d3280043b61f37"
+    },
+    {
+      "path": "captures/comparison-360x640-ar-light.png",
+      "sha256": "339bdd6f02a931f2d4cf06ca994420defa21448f690cc7e90d2cd49df4a21f19"
+    },
+    {
+      "path": "captures/evidence-360x640-ar-light.png",
+      "sha256": "81ffa140be48f406d7254222611599aecd2379eebb13d573aa545725c5d70eb2"
+    },
+    {
+      "path": "captures/drawer-360x640-ar-light.png",
+      "sha256": "a85155fdca28ff68a374521430cd5996f7a2be56294f70fd64412bff94419344"
+    },
+    {
+      "path": "captures/opening-640x360-en-dark.png",
+      "sha256": "38a889b9b15557ebf1c0911477a93967fdc3535d689152804b2a30cfb46e2d27"
+    },
+    {
+      "path": "captures/area-640x360-en-dark.png",
+      "sha256": "8355f535def976cb126fb8965b254880b9c249bf844cd1d5711fd87db436a887"
+    },
+    {
+      "path": "captures/answer-640x360-en-dark.png",
+      "sha256": "a33b0058534e33d6cc313add4cadabd5fb5d7ce0faabd778f4d081776218d26a"
+    },
+    {
+      "path": "captures/comparison-640x360-en-dark.png",
+      "sha256": "4662b723387b595cff7adbf863b65622de60e6426a1dbbcbda04ca5a5d310c95"
+    },
+    {
+      "path": "captures/evidence-640x360-en-dark.png",
+      "sha256": "491b2a5c3c660fa9495f126398d156f06f1bb86159843ab4c222eeadc312495f"
+    },
+    {
+      "path": "captures/drawer-640x360-en-dark.png",
+      "sha256": "7431f4cf95b79c363f14ccb2c3603eef479faa77925db7aebcf98b7b09ce57c2"
+    },
+    {
+      "path": "captures/opening-640x360-en-light.png",
+      "sha256": "eb4d4f2a62c8cf33ee84e7b5b15d5bc47db4481afa400a72bc88121580ae3bfc"
+    },
+    {
+      "path": "captures/area-640x360-en-light.png",
+      "sha256": "f4400c48a1e86520b216b1660f3d8f12831f649d70bc8ecf72e49baca8289890"
+    },
+    {
+      "path": "captures/answer-640x360-en-light.png",
+      "sha256": "a3be83e6d809f3b37ebbcd97fb1a9141966ee2fdc79d0022ade466c37e09e410"
+    },
+    {
+      "path": "captures/comparison-640x360-en-light.png",
+      "sha256": "221c7f976386890a0cb711bd8842440bb5b9519543a0d28d2b6accf099548ca1"
+    },
+    {
+      "path": "captures/evidence-640x360-en-light.png",
+      "sha256": "61713c7e872378468f5253528206fb4ba1116d2eda10de1b5ed55ec96a1d69fe"
+    },
+    {
+      "path": "captures/drawer-640x360-en-light.png",
+      "sha256": "118e43055a4fd3cf88c721806ea069e5aaf0c44ccc24ace95896520ece60e6c8"
+    },
+    {
+      "path": "captures/opening-640x360-ar-dark.png",
+      "sha256": "594d16f4bb3fe90d1b0ebdb811884c8fad652f84dad445b5acd65d73d73109ba"
+    },
+    {
+      "path": "captures/area-640x360-ar-dark.png",
+      "sha256": "009ebbab868897d8c78e20bd345ad3ce314bd14990cac806d6d54f5a800e2fff"
+    },
+    {
+      "path": "captures/answer-640x360-ar-dark.png",
+      "sha256": "01773eb0bb0aba89788f8c4f6398f2ac38e0fd4c2f13706b697045ec78fa8326"
+    },
+    {
+      "path": "captures/comparison-640x360-ar-dark.png",
+      "sha256": "ab36bd45a476b9f23969637cddfe693087798e07722e62e9867f9919dbefa6ab"
+    },
+    {
+      "path": "captures/evidence-640x360-ar-dark.png",
+      "sha256": "c4c4995d8b9ba73e03dbb77ef64bf8a12f40d8bc6acb89b80cb2243d3bb5453f"
+    },
+    {
+      "path": "captures/drawer-640x360-ar-dark.png",
+      "sha256": "67afb44000e50703907f9166150b85f96c76e4265222f2d1be9351ef7c9b4a8d"
+    },
+    {
+      "path": "captures/opening-640x360-ar-light.png",
+      "sha256": "7d68188534916d45e0501e9edd45b27818b7e447744cac9c55d401826b34f6a9"
+    },
+    {
+      "path": "captures/area-640x360-ar-light.png",
+      "sha256": "7bb1d3032b53a4e8997160aa9b51204e66a62f6fee6dc9e9eea29a50c680aa61"
+    },
+    {
+      "path": "captures/answer-640x360-ar-light.png",
+      "sha256": "94d8fe65c7ec2ba9dd79c289a7b13bf2a047a5900765d4414b08beca18b7f716"
+    },
+    {
+      "path": "captures/comparison-640x360-ar-light.png",
+      "sha256": "d5535302a7ab5691bcb57a12ae06e306969e68fe4e6d1aa7504f53983d934ae8"
+    },
+    {
+      "path": "captures/evidence-640x360-ar-light.png",
+      "sha256": "246218af18701562867b6fdfdfb37a922b0f237848b92de785a2d8974fd9d134"
+    },
+    {
+      "path": "captures/drawer-640x360-ar-light.png",
+      "sha256": "40d2075a0242e5df913b45269f30ec39302fd06697e32b46d0a4e1af39442850"
+    },
+    {
+      "path": "captures/opening-390x844-en-dark.png",
+      "sha256": "9d5febfea8d4e49f90c8a76c57fed898004c4cf9935fe91d6da905245d0f2701"
+    },
+    {
+      "path": "captures/area-390x844-en-dark.png",
+      "sha256": "851b47f0097e0c7df28f9c585cc5f076564698d187aefa5cf7fc22383820193f"
+    },
+    {
+      "path": "captures/answer-390x844-en-dark.png",
+      "sha256": "be27cddcda2fe5cad3f8f15a6406559e5ec7bc230ed5abf0e21a1e13abb240c9"
+    },
+    {
+      "path": "captures/comparison-390x844-en-dark.png",
+      "sha256": "23c6939dfa309d79a142f9d3b83a713915321991413af5ebb9ea38d938b56e6b"
+    },
+    {
+      "path": "captures/evidence-390x844-en-dark.png",
+      "sha256": "c10ad653552b28dcf92cdc6ef86faa0502fbe700738161e2c5898055e2502286"
+    },
+    {
+      "path": "captures/drawer-390x844-en-dark.png",
+      "sha256": "3e646cde30f5a14c804c02865c534e5f1be697643b723e4281a569fc01230991"
+    },
+    {
+      "path": "captures/opening-390x844-en-light.png",
+      "sha256": "ba36e0622aba72a2007a610ce16d322c9060fba549c63f1f5ab86e402db0b05a"
+    },
+    {
+      "path": "captures/area-390x844-en-light.png",
+      "sha256": "b44c6eacc24b43013ac2456a29ec1489bc247c127242ed3efc24c7257f424ceb"
+    },
+    {
+      "path": "captures/answer-390x844-en-light.png",
+      "sha256": "75421fe589b09616a7b8cab624ff6e4316f1d342311b4dea1ebcbac672776aa4"
+    },
+    {
+      "path": "captures/comparison-390x844-en-light.png",
+      "sha256": "f9f60944888389d07a946a6f8b3695aed18c86a7ff04a4fb4524a0bb76fe1ce3"
+    },
+    {
+      "path": "captures/evidence-390x844-en-light.png",
+      "sha256": "3b6708d75731c223afae451bcaf54db2f985c188730e6c18ddd3f7c6a863ad1b"
+    },
+    {
+      "path": "captures/drawer-390x844-en-light.png",
+      "sha256": "a0869d338fe79f3f3188cbe4d24295cb9642ccef508aa1465bfa5e88d67fe3cd"
+    },
+    {
+      "path": "captures/opening-390x844-ar-dark.png",
+      "sha256": "342ded03bdd160877b9987fa6d1e6065f96d41707ea0db95cc9e0feca536f9a5"
+    },
+    {
+      "path": "captures/area-390x844-ar-dark.png",
+      "sha256": "196e4480cb7e1fe2f93d419e73599f79a78ccc2e908c6758cd0082e7fe955c7d"
+    },
+    {
+      "path": "captures/answer-390x844-ar-dark.png",
+      "sha256": "609ddaafcb59e193c99c92c723723704e773ff179226530e562f2f7c7c29b5b6"
+    },
+    {
+      "path": "captures/comparison-390x844-ar-dark.png",
+      "sha256": "c9921e93d8be6c8a67efce13bf1edd1f68c3d54e3a28ea2dd4f54d8db34cd63b"
+    },
+    {
+      "path": "captures/evidence-390x844-ar-dark.png",
+      "sha256": "71dd5bbd8c9089e1e7a9d8aa1bf3e3778e751445557f373379c3f6c236d2fead"
+    },
+    {
+      "path": "captures/drawer-390x844-ar-dark.png",
+      "sha256": "9cfd4f76f074215afd2f9abc1f349ae41133ffba827be05df2e929c2a823dc8b"
+    },
+    {
+      "path": "captures/opening-390x844-ar-light.png",
+      "sha256": "ea00f3cadd5352a32fb66c83bc4bc179c313a0c9800b1b5314a12c8c74031b0e"
+    },
+    {
+      "path": "captures/area-390x844-ar-light.png",
+      "sha256": "a8cd0cbb4c9029d8565f9d2df6d6d2bbb8dfe974ef8b8763139e35201c401d6d"
+    },
+    {
+      "path": "captures/answer-390x844-ar-light.png",
+      "sha256": "78847dbb60d1c6b1807dfb12a688b5f3f18a522836fc48a6625ad57c4f1af96a"
+    },
+    {
+      "path": "captures/comparison-390x844-ar-light.png",
+      "sha256": "87562cbff45525023f2708e166ac80377851e6a1765b774b49b6f44d096c17d0"
+    },
+    {
+      "path": "captures/evidence-390x844-ar-light.png",
+      "sha256": "8b5ebb40e7e50b404f334611eac0baa59a8bc1182051f6fbc4cf3c3c1b8e4fae"
+    },
+    {
+      "path": "captures/drawer-390x844-ar-light.png",
+      "sha256": "e5cb38ac7e740e55ca8db3635228cd8d53b7f432f9947358f7becb6e596248b3"
+    },
+    {
+      "path": "captures/opening-844x390-en-dark.png",
+      "sha256": "30140b489c37542db62c517b562181055da1163ba3d09ad45a988035f1385ff2"
+    },
+    {
+      "path": "captures/area-844x390-en-dark.png",
+      "sha256": "ffa13eb040105e7ac6423fd2130adbb2ac276f5c73d148a233abdf3141d17590"
+    },
+    {
+      "path": "captures/answer-844x390-en-dark.png",
+      "sha256": "f63ba3ae50561eec56c70a71b94afdd6afe12e3c5644c2e298c3323a4c6ada4c"
+    },
+    {
+      "path": "captures/comparison-844x390-en-dark.png",
+      "sha256": "403cca92021d9adad7e79d84151d7f8a6c23a3c26274dbb248a1a99f150fff17"
+    },
+    {
+      "path": "captures/evidence-844x390-en-dark.png",
+      "sha256": "191338ee74c941a0f24a31e3abcf60ced46ae8feef34f9d8644a4002c48fc70d"
+    },
+    {
+      "path": "captures/drawer-844x390-en-dark.png",
+      "sha256": "6313895086808c7f12657bc6609adf90f6615c604b7f48c712583b154eaff859"
+    },
+    {
+      "path": "captures/opening-844x390-en-light.png",
+      "sha256": "0db3eb3c5df686c321411044b33a239c93cf97d92ad2fd19271d1734f3aac62f"
+    },
+    {
+      "path": "captures/area-844x390-en-light.png",
+      "sha256": "b21528c7f4ae1c170d86e4e6ba53d1424c105c1a45abf08c8159aa7acedf5a56"
+    },
+    {
+      "path": "captures/answer-844x390-en-light.png",
+      "sha256": "bd9a9b238b2bff78b9cfdd6990afbb89408115b9194f6ad951a2aab950ccd841"
+    },
+    {
+      "path": "captures/comparison-844x390-en-light.png",
+      "sha256": "5d344b7da9c5916764ba3583d763bc493ae3e6171735eb5e0eee8d8e53644ac1"
+    },
+    {
+      "path": "captures/evidence-844x390-en-light.png",
+      "sha256": "7e97c59e99e3b1b3333250610e0d67301e7384f8ab231d90ab01d39d37e75469"
+    },
+    {
+      "path": "captures/drawer-844x390-en-light.png",
+      "sha256": "fbc465299643c1d82cdf0ae8afd03722efe7982c95a6247564922b6fd50e2da4"
+    },
+    {
+      "path": "captures/opening-844x390-ar-dark.png",
+      "sha256": "45b2be9f24549dfe93d47496daec45d2237cf2a1c10948106644c2a932c9f612"
+    },
+    {
+      "path": "captures/area-844x390-ar-dark.png",
+      "sha256": "bf0d6edfb2dd31b6a147bc96211e059ba11e20d9a5675d5e8e7b2e060fb3f081"
+    },
+    {
+      "path": "captures/answer-844x390-ar-dark.png",
+      "sha256": "74272eb55f4a67bb8131ed4134819da4adb8e7ac0fb81040aad57c7e381a193e"
+    },
+    {
+      "path": "captures/comparison-844x390-ar-dark.png",
+      "sha256": "fa1509f08a439490808389ff0e08f082a44597140e3889e1ff2e883a3d736639"
+    },
+    {
+      "path": "captures/evidence-844x390-ar-dark.png",
+      "sha256": "62def47def758c4740fcbfd8676675490b96f86e81e1823672ede76d11375b04"
+    },
+    {
+      "path": "captures/drawer-844x390-ar-dark.png",
+      "sha256": "9061c338b93fb0e1db31b5535833296a8b7a078627ccb5a5db6aae75f86de79a"
+    },
+    {
+      "path": "captures/opening-844x390-ar-light.png",
+      "sha256": "0b1b467ca08184005840706d84cd4067e9f9c623bdfdcbeac597553190539152"
+    },
+    {
+      "path": "captures/area-844x390-ar-light.png",
+      "sha256": "de32cf6d80534a7ae35e790d9b64115de18ade467f76e5196775b60845512c4e"
+    },
+    {
+      "path": "captures/answer-844x390-ar-light.png",
+      "sha256": "b3820b94ad522201f8f31aeecbc6a6d4bd1f67d411df28d819002656c0244e8a"
+    },
+    {
+      "path": "captures/comparison-844x390-ar-light.png",
+      "sha256": "29400315ec8301b2236f10f8f8aef352aad9f27ab65b0cd53324f8b46b379435"
+    },
+    {
+      "path": "captures/evidence-844x390-ar-light.png",
+      "sha256": "db79f4a3ec8d08c9657f39089294ca7dfd4a6e8080c86895cf736c047fc2a362"
+    },
+    {
+      "path": "captures/drawer-844x390-ar-light.png",
+      "sha256": "c50e73d7e7dc89de5f7e0872fc0434c23f0af6ac8c7a5338bc6df86609c1659e"
+    },
+    {
+      "path": "captures/opening-768x1024-en-dark.png",
+      "sha256": "08ddc63316a3080f404ac73084020b6b92fdb8a6659a63bb73815320a164d80a"
+    },
+    {
+      "path": "captures/area-768x1024-en-dark.png",
+      "sha256": "5c6010b7a3b9bf0311466ac431158ec0c62530f039fbc0335a9fc06753f0523f"
+    },
+    {
+      "path": "captures/answer-768x1024-en-dark.png",
+      "sha256": "ab6c95dfbf342d1e61e1e8623c7f0863a87577759101a736dae85c6f86834f77"
+    },
+    {
+      "path": "captures/comparison-768x1024-en-dark.png",
+      "sha256": "90de63129980f5e84e6c5030bc6a845c571060b0331d380d3bb40bab49ac317e"
+    },
+    {
+      "path": "captures/evidence-768x1024-en-dark.png",
+      "sha256": "dfdc92fecd586ef6d2435e914a293f6ee25bb05f6d695cc75da866a13d8bda75"
+    },
+    {
+      "path": "captures/drawer-768x1024-en-dark.png",
+      "sha256": "5dbaba06f3c20745f0112080493e3cfb4f667b6897cfcc12c3769e599d5a1bdf"
+    },
+    {
+      "path": "captures/opening-768x1024-en-light.png",
+      "sha256": "9e6f4634a89e478cb53f68bee199b27b85ead3f1b499c0beb9c0006a5ae4221a"
+    },
+    {
+      "path": "captures/area-768x1024-en-light.png",
+      "sha256": "b8f6780b3c619e603f9533c14990960e426c0651444dd8021e43a7e021b9f4d9"
+    },
+    {
+      "path": "captures/answer-768x1024-en-light.png",
+      "sha256": "55e9d7424b3df82b47d15fb89e9856ba1e59f6c3f70a09c0e1883aded2e9ec59"
+    },
+    {
+      "path": "captures/comparison-768x1024-en-light.png",
+      "sha256": "28730b1e866cf18abafe5bad29cfd60e6aefc036d845604d4494c1878a82e20a"
+    },
+    {
+      "path": "captures/evidence-768x1024-en-light.png",
+      "sha256": "8142228498eee17977e9abc10763fb9bcc4dcd20cd3fd3c3d8c86b290e8364a6"
+    },
+    {
+      "path": "captures/drawer-768x1024-en-light.png",
+      "sha256": "d99032cc6643b7c933e6f5f0fdfca2a1a1692113064cbb0603c7cac45be1b02a"
+    },
+    {
+      "path": "captures/opening-768x1024-ar-dark.png",
+      "sha256": "9f3fcdddcf65cc47a92e4199976d04db5367f023c6b346053c36987061a83e72"
+    },
+    {
+      "path": "captures/area-768x1024-ar-dark.png",
+      "sha256": "8de95889d370548282043b2715ea8473a471b7db197435db9c5a240caae99bf4"
+    },
+    {
+      "path": "captures/answer-768x1024-ar-dark.png",
+      "sha256": "83e282ea9e2af84d1219e9491d6b6631411c88fd2612cae6aa048a7d61ca2595"
+    },
+    {
+      "path": "captures/comparison-768x1024-ar-dark.png",
+      "sha256": "91d896763c8cc33345e166483ff96a6a8a79db99d64ff63b39173a8966032bf9"
+    },
+    {
+      "path": "captures/evidence-768x1024-ar-dark.png",
+      "sha256": "9f01b261e98bf6b85a694d79baaa26922aa64a84672c2d47d4079d6be86e00e3"
+    },
+    {
+      "path": "captures/drawer-768x1024-ar-dark.png",
+      "sha256": "828824d91bc172add3b857d419e06007cd879b50be20ae7a3e55fa1c013e403c"
+    },
+    {
+      "path": "captures/opening-768x1024-ar-light.png",
+      "sha256": "f9df66cf019970d1423707054ffbb1b9f1ffd23e7b4cbced0b7125f64d899f0d"
+    },
+    {
+      "path": "captures/area-768x1024-ar-light.png",
+      "sha256": "b020942c8b17b013594d8708b25b3ad3ff091137ee187684610ed4fd64823c85"
+    },
+    {
+      "path": "captures/answer-768x1024-ar-light.png",
+      "sha256": "6b51378609b1c7535e6a667845331f67a7b07135e2a658b69ce0e6fe4b1b7b17"
+    },
+    {
+      "path": "captures/comparison-768x1024-ar-light.png",
+      "sha256": "6d538e22f8e623489b1bf3be555a7ac33c1a254115e0212b0869ec5e6f9077e5"
+    },
+    {
+      "path": "captures/evidence-768x1024-ar-light.png",
+      "sha256": "ea50c2439de1710f5708c942a8f7e339bd1fddf604ee019be14d2d3d9af418ac"
+    },
+    {
+      "path": "captures/drawer-768x1024-ar-light.png",
+      "sha256": "e8d2ed2f780e6b165584d39cbd04c156865e1c254f97ca48507e9860efd835a8"
+    },
+    {
+      "path": "captures/opening-1024x768-en-dark.png",
+      "sha256": "3498f7010cd7f5a75587c593656177561832df2e7cfc41d5652b1ddee44cf842"
+    },
+    {
+      "path": "captures/area-1024x768-en-dark.png",
+      "sha256": "e807153923f271158423dcc23b2b0d77f480bda88ced958ef1deadb2a567594b"
+    },
+    {
+      "path": "captures/answer-1024x768-en-dark.png",
+      "sha256": "7a6e50a3a9fb1bed7be626055ae78982c0b3a0a663278d9f2ebff0000d9e5dff"
+    },
+    {
+      "path": "captures/comparison-1024x768-en-dark.png",
+      "sha256": "ba77803cc5cbae6ea35691096aed551e99ae70162aae522aaf77507dfbc2e622"
+    },
+    {
+      "path": "captures/evidence-1024x768-en-dark.png",
+      "sha256": "78111316870640d03ba876e097f7ae7c7f3daa6753495a8028b347dc6662b335"
+    },
+    {
+      "path": "captures/drawer-1024x768-en-dark.png",
+      "sha256": "e0d29435fb556be48bbe9b36bb2c780a2451aafdd2347edb9da13493587f196f"
+    },
+    {
+      "path": "captures/opening-1024x768-en-light.png",
+      "sha256": "ad4ae4be12a965eaca3ddae8b902282871431d4a16fe5175fcc4ec48c0272a32"
+    },
+    {
+      "path": "captures/area-1024x768-en-light.png",
+      "sha256": "0f6fa0dbc06ed6c598eb9a7bb36579b93659c93cf5c09642e79109b7b2c29249"
+    },
+    {
+      "path": "captures/answer-1024x768-en-light.png",
+      "sha256": "dccb609f816b6e2948351a6eb10907a187898ed58d4a6abff7cffbb5e0971756"
+    },
+    {
+      "path": "captures/comparison-1024x768-en-light.png",
+      "sha256": "fb845f931f1a642b38b9f2552352bfa06a4e93e4e749ae6bcd2ff3fd84020fec"
+    },
+    {
+      "path": "captures/evidence-1024x768-en-light.png",
+      "sha256": "bf45bc2c45242247085fef92b7f02142df1cf1f2a44ae85b5c7f158b458d3c29"
+    },
+    {
+      "path": "captures/drawer-1024x768-en-light.png",
+      "sha256": "bcec8e54f2fff5588bfe2d9441dbeb633416d38b350c72cb7d1fd20be9830678"
+    },
+    {
+      "path": "captures/opening-1024x768-ar-dark.png",
+      "sha256": "b955112e3e3019421e33d882b4206ea5b8f1c408e9122c37a3673287ff953da9"
+    },
+    {
+      "path": "captures/area-1024x768-ar-dark.png",
+      "sha256": "7efeb65d440e945ae86e4b9884d65e35c272d8f21d499c3c45a78a304268063b"
+    },
+    {
+      "path": "captures/answer-1024x768-ar-dark.png",
+      "sha256": "95f8bfac4789a3b578775b259927603cc92b209bc6a873b3c8ba2397f35e2d76"
+    },
+    {
+      "path": "captures/comparison-1024x768-ar-dark.png",
+      "sha256": "7bdc997313da988f79290333c3877d2fc9daea88df475926d60be9d2eb3fa757"
+    },
+    {
+      "path": "captures/evidence-1024x768-ar-dark.png",
+      "sha256": "fe0132a48fdd052e7138b04a00c1eb14d516491d2edcfc6ab39847e15b79a8bb"
+    },
+    {
+      "path": "captures/drawer-1024x768-ar-dark.png",
+      "sha256": "41ee7b7560577532c5613f870ce3d7fed1924a33a3af1f263708a31f42d1e1cd"
+    },
+    {
+      "path": "captures/opening-1024x768-ar-light.png",
+      "sha256": "6ece8ec7095d0755ecc785ed8188bcd18b3765a219da1dbddb6f8c3530bf4cc6"
+    },
+    {
+      "path": "captures/area-1024x768-ar-light.png",
+      "sha256": "2f35217fed7e7f1d0d0b21dcd72b8a4fefe3fa7f9c4eea697bd7e2a7affed05a"
+    },
+    {
+      "path": "captures/answer-1024x768-ar-light.png",
+      "sha256": "34f3004a1748d90bbb31d6646714eeb78bd5a4f801bbe12b445fa811c254d5c0"
+    },
+    {
+      "path": "captures/comparison-1024x768-ar-light.png",
+      "sha256": "945446dc3cc55e24a795273f6175d4427f674f48346056261700a936bee2f675"
+    },
+    {
+      "path": "captures/evidence-1024x768-ar-light.png",
+      "sha256": "4b8bf282164e613ca368107b9369a7627b6af5af533cc7470c7fa28a9a1628cc"
+    },
+    {
+      "path": "captures/drawer-1024x768-ar-light.png",
+      "sha256": "2cd2bdc97be94265543fc4f4d7c2e8a8529f90403be9c45be5984e66e070837a"
+    },
+    {
+      "path": "captures/opening-1366x768-en-dark.png",
+      "sha256": "df31a4824efb1ef72b137e1065254632b25af9d44bc1cf7313961f108f0c56d8"
+    },
+    {
+      "path": "captures/area-1366x768-en-dark.png",
+      "sha256": "c1d6ff9db35a5e753c9f9783bc30dd3f1710a55417be7ddd4d5d46502ee77a14"
+    },
+    {
+      "path": "captures/answer-1366x768-en-dark.png",
+      "sha256": "8279bc908f5ffa1ae1231fa1ed3fdfb5de26780f94c62959c1e92a5b48200160"
+    },
+    {
+      "path": "captures/comparison-1366x768-en-dark.png",
+      "sha256": "273205e1539a57172b5b22c2e4ed9703993b5f380e8922829122b2f0c3f32693",
+      "storage": {
+        "original_container_sha256": "54c2c1d08c384dbf0183ade3fcf2aeb81f243f6a0717f214d156307f0337a951",
+        "decoded_scanlines_sha256": "1c897647a6b8cb6bb162795625168e9c779ef05beec26b8ff8d6a1e0d46f453b",
+        "other_chunks_identical": true,
+        "storage_encoding": "Lossless IDAT recompression at level 9; identical decoded scanlines and all other chunks."
+      }
+    },
+    {
+      "path": "captures/evidence-1366x768-en-dark.png",
+      "sha256": "83340bf443939f9f0ac04ff22ee5f6b3305464340d8ef1774be9746183545121"
+    },
+    {
+      "path": "captures/drawer-1366x768-en-dark.png",
+      "sha256": "1bd4a0da14822e047ea91bcede8c77fc57f9ab2c8068e0e606ec1634f91ebef8"
+    },
+    {
+      "path": "captures/opening-1366x768-en-light.png",
+      "sha256": "01fbb8b43958e129e31db69d337a2180927bc3655129803ca0c89d18cdab598a"
+    },
+    {
+      "path": "captures/area-1366x768-en-light.png",
+      "sha256": "b1d5a176391a70e50683d9a39d2f0e86e391db31862a7d5d4775cdb62c6ca369"
+    },
+    {
+      "path": "captures/answer-1366x768-en-light.png",
+      "sha256": "fcc3c9b1f3278c3d7aa965792f06ede0a1cbb5fc17871edfbe372aa2c06b52f5"
+    },
+    {
+      "path": "captures/comparison-1366x768-en-light.png",
+      "sha256": "b362b406f836efa3723d914b7a4614ffd7a13acc0a2b5cc0e583e4779a6c9a9e"
+    },
+    {
+      "path": "captures/evidence-1366x768-en-light.png",
+      "sha256": "5d8a749dde1fc02b1097d01a21fc218219dc43a39064ee80ac4c2a22e6119d57"
+    },
+    {
+      "path": "captures/drawer-1366x768-en-light.png",
+      "sha256": "e5634053652eb7cb6e2c06f8aefff3f0000f3075355e1cdd659524448d3dd78b"
+    },
+    {
+      "path": "captures/opening-1366x768-ar-dark.png",
+      "sha256": "1fc2ca594a2325b13dbd122a44a4fd139bea873de40b6e06ce492e8c5bb5385e"
+    },
+    {
+      "path": "captures/area-1366x768-ar-dark.png",
+      "sha256": "aec8b5b5150bce2784fecb5f5708d777873794cede7d53e61174e52251a90470"
+    },
+    {
+      "path": "captures/answer-1366x768-ar-dark.png",
+      "sha256": "f8dd8c4d87ab094b8b136731e81fdbc561fb407122d0357f5799fb55fdd94ae4"
+    },
+    {
+      "path": "captures/comparison-1366x768-ar-dark.png",
+      "sha256": "8e36451e9cfaccec5341d58a9859ac67acca43bf3eff14f873b715fe6976b675"
+    },
+    {
+      "path": "captures/evidence-1366x768-ar-dark.png",
+      "sha256": "515478e4f80ee2a9b8b2db78b339d00e67878347b1486892895081d52542ab5b"
+    },
+    {
+      "path": "captures/drawer-1366x768-ar-dark.png",
+      "sha256": "7c06df3a44c307ae087f6df8829daef507a7bcf6c037bc3a60c9814ae641e6f5"
+    },
+    {
+      "path": "captures/opening-1366x768-ar-light.png",
+      "sha256": "b2aead8e530a8ff8dc785744f9ea778d25684342b672f9da11f9e26eac021bd9"
+    },
+    {
+      "path": "captures/area-1366x768-ar-light.png",
+      "sha256": "bb74d9e57d750d0a19f01271f180421f78cfc5f727845c9545bdd2b8b5f79f9e"
+    },
+    {
+      "path": "captures/answer-1366x768-ar-light.png",
+      "sha256": "340f5c7516a60b09202248d78b3db91060f26e4dde967e08c87c310bcc15acfb"
+    },
+    {
+      "path": "captures/comparison-1366x768-ar-light.png",
+      "sha256": "9e961741dab4ab8a0b34c216d40131329b856e27839280fa09b97cd18958d751"
+    },
+    {
+      "path": "captures/evidence-1366x768-ar-light.png",
+      "sha256": "4b32f11e7663c8f148f31004121223be91ab45f68df42ffc465c61d3061b6042"
+    },
+    {
+      "path": "captures/drawer-1366x768-ar-light.png",
+      "sha256": "e99b3b2e5582ad0a87926732e1ba56c25b377af0ca897e379354c8ac03d8cae8"
+    },
+    {
+      "path": "captures/opening-1440x900-en-dark.png",
+      "sha256": "1971a7e6e650c686ddebd4a2c897b72e95726f5fffee1a4b1b9fa46bb68a610e"
+    },
+    {
+      "path": "captures/area-1440x900-en-dark.png",
+      "sha256": "f7f6c0594e3956aeeab989b3647317522ea4c7a41576400396b4638901b369b4"
+    },
+    {
+      "path": "captures/answer-1440x900-en-dark.png",
+      "sha256": "8aae1969ac2fcefd8b13bfc241c3eee423b4034e8ed9474915b5e41c77843881"
+    },
+    {
+      "path": "captures/comparison-1440x900-en-dark.png",
+      "sha256": "5a7dee665c16dbd289a198e0b6edd67b341b087d2b88c562b18c485aeffdcefc"
+    },
+    {
+      "path": "captures/evidence-1440x900-en-dark.png",
+      "sha256": "ea81fc20c472b40d37801af2f9de0c7aaeca96610c6ead658760d346347279d4"
+    },
+    {
+      "path": "captures/drawer-1440x900-en-dark.png",
+      "sha256": "1a77772bc703ed6a3ece1a83d7adbbfd38cea8a2b640574f155fd419f18aab1a"
+    },
+    {
+      "path": "captures/opening-1440x900-en-light.png",
+      "sha256": "b4de4ea17ad096c6bd74af086d88038d61b57be08cc8ae497f7a41c6733fae0c"
+    },
+    {
+      "path": "captures/area-1440x900-en-light.png",
+      "sha256": "1e1c51204b6f67ce12e3452431e51a1184c6751224d771b2fc1d640352fbf788"
+    },
+    {
+      "path": "captures/answer-1440x900-en-light.png",
+      "sha256": "7228b47b59cfce1ed53e642aabd09f35e6fa052bc16b1ecd89b81eb1b0651bfc"
+    },
+    {
+      "path": "captures/comparison-1440x900-en-light.png",
+      "sha256": "29c7db91bafee51f55b424f587e4b2f929349c8894aa8a9cc90862b75295fcd9"
+    },
+    {
+      "path": "captures/evidence-1440x900-en-light.png",
+      "sha256": "af42a30bc096f78a5e28f371487eb17bf164278a6e1afd0308e5097b730ef010"
+    },
+    {
+      "path": "captures/drawer-1440x900-en-light.png",
+      "sha256": "82d0029381ff84c98f0ed689047cf1c3bcd97856fc035ae04e4c4c7b50203a00"
+    },
+    {
+      "path": "captures/opening-1440x900-ar-dark.png",
+      "sha256": "3eb3ec3f642bef72be5231bb41d7cccdcaf2093bb0f3b4b5f585ea2975e4566a"
+    },
+    {
+      "path": "captures/area-1440x900-ar-dark.png",
+      "sha256": "60d8b9299dd116b4ff48f423980e48060111952d46f43330039d3916ef1c17a4"
+    },
+    {
+      "path": "captures/answer-1440x900-ar-dark.png",
+      "sha256": "9747836eb4020a4c255d78a157e1bd48f1feee53da84a719eb2bb3a8f6490227"
+    },
+    {
+      "path": "captures/comparison-1440x900-ar-dark.png",
+      "sha256": "70bda0be1f812c3dd69b76a82c3cd7053506fb3c0c29760c78ed9aeab8945835"
+    },
+    {
+      "path": "captures/evidence-1440x900-ar-dark.png",
+      "sha256": "a0d02d041cda16b654a6de4c9712e9df3312ab966e657bf9883e289cef10b267"
+    },
+    {
+      "path": "captures/drawer-1440x900-ar-dark.png",
+      "sha256": "76a38d1f0f5f814676067e2f2e0d930f4adb67ee75996fbdb63ba3fec6fb64c3"
+    },
+    {
+      "path": "captures/opening-1440x900-ar-light.png",
+      "sha256": "a84cc32bf2a3dbb12cc54acbc81a8852ced298b13bcea01fac4689a08a81a148"
+    },
+    {
+      "path": "captures/area-1440x900-ar-light.png",
+      "sha256": "e0c89d81a7e6ba7e685f5fcba164d2bdf1a6d85dd0ee280daf44a55afc4124f3"
+    },
+    {
+      "path": "captures/answer-1440x900-ar-light.png",
+      "sha256": "1df666c956856b2320e458be0e1c610fd668b963fd7d1824265513f2825586d4"
+    },
+    {
+      "path": "captures/comparison-1440x900-ar-light.png",
+      "sha256": "cdcaa3d3916906d13b9ae300abdc5c243c98ffd601c30046c8d2586160663917"
+    },
+    {
+      "path": "captures/evidence-1440x900-ar-light.png",
+      "sha256": "69d437b2c16ad6b23c713822cb2f0df0f6bb15fca28d5572e60d55cb54af6ffa"
+    },
+    {
+      "path": "captures/drawer-1440x900-ar-light.png",
+      "sha256": "08ae34c2df387586a89119142e7456b1c7c16f5c3c0fc3b4fccff50924677e76"
+    },
+    {
+      "path": "captures/opening-1920x1080-en-dark.png",
+      "sha256": "6d8f5f0cd97080b2b40b7e654de8a9dc4c7eb14ca52e9a93c52ab8afb9184392"
+    },
+    {
+      "path": "captures/area-1920x1080-en-dark.png",
+      "sha256": "77789683c6cb0ed1357b609779014481143bdbdfdf55c27fd24a8b85c5bc9999"
+    },
+    {
+      "path": "captures/answer-1920x1080-en-dark.png",
+      "sha256": "370ec2cf90a05bd49adbcda9684f6c8d59e45c1025e3ef2846f1588c44254a8d"
+    },
+    {
+      "path": "captures/comparison-1920x1080-en-dark.png",
+      "sha256": "08d048bc6ebf1f96026f0ff3a17dadaf01f7514244d5e2979b9693e2f5f40f31"
+    },
+    {
+      "path": "captures/evidence-1920x1080-en-dark.png",
+      "sha256": "415acad91b38c4b45e6c4ece2c4dd73762a4c51abd451ad4d4b59bba5124d79b"
+    },
+    {
+      "path": "captures/drawer-1920x1080-en-dark.png",
+      "sha256": "708c92200e69f4dab52e525354ab8e478ef630a8abdbb52576c6182c7ca289ec"
+    },
+    {
+      "path": "captures/opening-1920x1080-en-light.png",
+      "sha256": "277a91df77231944769ee355e7384a8a3d87e0bac7784272f1513fbdbdc2f9a0"
+    },
+    {
+      "path": "captures/area-1920x1080-en-light.png",
+      "sha256": "dd624aaf94342f8619b1299abf79966315ed6ac005d30572d67e3c93d5e8190d"
+    },
+    {
+      "path": "captures/answer-1920x1080-en-light.png",
+      "sha256": "a54f0d7eb7d8225edde5de9016ff637e3ff215aad56ad40604450913086a4067"
+    },
+    {
+      "path": "captures/comparison-1920x1080-en-light.png",
+      "sha256": "f1a832094c78449e9838c4712c26870555bfa254728c339544f635c47c139098"
+    },
+    {
+      "path": "captures/evidence-1920x1080-en-light.png",
+      "sha256": "fb1af54fdba6551a373a0c98bfd59df84b531d2f709a266f538ebe1e63f72a29"
+    },
+    {
+      "path": "captures/drawer-1920x1080-en-light.png",
+      "sha256": "bae5c196eb01ff585d1765d59bd58220d1212727ace3799d2d0e511da9b16463"
+    },
+    {
+      "path": "captures/opening-1920x1080-ar-dark.png",
+      "sha256": "b594caa3f4c792696c24dfcb75f3267112ed3306f339ca65f894290200720ae4"
+    },
+    {
+      "path": "captures/area-1920x1080-ar-dark.png",
+      "sha256": "9cfd231251f5697250cbc9145d13e26dd6a49f30352dac9669cfa4a67f0e4cf4"
+    },
+    {
+      "path": "captures/answer-1920x1080-ar-dark.png",
+      "sha256": "aaae4f5b3a062c5be723bb4934f7f597ec915bf2ac56944e668f5d9d299a9ee0"
+    },
+    {
+      "path": "captures/comparison-1920x1080-ar-dark.png",
+      "sha256": "a13091f7f2ae3929de86e99928c7bc193f555dbf1620911332a667c81480acd4"
+    },
+    {
+      "path": "captures/evidence-1920x1080-ar-dark.png",
+      "sha256": "0d4100d4dd0691e91c4ee251d5455b4a29fe651ffc2d5ce4aa54160f0da65870"
+    },
+    {
+      "path": "captures/drawer-1920x1080-ar-dark.png",
+      "sha256": "ffbb1bf456a0950dd75c4b94173b2ecb8ee703aaf3027eb289203243684dcdf0"
+    },
+    {
+      "path": "captures/opening-1920x1080-ar-light.png",
+      "sha256": "a530e3a32986ff5f8cfc21e2bb75ed458b586de03a8ae99b1a8286d07fed6ca8"
+    },
+    {
+      "path": "captures/area-1920x1080-ar-light.png",
+      "sha256": "b6d390ff62df8bdcd55af60ac4abb2756c544b7a84d62ed63ce776e7af4451fc"
+    },
+    {
+      "path": "captures/answer-1920x1080-ar-light.png",
+      "sha256": "eb5d2bd0b60378d43396e245e92323db9c42c0a33bec264826f2b874d1a093bb"
+    },
+    {
+      "path": "captures/comparison-1920x1080-ar-light.png",
+      "sha256": "021a4d385d00de0c6d9fbd25c9ebdab894da546a4a3f1504f535a03e11457834"
+    },
+    {
+      "path": "captures/evidence-1920x1080-ar-light.png",
+      "sha256": "53f3cd7acca92ad81cba1eccd2ffb53dd6d370dbee45e2629e78da0a090bd9a0"
+    },
+    {
+      "path": "captures/drawer-1920x1080-ar-light.png",
+      "sha256": "b47510d760e30243867342dd12ed1e81090006e05a26f50996b4e64f2a9d5a51"
+    },
+    {
+      "path": "captures/opening-2560x1440-en-dark.png",
+      "sha256": "cbd11827b27d622f553afd13d4d75e74c8b6ec32fc5edb086699277171416444"
+    },
+    {
+      "path": "captures/area-2560x1440-en-dark.png",
+      "sha256": "e3bb4ab92e4cb7b7f20cab8c15c57a33eb105f25480ee85437822b5d91134b5d"
+    },
+    {
+      "path": "captures/answer-2560x1440-en-dark.png",
+      "sha256": "307b4ddceaa3dcfb9297a708e5cb98780083dbb0fbd50b8e1a23f9fe18edf4f2"
+    },
+    {
+      "path": "captures/comparison-2560x1440-en-dark.png",
+      "sha256": "6d1781f4a3970be60a4d44b99781d9cd381dbb7e7257bd89ce422f791e846367"
+    },
+    {
+      "path": "captures/evidence-2560x1440-en-dark.png",
+      "sha256": "e31217bad24fb599c15ffa688751d1ffca5d4503d67eb19e30a1ea62ffe2fcfd"
+    },
+    {
+      "path": "captures/drawer-2560x1440-en-dark.png",
+      "sha256": "3b1fc36a46884775a496b3919043295219878621e660b12b0098bb74bfd98358"
+    },
+    {
+      "path": "captures/opening-2560x1440-en-light.png",
+      "sha256": "121e26e663e78bd28cf9fa89420c25abbc4bfd5944a97936f6c4bd4659dc6700"
+    },
+    {
+      "path": "captures/area-2560x1440-en-light.png",
+      "sha256": "6aeed34e0dd2a762f1a71b18d52258fac61f790e2f07588efcdceb451641dc8f"
+    },
+    {
+      "path": "captures/answer-2560x1440-en-light.png",
+      "sha256": "eb7effd557a41bc633c32861065bbf4ede643b26858dc87e4adb72c4b82dfb6a"
+    },
+    {
+      "path": "captures/comparison-2560x1440-en-light.png",
+      "sha256": "8d32195135ec08700d571eec83328b8f54b43d48cc60f56b4542ce509be45b7d"
+    },
+    {
+      "path": "captures/evidence-2560x1440-en-light.png",
+      "sha256": "74ce0865c8d4e83fcecb4ce1909bfae6ef5fe7b471f48f99947ce78fd5ce27ef"
+    },
+    {
+      "path": "captures/drawer-2560x1440-en-light.png",
+      "sha256": "8d0ecba7e53bcbe1c2f51f852461ada47f30e48c10525335780db92cd41f9875"
+    },
+    {
+      "path": "captures/opening-2560x1440-ar-dark.png",
+      "sha256": "6a9a1497fe5ea7d96407c560866d701efe7ed19a8b418d4ffe988cd79c30d265"
+    },
+    {
+      "path": "captures/area-2560x1440-ar-dark.png",
+      "sha256": "ecdad2dd6aaaaa6890c1e37690e911f37c6c2248388382f1faa0bc32c17560a7"
+    },
+    {
+      "path": "captures/answer-2560x1440-ar-dark.png",
+      "sha256": "a4f8ed836d714d63f1f825415e715654b28d907b0fe6e4bffb04618e6894d4d1"
+    },
+    {
+      "path": "captures/comparison-2560x1440-ar-dark.png",
+      "sha256": "b05f5a1ecce39f920e11807f3bd8db6976678c405834ffce9bf9e3cc552e850e"
+    },
+    {
+      "path": "captures/evidence-2560x1440-ar-dark.png",
+      "sha256": "0e7592b0b9ea777c06b36020b28a2a54def67738a58a05f2fbd1de544e7d6a35"
+    },
+    {
+      "path": "captures/drawer-2560x1440-ar-dark.png",
+      "sha256": "ef52f7e75469395f4351f081c14d3aa9bb67d9a756562aa0c927e0be7e0d795e"
+    },
+    {
+      "path": "captures/opening-2560x1440-ar-light.png",
+      "sha256": "6eb7ae5b3e763826a7a8ee30f52a2b83bbb80364783b6cbdd52f56c93ac8315d"
+    },
+    {
+      "path": "captures/area-2560x1440-ar-light.png",
+      "sha256": "990659cd9477e35dc269ab70d97c09e3b419d62c07482d0dde3167ab192d5e7e"
+    },
+    {
+      "path": "captures/answer-2560x1440-ar-light.png",
+      "sha256": "e6ab9687d79102012576b84053741632bca6b2bc2a010e603004ee96577357c6"
+    },
+    {
+      "path": "captures/comparison-2560x1440-ar-light.png",
+      "sha256": "324745a301af9df3ee08ba022f971a8f25d372600216c0abb2445f966d5ef730"
+    },
+    {
+      "path": "captures/evidence-2560x1440-ar-light.png",
+      "sha256": "326dc4c654886fdc80708fe995469703e04c5b7570b548b17512d1513404dca8"
+    },
+    {
+      "path": "captures/drawer-2560x1440-ar-light.png",
+      "sha256": "f220de4487e788d9e16e460678be106332382bb5a3f720fb21ace99c4f7f457c"
+    },
+    {
+      "path": "captures/opening-3440x1440-en-dark.png",
+      "sha256": "2b59af6cba9e8ec2440df8b56ed78c97c480e4c9545db3ed161fbc6296f0b21d"
+    },
+    {
+      "path": "captures/area-3440x1440-en-dark.png",
+      "sha256": "e905269492b95980963fe8c88dcd08989abf8f5e64d9bb5fadf2add98cd25be5"
+    },
+    {
+      "path": "captures/answer-3440x1440-en-dark.png",
+      "sha256": "4f93f8fa8c6cf14b2b5143948bf920829fe5d16f5e9af7c08cee320c26e75cef"
+    },
+    {
+      "path": "captures/comparison-3440x1440-en-dark.png",
+      "sha256": "615572a203482f34e813ea1b50c3387fe4eaf6a4c504008af01057bd45c2049b"
+    },
+    {
+      "path": "captures/evidence-3440x1440-en-dark.png",
+      "sha256": "eb9a640e406cba07ce3566710ee8478abcdb83862b67e43d66a9112e091e9649"
+    },
+    {
+      "path": "captures/drawer-3440x1440-en-dark.png",
+      "sha256": "62946d3d3149c676f61b4ce73eb977a86398cf91970ff51af828363ec8ca3a21"
+    },
+    {
+      "path": "captures/opening-3440x1440-en-light.png",
+      "sha256": "09afb732551ff95fc9a3f2af52bc3f390ecbc35d545146cd04824f284fb8623f"
+    },
+    {
+      "path": "captures/area-3440x1440-en-light.png",
+      "sha256": "8df30d4f19598ea9e5d30de433b7fc647bde5e139447715e2900d80c7495678d"
+    },
+    {
+      "path": "captures/answer-3440x1440-en-light.png",
+      "sha256": "9e9c267cc4c6e03b7bcb5131fe2afd6d8c638ed52e3bd2016e50affcbf1fe321"
+    },
+    {
+      "path": "captures/comparison-3440x1440-en-light.png",
+      "sha256": "357750c1c8fbdd928b357531882d0c982a49a4cb14edadcfea12d12057982cd6"
+    },
+    {
+      "path": "captures/evidence-3440x1440-en-light.png",
+      "sha256": "ac477e158f7c98c6bac39ce7bd41065531084a75de7a00198ac86a5e438517fa"
+    },
+    {
+      "path": "captures/drawer-3440x1440-en-light.png",
+      "sha256": "30a124901d7cbd165fd8601aa0a88bdc9c5d99bb7c9f42e8a69f873aa1b8874b"
+    },
+    {
+      "path": "captures/opening-3440x1440-ar-dark.png",
+      "sha256": "9e8199748f005ebcfeba98e3ec45e7658b243b39fa9bd9c57e99ce83f8d3b855"
+    },
+    {
+      "path": "captures/area-3440x1440-ar-dark.png",
+      "sha256": "f575f7e989467d0c7651e1068c4efdbf02c311ccdc62d2a32f1f44276dfe7c03"
+    },
+    {
+      "path": "captures/answer-3440x1440-ar-dark.png",
+      "sha256": "e382b5b4321b514a6a54ed70baacf07f784f7978ce6278e1e3f348a41efcab21"
+    },
+    {
+      "path": "captures/comparison-3440x1440-ar-dark.png",
+      "sha256": "d034a2bd4e765517d443d7777c0b8011b320decb4e4c8b374d7e81a48dce48a0"
+    },
+    {
+      "path": "captures/evidence-3440x1440-ar-dark.png",
+      "sha256": "07f14387a87e8d7b30cb2065110f92465ab90e06a1cc33bc47b78d5e00f34511"
+    },
+    {
+      "path": "captures/drawer-3440x1440-ar-dark.png",
+      "sha256": "1cf8426c0aed1740c58aa1842644d98ca49f00bb340e708b85b412a2a2a3ff55"
+    },
+    {
+      "path": "captures/opening-3440x1440-ar-light.png",
+      "sha256": "69585f9ba8c0132efe4f3b43fcb7e109bd70047093f716d62c7c58e4e9def08d"
+    },
+    {
+      "path": "captures/area-3440x1440-ar-light.png",
+      "sha256": "07a754b512c727dd6c10d13ce0789bfd6d58b6dcc039c32afc561b5401dca3ab"
+    },
+    {
+      "path": "captures/answer-3440x1440-ar-light.png",
+      "sha256": "938adc9de39eec75125c2a9acaa15fda5f9626385092403b2cc1b12dafa62015"
+    },
+    {
+      "path": "captures/comparison-3440x1440-ar-light.png",
+      "sha256": "b2fac2764a178caa6c925cafd977128c2a7a2bf284e0cd295176071f983e5868"
+    },
+    {
+      "path": "captures/evidence-3440x1440-ar-light.png",
+      "sha256": "22071523d21f199a695d2bcb6c7fad240800f7f513cf271ce83528863e2a504c"
+    },
+    {
+      "path": "captures/drawer-3440x1440-ar-light.png",
+      "sha256": "4df72ab15c10096f37c9de91c95817ed58af9e9edd340a2d2af77fe1d119dea6"
+    },
+    {
+      "path": "captures/opening-3840x2160-en-dark.png",
+      "sha256": "c62218fa10cc312a4caa1ca2603bf45e18bb55613e042191f90c5aae1d60847f"
+    },
+    {
+      "path": "captures/area-3840x2160-en-dark.png",
+      "sha256": "6ada7be026e4bf4689f2b2b392cbe3833aaaf01ccb6bc34014cb398b25850e45"
+    },
+    {
+      "path": "captures/answer-3840x2160-en-dark.png",
+      "sha256": "d16022f90a8504ccf53cacbc134198ce124e4e643db0c894f5af9e76ff9be1eb"
+    },
+    {
+      "path": "captures/comparison-3840x2160-en-dark.png",
+      "sha256": "39f52e2d60a5b6b3d22ecaf6c4edf6f59f3bef4006d5ab77608fab2ed4073b7c"
+    },
+    {
+      "path": "captures/evidence-3840x2160-en-dark.png",
+      "sha256": "b5ade8f38201143decb37310c5fc89e65bbefb8e87d55ddb4151f805d29cd8f7"
+    },
+    {
+      "path": "captures/drawer-3840x2160-en-dark.png",
+      "sha256": "45a73ba5d15dbae601a84745804f1f065a6e7a81f0c4a110f313cba554f0a5de"
+    },
+    {
+      "path": "captures/opening-3840x2160-en-light.png",
+      "sha256": "14fe38476c47156edcf33ca73df5b834a1b1f4b6ff04714574fe3ded80248d7f"
+    },
+    {
+      "path": "captures/area-3840x2160-en-light.png",
+      "sha256": "0f7c69541223457ea04258256b62b127bded1392f925c432b448843bd5d015aa"
+    },
+    {
+      "path": "captures/answer-3840x2160-en-light.png",
+      "sha256": "a30cf14b999a0134a7e7ccd635e5e5bd0b34b29858fb075436b6b21f2603ffde"
+    },
+    {
+      "path": "captures/comparison-3840x2160-en-light.png",
+      "sha256": "d0692c1bed289cebd340cb403ddece1f93d8072d34583c19c7f84a25918bcee0"
+    },
+    {
+      "path": "captures/evidence-3840x2160-en-light.png",
+      "sha256": "37112fa4b93d2f841d55a9ca204cbe0dd72b5651866ce07818bc17808205706e"
+    },
+    {
+      "path": "captures/drawer-3840x2160-en-light.png",
+      "sha256": "4c19baaedb9731b4a1b0c2f747da9be13f9a5ade6341b91a0d2f2c6a10010c34"
+    },
+    {
+      "path": "captures/opening-3840x2160-ar-dark.png",
+      "sha256": "71dbf57f63ef814f710bae2d25c98a0ba038b06dc6d3d055a85eeed120672b93"
+    },
+    {
+      "path": "captures/area-3840x2160-ar-dark.png",
+      "sha256": "f54a41011f856979ae6796cc7bf557e59602838f92039ca2f2c62b0cdcd0a413"
+    },
+    {
+      "path": "captures/answer-3840x2160-ar-dark.png",
+      "sha256": "511e9c2b961fb25e5f499294d6553b41ff329b90fe523e0c925a60ed648dacc1"
+    },
+    {
+      "path": "captures/comparison-3840x2160-ar-dark.png",
+      "sha256": "794afac29314c110d0644190e33b05ebd3b16c7126daf29bbf448f0ca5ee2613"
+    },
+    {
+      "path": "captures/evidence-3840x2160-ar-dark.png",
+      "sha256": "66a17de31476e4879820f8c45a883341a3d31379fe3deb51146bfda8f96fe738"
+    },
+    {
+      "path": "captures/drawer-3840x2160-ar-dark.png",
+      "sha256": "3d77094bce639730e250d82ad9f8f3647a33649f5ece58a92136ae2a6512c715"
+    },
+    {
+      "path": "captures/opening-3840x2160-ar-light.png",
+      "sha256": "c2c2860c47ddf8ceb9c2876e9bf19a71d574fce156f98aa8b68b0ffdfe5884cc"
+    },
+    {
+      "path": "captures/area-3840x2160-ar-light.png",
+      "sha256": "46cee0b2c99fd5af0997486801ac9636c75493048841500121310d4d2474199d"
+    },
+    {
+      "path": "captures/answer-3840x2160-ar-light.png",
+      "sha256": "bc3ecb721632a99e988ade000496c0a8179f55dea5fca4acfb43e975324a4d36"
+    },
+    {
+      "path": "captures/comparison-3840x2160-ar-light.png",
+      "sha256": "f9dc1b718c5d9ece86c8769fb798673d73ea3cd41f3d710be84f531a9bfedf3d"
+    },
+    {
+      "path": "captures/evidence-3840x2160-ar-light.png",
+      "sha256": "17e80b36f1d04e176f16330df046bb814814e0690c0d1c6bfbd88d84ea87d9d6"
+    },
+    {
+      "path": "captures/drawer-3840x2160-ar-light.png",
+      "sha256": "1b88cd824147b9bd551557b293cf27665b6533bb549ab2bf2b97a03e6a63dfb0"
+    },
+    {
+      "path": "captures/wall-greyscale-en.png",
+      "sha256": "1252771ed7b2d83120cf752168d76c4ea404c36746bb27742e1926625f40b9d7"
+    },
+    {
+      "path": "captures/wall-greyscale-ar.png",
+      "sha256": "79f7db785ae060992a866e258ffd4ca892ff211abfc4e01f9b0b4835671ffab9"
+    },
+    {
+      "path": "captures/negative-withheld-390x844-en-dark.png",
+      "sha256": "e7d9133eb23fb1eadd5f24db95d8bbf81391e62c5160ced01c63149584a85074"
+    },
+    {
+      "path": "captures/negative-withheld-390x844-en-light.png",
+      "sha256": "e039b96bebe2f043a9ca7692eafb341d348b1b122fe10b23e2b4a3f52eddd283"
+    },
+    {
+      "path": "captures/negative-withheld-390x844-ar-dark.png",
+      "sha256": "6b7e3ee4c6dad44c76030dde4d55b1af8458baaa1dd5eec2c07d3901d97b5ddf"
+    },
+    {
+      "path": "captures/negative-withheld-390x844-ar-light.png",
+      "sha256": "e04e7d80b1c46c169ed43559a691996d5370bea2b607c2fcf9319eaf9f6c848c"
+    },
+    {
+      "path": "captures/negative-withheld-1440x900-en-dark.png",
+      "sha256": "9465d1810ecc7768b45b3966f305e7097a4fc6b2b870c2e80f30c7021bc0401c"
+    },
+    {
+      "path": "captures/negative-withheld-1440x900-en-light.png",
+      "sha256": "eac30286acd9d177114bdda059fcb331d6c868bd9d2a49fdb80889a0695936d4"
+    },
+    {
+      "path": "captures/negative-withheld-1440x900-ar-dark.png",
+      "sha256": "8629eb904c7a58f8b56c96a84fe137e5950357ee77676b28d76ca6b3480b5041"
+    },
+    {
+      "path": "captures/negative-withheld-1440x900-ar-light.png",
+      "sha256": "42784f4aaef57aab76b9be73bd4eab4a90f407b17ae6c649d4ccdb707d9c0a6f"
+    }
+  ]
+}

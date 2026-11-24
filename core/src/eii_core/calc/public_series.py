@@ -35,6 +35,20 @@ C2_CALENDAR = tuple(f"{2015 + i // 12}-{i % 12 + 1:02}" for i in range(125))
 C2_METHOD_VERSION = "C2-v2"
 
 
+def complete_years(
+    calendar: Sequence[str] = C2_CALENDAR,
+) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    """Ordered complete years only; partial years at either end are omitted."""
+    groups: dict[str, list[str]] = {}
+    for month in calendar:
+        groups.setdefault(month[:4], []).append(month)
+    return tuple(
+        (year, tuple(months))
+        for year, months in groups.items()
+        if months == [f"{year}-{month:02}" for month in range(1, 13)]
+    )
+
+
 def finite(value: Decimal) -> None:
     """Reject missing, non-decimal and non-finite numeric cells."""
     if type(value) is not Decimal or not value.is_finite():

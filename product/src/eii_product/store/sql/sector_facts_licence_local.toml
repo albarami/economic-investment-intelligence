@@ -1,0 +1,29 @@
+[[tables]]
+name = "pub_licence_active"
+anchor = "7.3 Columns"
+key = ["municipality_code", "activity_code", "period"]
+
+[[tables.columns]]
+name = "municipality_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "activity_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "active_count"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

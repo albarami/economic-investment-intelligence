@@ -1,0 +1,639 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/component/mounted-opening-review.test.tsx (6 tests | 2 failed) 218ms
+   × a refused night-lights chain is an alert with unavailable wording (en) 35ms
+   × a refused night-lights chain is an alert with unavailable wording (ar) 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/component/mounted-opening-review.test.tsx > a refused night-lights chain is an alert with unavailable wording (en)
+TestingLibraryElementError: Unable to find an accessible element with the role "alert"
+
+Here are the accessible roles:
+
+  button:
+
+  Name "العربية":
+  <button
+    data-action="language"
+    lang="ar"
+    type="button"
+  />
+
+  Name "INVENTED-activity":
+  <button
+    type="button"
+  />
+
+  Name "INVENTED-place":
+  <button
+    type="button"
+  />
+
+  Name "Show the area evidence":
+  <button
+    data-action="story-next"
+    disabled=""
+    type="button"
+  />
+
+  Name "Reset":
+  <button
+    data-action="story-reset"
+    type="button"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "Site choice":
+  <h1 />
+
+  --------------------------------------------------
+  group:
+
+  Name "":
+  <details
+    class="story-selection"
+    open=""
+  />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p
+    class="story-caption"
+  />
+
+  --------------------------------------------------
+  combobox:
+
+  Name "Map layer":
+  <select />
+
+  --------------------------------------------------
+  option:
+
+  Name "Zone electricity growth":
+  <option
+    value="zone_electricity_growth"
+  />
+
+  Name "Listed places":
+  <option
+    value="public_places"
+  />
+
+  Name "Night-time radiance":
+  <option
+    value="night_lights"
+  />
+
+  Name "Guide land prices":
+  <option
+    value="land_prices"
+  />
+
+  Name "Parcels":
+  <option
+    value="parcels"
+  />
+
+  Name "Rail plans":
+  <option
+    value="rail_plan"
+  />
+
+  Name "Health centres":
+  <option
+    value="health_centres"
+  />
+
+  Name "Zoning":
+  <option
+    value="zoning"
+  />
+
+  Name "Commercial points":
+  <option
+    value="commercial_points"
+  />
+
+  Name "Addresses":
+  <option
+    value="address_points"
+  />
+
+  Name "Landmarks":
+  <option
+    value="landmarks"
+  />
+
+  Name "Announced investment projects":
+  <option
+    value="fdi_projects"
+  />
+
+  Name "Property transactions":
+  <option
+    value="property_prices"
+  />
+
+  Name "Firms by tower":
+  <option
+    value="fc_firms_per_tower"
+  />
+
+  --------------------------------------------------
+  status:
+
+  Name "":
+  <p
+    role="status"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="opening-app"
+      data-opening-scene="area"
+    >
+      <div>
+        <div
+          class="opening-language"
+        >
+          <button
+            data-action="language"
+            lang="ar"
+            type="button"
+          >
+            العربية
+          </button>
+        </div>
+        <section
+          class="public-story"
+          data-scene="area"
+        >
+          <h1>
+            Site choice
+          </h1>
+          <details
+            class="story-selection"
+            open=""
+          >
+            <summary>
+              Area and activity
+            </summary>
+            <button
+              type="button"
+            >
+              INVENTED-activity
+            </button>
+            <button
+              type="button"
+            >
+              INVENTED-place
+            </button>
+            <p
+              class="story-caption"
+            >
+              Official boundaries are not available
+            </p>
+          </details>
+          <button
+            data-action="story-next"
+            disabled=""
+            type="button"
+          >
+            Show the area evidence
+          </button>
+          <button
+            data-action="story-reset"
+            type="button"
+          >
+            Reset
+          </button>
+        </section>
+        <label
+          class="layer-chooser"
+        >
+          Map layer
+          <select>
+            <option
+              value="zone_electricity_growth"
+            >
+              Zone electricity growth
+            </option>
+            <option
+              value="public_places"
+            >
+              Listed places
+            </option>
+            <option
+              value="night_lights"
+            >
+              Night-time radiance
+            </option>
+            <option
+              value="land_prices"
+            >
+              Guide land prices
+            </option>
+            <option
+              value="parcels"
+            >
+              Parcels
+            </option>
+            <option
+              value="rail_plan"
+            >
+              Rail plans
+            </option>
+            <option
+              value="health_centres"
+            >
+              Health centres
+            </option>
+            <option
+              value="zoning"
+            >
+              Zoning
+            </option>
+            <option
+              value="commercial_points"
+            >
+              Commercial points
+            </option>
+            <option
+              value="address_points"
+            >
+              Addresses
+            </option>
+            <option
+              value="landmarks"
+            >
+              Landmarks
+            </option>
+            <option
+              value="fdi_projects"
+            >
+              Announced investment projects
+            </option>
+            <option
+              value="property_prices"
+            >
+              Property transactions
+            </option>
+            <option
+              value="fc_firms_per_tower"
+            >
+              Firms by tower
+            </option>
+          </select>
+        </label>
+        <p
+          role="status"
+        >
+          No data for this layer
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError ../../../../web/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../../../web/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../web/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../../../web/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/component/mounted-opening-review.test.tsx:180:17
+    178|       }),
+    179|     );
+    180|     expect(view.getByRole('alert').textContent).toBe(
+       |                 ^
+    181|       language === 'ar'
+    182|         ? 'طبقة الخريطة هذه غير متاحة.'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/component/mounted-opening-review.test.tsx > a refused night-lights chain is an alert with unavailable wording (ar)
+TestingLibraryElementError: Unable to find an accessible element with the role "alert"
+
+Here are the accessible roles:
+
+  button:
+
+  Name "English":
+  <button
+    data-action="language"
+    lang="en"
+    type="button"
+  />
+
+  Name "INVENTED-activity":
+  <button
+    type="button"
+  />
+
+  Name "INVENTED-place":
+  <button
+    type="button"
+  />
+
+  Name "عرض أدلة المنطقة":
+  <button
+    data-action="story-next"
+    disabled=""
+    type="button"
+  />
+
+  Name "البدء من جديد":
+  <button
+    data-action="story-reset"
+    type="button"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "اختيار الموقع":
+  <h1 />
+
+  --------------------------------------------------
+  group:
+
+  Name "":
+  <details
+    class="story-selection"
+    open=""
+  />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p
+    class="story-caption"
+  />
+
+  --------------------------------------------------
+  combobox:
+
+  Name "طبقة الخريطة":
+  <select />
+
+  --------------------------------------------------
+  option:
+
+  Name "نمو الكهرباء حسب المنطقة":
+  <option
+    value="zone_electricity_growth"
+  />
+
+  Name "الأماكن المدرجة":
+  <option
+    value="public_places"
+  />
+
+  Name "الإشعاع الضوئي الليلي":
+  <option
+    value="night_lights"
+  />
+
+  Name "أسعار الأراضي الإرشادية":
+  <option
+    value="land_prices"
+  />
+
+  Name "قطع الأراضي":
+  <option
+    value="parcels"
+  />
+
+  Name "مخططات السكك الحديدية":
+  <option
+    value="rail_plan"
+  />
+
+  Name "المراكز الصحية":
+  <option
+    value="health_centres"
+  />
+
+  Name "التنظيم العمراني":
+  <option
+    value="zoning"
+  />
+
+  Name "المواقع التجارية":
+  <option
+    value="commercial_points"
+  />
+
+  Name "العناوين":
+  <option
+    value="address_points"
+  />
+
+  Name "المعالم":
+  <option
+    value="landmarks"
+  />
+
+  Name "المشروعات الاستثمارية المعلنة":
+  <option
+    value="fdi_projects"
+  />
+
+  Name "المعاملات العقارية":
+  <option
+    value="property_prices"
+  />
+
+  Name "الشركات حسب البرج":
+  <option
+    value="fc_firms_per_tower"
+  />
+
+  --------------------------------------------------
+  status:
+
+  Name "":
+  <p
+    role="status"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="opening-app"
+      data-opening-scene="area"
+    >
+      <div>
+        <div
+          class="opening-language"
+        >
+          <button
+            data-action="language"
+            lang="en"
+            type="button"
+          >
+            English
+          </button>
+        </div>
+        <section
+          class="public-story"
+          data-scene="area"
+        >
+          <h1>
+            اختيار الموقع
+          </h1>
+          <details
+            class="story-selection"
+            open=""
+          >
+            <summary>
+              المنطقة والنشاط
+            </summary>
+            <button
+              type="button"
+            >
+              INVENTED-activity
+            </button>
+            <button
+              type="button"
+            >
+              INVENTED-place
+            </button>
+            <p
+              class="story-caption"
+            >
+              الحدود الرسمية غير متاحة
+            </p>
+          </details>
+          <button
+            data-action="story-next"
+            disabled=""
+            type="button"
+          >
+            عرض أدلة المنطقة
+          </button>
+          <button
+            data-action="story-reset"
+            type="button"
+          >
+            البدء من جديد
+          </button>
+        </section>
+        <label
+          class="layer-chooser"
+        >
+          طبقة الخريطة
+          <select>
+            <option
+              value="zone_electricity_growth"
+            >
+              نمو الكهرباء حسب المنطقة
+            </option>
+            <option
+              value="public_places"
+            >
+              الأماكن المدرجة
+            </option>
+            <option
+              value="night_lights"
+            >
+              الإشعاع الضوئي الليلي
+            </option>
+            <option
+              value="land_prices"
+            >
+              أسعار الأراضي الإرشادية
+            </option>
+            <option
+              value="parcels"
+            >
+              قطع الأراضي
+            </option>
+            <option
+              value="rail_plan"
+            >
+              مخططات السكك الحديدية
+            </option>
+            <option
+              value="health_centres"
+            >
+              المراكز الصحية
+            </option>
+            <option
+              value="zoning"
+            >
+              التنظيم العمراني
+            </option>
+            <option
+              value="commercial_points"
+            >
+              المواقع التجارية
+            </option>
+            <option
+              value="address_points"
+            >
+              العناوين
+            </option>
+            <option
+              value="landmarks"
+            >
+              المعالم
+            </option>
+            <option
+              value="fdi_projects"
+            >
+              المشروعات الاستثمارية المعلنة
+            </option>
+            <option
+              value="property_prices"
+            >
+              المعاملات العقارية
+            </option>
+            <option
+              value="fc_firms_per_tower"
+            >
+              الشركات حسب البرج
+            </option>
+          </select>
+        </label>
+        <p
+          role="status"
+        >
+          لا توجد بيانات لهذه الطبقة
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError ../../../../web/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../../../web/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../../../web/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../../../web/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/component/mounted-opening-review.test.tsx:180:17
+    178|       }),
+    179|     );
+    180|     expect(view.getByRole('alert').textContent).toBe(
+       |                 ^
+    181|       language === 'ar'
+    182|         ? 'طبقة الخريطة هذه غير متاحة.'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  12:15:07
+   Duration  649ms (environment 40%, tests 37%, transform 13%, import 10%)
+

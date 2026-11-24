@@ -1,0 +1,331 @@
+{
+  "status": "ok",
+  "facts": [
+    {
+      "fact_id": "f_f33d33b1c25f10b3dc01e14acccbd507",
+      "value": 1.1,
+      "unit": "ratio",
+      "period": "2025",
+      "geography": {
+        "kind": "public",
+        "public_code": "zone:INVENTED-zone-a"
+      },
+      "provenance": "public",
+      "input_classes": ["public"],
+      "evidence_status": "observed",
+      "reliability": "not_applicable",
+      "coverage_keys": [],
+      "caveat_keys": ["calculated", "activity_proxy_not_population"],
+      "label_en": "Ranked multiple",
+      "label_ar": "المضاعف المرتب",
+      "lineage_ref": "lin_pub_zone_utility",
+      "release_id": "abababababababababababababababababababababababababababababababab"
+    },
+    {
+      "fact_id": "f_20af06770985f4f96252e0a19f62349d",
+      "value": 1.2,
+      "unit": "ratio",
+      "period": "2025",
+      "geography": {
+        "kind": "public",
+        "public_code": "zone:INVENTED-zone-b"
+      },
+      "provenance": "public",
+      "input_classes": ["public"],
+      "evidence_status": "observed",
+      "reliability": "not_applicable",
+      "coverage_keys": [],
+      "caveat_keys": ["calculated", "activity_proxy_not_population"],
+      "label_en": "Ranked multiple",
+      "label_ar": "المضاعف المرتب",
+      "lineage_ref": "lin_pub_zone_utility",
+      "release_id": "abababababababababababababababababababababababababababababababab"
+    },
+    {
+      "fact_id": "f_b3e30512df7fc465608e817064634424",
+      "value": 1.3,
+      "unit": "ratio",
+      "period": "2025",
+      "geography": {
+        "kind": "public",
+        "public_code": "zone:INVENTED-zone-c"
+      },
+      "provenance": "public",
+      "input_classes": ["public"],
+      "evidence_status": "observed",
+      "reliability": "not_applicable",
+      "coverage_keys": [],
+      "caveat_keys": ["calculated", "activity_proxy_not_population"],
+      "label_en": "Ranked multiple",
+      "label_ar": "المضاعف المرتب",
+      "lineage_ref": "lin_pub_zone_utility",
+      "release_id": "abababababababababababababababababababababababababababababababab"
+    },
+    {
+      "fact_id": "f_9cb03c4611053300736cab627ded2404",
+      "value": 1.4,
+      "unit": "ratio",
+      "period": "2025",
+      "geography": {
+        "kind": "public",
+        "public_code": "zone:INVENTED-zone-d"
+      },
+      "provenance": "public",
+      "input_classes": ["public"],
+      "evidence_status": "observed",
+      "reliability": "not_applicable",
+      "coverage_keys": [],
+      "caveat_keys": ["calculated", "activity_proxy_not_population"],
+      "label_en": "Ranked multiple",
+      "label_ar": "المضاعف المرتب",
+      "lineage_ref": "lin_pub_zone_utility",
+      "release_id": "abababababababababababababababababababababababababababababababab"
+    },
+    {
+      "fact_id": "f_19f075297ed9db9228b54be35c0ba096",
+      "value": 1.5,
+      "unit": "ratio",
+      "period": "2025",
+      "geography": {
+        "kind": "public",
+        "public_code": "zone:INVENTED-zone-e"
+      },
+      "provenance": "public",
+      "input_classes": ["public"],
+      "evidence_status": "observed",
+      "reliability": "not_applicable",
+      "coverage_keys": [],
+      "caveat_keys": ["calculated", "activity_proxy_not_population"],
+      "label_en": "Ranked multiple",
+      "label_ar": "المضاعف المرتب",
+      "lineage_ref": "lin_pub_zone_utility",
+      "release_id": "abababababababababababababababababababababababababababababababab"
+    }
+  ],
+  "coverage_report": {
+    "counts": {}
+  },
+  "payload": {
+    "layers": [
+      {
+        "key": "zone_electricity_growth",
+        "visible": true,
+        "source_chain_fact_id": "f_f33d33b1c25f10b3dc01e14acccbd507",
+        "source_id": "src-invented",
+        "features": [
+          {
+            "feature_id": "zone:INVENTED-zone-a",
+            "metric_key": "electricity_growth_class",
+            "provenance": "public",
+            "fact_id": "f_f33d33b1c25f10b3dc01e14acccbd507",
+            "subject": "statistic",
+            "geometry_kind": "fill",
+            "ring": [
+              [0.0, 0.0],
+              [3.0, 0.0],
+              [3.0, 3.0],
+              [0.0, 3.0],
+              [0.0, 0.0]
+            ],
+            "name_segments": [
+              {
+                "kind": "plain",
+                "text": "INVENTED-zone-a"
+              }
+            ],
+            "class_id": "band_low"
+          },
+          {
+            "feature_id": "zone:INVENTED-zone-b",
+            "metric_key": "electricity_growth_class",
+            "provenance": "public",
+            "fact_id": "f_20af06770985f4f96252e0a19f62349d",
+            "subject": "statistic",
+            "geometry_kind": "fill",
+            "ring": [
+              [0.0, 0.0],
+              [3.0, 0.0],
+              [3.0, 3.0],
+              [0.0, 3.0],
+              [0.0, 0.0]
+            ],
+            "name_segments": [
+              {
+                "kind": "plain",
+                "text": "INVENTED-zone-b"
+              }
+            ],
+            "class_id": "band_mid_low"
+          },
+          {
+            "feature_id": "zone:INVENTED-zone-c",
+            "metric_key": "electricity_growth_class",
+            "provenance": "public",
+            "fact_id": "f_b3e30512df7fc465608e817064634424",
+            "subject": "statistic",
+            "geometry_kind": "fill",
+            "ring": [
+              [0.0, 0.0],
+              [3.0, 0.0],
+              [3.0, 3.0],
+              [0.0, 3.0],
+              [0.0, 0.0]
+            ],
+            "name_segments": [
+              {
+                "kind": "plain",
+                "text": "INVENTED-zone-c"
+              }
+            ],
+            "class_id": "band_mid"
+          },
+          {
+            "feature_id": "zone:INVENTED-zone-d",
+            "metric_key": "electricity_growth_class",
+            "provenance": "public",
+            "fact_id": "f_9cb03c4611053300736cab627ded2404",
+            "subject": "statistic",
+            "geometry_kind": "fill",
+            "ring": [
+              [0.0, 0.0],
+              [3.0, 0.0],
+              [3.0, 3.0],
+              [0.0, 3.0],
+              [0.0, 0.0]
+            ],
+            "name_segments": [
+              {
+                "kind": "plain",
+                "text": "INVENTED-zone-d"
+              }
+            ],
+            "class_id": "band_mid_high"
+          },
+          {
+            "feature_id": "zone:INVENTED-zone-e",
+            "metric_key": "electricity_growth_class",
+            "provenance": "public",
+            "fact_id": "f_19f075297ed9db9228b54be35c0ba096",
+            "subject": "statistic",
+            "geometry_kind": "fill",
+            "ring": [
+              [0.0, 0.0],
+              [3.0, 0.0],
+              [3.0, 3.0],
+              [0.0, 3.0],
+              [0.0, 0.0]
+            ],
+            "name_segments": [
+              {
+                "kind": "plain",
+                "text": "INVENTED-zone-e"
+              }
+            ],
+            "class_id": "band_high"
+          }
+        ],
+        "not_ranked": [
+          {
+            "feature_id": "zone:INVENTED-zone-floor",
+            "ring": [
+              [0.0, 0.0],
+              [3.0, 0.0],
+              [3.0, 3.0],
+              [0.0, 3.0],
+              [0.0, 0.0]
+            ],
+            "reason_key": "below_ranking_floor",
+            "name_segments": [
+              {
+                "kind": "plain",
+                "text": "INVENTED-zone-floor"
+              }
+            ]
+          },
+          {
+            "feature_id": "zone:INVENTED-zone-missing",
+            "ring": [
+              [0.0, 0.0],
+              [3.0, 0.0],
+              [3.0, 3.0],
+              [0.0, 3.0],
+              [0.0, 0.0]
+            ],
+            "reason_key": "missing_input",
+            "name_segments": [
+              {
+                "kind": "plain",
+                "text": "INVENTED-zone-missing"
+              }
+            ]
+          },
+          {
+            "feature_id": "zone:INVENTED-zone-zero",
+            "ring": [
+              [0.0, 0.0],
+              [3.0, 0.0],
+              [3.0, 3.0],
+              [0.0, 3.0],
+              [0.0, 0.0]
+            ],
+            "reason_key": "no_denominator",
+            "name_segments": [
+              {
+                "kind": "plain",
+                "text": "INVENTED-zone-zero"
+              }
+            ]
+          }
+        ],
+        "class_breaks": [
+          {
+            "group_key": null,
+            "breaks": [
+              {
+                "class_id": "band_low",
+                "fact_id": "f_f33d33b1c25f10b3dc01e14acccbd507"
+              },
+              {
+                "class_id": "band_mid_low",
+                "fact_id": "f_20af06770985f4f96252e0a19f62349d"
+              },
+              {
+                "class_id": "band_mid",
+                "fact_id": "f_b3e30512df7fc465608e817064634424"
+              },
+              {
+                "class_id": "band_mid_high",
+                "fact_id": "f_9cb03c4611053300736cab627ded2404"
+              },
+              {
+                "class_id": "band_high",
+                "fact_id": "f_19f075297ed9db9228b54be35c0ba096"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "sourceId": "src-invented",
+        "attribution": [
+          {
+            "kind": "plain",
+            "text": "INVENTED-dataset"
+          }
+        ],
+        "publisher": [
+          {
+            "kind": "plain",
+            "text": "INVENTED-publisher"
+          }
+        ],
+        "datasetOrPage": "INVENTED-dataset",
+        "licenceOrTerms": "INVENTED-licence",
+        "retrievalDate": "2026-01-02"
+      }
+    ],
+    "gazetteer_points": []
+  }
+}

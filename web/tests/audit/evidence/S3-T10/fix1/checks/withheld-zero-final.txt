@@ -1,0 +1,36 @@
+
+ RUN  v5.1.0 [workspace]/web
+
+ ❯ tests/component/public-context-levels.test.tsx (33 tests | 6 failed) 1087ms
+   × L4 L5 night_lights withheld reason never becomes zero in en 12ms
+   × L4 L5 venue_busyness withheld reason never becomes zero in en 6ms
+   × L4 L5 population_age_sex withheld reason never becomes zero in en 13ms
+   × L4 L5 night_lights withheld reason never becomes zero in ar 8ms
+   × L4 L5 venue_busyness withheld reason never becomes zero in ar 30ms
+   × L4 L5 population_age_sex withheld reason never becomes zero in ar 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/component/public-context-levels.test.tsx > L4 L5 night_lights withheld reason never becomes zero in en
+ FAIL  tests/component/public-context-levels.test.tsx > L4 L5 venue_busyness withheld reason never becomes zero in en
+ FAIL  tests/component/public-context-levels.test.tsx > L4 L5 population_age_sex withheld reason never becomes zero in en
+ FAIL  tests/component/public-context-levels.test.tsx > L4 L5 night_lights withheld reason never becomes zero in ar
+ FAIL  tests/component/public-context-levels.test.tsx > L4 L5 venue_busyness withheld reason never becomes zero in ar
+ FAIL  tests/component/public-context-levels.test.tsx > L4 L5 population_age_sex withheld reason never becomes zero in ar
+AssertionError: expected null not to be null
+ ❯ tests/component/public-context-levels.test.tsx:212:61
+    210|         withheld!.replaceChildren();
+    211|       }
+    212|       expect(withheld!.querySelector('.chip-withheld')).not.toBeNull();
+       |                                                             ^
+    213|       expect(exposedCounts(view.container, 7391)).toEqual([]);
+    214|       toggle(view.container, labels[language][1]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 27 passed (33)
+   Start at  12:09:57
+   Duration  2.46s (tests 46%, environment 32%, transform 16%, import 6%)
+

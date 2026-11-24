@@ -1,0 +1,44 @@
+[[tables]]
+name = "source_registry"
+anchor = "7.3 Columns"
+key = ["source_id"]
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "publisher"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "title"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "url"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "licence"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "retrieved_on"
+type = "date"
+nullable = false
+
+[[tables.columns]]
+name = "sha256"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "kind"
+type = "string"
+nullable = false

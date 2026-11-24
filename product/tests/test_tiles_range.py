@@ -10,11 +10,13 @@ import tempfile
 import threading
 import time
 from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Protocol
 
 import pytest
 from fastapi import FastAPI
+from product.tests import map_assets
 from starlette.middleware.cors import CORSMiddleware
 from uvicorn import Config, Server
 
@@ -461,3 +463,192 @@ def test_the_api_app_serves_the_tile_and_the_status(tile_server: int) -> None:
     paths = _route_paths(create_app(FIXTURE_DIR))
     assert "/tiles/{name}" in paths
     assert "/tiles" in paths
+
+
+PMTILES_NAME = "basemap.pmtiles"
+PMTILES_BYTES = map_assets.build_archive()
+PMTILES_SIZE = len(PMTILES_BYTES)
+PMTILES_SHA256 = "5669eccd8fb14e8cc0cb2bc336f7d3e42f42da0add2cba5775ac56be2350fc9f"
+
+
+@contextmanager
+def _serve(application: FastAPI) -> Iterator[int]:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("127.0.0.1", 0))
+    port = sock.getsockname()[1]
+    sock.close()
+    config = Config(application, host="127.0.0.1", port=port, log_level="error")
+    server = Server(config)
+    thread = threading.Thread(target=server.run, daemon=True)
+    thread.start()
+    try:
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            try:
+                probe, _, _ = _request(port, "GET", "/tiles")
+                if probe == 200:
+                    break
+            except (TimeoutError, OSError, http.client.HTTPException):
+                time.sleep(0.05)
+        else:
+            raise RuntimeError("test server did not answer on /tiles")
+        yield port
+    finally:
+        _stop_uvicorn_server(server, thread, join_timeout=5)
+
+
+def _pmtiles_dir(tmp: str) -> Path:
+    tile_dir = Path(tmp) / "tiles"
+    tile_dir.mkdir()
+    (tile_dir / PMTILES_NAME).write_bytes(PMTILES_BYTES)
+    return tile_dir
+
+
+def test_pmtiles_full_request_returns_exact_bytes() -> None:
+    assert PMTILES_SIZE == 2705
+    assert hashlib.sha256(PMTILES_BYTES).hexdigest() == PMTILES_SHA256
+    with (
+        tempfile.TemporaryDirectory() as tmp,
+        _serve(create_app(_pmtiles_dir(tmp))) as port,
+    ):
+        status, headers, body = _request(port, "GET", f"/tiles/{PMTILES_NAME}")
+        assert status == 200
+        assert headers.get("content-type", "").startswith("application/octet-stream")
+        assert headers.get("content-length") == str(PMTILES_SIZE)
+        assert headers.get("accept-ranges") == "bytes"
+        assert "access-control-allow-origin" not in headers
+        assert "location" not in headers
+        assert body == PMTILES_BYTES
+        assert hashlib.sha256(body).hexdigest() == PMTILES_SHA256
+
+
+def test_pmtiles_ranges_return_the_expected_bytes() -> None:
+    size = PMTILES_SIZE
+    cases: list[tuple[str, str, bytes]] = [
+        ("bytes=0-0", f"bytes 0-0/{size}", PMTILES_BYTES[0:1]),
+        ("bytes=127-127", f"bytes 127-127/{size}", PMTILES_BYTES[127:128]),
+        ("bytes=100-", f"bytes 100-{size - 1}/{size}", PMTILES_BYTES[100:]),
+        ("bytes=-64", f"bytes {size - 64}-{size - 1}/{size}", PMTILES_BYTES[-64:]),
+        (
+            f"bytes={size - 1}-{size}",
+            f"bytes {size - 1}-{size - 1}/{size}",
+            PMTILES_BYTES[-1:],
+        ),
+    ]
+    with (
+        tempfile.TemporaryDirectory() as tmp,
+        _serve(create_app(_pmtiles_dir(tmp))) as port,
+    ):
+        for range_header, content_range, expected in cases:
+            status, headers, body = _request(
+                port,
+                "GET",
+                f"/tiles/{PMTILES_NAME}",
+                headers={"Range": range_header},
+            )
+            assert status == 206, range_header
+            assert headers.get("content-range") == content_range
+            assert headers.get("content-length") == str(len(expected))
+            assert body == expected
+
+        status, headers, body = _request(
+            port,
+            "GET",
+            f"/tiles/{PMTILES_NAME}",
+            headers={"Range": "bytes=0-1,4-5"},
+        )
+        assert status == 206
+        content_type = headers.get("content-type", "")
+        assert content_type.startswith("multipart/byteranges")
+        parts = _multipart_byterange_parts(content_type, body)
+        assert parts == [
+            (f"bytes 0-1/{size}", PMTILES_BYTES[0:2]),
+            (f"bytes 4-5/{size}", PMTILES_BYTES[4:6]),
+        ]
+
+
+def test_pmtiles_invalid_ranges_fail_safely_and_the_server_survives() -> None:
+    with (
+        tempfile.TemporaryDirectory() as tmp,
+        _serve(create_app(_pmtiles_dir(tmp))) as port,
+    ):
+        status, headers, body = _request(
+            port,
+            "GET",
+            f"/tiles/{PMTILES_NAME}",
+            headers={"Range": f"bytes={PMTILES_SIZE}-"},
+        )
+        assert status == 416
+        assert headers.get("content-range") == f"bytes */{PMTILES_SIZE}"
+        assert PMTILES_BYTES[:32] not in body
+
+        for bad in ("bytes=abc", "bytes=9-2"):
+            status, _, body = _request(
+                port,
+                "GET",
+                f"/tiles/{PMTILES_NAME}",
+                headers={"Range": bad},
+            )
+            assert status == 400, bad
+            assert PMTILES_BYTES[:32] not in body
+
+        ok_status, _, ok_body = _request(port, "GET", f"/tiles/{PMTILES_NAME}")
+        assert ok_status == 200
+        assert ok_body == PMTILES_BYTES
+
+
+def test_pmtiles_name_and_escape_refusals() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        tile_dir = _pmtiles_dir(tmp)
+        secret = b"synth-pmtiles-secret-payload"
+        (tile_dir / "Upper.pmtiles").write_bytes(secret)
+        (tile_dir / "other.txt").write_bytes(secret)
+        outside = Path(tmp) / "outside.pmtiles"
+        outside.write_bytes(secret)
+        (tile_dir / "link.pmtiles").symlink_to(outside)
+
+        with _serve(create_app(tile_dir)) as port:
+            for path in (
+                "/tiles/Upper.pmtiles",
+                "/tiles/other.txt",
+                "/tiles/link.pmtiles",
+                "/tiles/x.pmtilesx",
+                "/tiles/.pmtiles",
+                "/tiles/..%2Foutside.pmtiles",
+                "/tiles/%2Ftmp%2Foutside.pmtiles",
+                "/tiles/basemap%2E%2E%2Fpmtiles",
+            ):
+                status, _, body = _request(port, "GET", path)
+                assert status == 404, path
+                assert secret not in body
+                assert str(tile_dir).encode() not in body
+                assert PMTILES_NAME.encode() not in body
+
+
+def test_pmtiles_planted_corruption_fails_the_byte_check() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        tile_dir = _pmtiles_dir(tmp)
+        with _serve(create_app(tile_dir)) as port:
+            status, _, body = _request(
+                port,
+                "GET",
+                f"/tiles/{PMTILES_NAME}",
+                headers={"Range": "bytes=0-9"},
+            )
+            assert status == 206
+            assert body == PMTILES_BYTES[0:10]
+
+            archive = tile_dir / PMTILES_NAME
+            corrupt = bytearray(archive.read_bytes())
+            corrupt[3] ^= 0xFF
+            archive.write_bytes(corrupt)
+
+            status, _, body = _request(
+                port,
+                "GET",
+                f"/tiles/{PMTILES_NAME}",
+                headers={"Range": "bytes=0-9"},
+            )
+            assert status == 206
+            with pytest.raises(AssertionError):
+                assert body == PMTILES_BYTES[0:10]

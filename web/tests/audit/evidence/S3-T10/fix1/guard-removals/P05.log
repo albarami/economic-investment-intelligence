@@ -1,0 +1,146 @@
+.FF                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_opening_fixture_main_binds_only_loopback_and_closes[False] ________
+
+tmp_path = PosixPath('[workspace]/.overnight[local-path]')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x72da68fa7a80>
+server_error = False
+
+    @pytest.mark.parametrize("server_error", [False, True])
+    def test_opening_fixture_main_binds_only_loopback_and_closes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, server_error: bool
+    ) -> None:
+        app, store, ledger = Mock(), Mock(), Mock()
+        monkeypatch.setattr(
+            "sys.argv",
+            ["opening", "--work", str(tmp_path), "--port", "1234", "--web", "web/dist"],
+        )
+        with (
+            patch.object(
+                public_opening_server,
+                "build_fixture_app",
+                return_value=(app, store, ledger),
+            ) as build,
+            patch("product.tests.public_opening_server.uvicorn.run") as run,
+        ):
+            if server_error:
+                run.side_effect = RuntimeError("INVENTED-server-failure")
+                with pytest.raises(RuntimeError, match="INVENTED-server-failure"):
+                    public_opening_server.main()
+            else:
+                public_opening_server.main()
+            build.assert_called_once_with(tmp_path, Path("web/dist"))
+>           run.assert_called_once_with(
+                app, host="127.0.0.1", port=1234, log_level="error", access_log=False
+            )
+
+scripts/tests/test_public_opening_e2e.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+[local-path] in assert_called_once_with
+    return self.assert_called_with(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='run' id='126282310044704'>
+args = (<Mock id='126282483267776'>,)
+kwargs = {'host': '127.0.0.1', 'port': 1234, 'log_level': 'error', 'access_log': False}
+
+    def assert_called_with(self, /, *args, **kwargs):
+        """assert that the last call was made with the specified arguments.
+    
+        Raises an AssertionError if the args and keyword args passed in are
+        different to the last call to the mock."""
+        if self.call_args is None:
+            expected = self._format_mock_call_signature(args, kwargs)
+            actual = 'not called.'
+            error_message = ('expected call not found.\nExpected: %s\n  Actual: %s'
+                    % (expected, actual))
+            raise AssertionError(error_message)
+    
+        def _error_message():
+            msg = self._format_mock_failure_message(args, kwargs)
+            return msg
+        expected = self._call_matcher(_Call((args, kwargs), two=True))
+        actual = self._call_matcher(self.call_args)
+        if actual != expected:
+            cause = expected if isinstance(expected, Exception) else None
+>           raise AssertionError(_error_message()) from cause
+E           AssertionError: expected call not found.
+E           Expected: run(<Mock id='126282483267776'>, host='127.0.0.1', port=1234, log_level='error', access_log=False)
+E             Actual: run(<Mock id='126282483267776'>, host='0.0.0.0', port=1234, log_level='error', access_log=False)
+
+[local-path] AssertionError
+________ test_opening_fixture_main_binds_only_loopback_and_closes[True] ________
+
+tmp_path = PosixPath('[workspace]/.overnight[local-path]')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x72da6b3a08a0>
+server_error = True
+
+    @pytest.mark.parametrize("server_error", [False, True])
+    def test_opening_fixture_main_binds_only_loopback_and_closes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, server_error: bool
+    ) -> None:
+        app, store, ledger = Mock(), Mock(), Mock()
+        monkeypatch.setattr(
+            "sys.argv",
+            ["opening", "--work", str(tmp_path), "--port", "1234", "--web", "web/dist"],
+        )
+        with (
+            patch.object(
+                public_opening_server,
+                "build_fixture_app",
+                return_value=(app, store, ledger),
+            ) as build,
+            patch("product.tests.public_opening_server.uvicorn.run") as run,
+        ):
+            if server_error:
+                run.side_effect = RuntimeError("INVENTED-server-failure")
+                with pytest.raises(RuntimeError, match="INVENTED-server-failure"):
+                    public_opening_server.main()
+            else:
+                public_opening_server.main()
+            build.assert_called_once_with(tmp_path, Path("web/dist"))
+>           run.assert_called_once_with(
+                app, host="127.0.0.1", port=1234, log_level="error", access_log=False
+            )
+
+scripts/tests/test_public_opening_e2e.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+[local-path] in assert_called_once_with
+    return self.assert_called_with(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='run' id='126282310050080'>
+args = (<Mock id='126282310047728'>,)
+kwargs = {'host': '127.0.0.1', 'port': 1234, 'log_level': 'error', 'access_log': False}
+
+    def assert_called_with(self, /, *args, **kwargs):
+        """assert that the last call was made with the specified arguments.
+    
+        Raises an AssertionError if the args and keyword args passed in are
+        different to the last call to the mock."""
+        if self.call_args is None:
+            expected = self._format_mock_call_signature(args, kwargs)
+            actual = 'not called.'
+            error_message = ('expected call not found.\nExpected: %s\n  Actual: %s'
+                    % (expected, actual))
+            raise AssertionError(error_message)
+    
+        def _error_message():
+            msg = self._format_mock_failure_message(args, kwargs)
+            return msg
+        expected = self._call_matcher(_Call((args, kwargs), two=True))
+        actual = self._call_matcher(self.call_args)
+        if actual != expected:
+            cause = expected if isinstance(expected, Exception) else None
+>           raise AssertionError(_error_message()) from cause
+E           AssertionError: expected call not found.
+E           Expected: run(<Mock id='126282310047728'>, host='127.0.0.1', port=1234, log_level='error', access_log=False)
+E             Actual: run(<Mock id='126282310047728'>, host='0.0.0.0', port=1234, log_level='error', access_log=False)
+
+[local-path] AssertionError
+=========================== short test summary info ============================
+FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_main_binds_only_loopback_and_closes[False]
+FAILED scripts/tests/test_public_opening_e2e.py::test_opening_fixture_main_binds_only_loopback_and_closes[True]
+2 failed, 1 passed, 9 deselected in 12.69s

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "[workspace]/.overnight[local-path]", line 70, in <module>
+    data, storage=stored_bytes((source/name).read_bytes())
+                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "[workspace]/.overnight[local-path]", line 54, in stored_bytes
+    assert not email.search(packed.decode('utf8',errors='ignore'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

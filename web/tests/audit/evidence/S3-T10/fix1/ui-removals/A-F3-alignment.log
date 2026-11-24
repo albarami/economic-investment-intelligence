@@ -1,0 +1,35 @@
+
+Running 1 test using 1 worker
+
+(node:487110) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+attribution contrast [{"selector":".stage-credits","foreground":"rgb(230, 234, 235)","background":"rgb(43, 55, 71)","ratio":9.960669285697975}]
+  ✘  1 [chromium] › tests/audit/opening.spec.ts:24:7 › opening audit 1440x900 ar dark (3.6s)
+
+
+  1) [chromium] › tests/audit/opening.spec.ts:24:7 › opening audit 1440x900 ar dark ────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "align": "flow-start",
+    +   "align": "normal",
+        "value": "start",
+      }
+
+      147 |         expect(pairs.length).toBeGreaterThan(0);
+      148 |         for (const pair of pairs)
+    > 149 |           expect(pair).toEqual({ align: 'flow-start', value: 'start' });
+          |                        ^
+      150 |         if (lang === 'ar') {
+      151 |           await caveat.evaluate((node) => node.setAttribute('dir', 'ltr'));
+      152 |           expect(await openingProblems(page)).toContain(
+        at [workspace]/.overnight[local-path]
+
+    Error Context: ../.overnight[local-path]
+
+  1 failed
+    [chromium] › tests/audit/opening.spec.ts:24:7 › opening audit 1440x900 ar dark ─────────────────

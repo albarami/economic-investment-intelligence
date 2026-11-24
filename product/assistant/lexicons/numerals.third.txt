@@ -1,0 +1,45 @@
+# AI-38 representative third-language number words. Version 1, 2026-11-21.
+# Neither application language uses these words; a string that holds one fails the scan.
+# Arabic-script entries use letters that Arabic does not (Persian and Urdu forms).
+# French
+deux
+trois
+quatre
+cinq
+cent
+mille
+# Spanish
+uno
+dos
+tres
+cuatro
+cinco
+cien
+# German
+eins
+zwei
+drei
+vier
+fünf
+zehn
+# Turkish
+iki
+üç
+dört
+beş
+# Tagalog
+isa
+dalawa
+tatlo
+# Hindi
+एक
+दो
+तीन
+# Persian
+یک
+چهار
+پنج
+# Urdu
+ایک
+چار
+پانچ

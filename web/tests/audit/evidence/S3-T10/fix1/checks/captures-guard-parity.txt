@@ -1,0 +1,1 @@
+{"captures": 298, "contrast_records": 48, "dark_matrix_captures": 144}

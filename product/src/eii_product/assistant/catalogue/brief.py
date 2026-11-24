@@ -9,6 +9,7 @@ from eii_product.assistant.catalogue.schema import (
     FACT_ID,
     IDENTIFIER,
     PLAYBOOKS,
+    REGISTER_COMPANY_METRICS,
     STRENGTHS,
     Alternative,
     Catalogue,
@@ -21,6 +22,7 @@ from eii_product.assistant.catalogue.slots import (
     match_slot_list,
     returned_fact_refusal,
 )
+from eii_product.tools.areas import valid_area_id
 
 _OBSERVED_FIELDS = frozenset({"claim_key", "slots"})
 _INFERRED_FIELDS = frozenset({"claim_key", "slots", "strength"})
@@ -184,7 +186,8 @@ def _questions(
                 fact = facts.get(bound)
                 if (
                     isinstance(fact, ReturnedFact)
-                    and fact.metric_key == "employee_count"
+                    and isinstance(fact.metric_key, str)
+                    and fact.metric_key in REGISTER_COMPANY_METRICS
                 ):
                     return Refusal("REGISTER_COMPANY_FACT", f"{path}.slots.{slot.name}")
         refusal = match_slot_list(
@@ -227,6 +230,30 @@ def _layout(
         props = item["props"]
         if not isinstance(props, dict):
             return Refusal("BRIEF_TYPE", f"{path}.props")
+        context = {
+            "night_lights_radiance": "night_lights",
+            "venue_busyness_index": "venue_busyness",
+            "population_grid_people": "population_age_sex",
+        }
+        for value in props.values():
+            fact = facts.get(value) if isinstance(value, str) else None
+            if isinstance(fact, ReturnedFact) and fact.metric_key in context:
+                if component.key != context[fact.metric_key]:
+                    return Refusal("SLOT_METRIC", f"{path}.props")
+        if component.key in context.values():
+            claim = catalogue.find_claim(component.key)
+            if claim is None:
+                return Refusal("UNKNOWN_CLAIM", path)
+            refusal = match_slot_list(
+                claim.slots,
+                props,
+                facts,
+                subject=claim.subject,
+                evidence=claim.section,
+                item_path=path,
+            )
+            if refusal is not None:
+                return refusal
         allowed = {prop.name: prop for prop in component.props}
         for key in props:
             if not isinstance(key, str) or key not in allowed:
@@ -356,7 +383,7 @@ def _lookup_returned_fact(
 
 
 def _company_fact(fact: ReturnedFact, path: str) -> Refusal | None:
-    if fact.metric_key == "employee_count":
+    if isinstance(fact.metric_key, str) and fact.metric_key in REGISTER_COMPANY_METRICS:
         return Refusal("REGISTER_COMPANY_FACT", path)
     return None
 
@@ -382,7 +409,9 @@ def _field_value(
             return Refusal("STAGE_VALUE", path)
         return None
     if field.kind in {"identifier_list", "area_ids"}:
-        return _identifiers(value, field.minimum, field.maximum, path)
+        return _identifiers(
+            value, field.minimum, field.maximum, path, area=field.kind == "area_ids"
+        )
     if field.kind == "fact_id":
         found = _lookup_returned_fact(value, path, facts, "STAGE_VALUE")
         if isinstance(found, Refusal):
@@ -402,6 +431,8 @@ def _identifiers(
     minimum: int | None,
     maximum: int | None,
     path: str,
+    *,
+    area: bool = False,
 ) -> Refusal | None:
     if not isinstance(value, list):
         return Refusal("STAGE_VALUE", path)
@@ -410,7 +441,9 @@ def _identifiers(
     if maximum is not None and len(value) > maximum:
         return Refusal("STAGE_VALUE", path)
     for item in value:
-        if not isinstance(item, str) or IDENTIFIER.fullmatch(item) is None:
+        if not isinstance(item, str) or not (
+            valid_area_id(item) if area else IDENTIFIER.fullmatch(item) is not None
+        ):
             return Refusal("STAGE_VALUE", path)
     return None
 
@@ -440,7 +473,10 @@ def _target(value: object, path: str) -> Refusal | None:
         return None
     name = next(iter(keys))
     ident = value[name]
-    if isinstance(ident, str) and IDENTIFIER.fullmatch(ident) is not None:
+    if isinstance(ident, str) and (
+        IDENTIFIER.fullmatch(ident) is not None
+        or (name == "area_id" and valid_area_id(ident))
+    ):
         return None
     return Refusal("STAGE_VALUE", f"{path}.{name}")
 

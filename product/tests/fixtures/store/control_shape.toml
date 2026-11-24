@@ -1,0 +1,14 @@
+[[tables]]
+name = "control_shape"
+anchor = "invented control table"
+key = ["shape_id"]
+
+[[tables.columns]]
+name = "shape_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "shape"
+type = "geometry"
+nullable = true

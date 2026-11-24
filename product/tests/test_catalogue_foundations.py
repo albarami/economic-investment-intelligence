@@ -8,7 +8,9 @@ from pathlib import Path
 from typing import Any
 
 FILES = ("claims.yaml", "components.yaml", "fragments.yaml", "questions.yaml")
-SHIPPED = Path(__file__).resolve().parents[1] / "assistant" / "catalogue"
+SHIPPED = (
+    Path(__file__).resolve().parents[1] / "src/eii_product/assistant/catalogue/assets"
+)
 FACT_A = "f_" + ("a1b2c3d4" * 4)
 FACT_B = "f_" + ("b2c3d4e5" * 4)
 NUMERAL_CATEGORIES = frozenset({"Nd", "Nl", "No"})
@@ -51,13 +53,15 @@ def _copy(tmp: Path, name: str = "cat", **replacements: str) -> Path:
 
 def _slot(
     name: str = "reading",
-    metric: str = "population_grid_people",
+    metric: str = "price_deal_count",
     unit: str = "count",
     geo: str = "area_shape",
     period: str = "calendar_year",
     provenance: str = "public",
     breakdown: str = "none",
 ) -> str:
+    # Generic slot guards use ordinary metrics; C36-C38 have display-only rules
+    # exercised by test_public_context rather than serving as generic fixtures.
     return (
         f"      - name: {name}\n"
         f"        metric_key: {metric}\n"
@@ -118,7 +122,7 @@ def _load(tmp: Path, claims: str, name: str = "cat") -> Any:
 def _fact(module: Any, **overrides: object) -> Any:
     values: dict[str, object] = {
         "fact_id": FACT_A,
-        "metric_key": "population_grid_people",
+        "metric_key": "price_deal_count",
         "unit": "count",
         "period": "2024",
         "geography_kind": "area_shape",
@@ -197,13 +201,54 @@ def test_pyyaml_safe_load_keeps_the_last_equal_key() -> None:
 def test_four_catalogue_files_load() -> None:
     module = _api()
     loaded = module.load_catalogue(SHIPPED)
-    assert loaded.claims == ()
-    assert tuple(item.key for item in loaded.components) == ("foundation_note",)
+    assert tuple(item.key for item in loaded.claims) == (
+        "night_lights",
+        "venue_busyness",
+        "population_age_sex",
+    )
+    assert tuple(item.key for item in loaded.components) == (
+        "foundation_note",
+        "night_lights",
+        "venue_busyness",
+        "population_age_sex",
+    )
     assert loaded.components[0].max_count == 1
     assert loaded.components[0].props == ()
     assert tuple(item.key for item in loaded.fragments) == (
         "foundation_headline",
         "foundation_decision",
+        "night_lights",
+        "venue_busyness",
+        "population_age_sex",
+        "night_lights_not_activity",
+        "relative_busyness_not_people",
+        "grid_cells_summed",
+        "context_no_data",
+        "context_no_forecast",
+        "context_retrieved",
+        "context_updated",
+        "context_update_not_stated",
+        "context_source",
+        "context_level_answer",
+        "context_level_comparison",
+        "context_level_evidence",
+        "context_compare_night_lights",
+        "context_compare_venue_busyness",
+        "context_compare_population_age_sex",
+        "context_withheld_reason",
+        "context_all_ages",
+        "context_age_band",
+        "context_female",
+        "context_male",
+        "context_none",
+        "context_monday",
+        "context_tuesday",
+        "context_wednesday",
+        "context_thursday",
+        "context_friday",
+        "context_saturday",
+        "context_sunday",
+        "opening_electricity_unavailable",
     )
     headline = loaded.fragments[0].fields
     decision = loaded.fragments[1].fields
@@ -249,7 +294,10 @@ def test_four_catalogue_files_load() -> None:
         "set_scenario_inputs",
     )
     assert loaded.version == module.catalogue_version(SHIPPED)
-    assert module.catalogue_directory().resolve() == SHIPPED.resolve()
+    for name in FILES:
+        assert (module.catalogue_directory() / name).read_bytes() == (
+            SHIPPED / name
+        ).read_bytes()
     assert module.check_brief(loaded, _brief(loaded.version), {}) is None
 
 
@@ -323,8 +371,8 @@ def test_unknown_keys_and_properties_fail(tmp_path: Path) -> None:
 def test_swapped_fact_slots_fail(tmp_path: Path) -> None:
     slots = _slot(name="people") + _slot(
         name="radiance",
-        metric="night_lights_radiance",
-        unit="radiance_nw_cm2_sr",
+        metric="price_deal_value",
+        unit="qar",
         period="calendar_month",
     )
     claim = _claim(
@@ -338,8 +386,8 @@ def test_swapped_fact_slots_fail(tmp_path: Path) -> None:
     radiance = _fact(
         module,
         fact_id=FACT_B,
-        metric_key="night_lights_radiance",
-        unit="radiance_nw_cm2_sr",
+        metric_key="price_deal_value",
+        unit="qar",
         period="2024-06",
         lineage_ref="lin_night_radiance",
     )
@@ -491,7 +539,12 @@ def test_three_ring_ids() -> None:
         brief["stage"] = [
             {
                 "component": "rings",
-                "props": {"area_ids": ["area_one", "area_two"][:count]},
+                "props": {
+                    "area_ids": [
+                        "ma1/" + "ab" * 8 + "/walk/5/none/25.000000/51.000000",
+                        "ma1/" + "ab" * 8 + "/drive/5/none/25.000000/51.000000",
+                    ][:count]
+                },
             }
         ]
         assert module.check_brief(loaded, brief, {}) is None
@@ -499,7 +552,13 @@ def test_three_ring_ids() -> None:
     brief["stage"] = [
         {
             "component": "rings",
-            "props": {"area_ids": ["area_one", "area_two", "area_three"]},
+            "props": {
+                "area_ids": [
+                    "ma1/" + "ab" * 8 + "/walk/5/none/25.000000/51.000000",
+                    "ma1/" + "ab" * 8 + "/drive/5/none/25.000000/51.000000",
+                    "ma1/" + "ab" * 8 + "/distance/5/none/25.000000/51.000000",
+                ]
+            },
         }
     ]
     assert module.check_brief(loaded, brief, {}) == module.Refusal(
@@ -512,14 +571,29 @@ def test_split_is_two_ids_or_off() -> None:
     loaded = module.load_catalogue(SHIPPED)
     paired = _brief(loaded.version)
     paired["stage"] = [
-        {"component": "split", "props": {"area_ids": ["area_one", "area_two"]}}
+        {
+            "component": "split",
+            "props": {
+                "area_ids": [
+                    "ma1/" + "ab" * 8 + "/walk/5/none/25.000000/51.000000",
+                    "ma1/" + "ab" * 8 + "/drive/5/none/25.000000/51.000000",
+                ]
+            },
+        }
     ]
     assert module.check_brief(loaded, paired, {}) is None
     off = _brief(loaded.version)
     off["stage"] = [{"component": "split", "props": {"off": True}}]
     assert module.check_brief(loaded, off, {}) is None
     one = _brief(loaded.version)
-    one["stage"] = [{"component": "split", "props": {"area_ids": ["area_one"]}}]
+    one["stage"] = [
+        {
+            "component": "split",
+            "props": {
+                "area_ids": ["ma1/" + "ab" * 8 + "/walk/5/none/25.000000/51.000000"]
+            },
+        }
+    ]
     assert module.check_brief(loaded, one, {}) == module.Refusal(
         "STAGE_VALUE", "stage[0].props.area_ids"
     )
@@ -538,8 +612,8 @@ def test_observed_claim_rejects_an_inferred_fact(tmp_path: Path) -> None:
 def test_place_public_simulated_slot_without_a_place_name(tmp_path: Path) -> None:
     slot = _slot(
         name="busyness",
-        metric="venue_busyness_index",
-        unit="relative_index",
+        metric="price_deal_value",
+        unit="qar",
         geo="public",
         provenance="simulated",
     )
@@ -567,8 +641,8 @@ def test_place_public_simulated_slot_without_a_place_name(tmp_path: Path) -> Non
                 subject="place_public",
                 slots=_slot(
                     name="busyness",
-                    metric="venue_busyness_index",
-                    unit="relative_index",
+                    metric="price_deal_value",
+                    unit="qar",
                     geo="public",
                 ),
                 en="The reading is {busyness}.",
@@ -579,8 +653,8 @@ def test_place_public_simulated_slot_without_a_place_name(tmp_path: Path) -> Non
     )
     fact = _fact(
         module,
-        metric_key="venue_busyness_index",
-        unit="relative_index",
+        metric_key="price_deal_value",
+        unit="qar",
         geography_kind="public",
         provenance="simulated",
         lineage_ref="lin_busyness",
@@ -831,12 +905,21 @@ def test_slot_unit_must_be_the_metric_unit(tmp_path: Path) -> None:
 def test_breakdown_sex_requires_public(tmp_path: Path) -> None:
     module, refused = _load(
         tmp_path,
-        _claims(_claim(slots=_slot(breakdown="sex", provenance="synthetic"))),
+        _claims(
+            _claim(
+                subject="national",
+                slots=_slot(geo="national", breakdown="sex", provenance="synthetic"),
+            )
+        ),
         name="bad",
     )
     assert refused == module.Refusal("BREAKDOWN", "claims[0].slots[0].breakdown")
     _, loaded = _load(
-        tmp_path, _claims(_claim(slots=_slot(breakdown="sex"))), name="good"
+        tmp_path,
+        _claims(
+            _claim(subject="national", slots=_slot(geo="national", breakdown="sex"))
+        ),
+        name="good",
     )
     assert loaded.claims[0].slots[0].breakdown == "sex"
 
@@ -973,8 +1056,8 @@ def test_question_slots_must_match(tmp_path: Path) -> None:
     other = _fact(
         module,
         fact_id=FACT_B,
-        metric_key="night_lights_radiance",
-        unit="radiance_nw_cm2_sr",
+        metric_key="price_deal_value",
+        unit="qar",
         period="2024-06",
         lineage_ref="lin_night_radiance",
     )
@@ -1040,7 +1123,7 @@ def test_closed_records_stay_frozen() -> None:
 
     slot = schema.Slot(
         "reading",
-        "population_grid_people",
+        "price_deal_count",
         "count",
         "area_shape",
         "calendar_year",
@@ -1061,7 +1144,7 @@ def test_closed_records_stay_frozen() -> None:
         schema.Catalogue("a" * 64, (claim,), (), (), (), ()),
         schema.ReturnedFact(
             FACT_A,
-            "population_grid_people",
+            "price_deal_count",
             "count",
             "2024",
             "area_shape",
@@ -1338,17 +1421,30 @@ def test_fact_binding_and_template_edges(tmp_path: Path) -> None:
     ) == module.Refusal("SLOT_PROVENANCE", "slots.reading")
     _, sex = _load(
         tmp_path,
-        _claims(_claim(slots=_slot(breakdown="sex"))),
+        _claims(
+            _claim(
+                key="population_age_sex",
+                slots=_slot(metric="population_grid_people", breakdown="sex"),
+                caveats="[grid_cells_summed]",
+            )
+        ),
         name="sex",
     )
     assert module.match_slots(
-        sex, "area_note", {"reading": fact.fact_id}, {fact.fact_id: synthetic}
+        sex,
+        "population_age_sex",
+        {"reading": fact.fact_id},
+        {
+            fact.fact_id: _fact(
+                module, metric_key="population_grid_people", provenance="synthetic"
+            )
+        },
     ) == module.Refusal("BREAKDOWN", "slots.reading")
     assert breakdown_refusal(
         "area",
         "widget",
         ("public",),
-        "population_grid_people",
+        "price_deal_count",
         "claims[0].slots[0].breakdown",
     ) == module.Refusal("BREAKDOWN", "claims[0].slots[0].breakdown")
     assert check_rendered("", (), "claims[0].template_en", require_slots=False) == (
@@ -1505,7 +1601,7 @@ def test_loader_closed_field_refusals(tmp_path: Path) -> None:
     question_slot = (
         "    slots:\n"
         "      - name: reading\n"
-        "        metric_key: population_grid_people\n"
+        "        metric_key: price_deal_count\n"
         "        unit: count\n"
         "        geography_role: area_shape\n"
         "        period_rule: calendar_year\n"
@@ -1700,7 +1796,7 @@ def test_malformed_values_are_refused(tmp_path: Path) -> None:
             "claims.yaml": _claims(
                 _claim(
                     slots=_slot().replace(
-                        "metric_key: population_grid_people", 'metric_key: ""'
+                        "metric_key: price_deal_count", 'metric_key: ""'
                     )
                 )
             )
@@ -2127,7 +2223,7 @@ def test_malformed_values_are_refused(tmp_path: Path) -> None:
         "    personas: [local]\n"
         "    slots:\n"
         "      - name: people\n"
-        "        metric_key: population_grid_people\n"
+        "        metric_key: price_deal_count\n"
         "        unit: count\n"
         "        geography_role: area_shape\n"
         "        period_rule: calendar_year\n"

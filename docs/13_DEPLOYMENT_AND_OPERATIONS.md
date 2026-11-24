@@ -45,7 +45,7 @@
 | ID | Requirement |
 |---|---|
 | OPS-01 | The API process binds to the loopback address `127.0.0.1` only, on every environment except a later deployment that the custodian approves in writing. |
-| OPS-02 | ASSUMPTION: the API listens on `127.0.0.1:8000` by default. Reason: one fixed, documented address keeps the runbook exact; doc 08 may change it, and then this table must change with it. |
+| OPS-02 | `EII_API_PORT` defaults to 8000 for development and 8089 for staging. Live has one loopback entry at 8088 and alternates private upstreams 18088 and 18089, under L-1238 A-S3-28a and decision 0072. |
 | OPS-03 | Changed by [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15, which removes the oversight seat: the two company seats (`company_a`, `company_b`) and the presenter console run as browser windows on the stage machine. No second device reaches the API over WSL networking in v1. |
 | OPS-04 | The stage browser is a native Windows browser (Chrome or Edge), never a Linux browser under WSLg. Reason: WSLg can fall back to software rendering, while Windows browsers use the GPU through Direct3D (stack research, 2026-11-11). |
 | OPS-05 | Continuous integration never holds a live `ANTHROPIC_API_KEY`; assistant tests run against the recorded provider. |
@@ -56,8 +56,15 @@ Configuration (names pinned in [02_ARCHITECTURE.md](02_ARCHITECTURE.md); values 
 |---|---|---|---|
 | `ANTHROPIC_API_KEY` | key or absent | Owner, stage session only | Absent means template writer and recorded replays only |
 | `EII_STORE` | `postgres` or `embedded` | `./eii up` (section 5) | Not edited by hand on stage |
-| `EII_DATABASE_URL` | connection string to this project's loopback database, default `127.0.0.1:55440` ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)) | `.env` | Holds the application role's password; never printed |
+| `EII_DATABASE_URL` | connection string to this project's loopback database, default `127.0.0.1:55440` ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)); parsed database name ends in `_staging` for staging or `_live` for live, and neither for development, case-insensitively (L-1260) | `.env` | Holds the application role's password; never printed. A namespace mismatch refuses `environment_database_conflict` before a database probe, store or loader is touched; query parameters remain refused |
 | `EII_RELEASE_DIR` | `data/releases/<release_id>` | `.env` | Must match the frozen release on stage |
+| `EII_ENVIRONMENT` | `development`, `staging` or `live` | Operator | Selects the isolated operational environment; absent or empty means development, with the same database namespace rule |
+| `EII_LISTEN_HOST` | `127.0.0.1` | Operator | Any other bind refuses |
+| `EII_API_PORT` | development 8000, staging 8089, live entry 8088 | Operator | Live alternates private upstreams 18088 and 18089 under L-1238 A-S3-28a |
+| `EII_STATE_DIR` | `<deployment>/<environment>/state` | Operator | Persistent environment state outside application and release hashes |
+| `EII_OPERATION_RECORD` | local operation JSON under the environment home | Lead or operator | Closed request schema; no credentials; public handover requires the lead |
+| `EII_SOURCE_RELEASE_DIR` | content-addressed exported Public release | Installer only | Used by load-release; excluded from the API child environment |
+| `EII_APPLICATION_ARCHIVE` | checksummed offline application ZIP | Installer only | Reuse the same archive for live; absent in staging prepares one from the exact clean commit |
 | `EII_LANG_DEFAULT` | `en` or `ar` | `.env` | Language of the opening scene |
 | `EII_PRESENTER` | `0` or `1` | `.env` | `1` on the stage machine only; enables the presenter console and its controls |
 | `EII_TRAFFIC_PROVIDER` | `simulated` (default) or `tomtom` | `.env` | `simulated` on the stage machine and in every test and gate; `tomtom` only for a session the owner chooses (OPS-70) |
@@ -69,7 +76,11 @@ Configuration (names pinned in [02_ARCHITECTURE.md](02_ARCHITECTURE.md); values 
 | `BESTTIME_API_KEY_PUBLIC` | key or absent | Owner, the lead's shell only | The same source's second key, under the same rules (OPS-72) |
 | `EII_BESTTIME_RUN_CREDIT_LIMIT` | whole number of credits or absent | Owner, the lead's shell only | The most credits one keyed run of the relative-busyness source may spend ([decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md) item 5); a keyed run refuses to start without it; never committed |
 | `ESRI_API_KEY` | key or absent | Owner, the product's own server only | The imagery provider's key ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), within its free tier on an account with pay-as-you-go disabled: read only by the running API process for the satellite mode and the address search; never printed, logged or committed, never in a work tree, brief, worker tool or sandbox; absent means the open map and the gazetteer only; needed by no test, gate, command or story (OPS-73) |
-| `MAPTILE_API_KEY` | key or absent | Owner, the product's own server only | The key of the photorealistic 3D tiles (Google's Map Tiles API; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), the one paid service of that decision: read at run time only by the running API process, which adds it to each tile request on a same-origin route of its own; the browser never holds it; never printed, logged or committed, never in a work tree, brief, worker tool or sandbox; the owner's spend cap of USD 20 in total is kept by a project-wide count of billable tile requests, refused once it reaches 3,333, and by a view budget of at most 600 tiles; absent means no photorealistic 3D mode; needed by no test, gate, command or story (OPS-74) |
+| `MAPTILE_API_KEY` | key or absent | Owner, the product's own server only | The key of the photorealistic 3D tiles (Google's Map Tiles API; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), the one paid service of that decision: read at run time only by the running API process, which adds it to each tile request on a same-origin route of its own; the browser never holds it; never printed, logged or committed, never in a work tree, brief, worker tool or sandbox; the owner's `SPEND_CEILING_USD` total-spend ceiling is kept by a project-wide count of billable tile requests, with a warning at `WARNING_FRACTION` and refusal at the computed request limit; there is no per-view budget; absent means no photorealistic 3D mode; needed by no test, gate, command or story (OPS-74) |
+| `EII_IMAGERY_TILE_BASE` | HTTPS service base or empty | API process | Runtime imagery service address; empty disables satellite mode; S3-T16 Part A remains incomplete |
+| `EII_PHOTOREAL_TILE_BASE` | HTTPS service base or empty | API process | Runtime photorealistic base; empty disables the mode; no browser address is supplied |
+| `EII_PHOTOREAL_LIMIT` | non-negative integer or empty | API process | Optional lower request limit, bounded by the computed spend cap; empty uses that cap |
+| `EII_PHOTOREAL_PRICE_PER_THOUSAND` | positive decimal or empty | API process | Price used for the spend cap; empty uses ruling L-717 item 3; a higher price lowers the request limit |
 | `EII_DECISION_PROVIDER` | `none` or `jev`, default `none` | Build/evaluation environment | No stage or run-time use in v1 |
 | `EII_REGISTER_FILE` | path to the register file outside the repository, or absent | Owner, in the lead's own shell | The file of public records of the public business register, source `biz_register` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1); read, read-only, by the world build and the release build run from the lead's own shell and by the running product; the path and the file's content are never printed and never put in the repository, a brief, a fixture, a log or a worker tool's or reviewer's environment; tests and continuous integration use an invented stand-in register. A snapshot of the file is kept each month from 2026-11 beside it, in the same folder outside the repository; the readers find the snapshots there through this same setting and read them under the same rules, so no further setting is added ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12). Who keeps them is open for the owner |
 | `EII_FC_REGISTER_FILE` | path to the financial centre's register file outside the repository, or absent | Owner, in the lead's own shell | The file of public company records of the financial centre's public register, source `fc_register`, a file of its own ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1); read, read-only, by the same readers as `EII_REGISTER_FILE` and under the same rules: the path and the file's content are never printed and never put in the repository, a brief, a fixture, a log or a worker tool's or reviewer's environment; tests and continuous integration use an invented stand-in of the same shape. Its monthly snapshots are kept beside it and read in the same way as those of `EII_REGISTER_FILE` ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12) |
@@ -92,7 +103,7 @@ Exact versions are pinned in slice S0 and confirmed at the spike (slice S1) with
 | Tiles, glyphs and interface fonts | Freeze bundle | Hash each file | A freeze-bundle check in every mode: with a `freeze.json` under `data/freeze/`, all files are present and hashes match, otherwise `FAIL`; with no `freeze.json`, a named `WARN` never makes preflight non-zero ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)) |
 | Recorded assistant replays | Freeze bundle | Re-validate each replay against the current release | Every replay is checked. Valid replays report `PASS`; missing or invalid replays report `WARN` naming the affected story steps and are excluded from the memo; those steps use the template writer. Replay failure does not prevent startup unless the runbook explicitly requires that prepared scene |
 | bubblewrap sandbox (build machine only) | [05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) | `bwrap --version` and the sandbox test | Present; test passes. Never downgraded on the build machine ([decision 0020](decisions/0020-freeze-bundle-check-and-project-database-port.md)) |
-| API port free | OPS-02 | Try to bind `127.0.0.1:8000` | Free |
+| API port free | OPS-02 | Try to bind `127.0.0.1` at the configured API or candidate backend port | Free, or verified as the environment’s owned process |
 | Model key | Optional | Test that `ANTHROPIC_API_KEY` is non-empty | Reports `present` or `absent`; never prints the value |
 | Traffic provider key | Optional | Test that `TOMTOM_API_KEY` is non-empty and read `EII_TRAFFIC_PROVIDER` | Reports `present` or `absent` and the switch value; never prints the key; makes no call to the provider |
 | Night-lights key | Optional | Test that `EARTHDATA_API_KEY` is non-empty | Reports `present` or `absent`; never prints the value; makes no call to a source host |
@@ -181,6 +192,8 @@ The CI workflow declares a `postgres` service container from the pinned `db` ima
 
 ## 5. Store selection, the presenter switch and the local ledger
 
+S3-T28 live and staging require PostgreSQL and refuse explicit embedded mode. The developer selection and presenter contracts below remain separate. Runtime settings are closed: provider none, simulated traffic, presenter disabled and no paid or build keys. The first Public map uses the existing S3 local question journal and reports `ledger: local` truthfully; it does not claim the later PostgreSQL ledger integration exists.
+
 ```mermaid
 flowchart TD
   U["./eii db-up (before ./eii up)"] --> V["start the database: native service or Compose; wait up to 60 s"]
@@ -222,7 +235,7 @@ All commands run from the repository root inside Ubuntu. Names are pinned in [02
 | `./eii preflight` | Runs every check in section 3, prints the store it would select, and changes nothing | No | All |
 | `./eii db-up` | Starts the database (Option N native service or Option C Compose `db`) and waits up to 60 s for it to answer; it starts nothing else | No | Tools, database |
 | `./eii db-down` | Stops the database; never removes volumes | No | Tools |
-| `./eii up` | Serves from the store preflight found (section 5), invokes `./eii load-release` only when the configured release schema is absent, replays the local ledger, starts the API serving the front end, tiles and fonts, prints the links for the two company seats and the presenter console (OPS-03), the store, `release_id` and model mode, then stays in the foreground until stopped | No | All |
+| `./eii up` | Serves from the store preflight found (section 5), invokes `./eii load-release` only when the configured release schema is absent, replays the local ledger, starts the API serving the front end, tiles and fonts, prints the links for the two company seats and the presenter console (OPS-03), the store, `release_id` and model mode, for live/staging, returns zero only after its owned detached process is ready; the foreground contract for other environments remains unchanged (decision 0072) | No | All |
 | `./eii up --embedded` | Same, with store `embedded`; skips PostgreSQL and Docker | No | All except PostgreSQL |
 | `./eii down` | Stops the API cleanly; never starts or stops the database (that is `./eii db-up` and `./eii db-down`); never removes volumes | No | None |
 | `./eii test` | Runs the suites defined in [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md), including parity on both engines | No | Tools, PostgreSQL |
@@ -234,9 +247,10 @@ All commands run from the repository root inside Ubuntu. Names are pinned in [02
 | `./eii build-public --busyness-bootstrap` | Explicit lead-shell identity acquisition for pending cache crosswalk rows; writes only the minimal returned identity handoff, input/code fingerprints and permitted usage counts; no hourly values, raw response or publication; no seed/resume flags | Forecast only, existing one-shot reservations and cap | Tools, disk |
 | `./eii build-public --busyness-confirm SHA256 ROLE DATE` | Confirm the exact reviewed handoff hash, functional reviewer role and ISO review date into the cache crosswalk atomically; changed inputs or a mismatched name refuse; production is a separate recorded run | No | Tools, disk |
 | `./eii build-world` | Builds the synthetic world and mobility feeds inside the sandbox from the public cache | No | Tools, sandbox |
-| `./eii build-release` | Runs linkage, the privacy engine and the traffic assignment, writes `data/releases/<release_id>/`, deletes the vault | No | Tools, sandbox |
-| `./eii load-release` | Loads the release named by `EII_RELEASE_DIR` into a PostgreSQL schema named after the release and into the embedded reader file; accepts only tables named in the manifest | No | Tools, PostgreSQL, release |
+| `./eii build-release` | Public-only: consumes the reviewed assembly envelope in the existing build-release sandbox, removes this build’s vault, verifies and publishes `data/releases/<release_id>/`. Protected linkage/privacy/traffic remains unimplemented, owned by S11-T09 | No | Tools, sandbox |
+| `./eii load-release` | Live/staging first install the verified application and an exact release copy from `EII_SOURCE_RELEASE_DIR`, then use the existing owner-only loader and full two-store verification. Application archive identity is separate from release identity; accepts only manifest tables | No | Tools, PostgreSQL, release |
 | `./eii freeze` | Accepts `protected` releases only and takes no mode flag. It is run twice (section 7): the first run writes the data bundle, checksum list and pending `freeze.json` and appends the register line; the second run, from the containing base-branch commit, builds and verifies the application archive, writes its checksum beside the bundle and marks `freeze.json` complete. A `public_only` release is never frozen or registered | No | All |
+| `./eii question-lab run --n N --seed S` | Runs distinct invented S3 scenarios in both languages through the loaded fixture; records coverage, empty cells, per-question results and the gallery packet; missing native, sealed, pixel or human evidence fails qualification | No | Local evaluation prerequisites only |
 
 "Network" in the table means that the command itself needs the network. The running API may in addition reach the traffic provider under the three conditions of OPS-70, the imagery provider under those of OPS-73 and the photorealistic 3D tiles under those of OPS-74.
 
@@ -249,13 +263,14 @@ Exit codes (ASSUMPTION: this scheme is set here because nothing else defines it;
 | Code | Meaning |
 |---|---|
 | 0 | Success |
-| 1 | A check or step failed; the printed `FAIL` lines say which |
+| 1 | A check or step failed; the printed `FAIL` lines say which; an existing final schema, a release kind the loader does not support, a host off the loopback address (`host_not_loopback`), an extension the target database must not hold, an extension schema that is not a plain identifier (`extension_schema_invalid`), or an engine operation that failed (`engine_operation_failed`) |
 | 2 | Usage error: unknown command or flag |
-| 3 | PostgreSQL required by this command but not answering (`test`, `load-release`, `freeze`) |
-| 4 | Release missing, incomplete, or hash mismatch (including embedded reader mismatch) |
+| 3 | PostgreSQL required by this command but not answering (`test`, `load-release`, `freeze`); or the owner role cannot connect on a server that answers |
+| 4 | Release missing, incomplete, or hash mismatch (including embedded reader mismatch); a forbidden manifest field, a forbidden table class, a privacy-written table (`privacy_written_table`) or an empty table list; a duplicate manifest key (`duplicate_key`), an unknown manifest key (`unknown_manifest_key`), a manifest key in another case (`manifest_key_case`), a manifest value of the wrong type (`manifest_type_invalid`) or a table listed twice (`duplicate_table`); an absolute table path (`absolute_path`), a table path with `..` (`path_traversal`), a symbolic link on a table path (`symbolic_link`) or a table path outside the release (`path_outside_release`); a source chain that is missing (`source_link_missing`), incomplete (`source_link_incomplete`), unknown (`source_link_unknown`) or mismatched (`source_link_mismatch`); or staged stores that differ in a count, a digest or the release identity |
 | 5 | API port already in use |
 | 6 | Network required but unavailable (`build-public` only) |
 | 7 | Freeze refused because the register conflicts or the recorded human review is missing; or frozen-bundle install or start refused because the installed application's register lacks the line or `freeze.json` is not complete (OPS-62, OPS-63) |
+| 8 | Candidate written for independent review; approval missing (candidate_written_approval_missing) |
 
 | ID | Requirement |
 |---|---|
@@ -288,7 +303,7 @@ Exit codes (ASSUMPTION: this scheme is set here because nothing else defines it;
 | OPS-71 | `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` lie outside the keys of [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12, which stay unused, and may be used by the build within their free allowances ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 16). Neither is printed, logged, committed, or put into a work tree, a brief, a prompt or a sandbox (OPS-07, OPS-08). No test, gate, command or the guided story needs either. Tests and continuous integration never call a live service: their fixtures are made by hand in the documented response format, and no response of a live service is committed. Under proposed decision 0066, `CDSE_CLIENT_ID` and `CDSE_CLIENT_SECRET` are tooling-only, environment-only, never disclosed or passed to product, generators, release or sandbox; defaults, tests, gates and the guided story need neither value nor cache. Only the lead-shell `./eii build-public --cdse-backup` form selects the optional unread backup; ordinary build-public never selects it. Provider hosts, request contracts, publisher and quota remain pending verification; no unverified host is admitted. The narrow unread CDSE public-cache exception changes no other provider storage rule. |
 | OPS-72 | The self-serve sources of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 18 to 24 are fetched only by `./eii build-public`, into the uncommitted public cache, each with its hash, licence or terms and retrieval date. `places_fsq`, a further source of the places layer (Apache 2.0), is fetched from the public copy on Source Cooperative, `https://data.source.coop/fused/fsq-os-places/` (host `data.source.coop`), which is geospatially partitioned GeoParquet read without an account; each refresh selects the newest dated release through the copy's root listing and fetches only the files that cover Qatar from that release, no secret variable is added for it, and runtime registry evidence records the actual release date, which is the date the places are shown with; every earlier dated snapshot is retained. `busy_besttime`, the relative busyness by hour of named venues, is read by the project's own reader of the provider's interface for a build-time list of venues, never at run time ([decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md)). Its two keys are read from the environment in the lead's shell only; neither is ever printed, logged, committed or put in a brief, worktree or sandbox, and an address that carries a key is never written to a log, receipt, error, cache name, fixture or file. No test, gate or command of `./eii test` needs either key. The provider's terms are recorded truthfully as the licence text with the date read; the source uses `licence_basis: provider_terms` ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md) item 3, [decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md)). Its values stay in the uncommitted public cache, the releases and the freeze bundles; they never enter the repository or a test fixture; and the source is left out of the nightly live fetch, as are the two keyed sources, whose fetchers are tested on hand-made fixtures only ([12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md)). Terms that need a permission or licence before real use are listed in document 17, DHA-102; they do not switch a source off or limit its display in version 1. See OPS-66. |
 | OPS-73 | `ESRI_API_KEY` is the imagery provider's key ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), on the free tier of an account with pay-as-you-go disabled, so no spend is possible. It is read only from the environment of the running API process, which alone contacts the provider, and only while the key is present and the presenter's offline control is not set; the browser never holds the key and still contacts only its own origin: the satellite tiles and the address-search results pass through the server's own paths. No tile is stored, and no address-search result is written to a file, the database, a ledger or egress row, a log, a backup or the freeze bundle. The key is never printed, logged or committed, and never reaches a work tree, a brief, a prompt, a worker tool or a sandbox (OPS-07, OPS-08). The provider's hosts are never on the fetcher allow-list of `./eii build-public`. Tests and continuous integration never call the provider: a planted request to the provider's hosts without the key fails a test. The open map, every test, every gate, `./eii up`, preflight, freeze and the guided story run without the key. RECEIVED (owner; ruling L-151; item 7; OI-132): the imagery provider's attribution note is received; the provider's name may appear only in the map attribution line and in the source rows of [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md). What remains is the documentation check's place-scoped exception, which task S1-T14 builds. |
-| OPS-74 | `MAPTILE_API_KEY` is the key of the photorealistic 3D mode ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7): Google's photorealistic 3D tiles through its Map Tiles API, the one paid service of that decision (item 14). It is read at run time only, from the environment of the running API process, which alone contacts the provider: it adds the key to each tile request on a same-origin route of its own, so the browser never holds the key and still contacts only its own origin ([02_ARCHITECTURE.md](02_ARCHITECTURE.md) ARC-35, ARC-36). It does so only while the key is present, the presenter's offline control is not set and the count of billable requests is under its limit. The owner caps the paid spend at USD 20 in total: every billable tile request is counted project-wide, free use is ignored, and requests are refused once the count reaches 3,333 (USD 6.00 per 1,000 requests at the provider's first paid tier). The task that builds the mode reads the provider's price again, and a higher price lowers that limit so that the spend stays within USD 20. Because the cap is in total, no command, restart, store switch, new release or restore resets or lowers the count. One view loads at most 600 tiles (the view budget). No tile is stored: none is written to a file, the database, a release, a ledger or egress row, a log, a backup or the freeze bundle. The mode shows the attribution its tiles carry. The key is never printed, logged or committed, and never reaches a work tree, a brief, a prompt, a worker tool or a sandbox (OPS-07, OPS-08). The provider's hosts are never on the fetcher allow-list of `./eii build-public`. Tests and continuous integration never call the provider; the refusal at the count and the view budget are tested without it ([12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md)). The open map stays the default; every test, every gate, `./eii up`, preflight, freeze and the guided story run without the key. Where the count is kept is open (section "Open questions and assumptions"). |
+| OPS-74 | `MAPTILE_API_KEY` is the key of the photorealistic 3D mode ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7): Google's photorealistic 3D tiles through its Map Tiles API, the one paid service of that decision (item 14). It is read at run time only, from the environment of the running API process, which alone contacts the provider: it adds the key to each tile request on a same-origin route of its own, so the browser never holds the key and still contacts only its own origin ([02_ARCHITECTURE.md](02_ARCHITECTURE.md) ARC-35, ARC-36). It does so only while the key is present, the presenter's offline control is not set and the count of billable requests is under its limit. The owner caps total paid spend at `SPEND_CEILING_USD`: every billable tile request is counted project-wide, free use is ignored, and requests are refused once the count reaches 3,333 (USD 6.00 per 1,000 requests at the provider's first paid tier). The task that builds the mode reads the provider's price again, and a higher price lowers that limit so that the spend stays within `SPEND_CEILING_USD`. Because the cap is in total, no command, restart, store switch, new release or restore resets or lowers the count. There is no per-view budget. The spend meter reports the running billable count, request limit and exact server-computed money, and warns at `WARNING_FRACTION` without reducing view detail, area or duration. No tile is stored: none is written to a file, the database, a release, a ledger or egress row, a log, a backup or the freeze bundle. The mode shows the attribution its tiles carry. The key is never printed, logged or committed, and never reaches a work tree, a brief, a prompt, a worker tool or a sandbox (OPS-07, OPS-08). The provider's hosts are never on the fetcher allow-list of `./eii build-public`. Tests and continuous integration never call the provider; the refusal at the ceiling, the warning boundary and continued requests above the former per-view allowance are tested without it ([12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md)). The open map stays the default; every test, every gate, `./eii up`, preflight, freeze and the guided story run without the key. The count journal and its remaining operator-rollback limit are described in section "S3-T16 Part A settings under implementation". |
 
 ### 6.4 The voice environment
 
@@ -350,6 +365,265 @@ The release files in the bundle carry the Public tables of the investment source
 Runbook step for a refused freeze, to be carried by [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md): when the first `./eii freeze` run exits 7, stop and investigate. A freeze is refused when the same `window_key` is already registered with different protected tables or the same `world_seed` with a different `window_key`. Never edit or remove a register line. After a freeze, a change of rules version, exported set, treatment code or world generator requires a new `world_seed` and a new build before another freeze (PRV-120). A missing review record is resolved by performing and recording the review (OPS-62), then re-running the first freeze step.
 
 Runbook step for a refused frozen bundle, to be carried by [16_DEMO_RUNBOOK.md](16_DEMO_RUNBOOK.md): when install or `./eii up` exits 7 because the register shipped inside the installed application lacks the bundle's line or `freeze.json` is not complete, stop. Finish the two-run freeze: merge the line normally if needed, run `./eii freeze` again with no new flag from a base-branch commit containing it, and verify that the archive checksum is present and `freeze.json` says `complete`. Do not change the seed, edit the shipped register or substitute a receipt file.
+
+### Closed build and operations reasons (S3-T11 early round, Part A)
+
+At the Part-A CLI and installed-entry boundaries, preserve the inner closed reason.
+The vocabulary is `eii_core.reason_codes.CODES`; `eii_core.reasons.reason` accepts
+only a whole member from `reason`, the configuration variable name, or a single
+exception argument. Unknown text is never printed, logged, sliced or prefixed.
+Unstructured key, type, attribute, timeout and operating-system faults use
+`input_key_missing`, `input_type_invalid`, `input_attribute_missing`,
+`operation_timeout` and `operation_os_error`; all other unstructured failures use
+`operation_failed`. Refusals still refuse. Startup and health logs carry the
+closed code as `error_code`, without exception text or traceback.
+
+Assembly input, approval, path, bound-file hash and pending-gate failures remain
+distinct. Independent approval checks use `approval_fields_invalid`,
+`approval_verdict_invalid`, `approval_builder_invalid`, `approval_reviewer_invalid`,
+`approval_same_maker`, `approval_code_mismatch` and `approval_hash_mismatch`.
+Receipt validation names the invalid field using the closed
+`producer_receipt_*` codes; no field value is included. The sandbox passes one
+whole closed stderr code only. Other stderr is `operation_failed`.
+Web packaging distinguishes `application_web_build_timeout`,
+`application_web_build_unavailable` and `application_web_build_nonzero` and
+never publishes npm output. Preflight reports `basemap_missing`, `fonts_missing`
+or `replays_missing` for one missing slot; combined codes retain every missing
+or invalid slot in asset order. An owned-process refusal is also retained.
+Catalogue export prints the closed loader rule code, or
+`catalogue_target_missing` for an absent check target. Lab fixture problems keep
+their `execution:` or `fixture:` scope and the inner closed code.
+
+Round-two additions to the Part-A boundary table:
+
+| Row | Boundary | Closed outcome |
+|---|---|---|
+| D54 | `operations.deploy.require_retained` | Retain the installed release/archive verifier's inner code, including `release_missing` and `application_checksum_mismatch`, with exit 4. Only an unstructured general failure uses `rollback_retention_failed`; typed unstructured faults retain the shared class code. A missing retained target still refuses. |
+| D55 | `evals.question_lab.runner.run_lab` input selection, through the command adapter | Print `question_manifest`, `question_identity`, `question_capacity` or `question_families`, with exit 2. Unknown exception text is withheld using the shared class code or `operation_failed`. |
+
+The static guard covers exact and prefixed generic constants, literal f-string
+tails, concatenation, percent/format construction and lexically bound constant
+names. Each generic output sink must carry its own projection. A direct reference to a
+caught exception in a raise, return, print, logging or write sink fails even when
+that sink also calls `reason(error)`. Only the argument to that call or the
+`.reason`, `.code` and `.exit_code` projections are admitted. This is a structural
+check, not arbitrary Python execution or alias/data-flow analysis. In deploy,
+D54 is covered now; D32 health and staging-evidence handling retain their later
+part's ownership. The two live-load diagnostic handlers also use `reason(error)`.
+The database parser's existing fixed literal outcomes, including its scheme and loopback
+refusals, are explicit closed-vocabulary members; their exact words are retained
+without admitting any connection-string value or arbitrary parser text.
+
+When a valid producer candidate has been written and only its approval file is
+absent, `./eii build-release` prints `candidate_written_approval_missing` and exits
+8. It writes no release and runs no sandbox. Supply the existing independently
+reviewed, hash-bound approval and use the same command again; no new command or
+flag is introduced. Malformed, stale and same-maker approvals remain failures,
+with their specific closed reasons and exit 4. An incomplete source chain is
+also a failure, with its closed reason and exit 4. Protected placeholders,
+freeze refusal, sandbox enforcement, cleanup and publication gates retain their
+existing behaviour.
+
+### S3-T28 isolated Public setup and operator sequence
+
+Authority: supplied decision 0071 items 1–6, L-1219 and L-1238 A-S3-28a/b/c; the task wording is owned by the documents branch. [Decision 0072](decisions/0072-loopback-activation-and-ready-return.md) records the narrow process reconciliation. This implementation candidate is not a public launch or a slice gate approval.
+
+Use `<deployment>/<environment>/releases/<full-release-id>`, `applications/<archive-sha256>` and `state/` as three separate roots. Each configured environment has a distinct canonical database and port. The installer records database identity without credentials. State, local question journal and the photoreal count journal survive upgrades, rollback and down. The count journal is never initialised or reset by these commands. Installer settings are removed before preflight/up. Application children receive only the closed list in `scripts/operations/config.py`; the selected store is generated after verification. Product code never reads gateway settings.
+
+1. **Build.** `./eii build-release` once per export consumes `assembly/release.json` and `assembly/release_review.json` from the Public cache. With `review/release_spec.json` present, the Public assembly producer described below materialises these files from the stored S2 outputs and their authenticated receipts before the read-only sandbox mount. The closed envelope supplies typed columns and original rows, scalar build metadata, source records, artefact descriptors and hashes of its reviewed inputs, including `assembly/final_audit.json`. The different-maker review binds its canonical SHA-256 and full code commit. Missing or unresolved inputs refuse; no synthetic substitute is produced. The sandbox has no network, product mount or unsandboxed retry. Only this build’s temporary vault is removed, on success and failure; cleanup failure blocks publication.
+2. **Staging install.** Set `EII_ENVIRONMENT=staging`, its own application-role database URL, state and installed release paths, the source export and operation request. The parsed database name must end in `_staging`; live requires `_live`, and development permits neither reserved suffix. Suffix classification ignores case and uses the decoded database name, while the actual connection name retains its case. Query parameters remain refused. A namespace mismatch refuses `environment_database_conflict` before any database probe, store or loader is touched, including under disjoint deployment parents (L-1260). `./eii load-release` copies exact export bytes, prepares or verifies the checksummed offline application archive, and writes only the existing loader outputs beside the manifest. Expect zero and a complete matching two-store receipt. Keep the archive for live. Absent offline dependencies, a dirty/wrong source commit or a failed web build refuses packaging.
+3. **Staging readiness.** Remove installation-only settings. `./eii preflight` then `./eii up`, using `start_staging`, must both exit zero. Expect healthy `/health`, `/`, `/api/release` and one Public layer. A ready result binds the installed archive and source commit through process state, without extra health fields.
+4. **First live activation.** Install with the same source export and archive into live’s separate roots and database. Run `load-release`, `preflight`, then `up` using `initial_live_activation`, loopback exposure and a null predecessor. Every promotion item is required; only pristine empty history permits this operation. Retain the initial installation itself. Expect entry 8088 to serve the full identity through upstream 18088. No S3 gate approval is required for this loopback setup.
+5. **Promote.** Build the next export once, install/check/start its staging copy, then install and preflight live. `./eii up` with `promote` names the active predecessor and the other private upstream. Offline evidence files bind full commit, release and archive: merged-main ancestry and each of the six hosted checks; a different-maker APPROVED review; actual whole-test exit/count/seed report; staging identity plus actual smoke/health probes; retained predecessor; reviewed completed surfaces and existing gates. Hash references and structured reports are required; a boolean is insufficient. Authorisation is appended and synced before candidate service, readiness precedes atomic route replacement, and only then is the retiring owned upstream stopped.
+6. **Rollback.** Keep both application archives, installed copies, schemas and loader outputs. Recheck the retained target in staging, then `./eii up` with `rollback` names the current predecessor and restores the retained release **and its backend port**. No rebuild or schema overwrite occurs. First-release rollback refuses `no_previous_release_for_rollback`; down is the explicit stop operation.
+7. **Public handover.** After recorded S3 gate approval, the lead uses an `expose_public` request for the current identity. Approval must match the exact commit, release and archive. The shared callback is reserved for S3-T20; while that entry is unavailable the command refuses `public_entry_requires_s3_t20`. This task opens no tunnel and records no public address.
+8. **Stop.** `./eii down` for each environment verifies PID/start ticks/command hash/nonce/environment, signals only owned processes through pidfds and waits within its fixed bound. New process records include the kernel boot identity. Records from a previous boot are marked stopped without signalling; a same-boot identity refusal is reported after the other records have been processed. A same-boot record with different live start ticks or a PID now owned by another user is also marked stopped without signalling, while still reporting the mismatch; matching ticks with a different nonce or command do not retire the record. A failed ownership probe keeps refusing and does not retire the record. It retains releases, databases, route/history, question journal, count journal and archives. It issues no database-control command.
+
+A request has exactly the fields of `operations.evidence.FIELDS`; reports use local relative hash references. Promotion logs form a hash chain; the route binds its authorisation sequence/hash, release, archive and backend. Serving also requires a durable switched outcome for the entire route, including its predecessor; the outcome is written ahead of the route, so an interrupted switch leaves the previous route serving. Missing/truncated history, a mismatched route, concurrent operation, removed retention or a failed readiness check refuses. A file edit that does not match a durable authorisation and switched outcome never promotes; the unkeyed hash chain detects accidental corruption, not a writer with access to the state folder. Recovery is an explicit reviewed operation; there is no automatic rollback or store fallback.
+
+Authorisation and outcome appends use unbuffered writes. A short return or an
+operating-system write/sync error truncates that append back to its starting
+offset and syncs it before reporting `promotion_log_unwritable`. A failed append
+therefore leaves the previous complete log and serving route intact when the
+truncate and sync succeed; a failed recovery still refuses.
+
+Readiness failure cleans up only a newly launched child. Reused backends and
+their route/process records remain intact. The live entry's ownership check,
+launch and readiness step hold the operation lock. Its numeric loopback HTTP
+server avoids the standard server's optional name-service lookup.
+
+The loader now reserves environment/database identity before either store is
+loaded, serialising the sibling check and reservation with the deployment-folder
+lock. A failed load retains that reservation. L-1260 closes lens A F5's
+disjoint-parent database gap with the parsed-name namespace rule above; the
+proposed required deployment-root setting was declined. Case-insensitive suffix
+classification keeps case variants of the reserved namespaces unavailable to
+development; it does not fold or rewrite a connection's database identity.
+`read_environment`, direct `Environment` construction, preflight probes and the
+legacy development loader apply the same guard before database access. The
+staging smoke check reads staging's persisted database identity rather than
+copying live's, and retained releases preserve their validated environment.
+Local regression evidence for this repair does not replace independent review
+or the lead's real-store and joined-result checks.
+
+`up` probes once. If only release checks fail, the installed archive and application role are verified before the selected namespace is inspected. Only an absent namespace permits the owner-only loader step, followed by full two-store verification. An existing namespace is never reloaded by `up`; a mismatch keeps exit 4 and its bytes. Explicit developer `up --embedded` remains foreground, uses a separate development installation and state, and imports no PostgreSQL driver.
+
+Ambient `PG*` settings are refused by the operational runtime boundary. Its application connector pins the numeric loopback host address and disables password-file lookup through the platform's null device; credentials come from the configured environment URL. The current [libpq connection-parameter documentation](https://www.postgresql.org/docs/18/libpq-connect.html#LIBPQ-PARAMKEYWORDS), read 2026-11-20, explains the independent host-address and password-file parameters. Driver-spy tests prove the supplied arguments and rejection variants; they are not a live PostgreSQL observation.
+
+Current official API pages read for S3-T28 on 2026-11-20: [DuckDB Python DB API](https://duckdb.org/docs/2.0/clients/python/dbapi) for read-only connections; PostgreSQL [roles](https://www.postgresql.org/docs/18/view-pg-roles.html) and [relations](https://www.postgresql.org/docs/18/catalog-pg-class.html) for application-role flags and exact namespace inventory; [Psycopg connections](https://www.psycopg.org/psycopg3/docs/api/connections.html) for connection options and transaction mode; [Uvicorn programmatic serving](https://uvicorn.dev/deployment/) for a single application instance; [uv workspaces](https://docs.astral.sh/uv/concepts/projects/workspaces/) for command-scoped packages; [Shapely WKB conversion](https://shapely.readthedocs.io/en/stable/reference/shapely.from_wkb.html) for the existing Public geometry reader. The exact pins and written retreats remain in `pins.toml`; no retreat was selected or tested here. Shapely's existing pin is now also a Product dependency, so its existing geometry reader works in the isolated offline archive. Native tests exercise the installed dependency closure; the PostgreSQL server integration still belongs to the lead's permitted live proof.
+
+The runbook tests use invented store/package/process interfaces; they are not evidence of a real database, protected release, public handover or installed production service. World build, protected release and non-Public freeze remain placeholders with S11-T09’s obligations intact.
+
+S3-T28 round-two verification keeps those boundaries. The Public build and install
+validators independently refuse an explicit privacy-parameter request before
+work begins; no command flag or parameter selection is added. The shared Public
+source chain refuses an explicitly generated producer kind or origin and an
+explicit Synthetic or Simulated lineage input class, using the existing
+`source_link_mismatch` reason (DAT-107). This detects declared producing metadata;
+it does not establish the truth of an otherwise unmarked source. The Parquet
+serving projection preserves registry `kind` and `origin` and lineage
+`input_class` for that shared guard. Hash-consistent generated-metadata plants
+exercise `check_release` and refuse before either loader stage is called.
+
+Every retained rollback node is checked against an earlier authorisation in the
+same environment. Candidate evidence is read once: its SHA-256 and decoded JSON
+come from the same bytes. Individual controls-off tests compile copies with one
+deciding refusal or invocation removed; another refusal or setup error is not
+admission evidence. Separate native tests plant sandbox bypass, a broader mount,
+an omitted network namespace, missing loader cleanup and changed loader outputs.
+The syscall-entry tripwire covers the complete invented command sequence and
+the native sandbox/writer, offline archive, entry and owned-child interfaces.
+It observes native libraries and descendants and blocks disallowed attempts
+before execution, including attempts whose errors the caller catches. Internet
+destinations are limited to exact loopback addresses and ports bound by the
+test's process tree in the same network namespace. Every destination on port
+53 is recorded as DNS; other loopback addresses and Unix destinations outside
+the scratch root, including abstract names, are recorded and blocked. A listen
+without an owned loopback bind is recorded and blocked. Socket inspection reads the thread group's descriptor table, so binds and listens from worker threads are classified the same way. The tracer runs in its own process, so its cleanup never waits for or reaps a child of the test that called it. Only kernel-directed,
+non-multicast NETLINK_ROUTE IPC is permitted for sandbox loopback setup.
+This catches accidental attempts, not an adversary racing sockaddr or path
+changes against inspection. Unsupported tracing fails; there is no no-tracing
+fallback, skip or increased existing bound.
+
+The catalogue grammar/slot validators accept
+otherwise valid templates containing prohibited meanings; they are not a
+general rule-24 semantic classifier. Under lead ruling L-1256, the AC8 row is:
+"S3-T28 adds no claim, fragment or template text; operations output is structural evidence only; the semantic review of catalogue claims stays with the catalogue's owning review".
+The existing shape-versus-semantics test and narrower generated-chain wording
+check remain in place; neither certifies semantic claims. Rule 24 and the
+catalogue's independent content review still bind every release (supplied
+decision 0071 item 6). Part C adds the tracked
+Public assembly producer below. Its invented-input evidence does not establish
+the completeness of a real cache, its reviewed schema bindings or its release
+approval. Those remain lead-run evidence; no real cache was read here. These
+limits and the F5 root decision do not close S3-T28 or a slice gate.
+
+### S3-T28 Public assembly producer
+
+`eii_custodian.release.producer` adapts the stored table envelopes emitted by
+`publicdata.assembly_adapters.Production.record`. Its closed phases are
+`reviewed_selections`, `frame`, `spine_graph`, `gis_property_singles`, `fsq`, `series_stage`,
+`additions` and `busyness`. A release spec supplies schemas and explicit source
+bindings, because these S2 envelopes contain original rows rather than the
+reader's typed column declarations. The spec is operator-supplied review
+configuration; the producer never guesses a column type, selects a latest
+snapshot, fetches data or supplies replacement rows.
+
+The local `review/release_spec.json` has exactly `version` (the supported integer
+version), `scalars`, `sources`, `tables` and `artefacts`. `scalars` contains the
+common build metadata of document 03 section **8. The manifest and the loader**, including
+`release_kind: public_only`, the full code commit and all three engine versions;
+it excludes `release_id` and all protected-window fields. No clock is sampled.
+`sources` maps each registry key to exactly `format`, `receipt` and `body`.
+Each file reference has exactly `path` and `sha256`, relative to the Public
+cache. `format: sidecar` reads the receipt directly; `format: manifest` reads
+the native source manifest's embedded `receipt`. Both authenticate the actual
+body bytes against the receipt's own SHA-256. These references point at the
+existing dated S2 receipt/body pair or selected native manifest and archive;
+they do not create another raw-data store.
+
+Each `tables` item has exactly `name`, `phase`, `columns` and `source_keys`.
+Columns use `ColumnSpec` names, logical types, nullability and geometry metadata.
+The rows come only from that phase's stored `tables[name]`; `spine_graph` reads
+its existing `assembly/graph/graph_node.parquet` and `graph_edge.parquet` through
+the existing S2 Parquet reader and binds both files. Graph source nodes and
+source edges keep their schema's `lineage` metadata class; their inputs remain
+Public and their sources must resolve exactly as every other row. An untyped field,
+omitted table, duplicate table or unresolvable row source refuses. The existing
+frame-to-GIS gazetteer append is accepted only when the later stored rows keep
+the complete earlier prefix. S2 now records its existing per-table `table_sources`
+bindings alongside the rows; these and any inverse `source_tables` edges must
+match the spec. Each source also matches the phase's recorded source
+chain. `artefacts` contains existing relative `artefacts/` paths and their
+digests; it supplies no artefact bytes.
+
+The producer derives `source_registry` and manifest citations from receipt
+publisher, title, key-free fetch URL, licence and basis, original retrieval UTC
+date and body hash. It derives `fact_lineage` from the released table, the
+versioned S2 producing method and every explicitly bound source. Source IDs are
+canonical registry keys; ambiguous family-to-key mappings refuse. Only Public
+source kinds and input classes are admitted. The existing writer's table and
+source-chain checks also run before a candidate is written. Decimal JSON
+lexemes are retained as decimal strings; values requiring rounding or driver
+coercion refuse. Input receipts, bodies, phases, spec, final audit and artefacts
+all enter the envelope's bound `files` inventory.
+Typed decoder errors preserve a closed inner reason; otherwise value errors use
+`producer_schema_refused` and type errors use `input_type_invalid`. Missing
+final-audit or graph files refuse as `producer_receipt_missing`, before a
+candidate is written.
+
+`prepare(cache)` writes deterministic `assembly/release_candidate.json` for
+review. The first `build-release` with a complete spec and no approval prepares
+this candidate, prints `candidate_written_approval_missing` and exits eight
+without running the sandbox or publishing an
+export. A different maker must then supply `review/release_approval.json` with
+exactly `verdict: APPROVED`, `builder`, `reviewer`, `code_version` and
+`input_sha256`, the SHA-256 of the candidate's canonical JSON. Builder and
+reviewer must differ after trimming and case folding. This is an external
+review record, never a verdict manufactured by the producer. On a subsequent
+`build-release`, `produce(cache)` reconstructs the candidate, verifies that
+exact approval and writes canonical `assembly/release.json` and
+`assembly/release_review.json` for the existing reader. Changed inputs require
+another review; the producer never rebinds an old approval. Already materialised
+reviewed envelopes retain their existing consumer path when no spec is supplied.
+
+**Release-spec draft (S3-P03).** From the lead's shell only,
+`./eii build-release --spec-draft LISTING` runs
+`eii_custodian.release.spec_draft.draft` over the Public cache and writes
+`review/release_spec.draft.json`; it builds nothing and runs no sandbox.
+`LISTING` is a JSON object mapping each source key to exactly `format`,
+`receipt` and `body`, the two being cache-relative paths with no hash. The draft
+takes each `tables` item from the present phase records with its owning
+`phase` (a later phase that extends a table, the GIS gazetteer, owns it) and its
+`source_keys` from the phase's `table_sources`, else its `source_tables`, else
+its recorded source chain. Each `sources` hash is computed, never typed: the
+receipt hash by the producer's own receipt reader, and the body bound to the
+phase record's chain hash by the producer's own source check, so the draft's
+sources pass the producer's checks before it is written. The core manifest
+catalogue carries no column types, so each column's type comes from its stored
+values only: all booleans `bool`, all integers `int`, all strings `string`,
+with `nullable` when a value is null or absent; any other or mixed value type,
+an empty table or an all-null column refuses as `column_type_unknown`, and the
+lead supplies such types (for example a decimal) by hand. The draft carries no
+scalar but `release_contract_version: release.v1` and an empty `artefacts`
+list. The lead fills the scalars and any narrower types, reviews the draft and
+renames it to `review/release_spec.json`; the producer's checks then run
+unchanged. The draft never writes or reads `review/release_approval.json` and
+refuses to replace an existing draft (`spec_draft_exists`). Its other refusals
+are `producer_receipt_missing`, `producer_hash_mismatch`, `unknown_table` (a
+phase table absent from the core catalogue), `producer_chain_incomplete` (no
+phase table, a listed key absent from the recorded chains, or a table source
+absent from the listing), `producer_schema_refused` (a malformed listing entry
+or phase record) and the producer's own source refusals; each exits four with
+its reason and writes nothing.
+
+Invented tests cover byte determinism, each required refusal, a real S2 bank
+parser output, actual sandbox/writer/verification, command dispatch and cleanup.
+The script command tests replace the store/sandbox interface and remain driver-free;
+the custodian tests separately run the actual sandbox, including command dispatch
+returning success followed by independent export verification. These are not real-cache
+or real PostgreSQL observations. See TASKS.md **S3-T28** and OPEN_ITEMS.md
+**S3-T28 Part C — real-cache assembly and independent review**.
 
 ## 8. Offline and no-key modes
 
@@ -431,7 +705,7 @@ The research checked provider pages on 2026-11-11. They describe what the provid
 | Model API | Estimate by the feasibility judge from the provider's price table: roughly USD 0.05 to 0.15 per answer and a few hundred dollars over the whole project. To be measured at go-live, when the owner switches the live adapter on (OI-01: the key is supplied for go-live and is not used during the build). |
 | Traffic provider | Used only within its free allowance, which is monthly: 200,000 tile requests and 2,500 reachable-range requests (provider pricing page, read 2026-11-12). No paid use is decided. The developer terms page could not be read. |
 | Imagery provider | Used only within its free tier, on an account with pay-as-you-go disabled, so no spend is possible ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7; OPS-73). |
-| Photorealistic 3D tiles | The one paid service of decision 0023, capped by the owner at USD 20 in total: requests are refused once a project-wide count of billable tile requests reaches 3,333, at USD 6.00 per 1,000 requests at the provider's first paid tier, as the lead's brief of 2026-11-14 states the price (recorded in decision 0023); the task that builds the mode reads the price again (OPS-74). |
+| Photorealistic 3D tiles | The one paid service of decision 0023, capped by the owner at `SPEND_CEILING_USD` in total: requests are refused once a project-wide count of billable tile requests reaches 3,333, at USD 6.00 per 1,000 requests at the provider's first paid tier, as the lead's brief of 2026-11-14 states the price (recorded in decision 0023); the task that builds the mode reads the price again (OPS-74). |
 | Managed database in country | Not estimated. To be priced with the custodian. |
 | Continuous integration | Not estimated; depends on the repository's GitHub plan. |
 
@@ -472,7 +746,7 @@ Open items from the master design that touch this document: OI-01 (API key and s
 - Project decision record 0014, "Typed-decision gateway", [decisions/0014-typed-decision-gateway.md](decisions/0014-typed-decision-gateway.md), 2026-11-11.
 - Project decision record 0019, "Forecasts, estimates and scenarios by tested code; six self-serve sources; citations by stable anchor": [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md), 2026-11-12. TomTom, Traffic API documentation and pricing page, https://docs.tomtom.com/traffic-api/ and https://docs.tomtom.com/pricing , read 2026-11-12 (free allowance; the developer terms page was not read).
 - Project decision record 0022, "Real register companies with a synthetic labour and residence world attached": [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md), 2026-11-13, for the settings `EII_REGISTER_FILE` and `EII_FC_REGISTER_FILE`.
-- Project decision record 0023, "Ten additions and the data rule": [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md), 2026-11-13, for the settings `ESRI_API_KEY` and `MAPTILE_API_KEY`, the spend cap of the photorealistic 3D mode with its count and view budget, the monthly register snapshots, the voice environment and the removal of the oversight seat. The price of a billable photorealistic 3D tile request at the provider's first paid tier, USD 6.00 per 1,000, is the one the lead's brief of 2026-11-14 states, as that record cites it (a project record of the run, not in this repository); the task that builds the mode reads it again.
+- Project decision record 0023, "Ten additions and the data rule": [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md), 2026-11-13, for the settings `ESRI_API_KEY` and `MAPTILE_API_KEY`, the original spend cap and count of the photorealistic 3D mode (the per-view budget is removed by lead rulings L-1015 and L-1017 of 2026-11-18), the monthly register snapshots, the voice environment and the removal of the oversight seat. The price of a billable photorealistic 3D tile request at the provider's first paid tier, USD 6.00 per 1,000, is the one the lead's brief of 2026-11-14 states, as that record cites it (a project record of the run, not in this repository); the task that builds the mode reads it again.
 - Project decision records 0016 and 0017, "Version 1 covers the whole initiative" and "Public data additions, public splits by sex and nationality, and investment sources": [decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) and [decision 0017](decisions/0017-public-data-additions-and-public-splits.md), 2026-11-12.
 - Qatar Open Data Portal, Explore API v2.1, https://www.data.gov.qa/api/explore/v2.1/ (CC BY 4.0; also served at `www.data.qa`), retrieved 2026-11-12 as recorded in decision 0017.
 - National investment promotion agency, FDI Projects dashboard, https://fdiprojects.invest.qa/ (data from fDi Markets), read 2026-11-12 as recorded in decision 0017; and its site, https://www.invest.qa/ , whose sector, opportunity, incentive, set-up and law pages the fetcher reads under the publisher's terms recorded at fetch.
@@ -507,3 +781,66 @@ frame hash, both reviewed sibling-index hashes, output and release kind. Its suc
 paths, row content or keys. This entry point verifies reusable register outputs;
 it is not the placeholder `build-release` command. Actual source and monthly
 retention verification remain lead-shell work.
+
+## S3-T16 Part A settings under implementation
+
+The empty names in `.env.example` and the pinned tree-check names additionally
+include `EII_IMAGERY_TILE_BASE`, `EII_PHOTOREAL_TILE_BASE`,
+`EII_PHOTOREAL_LIMIT` and `EII_PHOTOREAL_PRICE_PER_THOUSAND`. Addresses default
+to empty and disable the corresponding mode. The limit setting can lower the
+computed limit, never raise it. The price defaults to the reading recorded in
+ruling L-717 item 3; a higher configured price lowers the limit. These settings
+are read in the API process. The browser receives only the effective request
+limit and operational meter, never a provider address or key.
+
+`SPEND_CEILING_USD` is the USD 20 absolute project-wide ceiling,
+defined once in `product/src/eii_product/photoreal_tiles/limit.py` and used by
+`billable_limit`; tests import this constant. `WARNING_FRACTION = Decimal("0.80")`
+is the second named constant: a lead default until a micro-pass measures a
+showing. The warning becomes true exactly when the billable count reaches
+that fraction of the effective request limit, including a lower configured
+limit, and remains true above it. It never refuses or slows a request. Only the
+absolute project-wide ceiling refuses requests with `cap_reached`; journal
+failure still refuses with `count_unavailable`. There is no per-view request
+budget; registration, alias binding, native session expiry and disposal remain.
+
+The photoreal entry of `GET /api/map-modes` returns `meter` with
+`billable_requests`, `request_limit`, `spend_usd`, `warning`, `ceiling_usd`,
+`price_per_thousand_usd`, `method_version` and `default_price_retrieved_on`.
+Money is an exact
+plain decimal string computed with Python `Decimal` from count times the read
+price per thousand, without rounding or browser arithmetic. A missing or
+unsafe journal or price returns a null meter, never a made-up zero; reading the
+meter does not write the journal. The total survives application restart and
+release changes because it is read from that same durable journal.
+
+Under lead ruling L-1020, the bilingual running-total display and warning now
+appear in the photoreal Stage controls through the Fact chip family's typed
+`operational` form. Requests, effective request limit, exact USD spend and the
+named ceiling use the existing formatters and bidi isolation. The explanation
+names the project's request journal, `Budget.meter` and its server version,
+`EII_PHOTOREAL_PRICE_PER_THOUSAND`, its effective value, and
+`SPEND_CEILING_USD`. Document 04's `tiles3d_google` row records the default
+price read date; it does not attest to an operator override. The pricing-page
+address remains "To record", proposed for the lead's open items. No publisher
+licence or release lineage is invented for the count. The server's warning
+flag alone controls the warning sentence. Existing availability responses
+refresh the display, with no extra polling or spending request; null shows
+the withheld treatment and reason, never zero. Arabic keys remain pending
+native review.
+
+The count journal at `data/photoreal-count.log` is separate from releases and
+stores. Before initial use, the operator creates the file once with exactly
+`ready:0` followed by a newline, and grants the API process read and append
+access. An existing file is never replaced. No initialization, reset or restore
+command is provided; no product action creates or lowers this file. Missing,
+unreadable, malformed or interrupted state disables the mode with
+`count_unavailable` and keeps the open map.
+
+Under ruling L-721 item 2, restoring an older valid copy by hand after a process
+restart is a stated limit: this local journal cannot detect operator rollback
+without independent durable state. The owner should consider an independent
+budget alert or cap in the provider account as a backstop; none is configured by
+this task. Release restoration excludes this journal. The real provider adapters
+and frontend integration remain incomplete; this work does not authorize live
+use or claim all of OPS-74 is satisfied.

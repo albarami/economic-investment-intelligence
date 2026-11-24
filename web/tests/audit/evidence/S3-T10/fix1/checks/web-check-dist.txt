@@ -1,0 +1,5 @@
+
+> [email-shaped-token] check:hosts:dist
+> node scripts/check-no-third-party-hosts.mjs --dist
+
+checked 168 files: OK

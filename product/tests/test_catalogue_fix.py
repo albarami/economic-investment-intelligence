@@ -83,8 +83,8 @@ def test_fix_a_sex_and_nationality_breakdown(tmp_path: Path) -> None:
             _claim(
                 subject="place_public",
                 slots=_slot(
-                    metric="venue_busyness_index",
-                    unit="relative_index",
+                    metric="price_deal_value",
+                    unit="qar",
                     geo="public",
                     breakdown="nationality",
                 ),
@@ -97,7 +97,15 @@ def test_fix_a_sex_and_nationality_breakdown(tmp_path: Path) -> None:
         module, result = _load(tmp_path, _claims(claim), name=name)
         assert result == module.Refusal("BREAKDOWN", path)
     module, grid = _load(
-        tmp_path, _claims(_claim(slots=_slot(breakdown="sex"))), name="grid-sex"
+        tmp_path,
+        _claims(
+            _claim(
+                key="population_age_sex",
+                slots=_slot(metric="population_grid_people", breakdown="sex"),
+                caveats="[grid_cells_summed]",
+            )
+        ),
+        name="grid-sex",
     )
     assert grid.claims[0].slots[0].breakdown == "sex"
     for name, subject in (
@@ -118,7 +126,7 @@ def test_fix_a_sex_and_nationality_breakdown(tmp_path: Path) -> None:
             name=name,
         )
         assert loaded.claims[0].slots[0].breakdown == breakdown
-    sex = _slot(breakdown="sex")
+    sex = _slot(metric="population_grid_people", breakdown="sex")
     other_simulated = _slot(name="other", metric="talent_pool", provenance="simulated")
     other_synthetic = _slot(name="other", metric="talent_pool", provenance="synthetic")
     words = _words("See {reading} and {other}.", "انظر {reading} و {other}.")
@@ -371,8 +379,8 @@ def test_fix_k_slot_fact_reused_and_identical(tmp_path: Path) -> None:
     people = _slot(name="people")
     again = _slot(
         name="again",
-        metric="night_lights_radiance",
-        unit="radiance_nw_cm2_sr",
+        metric="price_deal_value",
+        unit="qar",
         period="calendar_month",
     )
     words = _words("See {people} and {again}.", "انظر {people} و {again}.")

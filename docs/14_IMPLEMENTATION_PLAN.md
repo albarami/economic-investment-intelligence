@@ -472,7 +472,7 @@ and live receipt remain required; tests use invented shapes only.
 
 **Scope.** Dual stores, first tools, calculation facts, catalogue foundations, API stream, Stage, Brief, Fact chip, provenance, evidence drawer, bilingual opening and design audit. The living map's Public layers: real business points, FDI projects under PUB-87 and decision 0026, and Public statistics on their official geography, with any value apportioned to a drawn shape labelled Inferred; and area drawing (a drawn area, a radius, or a walk or drive time from any point) for those layers. FDI projects are shown in full, with no field dropped at loading; every field may appear on cards, lists and the map. Each card, list and map legend carries collapsed credits naming the agency as publisher, the data gatherer as the page names it, the date read and a link to the dashboard, with the page's caveat: the data "includes estimates of publicly announced projects" and "does not capture all investment projects". Capital and jobs are labelled as announced estimates, never added to measured figures or shown beside them without that label. [Decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) adds to the Public layers night-time radiance by area and month, the relative busyness of a named venue as a Public fact of its place, and population by age and sex from whole cells of the published grid summed over an area (cards C36 to C38); each is a Public fact with its source chain, worded as the card states it.
 
-[Decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) adds all of Qatar in 3D, with building heights marked as estimates, and a clock (sunlight with shadows on the buildings in view wherever a height exists, under a measured building cap ([decision 0048](decisions/0048-the-shadow-clock-serves-every-area.md)), the map's light and sky, night lights at dusk, a time scrubber and a before-and-after swipe, which may also show two fixed views of the imagery history of S2-T19); the three map modes with their switch: the open map, the default and the only mode that needs no network; satellite, the imagery provider's tiles passed through the product's own server under `ESRI_API_KEY`; and the owner's photorealistic 3D mode, whose key `MAPTILE_API_KEY` only the product's own server reads and adds to each tile request on a same-origin route, so that the browser never holds it. That mode is the one paid service, capped by the owner at USD 20 in total: every billable tile request is counted project-wide and refused once the count reaches 3,333 (a higher price read when the mode is built lowers that count), one view loads at most 600 tiles, and the mode is never mixed with another basemap in one view. The satellite and photorealistic 3D modes show the attribution their tiles carry, store no tile, run online only and are never called by a test or by continuous integration. The slice also draws the national GIS centre's layers among the living map's Public layers (S3-T12), adds the live address search of the ask bar and the place picker, whose results are never stored, and draws the financial centre's firms counted per tower, with district-level firms as counts, never as building points.
+[Decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) adds all of Qatar in 3D, with building heights marked as estimates, and a clock (sunlight with shadows on the buildings in view wherever a height exists, under a measured building cap ([decision 0048](decisions/0048-the-shadow-clock-serves-every-area.md)), the map's light and sky, night lights at dusk, a time scrubber and a before-and-after swipe, which may also show two fixed views of the imagery history of S2-T19); the three map modes with their switch: the open map, the default and the only mode that needs no network; satellite, the imagery provider's tiles passed through the product's own server under `ESRI_API_KEY`; and the owner's photorealistic 3D mode, whose key `MAPTILE_API_KEY` only the product's own server reads and adds to each tile request on a same-origin route, so that the browser never holds it. That mode is the one paid service, capped by the owner at USD 20 in total: every billable tile request is counted project-wide and refused once the count reaches 3,333 (a higher price read when the mode is built lowers that count), no view has a per-view tile budget ([decision 0063](decisions/0063-the-photoreal-spend-meter-and-the-operational-fact-chip.md)), and the mode is never mixed with another basemap in one view. The satellite and photorealistic 3D modes show the attribution their tiles carry, store no tile, run online only and are never called by a test or by continuous integration. The slice also draws the national GIS centre's layers among the living map's Public layers (S3-T12), adds the live address search of the ask bar and the place picker, whose results are never stored, and draws the financial centre's firms counted per tower, with district-level firms as counts, never as building points.
 
 **Out of scope.** Synthetic and Simulated facts and layers, live model use and the company seats.
 
@@ -499,13 +499,16 @@ and live receipt remain required; tests use invented shapes only.
 - S3-T20 — Remote mode through the owner's own host (decision 0041 items 1 to 10). Runs after the slice S3 gate approves, outside that gate; S3-T10 and S3-T11 do not depend on it. Add the remote-check result to the S3 gate record when it merges and record it at every slice gate from S4 on.
 - S3-T21 — Conversation test lab, first version (decision 0044). Depends: S3-T08, S3-T09, S3-T10.
 - S3-T23 — Offline satellite imagery under the provider's plan, off by default, once the owner holds the plan ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 6). Depends: S3-T16.
+- S3-T22 — Public routes of slice S3: the four document 08 section 8.1 routes, class method MTH-126, exact area-context and card seams, bounded session shapes, same-origin built bundle, shared land-use selection and preserved source geography including holes and multipart islands (decision 0061; L-1036 item 3; L-1060 item 2). Depends: S3-T04, S3-T08, S3-T12, S3-T13, S3-T14, S3-T17.
 - S3-T24 — Mounted Public release and source-chain transport with live parity (decision 0068 item 1). Depends: S3-T22, S3-T02, S3-T09, S3-T14; reuse S3-T08's live proof. Coordinate final query coverage with S3-T25 and S3-T26.
-- S3-T25 — Offline gazetteer resolution through the typed tool route (decision 0068 item 2). Depends: S3-T22, S3-T03, S3-T04; S3-T24 supplies final real-store evidence.
-- S3-T26 — Preserve the chosen Public area in site_check (decision 0068 item 3). Depends: S3-T22, S3-T08, S3-T13; S3-T24 supplies final live parity evidence and S3-T25 supplies named-place HTTP selection when used.
+- S3-T25 — Mount the existing offline gazetteer resolver on the typed tool route and carry a selected place key plus an existing closed preset into `make_area`. Reuse the resolver, named reads and returned geometry; preserve null-cell context, governed outcomes, Fact-chip display and boundaries-absent wording. Picker rendering stays in S3-T10. Resolver/area query cases join the lead's S3-T24 live proof before its final evidence closes. Depends: S3-T22, S3-T03, S3-T04. Acceptance is the S3-T25 task entry; this implementation record does not mark it done.
+- S3-T26 — Preserve the chosen Public polygon, radius, walk or free-flow drive area through the existing site_check route, trusted session/seat context, execution, Public cards and stage directives. The closed projection and Public-only implementation boundary are documented in document 08, **site_check structured area projection** and **7. Playbooks and the template writer**. Selected cases join the existing live playbook companion; real two-store records and the joined EN/AR browser story remain prerequisites to closure. S9-T02 repeats the same-session foreign-seat plant with its signed cookie. This worker evidence does not claim a slice gate.
 - S3-T27 — Same-origin offline basemap and glyph assets (decision 0068 item 4). Depends: S1-T04, S3-T02, S3-T09, S3-T22; reuse released map artefacts and font pins. These four tasks have status queued; full criteria and plants are in TASKS.md.
-- S3-T10 — Deliver the bilingual opening scene, end-to-end tests and design audit. S3-T24 to S3-T27 precede its end-to-end step only; its other parts may be built ahead after the S3 re-cut head exists (decision 0068 item 5).
+- S3-T28 implementation candidate — isolated Public build/install/start, recorded loopback promotion and rollback under L-1219/L-1238; independent review pending. The documents branch owns its approved task criteria and S11-T09 split. Runbook: document 13, S3-T28 isolated Public setup and operator sequence.
+- S3-T10 — Deliver the bilingual opening scene, end-to-end tests and design audit. S3-T24 to S3-T27 precede its end-to-end step only; its other parts may be built ahead after the S3 re-cut head exists (decision 0068 item 5). Also depends on S3-T22.
 - S3-T28 — Live and staging setup with continuous promotion, in slice S3, before its gate, so the first map does not wait for its own setup (decision 0071 items 5 and 6; L-1219). Depends: S3-T02; build/test on loopback, then use S3-T20's entry when it opens after gate approval. Owns the public_only build-release/load-release path; protected freeze/promotion belongs to S11-T09.
 - S3-T11 — Close every proposed open item of the slice's reviews before the gate (REV-41); includes S3-T28 and excludes only the post-gate S3-T20.
+  Early round S3-P02 Part A (lead ruling L-1490) preserves closed build and operations reasons for D1–D17, D48–D52 and the round-two D54/D55 additions, with a distinct approval-missing candidate outcome (exit 8), a planted static handler guard, and offline refusal tests. Parts B and C remain later rounds; this candidate does not close S3-T11 or approve a slice gate. See document 13, **Closed build and operations reasons (S3-T11 early round, Part A)**.
 
 **Parallel work.** T03–T06 may run after T01 on separate tool modules and each supplies a parity case. T07 owns catalogue files. T08 follows T03–T07. T09 may run beside backend tools in `web/`. T12 follows T02 and T09 and owns the map layer registry; T13 follows T04 and T12 and owns the area-drawing components. T14 follows T07, T12 and T13 and owns the components of cards C36 to C38. T16 follows T12, S2-T14, S2-T19 and S2-T20 and owns the 3D, clock and map-mode components; T17 follows T12 and S2-T06 and owns the firms-by-tower layer. T24 to T27 fill the integration gaps assigned by [decision 0068](decisions/0068-public-map-integration-follow-ons.md) items 1 to 4, without widening a built task; S3-T22 is a plain-text dependency whose task-owned record is on its local branch, not a linked file on this base. T25 and T26 supply their query cases to T24 before its final live evidence is closed; this is an evidence join, not a circular build dependency. T27 reuses T09's shell and fonts. T09 keeps its own phone-bottom-sheet fix and review (decision 0068 item 7). T10 integrates every output, including T16, T17 and T24 to T27, and its joined end-to-end proof runs alone; its other parts may be built ahead after the S3 re-cut head exists (decision 0068 item 5). T28 follows T02 on its own operational scope. T11 runs last. No value is cut and no gate is weakened.
 
@@ -555,6 +558,72 @@ and protected-window fields. Both stores load with parity and no fallback and a 
 content-addressed release for rollback. L-1219 closes OI-346 on these anchors, without exemption or invented
 protected data. Every security check, slice gate and rule-24 claim guard remains; rule 44's placeholder descriptions
 change only when implementation actually works. This note claims no working command, live service or gate approval.
+
+### S3-T24 transport implementation and evidence boundary
+
+The mounted Public release/source-chain follow-on uses the existing API factory,
+fixed readers, loader receipt and browser registry. Its transport mapping is in
+document 03 **Mounted Public transport (S3-T24)**; its two existing GET paths and
+sanitized refusal policy remain under document 08 **8.1 Endpoints**.
+Round S3-P09 passes the verified mount to the playbook router, so each fact of a
+`site_check` answer resolves over the same lineage read as a card fact (S3 gate
+row 29); the answer's chains are validated through the mount's existing
+prepare-then-admit call, and an unmounted store still refuses the lineage read.
+Its second round holds an answer's facts for the admitted session that received
+it, so another session's lineage read of them is `NOT_FOUND`. Its third round
+releases a newly admitted session when the answer's commit fails, so a failed
+answer uses no session capacity.
+
+The lead-run `scripts/tests/live_public_playbook.py` now loads the invented cards
+fixture through the existing disposable database lifecycle and executes every
+scoped S3-T22 Public layer/card read plus the mounted summary and lineage reads
+on actual PostgreSQL and embedded DuckDB. It traces only completed fetches,
+requires coverage of every named query, and compares full results through
+`require_identical` with the existing normalization and BE-27 exclusions; no new
+numeric tolerance is introduced. Its existing `--diverge` form must exit three
+on an injected result difference. No service is started or stopped by a test.
+
+Actual live evidence remains pending until the lead records both exits, the
+release identity, executed query coverage and exact commit. The completion
+predicate refuses pending, incomplete, foreign-commit and missing-query records.
+S3-T25 and S3-T26 must join their query cases before this evidence closes.
+The built-browser companion uses the API factory with the built bundle and
+loaded invented fixture, never the visual-fixture registry or provenance route
+interception. A missing installed browser is a setup blocker, never an acceptance
+red or browser pass. The slice S3 Public-only flagship gate stays open until the
+live and browser evidence and independent review are supplied.
+
+### S3-T10 opening implementation and evidence boundary
+
+The opening, client-side EN/AR switch, provided site-choice action and Public
+story are implemented through the existing shell, registry, card renderers,
+offline gazetteer, selected-area API and local map assets. The browser companion
+in `web/playwright.opening.config.ts` joins the built bundle to the real API over
+an invented loaded fixture. It exercises named choice, polygon, radius, walk
+and free-flow drive selection; layers and cards; source access; reset; and
+rejection of model/foreign-origin attempts. Its audit matrix includes the
+TST-90 sizes, both phone orientations, both languages and both themes, plus
+planted violations and greyscale/reduced-motion checks.
+
+This implementation record closes no slice gate. L-1136 C3's dated opening fact
+remains unavailable on the mounted projection, native Arabic review remains
+OI-09, and the independent running-interface audit and the lead's actual loaded
+release, two-store, configured-preflight and merged-head evidence are still
+required. The absent firms-register input follows its governed no-data path;
+no invented browser provenance substitutes for a mounted firm chain. Task-owned
+checks and pending criteria are recorded in the S3-T10 evidence and PROGRESS.
+
+
+### S3-T21 conversation lab implementation boundary
+
+The [lab](../evals/question_lab/README.md) adds the closed command, a manifest of
+distinct invented bilingual scenarios, independent fixture expectations, code
+oracles, planted corruptions, prior-budget guards, actual API trace/results and
+coverage/gallery packet construction. Its browser companion reuses the opening
+fixture and audit across the complete named size matrix. Per-run captures are
+ignored; inputs, budgets, the guard map, curated index and ledger remain tracked.
+This record closes no gate: native measurements, the independent held-out seal,
+approved CI pixels, S3-T10's prerequisite evidence and human reviews remain waiting.
 
 ## 12. slice S4 — Synthetic world, months, presence and traffic
 

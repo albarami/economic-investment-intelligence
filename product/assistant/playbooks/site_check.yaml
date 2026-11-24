@@ -1,0 +1,36 @@
+name: site_check
+calls:
+  - key: resolve
+    tool: resolve
+    arguments: {kind: activity}
+  - key: near
+    tool: make_area
+    arguments: {mode: walk, cutoff: 5}
+  - key: wider
+    tool: make_area
+    arguments: {mode: drive, cutoff: 10}
+  - key: fly
+    tool: stage
+    arguments: {directive: fly, zoom: street}
+  - key: rings
+    tool: stage
+    arguments: {directive: rings}
+  - key: sector
+    tool: sector_facts
+    arguments: {topic: unit_economics, geography: national}
+  - key: night
+    tool: night_lights
+    arguments: {}
+  - key: population
+    tool: population_age_sex
+    arguments: {split: none}
+caveat_keys: []
+still_to_test: [foundation_read_sources]
+not_measured: []
+headline_key: foundation_headline
+decision_template_key: foundation_decision
+claims: []
+layout:
+  - component: foundation_note
+    props: {}
+questions: [foundation_ask_shape, foundation_ask_walk, foundation_ask_context]

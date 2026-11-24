@@ -1,0 +1,34 @@
+[[tables]]
+name = "district"
+anchor = "7.3 Columns"
+key = ["district_key"]
+
+[[tables.columns]]
+name = "district_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_en"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "name_ar"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "municipality_code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "geometry"
+type = "geometry"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

@@ -602,10 +602,10 @@ Writers are modules of `custodian/`; readers are modules of `product/` (`store` 
 | `grid_cell` | Frame | base cell | `cell` | `publicdata` | `make_area`, `area_evidence`, `compare_areas` |
 | `release_unit` | Frame | unit | `unit_id` | `privacy` | `make_area`, `area_evidence`, `compare_areas` |
 | `unit_member` | Frame | unit × cell | `unit_id`, `cell` | `privacy` | `make_area` |
-| `zone` | Frame (Public geometry) | zone | `zone_code` | `publicdata` | `area_evidence`, `sector_facts`, `stage` |
+| `zone` | Frame (Public geometry) | zone | `zone_code` | `publicdata` | `area_evidence`, `sector_facts`, `stage`, `resolve` |
 | `district` | Frame (Public geometry) | district | `district_key` | `publicdata` | `resolve`, `area_evidence`, `stage` |
-| `municipality` | Frame (Public geometry) | municipality | `municipality_code` | `publicdata` | `area_evidence`, `sector_facts` |
-| `gazetteer` | Frame (Public) | named place | `place_key` | `publicdata` | `resolve` |
+| `municipality` | Frame (Public geometry) | municipality | `municipality_code` | `publicdata` | `area_evidence`, `sector_facts`, `make_area`, `resolve` |
+| `gazetteer` | Frame (Public) | named place | `place_key` | `publicdata` | `resolve`, `make_area` |
 | `road_link` | Frame (Public geometry) | road link | `link_id` | `publicdata` | `make_area`; traffic layer |
 | `resident_pay` | Protected | unit × period × measure × housing class × band range | `unit_id`, `period`, `measure`, `housing_class`, `band_from`, `band_to` | `privacy` | `area_evidence`, `compare_areas` |
 | `worker_pay` | Protected | unit × period × measure × band range | `unit_id`, `period`, `measure`, `band_from` | `privacy` | `area_evidence`, `compare_areas` |
@@ -1287,6 +1287,8 @@ Dated school access-failure receipts remain separate from successful page output
 
 ## 8. The manifest and the loader
 
+S3-T28 operations preserve the Public manifest and loader outputs byte-for-byte across environments. The separate application ZIP has a checksummed inventory, exact source commit, Python version and route/component inventory. Its metadata and promotion/state records are not manifest artefacts. The fixed operational count reader is `eii_product.ledger.local.LocalLedger.row_count`; full read-only startup verification is `eii_product.store.startup.verify_startup`. These operational reads create no product fact or protected field.
+
 Public source selections identify a reviewed immutable snapshot by hash. Its
 retrieval UTC and publisher modification/version are separate from the source
 observation period and from later equal-byte checks. The cache reader verifies
@@ -1307,6 +1309,14 @@ window's months, DAT-136), `window_key`, `protected_sha256` and `contracts`
 (list of `{name, revision, feed_sha256, reference_period}`). A `public_only` manifest omits
 `window_period`, `window_key`, `protected_sha256`, `parameter_set`, `world_seed`, `scenario_sha256`
 and `contracts`.
+The Public-only assembly producer of S3-T28 constructs the reader's typed
+envelope from stored S2 table outputs and hash-bound receipts. It derives
+`source_registry`, `fact_lineage` and the complete manifest citations from those
+inputs; an operator spec supplies schemas and common build metadata, never
+replacement data. Its independent approval binds the canonical envelope and
+full code commit. The input schema and operator sequence are in document 13,
+**S3-T28 Public assembly producer**. This handoff does not change any release
+table, fact shape, Public-only restriction or manifest identity rule.
 Its lists:
 `tables` (`{name, file, provenance_class, sha256, row_count, schema_sha256, grain}`), `sources`
 (`{source_id, url, licence, retrieved_on, sha256}`) and `artefacts` (`{path, sha256}`). The complete
@@ -1417,10 +1427,10 @@ Every number on screen is rendered from one fact. The schema below is binding an
     "value": {"type": ["number", "string", "null"]},
     "unit": {"enum": ["count", "qar_per_month", "qar", "qar_thousand", "qar_million", "qar_per_kg",
                       "qar_per_m2", "usd_million", "kwh", "riders", "ratio", "percent", "index", "relative_index",
-                      "wage_band", "size_band", "volume_band", "metres", "minutes",
+                      "wage_band", "size_band", "volume_band", "metres", "square_metre", "minutes",
                       "covers_per_day", "people_per_km2", "tonnage", "rank", "direction",
                       "calendar_date", "calendar_month", "calendar_year", "published_text",
-                      "radiance_nw_cm2_sr", "qar_per_ft2", "years"]},
+                      "radiance_nw_cm2_sr", "qar_per_ft2", "years", "announced_jobs", "decimal_degree"]},
     "period": {"type": "string", "minLength": 4},
     "geography": {
       "type": "object", "additionalProperties": false, "required": ["kind"],
@@ -1467,7 +1477,8 @@ Every number on screen is rendered from one fact. The schema below is binding an
                                                 "qar_per_kg", "qar_per_m2", "usd_million", "kwh",
                                                 "riders", "ratio", "percent", "index", "relative_index", "metres",
                                                 "minutes", "covers_per_day", "people_per_km2",
-                                                "tonnage", "radiance_nw_cm2_sr", "qar_per_ft2", "years"]}},
+                                                "tonnage", "radiance_nw_cm2_sr", "qar_per_ft2", "years",
+                                                "announced_jobs", "decimal_degree"]}},
             "required": ["unit"]},
      "then": {"properties": {"value": {"type": ["number", "null"]}}}},
     {"if": {"properties": {"unit": {"const": "rank"}}, "required": ["unit"]},
@@ -1651,6 +1662,7 @@ validator reads it from the resolved subject and the fact's fields, never from w
 | `place_public` | a real named public place: a gazetteer entry, a `pub_place` or `pub_place_fsq` record, a venue of `pub_venue_visits` or `pub_venue_busyness`, or a commercial point of `pub_poi_comm` or a health centre of `pub_health_centre` ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 3, DAT-168) | `place_key`, `place_id`, `fsq_place_id`, `venue_key` or `feature_key` | Public facts only; for a named competitor of the catchment-share scenario (DAT-162) also its distance from the user's outlet, whose inputs are Public and the user's own point. No share, score or estimate is attached to it. |
 | `register_company` | one real company of the public business register or of the financial centre's public register, a row of `pub_register_company` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)) | `registration_number`, which the application resolves and never sends to the model or writes to an egress record, a ledger row or a log | Public facts of `pub_register_company` (the fields the register publishes, person names excluded); the Synthetic fact `employee_count` of its row in `register_company_list`; and, in a list, the rank and fit facts that tested code computes over the card fields, the employee count, Public inputs such as free-flow drive time and the user's typed criteria and weights, with the stability facts of DAT-134. Never a Simulated fact, an estimate, share or score, or a wage, wage bill or other labour or residence fact of the company: those appear only in released aggregates of `area` subjects, and in the company's own seat only as its design provides (rule 8 of AGENTS.md; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 15 removes the oversight seat). |
 | `fdi_project` | one published investment announcement of `fdi_projects` | `project_key` | Public facts only, read from `fdi_projects` and its source; never a fact computed with a synthetic, protected or simulated input |
+| `district` | the publisher's own district geography | the source's district key (mapping remains OI-102) | Public facts only on that publisher geography, never a drawn or apportioned area; Synthetic and Simulated slots are refused. |
 
 The `district` subject accepts Public slots only, identified by the publisher's own district label with its municipality, never a drawn area, never apportioned and never an `area` subject (S2-T17; [decision 0073](decisions/0073-s2-gate-decisions-district-subject-venue-notes-and-a-spike-assertion.md) item 1).
 
@@ -1677,7 +1689,9 @@ drive time can be taken at an hour of day
 live traffic provider, a traffic-aware drive-time area is a second route into the session, through the
 adapter, and is registered as a session polygon (DAT-163). `make_area` returns one area record when
 an area is made; a drive refused under PRV-135 returns `NO_DATA` with `point_without_base_cell` and
-no area record. Its JSON Schema is `contracts/area.v1.schema.json`.
+no area record. A request by a returned `area_id` alone decodes that area through BE-86 of
+[08_BACKEND.md](08_BACKEND.md) and returns the original area record unchanged
+([decision 0087](decisions/0087-make-area-by-a-returned-area-id.md)). Its JSON Schema is `contracts/area.v1.schema.json`.
 
 | Field | Content |
 |---|---|
@@ -1707,6 +1721,155 @@ session and seat that drew or requested them; no `app` table holds either (DAT-1
 | DAT-147 | A Public statistic stays on its official geography. When `eii_core.calc` apportions one to an area, the fact has geography kind `area_shape` with `apportioned_from` naming the official geography, `evidence_status` `inferred`, the caveat key `apportioned_estimate`, and a lineage naming the apportioning method and version ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md) item 6). Released `presence_count` and `flow_hourly` estimates reach a drawn area the same way, with `apportioned_from` `release_units`, as post-processing of published leaves only; a value that draws on a withheld presence group returns `BELOW_PANEL_MINIMUM` (PRV-58, PRV-122). No fact from a Protected table has geography `area_shape`, and no row of a Public split table is apportioned (DAT-141); the sum of whole cells of `pub_pop_agesex_grid` over an area is not an apportionment, has no `apportioned_from`, and follows DAT-141, and so is the mean of the `pub_night_lights` frame-cell values whose centres lie inside an area, each cell counted once, Public and Observed with the caveat keys `calculated` and `night_lights_not_activity` and no `apportioned_from` (card C36, DAT-157). | Fixtures: an apportioned fact marked `observed`, without `apportioned_from`, without the caveat or without method lineage fails; an apportioned value over a withheld group that is not `BELOW_PANEL_MINIMUM` fails; a protected-table fact with `area_shape` fails; an apportioned split row fails, including one of `pub_pop_agesex_grid` that is weighted by area instead of summed by whole cells; a `pub_night_lights` area figure that sums the cells, is apportioned or carries `apportioned_from` fails, and the mean over the frame-cell values 4 and 10 renders 7, with `NO_DATA` where no value exists (card C36); an exact-shape count of Public points passes as `observed`. |
 | DAT-163 | With `EII_TRAFFIC_PROVIDER` set to `tomtom`, the key present and the presenter's offline control not set (ARC-135), a traffic-aware drive-time area may enter the session through the provider adapter, a second route beside the user's drawing ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 17). The adapter registers the returned outline as a session polygon, bound to the session and seat like a drawn shape: its record has shape `polygon` and `request.shape_id`, meets the validity rules of DAT-146 for a drawn polygon, and carries the `provider_note` of 9.2: the closed object with `provider` `tomtom`, the typed `request` (the resolved point and the minutes, no key), `retrieved_at`, `response_sha256` and the attribution `© TomTom`. The area is geometry and not a fact; the minutes are the user's own request, and no numeral of a tile or response is a fact (DAT-94). Nothing of a response is written to disk, to the release, to the ledger, to an `app` table or to a log (DAT-149); the note lives in the session store with the record, and a ledger row carries only the `shape_id`. A figure computed over the area follows the rules of a drawn shape (DAT-147), carries the least-real class of its released inputs (DAT-91) and the caveat key `live_traffic_provider`; a figure over a stored session area is repeatable for that area. With the default provider the record is as DAT-146 states, and a test, a gate, a command or the guided story never needs the provider: tests build the response from hand-made fixtures in the documented format, and no response is committed. | Fixtures: an adapter area without `provider_note`, one whose note is missing a field, carries an extra field or a malformed `retrieved_at` or `response_sha256`, one whose `request` is not an object, lacks `latitude`, `longitude` or `minutes`, carries a further field, holds a latitude or longitude outside its range or minutes other than 5, 10 and 15, one that does not pass DAT-146 as a polygon, one whose note holds a key or token, and a figure over it without `live_traffic_provider` fail; a response, or a hash of one, found in a release, ledger row, `app` table or log, and a numeral read from a tile or response as a fact, fail; with the switch `simulated`, the key absent or the offline control set, an adapter request fails with no outbound call; a repeated request for a stored session area gives the same figures; a test that calls the live service, or a committed response, fails. |
 | DAT-164 | Openings and closures of register companies are Public counts, never generated ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12). `eii_core.calc` computes them at request time for an area and a month from the register's own dates, the registration date and, where a register file shows it, the cancellation date, read from `pub_register_company`, and, from the first two kept snapshots onward, from `pub_register_snapshot`. Membership is compared by `registration_number`: a company present in month m and absent in m − 1 is an opening of m, and one present in m − 1 and absent in m a closure of m. An opening takes the entering month's location; a closure takes the preceding month's. An area counts the companies whose `registered_cell` for that location lies in it, as a Public point layer on the exact shape (DAT-147): on the snapshot route the location is the entering month's `registered_cell` for an opening and the preceding month's for a closure, each read from that month's `pub_register_snapshot` row; on the dates route the location is the `registered_cell` of `pub_register_company`. `registered_cell` may be null where the location is unresolved, and a company with a null `registered_cell` lies in no area, and a company of the area with no date is counted in no month by the dates route, the number of such companies in the area standing beside the two counts (`register_without_date`). The snapshot route returns `NO_DATA` with the reason key `snapshot_not_kept` while either snapshot of the pair is not kept. Each figure names which of the two routes it used, and the two routes are never added together. The counts are Public and Observed, with the caveat key `calculated` (card C22). `register_without_date`, the count of companies without a date that stands beside the dates-route counts, is not an opening or closure count: it carries `calculated` and neither register caveat. `register_dates_as_published` is carried by every dates-route count of openings or closures and by no other; `register_snapshots_between` is carried by every snapshot-route count of openings or closures and by no other. A count carrying the other route's caveat fails: a snapshot-route count that carries `register_dates_as_published` fails, and a dates-route count that carries `register_snapshots_between` fails. A dates-route count without `register_dates_as_published` fails. The fixed sentences are those of [11_DESIGN_DIRECTION.md](11_DESIGN_DIRECTION.md) section 10.13 and are not changed. A snapshot-route count is worded as companies newly present or no longer present between the named snapshots and carries no registration or cancellation-date claim. No rate, net change or survival figure is computed from them. No opening or closing month enters `month_change`, `outlet_register`, `register_company_list` or any Protected table. The attached records start and end their spells by the registration and cancellation dates, never by a generated rate and never by the snapshots, which are kept from 2026-11, after the reference period ([05_SYNTHETIC_WORLD_AND_SIMULATION.md](05_SYNTHETIC_WORLD_AND_SIMULATION.md) SYN-12, SYN-72). Both dates are therefore attacker knowledge in the attacker-view audit, beside the released employee counts, with an entrant canary ([06_PRIVACY_AND_DISCLOSURE_CONTROL.md](06_PRIVACY_AND_DISCLOSURE_CONTROL.md) PRV-113 item 13, PRV-75; decision 0023 item 12). | Fixtures on the invented stand-in register: a company with a registration date in the month counts as an opening; one with a cancellation date counts as a closure; one with no date counts in no month and in the beside count; two snapshots give the opening and the closure of the month, and with the earlier snapshot not kept both are `NO_DATA` with `snapshot_not_kept`; a company absent from both the later snapshot and `pub_register_company`, whose earlier snapshot places it in the selected area, still counts as a closure of that area, computed from the released tables alone; a figure that adds the two routes, a dates-route count without `register_dates_as_published`, a snapshot-route count that carries `register_dates_as_published`, a dates-route count that carries `register_snapshots_between`, a snapshot-route count without `register_snapshots_between`, a snapshot-route figure that claims a registration or cancellation month, a planted `register_without_date` that carries either `register_dates_as_published` or `register_snapshots_between`, and a rate, net change or survival figure computed from the counts each fail; a generated opening or closing month, an `openings` column in `month_change`, a company's month in `register_company_list` and a spell outside its company's registration and cancellation months each fail. |
+
+### Fixed Public context reads (S3-T14)
+
+The fixed readers `eii_product.tools.public_context.read_night_lights`,
+`read_population_age_sex` and `read_venue_busyness` consume in-memory projections
+of the verified release tables named by DAT-157. They perform no IO. The area
+readers bind the canonical area identifier to the release and select source-cell
+centres with boundary inclusion. Only `eii_core.calc.public_context` computes the
+mean or the whole-cell sum, using exact arithmetic and one display rounding.
+Returned area facts use `area_shape` with `area_id` and no `apportioned_from`.
+S3-T22 forced difference F7 replaces the former shapely `geometry` argument with
+`area: CircleOutline | PolygonOutline`. Night-light `centres` are a mapping of
+integer cell keys to `(latitude, longitude)` float tuples. `area_outline.covers`
+delegates a Circle to `eii_core.shapes.within_radius` around the requested pin
+and requested cutoff, and a Polygon to `point_in_polygon` on the exact ring,
+boundary included. No buffer, bounding box, snapped-cell selection or
+apportionment enters these readers; calculator calls and fact construction
+remain unchanged ([decision 0061](decisions/0061-public-routes-of-slice-s3.md) item 12).
+
+Empty selections and unresolved source chains return `NO_DATA` with the existing
+`missing_input` reason, never an imputed value.
+
+The C37 reader selects exactly one place, weekday and hour. Its `VenueContext`
+holds the fact and a `VenueLineage` row citation: the source chain, the selected
+place/day/hour, the row's `retrieved_on` and nullable `provider_updated_on`.
+The registry receipt's retrieval date is preserved separately; it never replaces
+the row date. Browser lineage carries these row dates as `rowRetrievalDate` and
+`providerUpdatedOn`; the card refuses dates that disagree with this citation.
+Provider coverage reasons are copied only from the build's closed reason set.
+There is no fill from another hour or venue and no provider request at runtime.
+
+The C37 `VenueContext.binding` and the successful C38 reader result are
+`ContextBinding` objects. Their `wire()` serialization carries the strict fact,
+metric key, ordinary presentation and the same qualifiers used to build its
+identity, beside the fact rather than as additional fact properties. C37 carries
+`day_of_week` and string `hour`; C38 carries `age_band` and `sex`, with canonical
+aggregate values `all` and `none`. Browser `FactBinding.qualifiers` preserves
+these strings. The card refuses a displayed day, hour, age band or sex that
+differs from the binding; its null all-ages payload maps only to canonical `all`.
+A missing C37 fact has no binding; missing C38 input remains `NO_DATA`.
+
+The display results are distinct from `Measure` and `CalculationFact` and cannot
+enter their comparison or numeric input types. The closed context claims each
+have one metric slot and their required caveat. Layout validation binds that
+slot only to its own component; generic components and question input slots
+refuse these metrics, including a C38 total with no sex breakdown. The browser's
+`PublicContextCard` takes a closed payload with no ranking, criterion, chart or
+additional-fact property and renders numbers, periods and dates through Fact
+chips. Generic Brief slots refuse these metrics. Binding these readers to the
+integrated application remains S3-T10's work; this task adds no store query,
+public fetch or provider integration.
+
+### Mounted Public transport (S3-T24)
+
+The existing Fact object and tool envelope are unchanged. The API factory accepts an
+explicit release folder, verifies it with `check_release`, requires the completed
+`load_receipt.json` for that identity, checks both engine entries, the table
+inventory and row counts, and verifies the source-chain and manifest row digests.
+It compares the named
+`public_release_manifest` projection with `manifest_rows`. No folder is selected
+from a request. A store without a verified mount refuses the two reads.
+
+`GET /api/release` has exactly `release_id`, `release_kind`, `rules_version_id`,
+`tables`, `hour_keys`, `day_keys`, `month_keys` and `basemap_url`. Each table has exactly
+`releaseId` and `tableName`, copied from the verified loaded manifest. The Public
+mount reports `public_only`; it has no parameter-set or protected-window field.
+Hour/day controls are unavailable in this Public-only context and their lists are
+empty. The available night-light month list comes from the existing
+`layer_night_lights_months` fixed read. The summary contains no display values.
+
+The nullable `basemap_url` is operational asset configuration, not a Fact or a
+release-table binding. The API factory accepts the closed, trusted
+`basemap_name` selection `basemap.pmtiles` or null (the default); every other
+name refuses configuration. Only a verified mounted release can expose the
+corresponding `/tiles/basemap.pmtiles` URL. A mount without that selection
+reports null. Map assets remain outside release tables and release identity,
+as in document 02 **4.1 Folder structure**. A named asset whose file later fails
+still uses the existing tile route and fails its range/geometry proof; it is
+never replaced by another archive.
+
+The browser independently reads this closed summary before requesting an
+extract. With no mount, a refused summary, or a null name, it keeps the
+asset-absent land/sea stage and requests no tile or glyph. A named extract can
+load even when the opening Public figure is unavailable. Unknown summary
+properties and names still refuse; no pathname, external URL or identifier is
+inferred from a fact. The local map browser server now loads its disposable
+invented Public release before naming the invented extract; its production
+route, range, glyph, geometry, language/theme and missing-asset assertions are
+unchanged. This fixture's recording connection is not live two-store evidence.
+
+`GET /api/facts/{fact_id}/lineage` accepts only the DAT-93 identifier pattern,
+with no body or query. Its exact keys are `fact_id`, `release_id`, `lineage`,
+`sources` and `binding`. An unknown identifier refuses: this mount matches only
+facts emitted by the existing closed Public layer/card readers and by the
+`POST /api/playbooks/{playbook}` answers of this process. Card chains validate
+before serialization and the ledger transaction; their index entries are
+admitted only after that transaction commits. A playbook answer's facts are
+validated inside its ledger transaction, so a refused chain rolls the answer
+back with `PLAYBOOK_FAILED`, and are admitted only after that transaction
+commits, before the answer's event stream exists. An answer's facts are held
+for the one admitted `eii_session` that received the answer (BE-109): the
+lineage read resolves them only for the session that the trusted seat
+dependency verifies, and another session, an unknown key or no session gets
+`NOT_FOUND`. Layer and card facts stay process-wide. A failed
+ledger write leaves no new fact eligible for the lineage read. The transport
+neither decodes the identifier nor adds a fact table. The Fact's
+`lineage_ref` selects `sector_facts_lineage`; its loaded `table_name` must exist
+in the verified manifest. `transform` supplies `method` and `methodVersion`.
+The existing reader's initial table selection uses `public_lineage_for_table`,
+which reads stored table bindings rather than constructing a lineage identifier.
+
+The lineage projection has exactly `lineageId`, `releaseId`, `tableName`,
+`method`, `methodVersion`, `sourceIds` and `inputClasses`; the C37 citation
+also carries the existing `rowRetrievalDate` and nullable `providerUpdatedOn`,
+copied from its fixed reader's selected stored row. A source projection
+has exactly `sourceId`, `kind`, `inputClass`, `publisher`, `datasetOrPage`,
+`licenceOrTerms`, `retrievalDate` and `sha256`. The existing
+`sector_facts_sources` read now includes stored `kind`. Its metadata and the
+lineage metadata must match the verified release files; fabricated-but-well-formed
+hashes or transforms refuse. Incomplete, unknown, foreign and non-Public chains
+refuse the value and any layer geometry dependent on it. No empty-source or zero
+fallback is supplied.
+
+`binding` has exactly `metricKey`, `presentation` and `qualifiers`. These are
+companions, never properties added to Fact. Layer feature metrics and closed FDI
+field slots supply their metric bindings. The card reader supplies the three
+existing C36-C38 metric keys and copies its selection qualifiers (weekday/hour,
+age band/sex) beside the Fact. A playbook answer binds each fact to the metric
+key its evidence already carries and copies the same selection qualifiers from
+its card step's entry, so a fact reached through a card call or an answer has
+one binding. `presentation` is `ordinary` for this scope.
+There is no numeric payload or arithmetic in these transport projections.
+`web/src/api/release.ts` rejects unknown transport properties and projects these
+closed records into the existing `RegistryInput` and `createRegistry`. Fact chips,
+layer acceptance and the drawer resolve the same Fact identifier. Conflicting
+base lineage records or source records with the same identity refuse rather than
+selecting the first copy. The validated outer `fact_id` becomes the optional
+`LineageRow.factId` companion in `RegistryInput`; row citations resolve by that
+identity, so two facts sharing a stored lineage retain their own row dates.
+This companion adds no property to Fact or to the lineage HTTP projection. Native population band keys remain opaque published-text
+references with their original spelling and the same companion binding; the
+transport does not parse or rename a source band.
+
+The static `web/src/app/App.tsx` composes `MountedPublicShell`; that child owns
+the mounted HTTP requests, state and effects. For the built-browser proof,
+`web/src/app/MountedPublicShell.tsx` reads `?lang=ar` and
+`?theme=light` from the page URL to bootstrap Arabic and the light theme;
+other values default to English and the dark theme. The proof exercises every
+language/theme pair against the mounted same-origin HTTP transport.
 
 ## 10. The economic graph
 
@@ -2845,3 +3008,145 @@ bounded format/dimension checks and a full rasterio/GDAL JPEG pixel read inside
 errors. Missing scan/quantization structure and decoder-reported invalid or truncated
 scans become invalid-tile gaps during acquisition, and refuse archive verification
 if planted in a stored member (L-1303).
+
+### Fixed Public route reads (S3-T22)
+
+The pass-2 readers `eii_product.api.public_layers.read_layer` and
+`eii_product.tools.public_context_tools.run_card` read only the named inventory
+queries below. They copy published values and geometry; only the existing core
+calculators compute card aggregates, hero eligibility and map classes. This is
+route wiring for decision 0061, not completion of S3-T10's screen integration.
+
+The layer inventory adds `layer_public_places`, `layer_public_places_fsq`,
+`layer_land_prices`, `layer_rail_plan`, `layer_health_centres`, `layer_zoning`,
+`layer_commercial_points`, `layer_address_points`, `layer_parcels`,
+`layer_landmarks`, `layer_fdi_projects`, `layer_fdi_gazetteer`, `layer_property_prices`,
+`layer_night_lights`, `layer_night_lights_months`, `layer_district_geometry` and
+`layer_zone_geometry`. Their adjacent contracts bind the section **7.3 Columns**
+projections. The property-price read uses `pub_property_sale`, matching the
+existing browser registry; land prices use `pub_land_price`, and their geometry
+comes from `district`. Landmarks read only `gazetteer` rows of kind `landmark`.
+The hero reuses `sector_facts_utility` and `sector_facts_utility_national` and
+reads geometry from `zone`; only the calculator's `ranked_unrounded` output
+admits a zone to MTH-126. Excluded zones carry no number or class.
+
+The card inventory adds `night_lights_cells`, `venue_busyness_rows`,
+`venue_busyness_places`, `population_age_sex_rows` and
+`population_age_sex_bands`. The first reads a requested month, the venue read
+binds the listed place keys, and the population reads keep the source bands and
+periods. The fixed readers above select the exact outline. Venue hours are
+identifiers in payload entries; their indices are facts. A missing hour keeps
+its reason and no figure. Both groups reuse `sector_facts_lineage` and
+`sector_facts_sources`; no HTTP handler writes SQL.
+
+The strict Fact identity list gains the existing closed layer-slot metrics:
+`place_listing`, `guide_price_class`, `rail_feature`, `health_centre_name`,
+`permitted_use`, `poi_category`, `address_zone`, `address_street`,
+`address_building`, `parcel_area`, `landmark_name`, `fdi_company`,
+`district_sale`, `radiance_class`, `electricity_growth_class`, and
+`register_company_point` (S3-T12's establishment point of a register company;
+a source-retrieval `calendar_date` on a `feature:` code, Public only). Land-price
+identities retain `use_category` and `price_basis` qualifiers. Published
+price-per-area facts retain `qar_per_ft2` or `qar_per_m2`; parcel areas retain
+`square_metre`, never a count. These three units accept only Public, Observed
+facts. Public source-geography codes additionally admit `cell:` for a frame
+cell and `feature:` for a source feature, also Public and Observed only.
+`calendar_date` validates an ISO date and the existing Public metadata status;
+a source-retrieval date may bind the chain of a non-numeric listing, while its
+published name remains typed text. This extends the strict schema without
+changing a protected geography, a privacy rule or an existing numeric unit.
+
+The scoped parity cases execute all named reads on an embedded fixture and a
+second-engine delegation stand-in; the latter is ownership/coverage evidence
+only. Campaign disposition is recorded in PROGRESS.md. No live two-store evidence is claimed (L-1036 item 2).
+
+`eii_product.api.results.wire_fact` is the fixed Fact wire projection used by
+R1 and R2. It preserves metadata strings and emits numeric values as JSON
+numbers, which the existing Fact-chip formatter accepts. Its tested guard
+refuses a numeric value whose browser-number round trip would change the
+published value (`numeric_wire_invalid`), rather than publishing a rounded
+replacement. Parcel area adds the numeric unit `square_metre` to the closed
+Fact schema and formatter. No formatting or rounding algorithm changes.
+
+Source-geometry extension (S3-T22, ruling L-1060 item 2): a source feature
+may carry `geometry`, exactly `{type, coordinates}`, with one of four kinds:
+`Point` has one `[longitude, latitude]` position; `LineString` has a list of
+positions; `Polygon` has a list of rings, exterior first, then holes;
+`MultiPolygon` has a list of polygons in that same ring structure (RFC 7946).
+No other kind or member is accepted. Every position has exactly two finite,
+non-boolean numbers, longitude in [-180, 180] and latitude in [-90, 90]. The
+maximum coordinate-list depth is four (MultiPolygon), with at most 64 polygons,
+64 rings per polygon, 4,096 positions per ring or line, and 16,384 positions
+in the complete geometry. Lines have at least two positions, rings at least
+four, polygons at least one ring and multipolygons at least one polygon.
+Every ring is closed, exterior rings are counterclockwise and holes clockwise;
+zero signed area is refused. `eii_core.calc.source_geometry` checks these
+bounds and orientation before emission. No source island or hole is dropped,
+no ring is reordered, and no vertex is rounded, simplified or repaired.
+The browser checks orientation exactly for the supplied binary numbers too:
+integer arithmetic at a common binary scale decides acceptance only, never a
+displayed figure. The shared `source-orientation.json` fixture covers thin
+exteriors, reversed rings, corresponding holes, subnormal and zero-area rings.
+Invalid geometry refuses the complete response as sanitized INTERNAL.
+
+The existing simple `position`, `path` and exterior `ring` members retain their
+wire form. `geometry` is mutually exclusive with these members; Point binds
+`geometry_kind=point`, LineString binds `line`, and Polygon/MultiPolygon bind
+`outline` or `fill`. Simple source polygons keep `ring` for byte compatibility;
+holes and multipart polygons use `geometry`. A not-ranked hero zone carries
+exactly `feature_id`, `name_segments`, `reason_key` and either `ring` or polygon
+`geometry`, never both. The browser validates the closed geometry using exact
+BigInt sign arithmetic over the input doubles for orientation and passes all
+rings and parts to its renderer; invalid geometry is refused, never
+projected onto a simpler shape. The LineString renderer uses the existing
+outline-width token as its minimum pixel width. DAT-146 is unchanged: its
+single outer ring and no-hole limit governs drawn areas, not source layers.
+
+ASSUMPTION (L-1060 asks for documented bounds without specifying values): the
+limits above bound each source feature's transport; they never authorize
+truncation or reduction. A source exceeding a limit is refused whole.
+
+
+FDI `announced` references retain the stored year, month or day precision;
+the reader never supplies a missing month or day (DAT-155). The gatherer credit
+copies the registered source `attribution` text, which preserves its original
+data credit, rather than substituting the publishing organisation.
+
+S3-T12 fix5 completes the S3-T22 producer/renderer binding for announcements
+with a source year (FE-116, FE-139); OI-265 records the undated-year decision.
+Every ordinary feature carries its verified record `source_id`. A
+`pub_place_fsq.source_release` is copied as a `calendar_date` reference in that
+source's `sourceRelease` metadata; a missing/invalid date or conflicting dates
+for one source refuses the response. Source metadata survives subsequent facts.
+
+The FDI reader copies every section **7.3 Columns** field already projected by
+`layer_fdi_projects`. The closed `field_segments` map holds the text and
+identifier fields, including all additional page columns of DAT-142; null
+fields remain unstated. Digit-bearing fields reference verified `fdi_field`
+facts in `published_text`; no browser splitting or numeral extraction occurs.
+Dates keep their source precision. Capex, jobs and the two source coordinates
+have separate `capex_fact_id`, `jobs_fact_id`, `lon_fact_id` and `lat_fact_id`
+bindings: metrics `fdi_capex`, `fdi_jobs` and `fdi_location`, with the existing
+`usd_million` unit and the added numeric units `announced_jobs` (fractional
+published jobs, never an integer `count`) and `decimal_degree` (the source's
+longitude or latitude, without conversion). These units require Public,
+Observed, `not_applicable` metadata; capex and jobs require `fdi_estimates`.
+The `field` identity qualifier keeps longitude, latitude and individual text
+fields distinct. These are transport units for existing columns, not new source
+attributes. Digit-only reference strings retain their string type through JSON
+validation. The four filters carry source category keys and typed label
+segments; every reference resolves through the Fact registry before display.
+
+The fixed `layer_fdi_gazetteer` read binds the published `place_key` to the
+released gazetteer point. Its successful keys enter `gazetteer_points`, never
+keys inferred from location text. Source coordinates are preserved when given;
+a reviewed gazetteer binding supplies geometry otherwise. A direct source point
+is eligible without a gazetteer key only when its coordinates equal the two
+verified `fdi_location` facts. This is an acceptance check, not a displayed
+calculation. A project without supported placement remains listed. No address
+or coordinate is invented.
+
+The nullable `announced` and `project_year` columns leave a year-policy gap with
+FE-116. An undated record keeps its absent year and the browser's existing
+`fdi_year_missing` refusal; no year is inferred from retrieval metadata.
+OI-265 asks for the minimal contract decision before those records can display.

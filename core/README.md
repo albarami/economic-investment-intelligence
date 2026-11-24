@@ -29,3 +29,7 @@ The calculation-purity guard discovers every Python file below `calc/`, includin
 new modules, and plants an unlisted module that attempts I/O. Dynamic attribute
 access remains forbidden; apportioning lineage and trade compatibility use
 explicit fields. Existing per-field refusal tests cover both contracts.
+
+The strict application fact model is `eii_core.facts`. It admits only units
+that a built tool emits, and refuses every other schema unit as unknown until
+the first emitting task adds that unit with its rule and planted test.

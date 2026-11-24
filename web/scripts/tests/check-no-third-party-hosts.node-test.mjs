@@ -471,3 +471,156 @@ test('reads only', () => {
   assert.equal(result.status, 0, result.stdout);
   assert.equal(snapshot(root), before);
 });
+
+const ADDED_PAIRS = [
+  ['https', 'maplibre.invalid'],
+  ['https', 'wiki.openstreetmap.org'],
+  ['https', 'maplibre.org'],
+  ['resource', 'android'],
+  ['pmtiles', '(.+'],
+];
+
+function distScript(home, body) {
+  fs.mkdirSync(path.join(home, 'dist', 'assets'), { recursive: true });
+  fs.writeFileSync(
+    path.join(home, 'dist', 'index.html'),
+    builtPage('/assets/a.js'),
+  );
+  fs.writeFileSync(path.join(home, 'dist', 'assets', 'a.js'), body);
+}
+
+function licenceBytes(name) {
+  return fs.readFileSync(
+    path.join(WEB, 'node_modules', '@fontsource', name, 'LICENSE'),
+  );
+}
+
+function licenceRoot() {
+  const home = makeRoot();
+  fs.mkdirSync(path.join(home, 'dist', 'assets'), { recursive: true });
+  fs.mkdirSync(path.join(home, 'dist', 'licences'), { recursive: true });
+  fs.writeFileSync(
+    path.join(home, 'dist', 'index.html'),
+    builtPage('/assets/a.js'),
+  );
+  fs.writeFileSync(path.join(home, 'dist', 'assets', 'a.js'), 'var n = 1;\n');
+  return home;
+}
+
+test('added scheme and host pairs are allowed in a built script', async (t) => {
+  for (const [scheme, host] of ADDED_PAIRS) {
+    await t.test(`${scheme} ${host}`, () => {
+      const home = makeRoot();
+      distScript(home, `${scheme}://${host}/x\n`);
+      const result = run(['--root', home, '--dist']);
+      assert.equal(result.status, 0, result.stdout);
+      assert.match(result.stdout.trim().split('\n').at(-1), /OK$/);
+    });
+  }
+});
+
+test('shipped font licence texts pass by identity', () => {
+  const home = licenceRoot();
+  fs.writeFileSync(
+    path.join(home, 'dist', 'licences', 'ibm-plex-sans.txt'),
+    licenceBytes('ibm-plex-sans'),
+  );
+  fs.writeFileSync(
+    path.join(home, 'dist', 'licences', 'ibm-plex-sans-arabic.txt'),
+    licenceBytes('ibm-plex-sans-arabic'),
+  );
+  const result = run(['--root', home, '--dist']);
+  assert.equal(result.status, 0, result.stdout);
+  assert.match(result.stdout.trim().split('\n').at(-1), /OK$/);
+});
+
+test('an unlisted host in a built script fails', () => {
+  const home = makeRoot();
+  distScript(home, 'https://not-listed.example/x\n');
+  assertFail(
+    run(['--root', home, '--dist']),
+    'FAIL absolute-url-js: dist/assets/a.js',
+  );
+});
+
+test('a listed host under another scheme fails', () => {
+  const home = makeRoot();
+  distScript(home, 'http://maplibre.org/x\n');
+  assertFail(
+    run(['--root', home, '--dist']),
+    'FAIL absolute-url-js: dist/assets/a.js',
+  );
+});
+
+test('a listed host in a source file fails', () => {
+  const home = makeRoot();
+  fs.writeFileSync(
+    path.join(home, 'src', 'main.tsx'),
+    'const u = "https://maplibre.org/x";\n',
+  );
+  assertFail(run(['--root', home]), 'FAIL absolute-url: src/main.tsx');
+});
+
+test('a licence text with one byte changed fails', () => {
+  const home = licenceRoot();
+  const bytes = Buffer.from(licenceBytes('ibm-plex-sans'));
+  bytes[0] = bytes[0] === 0x41 ? 0x42 : 0x41;
+  fs.writeFileSync(
+    path.join(home, 'dist', 'licences', 'ibm-plex-sans.txt'),
+    bytes,
+  );
+  assertFail(
+    run(['--root', home, '--dist']),
+    'FAIL absolute-url: dist/licences/ibm-plex-sans.txt',
+  );
+});
+
+test('another text file under dist/licences with an address fails', () => {
+  const home = licenceRoot();
+  fs.writeFileSync(
+    path.join(home, 'dist', 'licences', 'other.txt'),
+    'See http://scripts.sil.org/OFL\n',
+  );
+  assertFail(
+    run(['--root', home, '--dist']),
+    'FAIL absolute-url: dist/licences/other.txt',
+  );
+});
+
+test('RTL plugin licence is accepted by exact path and bytes', () => {
+  const home = licenceRoot();
+  const bytes = fs.readFileSync(
+    path.join(WEB, 'node_modules/@mapbox/mapbox-gl-rtl-text/LICENSE.md'),
+  );
+  const file = path.join(home, 'dist/licences/mapbox-gl-rtl-text.txt');
+  fs.writeFileSync(file, bytes);
+  assert.equal(run(['--root', home, '--dist']).status, 0);
+  fs.writeFileSync(path.join(home, 'dist/licences/other-rtl.txt'), bytes);
+  assertFail(
+    run(['--root', home, '--dist']),
+    'FAIL absolute-url: dist/licences/other-rtl.txt',
+  );
+  fs.rmSync(path.join(home, 'dist/licences/other-rtl.txt'));
+  bytes[0] ^= 1;
+  fs.writeFileSync(file, bytes);
+  assertFail(
+    run(['--root', home, '--dist']),
+    'FAIL absolute-url: dist/licences/mapbox-gl-rtl-text.txt',
+  );
+});
+
+test('dist/licences/photoreal-loaders.txt requires unchanged installed notice bytes', () => {
+  const home = licenceRoot();
+  const bytes = fs.readFileSync(
+    path.join(WEB, 'node_modules/@loaders.gl/draco/LICENSE'),
+  );
+  const file = path.join(home, 'dist/licences/photoreal-loaders.txt');
+  fs.writeFileSync(file, bytes);
+  assert.equal(run(['--root', home, '--dist']).status, 0);
+  bytes[0] ^= 1;
+  fs.writeFileSync(file, bytes);
+  assertFail(
+    run(['--root', home, '--dist']),
+    'FAIL absolute-url: dist/licences/photoreal-loaders.txt',
+  );
+});

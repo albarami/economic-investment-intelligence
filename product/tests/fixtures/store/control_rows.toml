@@ -1,0 +1,29 @@
+[[tables]]
+name = "control_rows"
+anchor = "invented control table"
+key = ["unit_id"]
+
+[[tables.columns]]
+name = "unit_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "label"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "period"
+type = "date"
+nullable = false
+
+[[tables.columns]]
+name = "count_value"
+type = "int"
+nullable = false
+
+[[tables.columns]]
+name = "amount"
+type = "decimal(18,6)"
+nullable = true

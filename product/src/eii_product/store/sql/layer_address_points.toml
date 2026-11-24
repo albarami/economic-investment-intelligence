@@ -1,0 +1,54 @@
+[[tables]]
+name = "pub_address_point"
+anchor = "7.3 Columns"
+key = ["feature_key"]
+
+[[tables.columns]]
+name = "feature_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "zone_number"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "street_number"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "building_number"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "building_subtype"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "survey_date"
+type = "date"
+nullable = true
+
+[[tables.columns]]
+name = "lon"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "lat"
+type = "decimal(9,6)"
+nullable = false
+
+[[tables.columns]]
+name = "cell"
+type = "cell"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

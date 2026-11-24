@@ -1,0 +1,29 @@
+[[tables]]
+name = "graph_node"
+anchor = "docs/03_DATA_CONTRACTS.md section \"## 10. The economic graph\" row graph_node"
+key = ["node_id"]
+
+[[tables.columns]]
+name = "node_id"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "node_type"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "code"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "label_en"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "label_ar"
+type = "string"
+nullable = false

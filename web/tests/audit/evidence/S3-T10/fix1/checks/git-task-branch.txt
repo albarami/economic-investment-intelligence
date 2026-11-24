@@ -1,0 +1,1 @@
+fatal: cannot lock ref 'refs/heads/fix/s3-t10-review-round-1': Unable to create '[local-path]': Read-only file system

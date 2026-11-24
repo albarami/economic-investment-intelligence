@@ -1,0 +1,50 @@
+version: 1
+claims:
+  - claim_key: night_lights
+    section: observed
+    subject: area
+    slots:
+      - name: value
+        metric_key: night_lights_radiance
+        unit: radiance_nw_cm2_sr
+        geography_role: area_shape
+        period_rule: calendar_month
+        allowed_provenance: [public]
+        breakdown: none
+    required_caveat_keys: [night_lights_not_activity]
+    required_companions: []
+    strengths_allowed: [indicative]
+    template_en: "Night-time radiance: {value}"
+    template_ar: "الإشعاع الضوئي الليلي: {value}"
+  - claim_key: venue_busyness
+    section: observed
+    subject: place_public
+    slots:
+      - name: value
+        metric_key: venue_busyness_index
+        unit: relative_index
+        geography_role: public
+        period_rule: calendar_date
+        allowed_provenance: [public]
+        breakdown: none
+    required_caveat_keys: [relative_busyness_not_people]
+    required_companions: []
+    strengths_allowed: [indicative]
+    template_en: "BestTime relative busyness: {value}"
+    template_ar: "مؤشر الانشغال النسبي من BestTime: {value}"
+  - claim_key: population_age_sex
+    section: observed
+    subject: area
+    slots:
+      - name: value
+        metric_key: population_grid_people
+        unit: count
+        geography_role: area_shape
+        period_rule: calendar_year
+        allowed_provenance: [public]
+        breakdown: sex
+    required_caveat_keys: [grid_cells_summed]
+    required_companions: []
+    strengths_allowed: [indicative]
+    template_en: "WorldPop population by age and sex: about {value}"
+    template_ar: "السكان حسب العمر والجنس من WorldPop: نحو {value}"

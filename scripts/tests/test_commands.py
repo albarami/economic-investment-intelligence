@@ -1,4 +1,4 @@
-"""Tests for the twelve ./eii commands and the launcher dispatch."""
+"""Tests for the eighteen ./eii command forms and the launcher dispatch."""
 
 from __future__ import annotations
 
@@ -16,10 +16,7 @@ ROOT = support.ROOT
 UP_TAIL = ("up", "-d", "--wait", "--wait-timeout", "60", "db")
 DOWN_TAIL = ("stop", "db")
 PLACEHOLDER_DETAIL = {
-    "down": "not_built (not built yet)",
     "build-world": "not_built (not built yet)",
-    "build-release": "not_built (not built yet)",
-    "load-release": "not_built (built by task S3-T02)",
     "freeze": "not_built (built by task S11-T01 and S11-T06)",
 }
 UP_DETAIL = "not_built (not built yet)"
@@ -29,7 +26,7 @@ class Commands(unittest.TestCase):
     def test_usage_lists_every_command(self) -> None:
         expected = support.expected_usage(ROOT)
         rows = support.architecture_table(ROOT)
-        self.assertEqual(len(rows), 17)
+        self.assertEqual(len(rows), 18)
         for args in ((), ("bogus",)):
             with self.subTest(args=args):
                 proc = support.run_launcher(args, {"PATH": ""}, ROOT)
@@ -44,7 +41,7 @@ class Commands(unittest.TestCase):
 
         self.assertEqual(table.usage_text(), expected)
         specs = table.COMMANDS
-        self.assertEqual(len(specs), 17)
+        self.assertEqual(len(specs), 18)
         for spec, (command, plane) in zip(specs, rows, strict=True):
             self.assertEqual(spec.form, support.usage_form(command))
             self.assertEqual(spec.plane, plane)
@@ -199,7 +196,7 @@ class Commands(unittest.TestCase):
 
     def test_exit_codes_are_in_the_table(self) -> None:
         meanings = support.exit_meanings(ROOT)
-        self.assertEqual(set(meanings), set(range(8)))
+        self.assertEqual(set(meanings), set(range(9)))
         import commands.exits as exits
 
         self.assertEqual(exits.MEANINGS, meanings)
@@ -211,10 +208,10 @@ class Commands(unittest.TestCase):
             (("db-down",), 1, "db-down"),
             (("up",), 4, "up"),
             (("up", "--embedded"), 4, "up"),
-            (("down",), 1, "down"),
+            (("down",), 4, "down"),
             (("build-world",), 1, "build-world"),
             (("build-release",), 1, "build-release"),
-            (("load-release",), 1, "load-release"),
+            (("load-release",), 4, "load-release"),
             (("freeze",), 1, "freeze"),
         )
         for argv, expect, command in cases:
@@ -233,6 +230,8 @@ class Commands(unittest.TestCase):
                 self.assertTrue(stderr.startswith(f"FAIL {command}: "), stderr)
                 if command in PLACEHOLDER_DETAIL:
                     self.assertIn(PLACEHOLDER_DETAIL[command], stderr)
+                if command == "load-release":
+                    self.assertIn("release_missing", stderr)
                 if command in {"db-up", "db-down"}:
                     self.assertIn("EII_DATABASE_URL", stderr)
         with self.subTest(command="test"):
@@ -414,10 +413,10 @@ class Commands(unittest.TestCase):
             {"PATH": str(folder), "EII_DATABASE_URL": support.command_url()},
             root,
         )
-        self.assertEqual(code, 1, stderr)
+        self.assertEqual(code, 4, stderr)
         self.assertEqual(stdout, "")
-        self.assertIn(PLACEHOLDER_DETAIL["down"], stderr)
-        self.assertEqual(support.failure_problems(code, stderr, _meaning(1)), [])
+        self.assertIn("deployment_configuration_missing", stderr)
+        self.assertEqual(support.failure_problems(code, stderr, _meaning(4)), [])
         self.assertEqual(support.calls(folder), [])
         self.assertEqual(support.tree_problems(before, support.snapshot(root)), [])
         planted = dict(before)
@@ -461,6 +460,85 @@ class Commands(unittest.TestCase):
                     "FAIL tools: uv: not found on PATH; install uv, then run "
                     f"./eii {word} again\n",
                 )
+
+
+class LoadAndFreeze(unittest.TestCase):
+    def test_unknown_flag_exits_2(self) -> None:
+        code, stdout, stderr = support.run_main(
+            ("load-release", "--bogus"),
+            {"PATH": ""},
+            ROOT,
+        )
+        self.assertEqual(code, 2, stderr)
+        self.assertEqual(stdout, "")
+        self.assertTrue(stderr.startswith("eii: usage error:"), stderr)
+
+    def test_host_off_loopback_never_connects(self) -> None:
+        opened: list[str] = []
+
+        def connect(**_kwargs: object) -> object:
+            opened.append("opened")
+            message = "connection was opened"
+            raise AssertionError(message)
+
+        import commands.load_release as load_release
+
+        secret = "invented-secret-token"
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            code = load_release.run(
+                {
+                    "EII_RELEASE_DIR": "data/releases/x",
+                    "EII_DATABASE_URL": (
+                        "postgresql://eii_owner:"
+                        + secret
+                        + "@"
+                        + "10.1.1.1:5432/invented"
+                    ),
+                },
+                [],
+                connect=connect,
+            )
+        self.assertEqual(code, 1)
+        self.assertEqual(opened, [])
+        self.assertIn("host_not_loopback", err.getvalue())
+        self.assertNotIn(secret, err.getvalue())
+
+    def test_freeze_public_only_is_refused(self) -> None:
+        import json
+
+        register = ROOT / "infra" / "export_register.jsonl"
+        before = register.read_bytes() if register.exists() else b""
+        folder = support.make_temp(self, "eii-freeze-")
+        (folder / "manifest.json").write_text(
+            json.dumps({"release_kind": "public_only", "release_id": "ab" * 32}),
+            encoding="utf-8",
+        )
+        code, stdout, stderr = support.run_main(
+            ("freeze",),
+            {"PATH": "", "EII_RELEASE_DIR": str(folder)},
+            ROOT,
+        )
+        self.assertEqual(code, 7, stderr)
+        self.assertEqual(stdout, "")
+        self.assertIn("freeze_refused_public_only", stderr)
+        after = register.read_bytes() if register.exists() else b""
+        self.assertEqual(after, before)
+        other = support.make_temp(self, "eii-freeze-other-")
+        (other / "manifest.json").write_text(
+            json.dumps({"release_kind": "protected_window"}),
+            encoding="utf-8",
+        )
+        code, _stdout, stderr = support.run_main(
+            ("freeze",),
+            {"PATH": "", "EII_RELEASE_DIR": str(other)},
+            ROOT,
+        )
+        self.assertEqual(code, 1, stderr)
+        self.assertIn(PLACEHOLDER_DETAIL["freeze"], stderr)
+        code, _stdout, stderr = support.run_main(("freeze",), {"PATH": ""}, ROOT)
+        self.assertEqual(code, 1, stderr)
+        self.assertIn(PLACEHOLDER_DETAIL["freeze"], stderr)
 
 
 def _meaning(code: int) -> str:

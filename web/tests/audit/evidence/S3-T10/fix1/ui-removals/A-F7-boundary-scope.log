@@ -1,0 +1,28 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/component/mounted-opening-review.test.tsx (6 tests | 2 failed) 222ms
+   × labels the layer picker, selected activity and place, and scopes the boundary message (en) 30ms
+   × labels the layer picker, selected activity and place, and scopes the boundary message (ar) 21ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (en)
+ FAIL  tests/component/mounted-opening-review.test.tsx > labels the layer picker, selected activity and place, and scopes the boundary message (ar)
+AssertionError: expected null not to be null
+ ❯ tests/component/mounted-opening-review.test.tsx:214:56
+    212|       text(language, 'layers.boundaries.absent'),
+    213|     );
+    214|     expect(boundaries.closest('.story-selection')).not.toBeNull();
+       |                                                        ^
+    215|     expect(boundaries.classList.contains('story-caption')).toBe(true);
+    216|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  12:16:14
+   Duration  655ms (environment 40%, tests 37%, transform 13%, import 10%)
+

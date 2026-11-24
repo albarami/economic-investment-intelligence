@@ -1,0 +1,987 @@
+/*
+ * Answer surface. Logical properties only. One motion: the drawer entrance.
+ */
+html,
+body {
+  margin: 0;
+  background: var(--eii-bg);
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--eii-brief-width);
+  min-block-size: 100vh;
+  background: var(--eii-bg);
+  color: var(--eii-text);
+  font: var(--eii-type-body);
+  letter-spacing: var(--eii-type-tracking);
+}
+
+.stage-column {
+  position: relative;
+  min-block-size: 0;
+}
+
+.brief-column {
+  min-inline-size: 0;
+  background: var(--eii-surface-1);
+}
+
+.stage {
+  position: relative;
+  min-block-size: 100vh;
+  background: var(--eii-map-water);
+  direction: ltr;
+}
+
+.stage-plain {
+  display: grid;
+  grid-template-rows: 1fr 2fr;
+}
+
+.stage-sea {
+  background: var(--eii-map-water);
+}
+
+.stage-land {
+  background: var(--eii-map-land);
+}
+
+.stage-host {
+  position: absolute;
+  inset: 0;
+}
+
+.stage-status,
+.stage-credits {
+  position: absolute;
+  inset-inline-start: var(--eii-space-4);
+  margin: 0;
+  font: var(--eii-type-caption);
+}
+
+.stage-status {
+  inset-block-start: var(--eii-space-4);
+}
+
+.stage-credits {
+  inset-block-end: var(--eii-space-4);
+  z-index: var(--eii-z-tools);
+  box-sizing: border-box;
+  max-inline-size: calc(100% - var(--eii-space-6));
+  background: var(--eii-surface-3);
+  color: var(--eii-text);
+  padding: var(--eii-space-2) var(--eii-space-3);
+  border-radius: var(--eii-radius-s);
+}
+
+.stage-credits p {
+  margin: 0;
+}
+
+.layer-plate {
+  position: absolute;
+  inset-inline-end: var(--eii-space-4);
+  inset-block-start: var(--eii-space-5);
+  max-inline-size: 20rem;
+  margin: 0;
+  padding: var(--eii-space-3);
+  background: var(--eii-surface-1);
+  color: var(--eii-text);
+  font: var(--eii-type-caption);
+}
+
+.layer-sample {
+  border-block-end: var(--eii-edge) solid var(--eii-map-boundary);
+}
+
+.layer-sample[data-pattern='hatch-lock'] {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--eii-map-boundary),
+    var(--eii-map-boundary) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+
+.brief {
+  box-sizing: border-box;
+  background: var(--eii-surface-1);
+  color: var(--eii-text);
+  padding: var(--eii-space-5);
+  border-inline-start: var(--eii-edge) solid var(--eii-line);
+  overflow: auto;
+}
+
+.brief h1 {
+  margin: 0 0 var(--eii-space-4);
+  font: var(--eii-type-title);
+}
+
+.brief p {
+  margin: 0 0 var(--eii-space-4);
+}
+
+.answer-sheet {
+  display: contents;
+}
+
+.sheet-toggle {
+  display: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--eii-space-2);
+  min-block-size: var(--eii-target-min);
+  min-inline-size: var(--eii-target-min);
+  padding-block: var(--eii-space-2);
+  padding-inline: var(--eii-space-3);
+  border: var(--eii-edge) solid var(--eii-line-strong);
+  border-radius: var(--eii-radius-s);
+  background: var(--eii-surface-3);
+  color: var(--eii-text);
+  font: var(--eii-type-label);
+  text-align: start;
+}
+
+.chip:focus-visible,
+.drawer-close:focus-visible,
+.sheet-toggle:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: var(--eii-focus-offset);
+}
+
+.chip-num {
+  font-family: var(--eii-font-latin);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.chip[data-size='hero'] .chip-num {
+  font: var(--eii-num-hero);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip[data-size='large'] .chip-num {
+  font: var(--eii-num-large);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip[data-size='standard'] .chip-num {
+  font: var(--eii-num-standard);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip[data-size='compact'] .chip-num {
+  font: var(--eii-num-compact);
+  font-variant-numeric: tabular-nums;
+}
+
+.chip[data-fact-chip='reference'] {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.chip[data-size='inline'] {
+  min-block-size: 0;
+  min-inline-size: 0;
+  padding-block: 0;
+}
+
+.chip[data-size='inline'] .chip-num {
+  font: var(--eii-type-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-unit {
+  font: var(--eii-type-caption);
+}
+
+.chip-figure,
+.chip-range,
+.chip-root {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--eii-space-2);
+}
+
+.chip-range {
+  display: flex;
+  flex-direction: column;
+}
+
+.chip-withheld,
+.chip-skeleton {
+  inline-size: var(--eii-space-8);
+  block-size: var(--eii-space-5);
+}
+
+.chip-skeleton {
+  background: var(--eii-surface-3);
+  border-radius: var(--eii-radius-s);
+}
+
+.chip-input input {
+  min-block-size: var(--eii-target-min);
+  border: var(--eii-edge) solid var(--eii-line);
+  background: var(--eii-surface-1);
+  color: var(--eii-text);
+  font: var(--eii-num-compact);
+  font-variant-numeric: tabular-nums;
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--eii-space-2);
+  color: var(--eii-text);
+}
+
+.mark-glyph {
+  inline-size: var(--eii-space-5);
+  block-size: var(--eii-space-5);
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: var(--eii-thread);
+}
+
+.drawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  box-sizing: border-box;
+  inline-size: var(--eii-brief-width);
+  background: var(--eii-surface-2);
+  color: var(--eii-text);
+  border: var(--eii-edge) solid var(--eii-line);
+  border-radius: var(--eii-radius-l);
+  padding: var(--eii-space-5);
+  overflow: auto;
+  z-index: var(--eii-z-drawer);
+  animation: drawer-in var(--eii-dur-slow) var(--eii-ease-enter);
+}
+
+.drawer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eii-space-3);
+}
+
+.drawer h2 {
+  margin: 0;
+  font: var(--eii-type-title);
+}
+
+.drawer-close {
+  font: var(--eii-type-label);
+  min-block-size: var(--eii-button-height);
+  min-inline-size: var(--eii-target-min);
+  padding-inline: var(--eii-space-4);
+  border: var(--eii-edge) solid var(--eii-line-strong);
+  border-radius: var(--eii-radius-s);
+  background: var(--eii-surface-3);
+  color: var(--eii-text);
+}
+
+.drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-6);
+}
+
+.drawer-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-3);
+}
+
+.chain-pair {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--eii-space-2);
+  inline-size: 100%;
+}
+
+.chain-label {
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+}
+
+.chain-value {
+  display: block;
+  text-align: start;
+  font: var(--eii-type-body);
+  overflow-wrap: anywhere;
+}
+
+.drawer [data-part='inputs'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--eii-space-3);
+}
+
+.thread {
+  margin: 0;
+  padding-inline-start: var(--eii-space-5);
+  border-inline-start: var(--eii-thread) solid var(--eii-line-strong);
+  list-style: none;
+}
+
+.thread li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--eii-space-2);
+  margin-block-end: var(--eii-space-3);
+}
+
+.visually-hidden {
+  position: absolute;
+  inline-size: var(--eii-edge);
+  block-size: var(--eii-edge);
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.draw-tools {
+  position: absolute;
+  z-index: var(--eii-z-tools);
+  inset-inline-start: 0;
+  inset-block-start: var(--eii-space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--eii-space-2);
+  max-inline-size: 16rem;
+  margin: 0;
+  padding: var(--eii-space-3);
+  background: var(--eii-surface-1);
+  color: var(--eii-text);
+}
+
+.stage-column > .draw-tools:has(button) {
+  box-sizing: border-box;
+  max-block-size: max(44px, calc(100dvh - var(--eii-sheet-size, 0px) - 6rem));
+  overflow: auto;
+}
+
+.draw-knob {
+  touch-action: none;
+}
+
+.draw-tool,
+.draw-preset,
+.draw-knob,
+.draw-crosshair {
+  min-inline-size: var(--eii-target-min);
+  min-block-size: var(--eii-target-min);
+  font: var(--eii-type-label);
+  color: var(--eii-text);
+  background: var(--eii-surface-1);
+  border: var(--eii-edge) solid var(--eii-line);
+}
+
+.draw-tool:focus-visible,
+.draw-preset:focus-visible,
+.draw-knob:focus-visible,
+.draw-crosshair:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: var(--eii-focus-offset);
+}
+
+.area-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--eii-z-overlay);
+  pointer-events: none;
+}
+
+.area-overlay.is-live {
+  pointer-events: auto;
+}
+
+.area-lines {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.area-line-casing {
+  fill: none;
+  stroke: var(--eii-bg);
+  stroke-width: 4px;
+}
+
+.area-line-accent {
+  fill: none;
+  stroke: var(--eii-accent);
+  stroke-width: 2px;
+}
+
+.area-line-strong {
+  fill: none;
+  stroke: var(--eii-line-strong);
+  stroke-width: 2px;
+}
+
+.draw-knob,
+.draw-crosshair,
+.draw-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.draw-pin {
+  inline-size: var(--eii-target-min);
+  block-size: var(--eii-target-min);
+  background: var(--eii-accent);
+  border-radius: var(--eii-radius-s);
+}
+
+@keyframes drawer-in {
+  from {
+    inset-inline-end: calc(var(--eii-brief-width) * -1);
+  }
+  to {
+    inset-inline-end: 0;
+  }
+}
+
+@media (max-width: 1199px) {
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    block-size: 100vh;
+    min-block-size: 0;
+  }
+
+  .stage-column,
+  .stage {
+    min-block-size: 0;
+    block-size: 100%;
+  }
+
+  .drawer {
+    box-sizing: border-box;
+    inset-inline: 0;
+    inline-size: auto;
+    block-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    animation: none;
+  }
+
+  .draw-knob,
+  .draw-crosshair,
+  .draw-pin {
+    transition: none;
+  }
+}
+
+.map-mode-switch,
+.comparison-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eii-space-2);
+}
+
+.map-mode-switch button,
+.comparison-controls button {
+  font: var(--eii-type-label);
+  padding: var(--eii-space-3);
+  color: var(--eii-text);
+  background: var(--eii-surface-1);
+  border: var(--eii-edge) solid var(--eii-line-strong);
+  border-radius: var(--eii-radius-s);
+}
+
+.map-mode-switch button:focus-visible,
+.comparison-controls button:focus-visible,
+.stage-credits summary:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: var(--eii-focus-offset);
+}
+
+.map-mode-switch button[aria-checked='true'],
+.comparison-controls button[aria-pressed='true'] {
+  background: var(--eii-surface-3);
+}
+
+.scenario-comparison {
+  display: grid;
+  gap: var(--eii-space-3);
+  padding: var(--eii-space-3);
+  color: var(--eii-text);
+  background: var(--eii-surface-1);
+}
+
+.scenario-comparison [role='group'] {
+  padding: var(--eii-space-3);
+  border: var(--eii-edge) solid var(--eii-line-strong);
+}
+
+.scenario-comparison [data-emphasis='true'] {
+  border-color: var(--eii-accent);
+}
+
+/* Controls stay in the map's flow, in either writing direction. */
+.map-controls {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.map-controls button,
+.map-mode-switch button,
+.comparison-controls button,
+.clock-control input,
+.stage-credits summary {
+  box-sizing: border-box;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+
+.clock-control {
+  display: flex;
+  flex-wrap: wrap;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  gap: var(--eii-space-2);
+}
+
+.clock-control input:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: var(--eii-focus-offset);
+}
+
+/* The map occupies its own grid cell; controls cannot paint over the answer. */
+.stage {
+  min-inline-size: 0;
+  overflow: auto;
+}
+.map-controls {
+  gap: var(--eii-space-3);
+  background: var(--eii-surface-1);
+  color: var(--eii-text);
+}
+.map-controls > * {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.operational-meter,
+.operational-quantities {
+  display: grid;
+  gap: var(--eii-space-2);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  text-align: start;
+}
+
+.operational-meter .chip {
+  flex-wrap: wrap;
+  max-inline-size: 100%;
+}
+
+.operational-quantity {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--eii-space-2);
+}
+
+.operational-meter section {
+  border: var(--eii-edge) solid var(--eii-line-strong);
+  padding: var(--eii-space-3);
+  background: var(--eii-surface-1);
+  color: var(--eii-text);
+}
+
+.operational-meter dd {
+  margin-inline-start: 0;
+}
+
+.operational-meter {
+  box-sizing: border-box;
+  padding: var(--eii-space-2);
+}
+
+/* An open explanation must remain separate from the map's attribution. */
+.stage:has(.operational-meter [aria-expanded='true']) > .stage-credits {
+  position: relative;
+  inset: auto;
+  padding: var(--eii-space-4);
+}
+
+/* The phone sheet is nonmodal: both states keep the answer and map available. */
+@media (max-width: 767px) {
+  .shell {
+    --eii-sheet-size: min(22rem, 50dvh);
+    position: relative;
+    grid-template-rows: minmax(0, 1fr);
+    block-size: 100dvh;
+    isolation: isolate;
+  }
+
+  .shell[data-sheet-expanded='true'] {
+    --eii-sheet-size: 75dvh;
+  }
+
+  .answer-sheet {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    block-size: var(--eii-sheet-size);
+    min-inline-size: 0;
+    background: var(--eii-surface-1);
+    border-block-start: var(--eii-edge) solid var(--eii-line-strong);
+    border-start-start-radius: var(--eii-radius-l);
+    border-start-end-radius: var(--eii-radius-l);
+    box-shadow: var(--eii-shadow-2);
+    padding-block-end: env(safe-area-inset-bottom, 0px);
+  }
+
+  .sheet-toggle {
+    display: block;
+    flex-shrink: 0;
+    min-block-size: var(--eii-button-height);
+    margin-block: var(--eii-space-2) 0;
+    margin-inline: var(--eii-space-4);
+    padding-block: var(--eii-space-2);
+    padding-inline: var(--eii-space-4);
+    border: var(--eii-edge) solid var(--eii-line-strong);
+    border-radius: var(--eii-radius-m);
+    background: var(--eii-surface-3);
+    color: var(--eii-text);
+    font: var(--eii-type-label);
+    overflow-wrap: anywhere;
+  }
+
+  .answer-sheet .brief-column {
+    flex: 1;
+    min-block-size: 0;
+    overflow: auto;
+    overscroll-behavior-block: contain;
+    scroll-padding-block: var(--eii-space-2);
+  }
+
+  .answer-sheet .brief {
+    flex: 1;
+    min-block-size: 0;
+    min-inline-size: 0;
+    border-inline-start: 0;
+    padding: var(--eii-space-4);
+    overflow-wrap: anywhere;
+    overscroll-behavior-block: contain;
+    scroll-padding-block: var(--eii-space-2);
+  }
+
+  .answer-sheet .chip {
+    box-sizing: border-box;
+    max-inline-size: 100%;
+    flex-wrap: wrap;
+  }
+
+  .stage-credits {
+    inset-block-end: calc(var(--eii-sheet-size) + var(--eii-space-4));
+    inset-inline-end: var(--eii-space-4);
+  }
+
+  .drawer {
+    z-index: 2;
+  }
+}
+
+/* Opening/story controls use the existing type, surface and focus tokens. */
+.opening-app .brief-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-4);
+  padding: var(--eii-space-4);
+  box-sizing: border-box;
+  overflow: auto;
+  max-block-size: 100dvh;
+}
+.opening-language {
+  display: flex;
+  justify-content: flex-end;
+}
+.public-opening,
+.public-story,
+.resolve-picker,
+.layer-chooser {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--eii-space-3);
+}
+.public-opening h1,
+.public-story h1 {
+  font: var(--eii-type-title);
+  margin-block: var(--eii-space-4);
+}
+.public-opening nav,
+.named-presets,
+.picker-results,
+.camera-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eii-space-2);
+}
+.opening-app button,
+.opening-app input,
+.opening-app select,
+.camera-controls button {
+  box-sizing: border-box;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  max-inline-size: 100%;
+  padding: var(--eii-space-2) var(--eii-space-3);
+  border: var(--eii-edge) solid var(--eii-line-strong);
+  border-radius: var(--eii-radius-s);
+  color: var(--eii-text);
+  background: var(--eii-surface-1);
+  font: var(--eii-type-label);
+  overflow-wrap: anywhere;
+}
+.opening-app button:focus-visible,
+.opening-app input:focus-visible,
+.opening-app select:focus-visible,
+.camera-controls button:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: var(--eii-focus-offset);
+}
+.opening-app button:disabled {
+  color: var(--eii-text-2);
+  border-color: var(--eii-line);
+}
+.opening-app .draw-tools {
+  position: static;
+  max-inline-size: none;
+  padding: 0;
+}
+.opening-app .layer-plate {
+  max-block-size: 45dvh;
+  max-inline-size: min(20rem, 70%);
+  overflow: auto;
+  box-sizing: border-box;
+}
+.opening-app .brief-column > *,
+.opening-app .public-story > *,
+.opening-app .public-context-card {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+.opening-app .stage-column {
+  min-inline-size: 0;
+}
+@media (max-width: 1199px) and (min-width: 768px) {
+  .opening-app .shell {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 45%);
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+.public-opening p {
+  margin: 0;
+}
+.public-opening h1 {
+  margin: 0;
+}
+@media (max-width: 767px) {
+  .opening-app[data-opening-scene='opening'] .shell {
+    --eii-sheet-size: min(26rem, 65dvh);
+  }
+  .opening-app[data-opening-scene='opening'] .brief-column {
+    gap: var(--eii-space-2);
+  }
+}
+.context-options {
+  font: var(--eii-type-label);
+  margin-block-end: var(--eii-space-3);
+}
+.context-options[open] {
+  max-block-size: 16rem;
+  overflow: auto;
+}
+.context-options button {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--eii-space-2);
+  margin: var(--eii-space-1);
+}
+
+/* Production inspectors disclose the same controls without obscuring the map. */
+.map-control-panel,
+.layer-inspector {
+  position: absolute;
+  z-index: var(--eii-z-tools);
+  inset-inline-end: var(--eii-space-4);
+  max-inline-size: calc(100% - var(--eii-space-6));
+  max-block-size: max(44px, calc(100dvh - var(--eii-sheet-size, 0px) - 6rem));
+  overflow: auto;
+  color: var(--eii-text);
+  background: var(--eii-surface-1);
+  border: var(--eii-edge) solid var(--eii-line-strong);
+  border-radius: var(--eii-radius-s);
+}
+.map-control-panel {
+  inset-block-start: var(--eii-space-4);
+}
+.layer-inspector {
+  inset-block-start: 5rem;
+}
+.map-control-panel > summary,
+.layer-inspector > summary {
+  box-sizing: border-box;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding: var(--eii-space-3);
+  font: var(--eii-type-label);
+  cursor: pointer;
+}
+.map-control-panel > summary:focus-visible,
+.layer-inspector > summary:focus-visible,
+.context-options > summary:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: calc(-1 * var(--eii-focus-ring));
+}
+.opening-app .layer-inspector .layer-plate {
+  position: static;
+  max-block-size: none;
+  max-inline-size: 100%;
+}
+.opening-app .map-control-panel .map-controls {
+  padding: var(--eii-space-3);
+  box-sizing: border-box;
+}
+.layer-inspector {
+  max-block-size: max(44px, calc(100dvh - var(--eii-sheet-size, 0px) - 10rem));
+}
+.story-selection > summary,
+.drawing-disclosure > summary,
+.context-options > summary {
+  box-sizing: border-box;
+  min-block-size: 44px;
+  padding: var(--eii-space-3);
+  font: var(--eii-type-label);
+  cursor: pointer;
+}
+.story-selection > summary:focus-visible,
+.drawing-disclosure > summary:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: calc(-1 * var(--eii-focus-ring));
+}
+.context-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eii-space-2);
+  margin-block-end: var(--eii-space-3);
+}
+.context-tabs [aria-pressed='true'] {
+  border-color: var(--eii-accent);
+  background: var(--eii-surface-3);
+}
+
+.opening-app .stage-column {
+  isolation: isolate;
+}
+.selection-caption,
+.story-caption {
+  color: var(--eii-text-2);
+  font: var(--eii-type-caption);
+}
+.selection-caption,
+.busyness-place {
+  display: block;
+}
+
+.opening-app .drawing-disclosure {
+  position: absolute;
+  z-index: var(--eii-z-tools);
+  inset-inline-start: var(--eii-space-4);
+  inset-block-start: var(--eii-space-4);
+  box-sizing: border-box;
+  max-inline-size: calc(100% - var(--eii-space-6));
+  max-block-size: max(44px, calc(100dvh - var(--eii-sheet-size, 0px) - 6rem));
+  overflow: auto;
+  border: var(--eii-edge) solid var(--eii-line-strong);
+  border-radius: var(--eii-radius-s);
+  color: var(--eii-text);
+  background: var(--eii-surface-1);
+}
+.opening-app .drawing-disclosure .draw-tools {
+  max-inline-size: 20rem;
+  padding: var(--eii-space-3);
+  box-sizing: border-box;
+}
+
+/* DES-15: the ring is painted above the chosen outline on its own casing,
+   which is wider than the line, so wherever the two meet the ring is separated
+   from the chosen accent by the casing in both themes (3:1 each way). */
+.context-ring-casing {
+  fill: none;
+  stroke: var(--eii-bg);
+  stroke-width: 6px;
+}
+
+.context-ring-line {
+  fill: none;
+  stroke: var(--eii-text);
+  stroke-width: 2px;
+  stroke-dasharray: 6px 4px;
+}
+
+.context-legend {
+  position: absolute;
+  inset-inline-start: var(--eii-space-4);
+  inset-block-end: var(--eii-space-8);
+  z-index: var(--eii-z-overlay);
+  display: flex;
+  align-items: center;
+  gap: var(--eii-space-2);
+  max-inline-size: 20rem;
+  margin: 0;
+  padding: var(--eii-space-2) var(--eii-space-3);
+  background: var(--eii-surface-1);
+  color: var(--eii-text);
+  font: var(--eii-type-caption);
+}
+
+.context-sample {
+  flex: none;
+  inline-size: var(--eii-space-6);
+  block-size: var(--eii-space-3);
+}
+
+/* On a phone the legend sits above the sheet and the attribution plate. */
+@media (max-width: 767px) {
+  .context-legend {
+    inset-block-end: calc(var(--eii-sheet-size) + var(--eii-space-8));
+    inset-inline-end: var(--eii-space-4);
+  }
+}

@@ -1,0 +1,113 @@
+# AI-38 numeral lexicon, Arabic. Version 1, 2026-11-21. Pending native review (OI-09, AI-86).
+# One base form per line; a line that starts with # is a comment.
+# The scanner matches an Arabic-script term with its attached proclitics (و ف ب ك ل ال لل)
+# and the endings ا ان ين ة ات, after unifying alef forms and removing diacritics and tatweel.
+# A line that starts with ! is a fixed compound that is not a number; it is removed before terms match.
+# Coverage is equivalent to the English lexicon: cardinals, ordinals, fractions,
+# multiplicatives and percentage terms.
+# cardinals
+صفر
+واحد
+واحدة
+اثنان
+اثنين
+اثنتان
+اثنتين
+اثنا
+اثني
+اثنتا
+إحدى
+أحد عشر
+ثلاث
+أربع
+خمس
+ست
+سبع
+ثمان
+ثماني
+ثمانية
+تسع
+عشر
+عشرون
+ثلاثون
+أربعون
+خمسون
+ستون
+سبعون
+ثمانون
+تسعون
+مئة
+مائة
+مئتان
+مئتين
+مائتان
+مائتين
+مئات
+ثلاثمئة
+أربعمئة
+خمسمئة
+ستمئة
+سبعمئة
+ثمانمئة
+تسعمئة
+ألف
+آلاف
+ألوف
+مليون
+ملايين
+مليار
+بليون
+تريليون
+دزينة
+دستة
+# ordinals
+أول
+أولى
+أولا
+ثان
+ثاني
+ثالث
+رابع
+خامس
+سادس
+سابع
+ثامن
+تاسع
+عاشر
+حادي عشر
+حادية عشرة
+# fractions
+نصف
+أنصاف
+ثلث
+أثلاث
+ربع
+أرباع
+أخماس
+سدس
+أسداس
+أسباع
+أثمان
+أتساع
+أعشار
+# multiplicatives
+مرتين
+مرتان
+ضعفين
+ضعفان
+أضعاف
+مضاعف
+مزدوج
+ثنائي
+ثلاثي
+رباعي
+أحادي
+# percentage terms
+بالمئة
+بالمائة
+مئوية
+مئيني
+٪
+# fixed compounds that are not numbers
+! نصف قطر
+! نصف القطر

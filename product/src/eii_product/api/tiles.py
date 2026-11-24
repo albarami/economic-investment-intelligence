@@ -14,7 +14,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from starlette.responses import FileResponse
 
-TILE_NAME = re.compile(r"^[a-z][a-z0-9_-]*\.tile$")
+TILE_NAME = re.compile(r"^[a-z][a-z0-9_-]*\.(tile|pmtiles)$")
 
 _PROBE_NAME = "spike.tile"
 

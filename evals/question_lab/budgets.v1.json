@@ -1,0 +1,43 @@
+{
+  "version": "question-lab.budgets.v1",
+  "ratification": "waiting",
+  "native_stage": null,
+  "native_phone": null,
+  "limits_ms": {
+    "map": {
+      "p95": 500,
+      "p95_strict": true,
+      "worst": 1000
+    },
+    "chip": {
+      "p95": 2000,
+      "worst": 3000
+    },
+    "brief": {
+      "p95": 6000,
+      "worst": 8000
+    },
+    "interrupt": {
+      "p95": 500,
+      "worst": 1000
+    },
+    "reset": {
+      "p95": 500,
+      "worst": 1000
+    },
+    "flight_frame": {
+      "p95": 16.7,
+      "worst": 33
+    },
+    "evidence_bundle": {
+      "p95": 1500,
+      "p95_strict": true
+    }
+  },
+  "layout_shift_max": 0.1,
+  "max_actions": 6,
+  "evidence_samples": 200,
+  "warmups": 20,
+  "authority": "decision 0044 item 3; document 12 TST-130 to TST-133; S3-T21 plan page 4",
+  "rule": "Ratify and commit before measurement. No limit increases, retries, skips or local baseline refresh."
+}

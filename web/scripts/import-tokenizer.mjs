@@ -243,6 +243,20 @@ function isWord(tok, value) {
   return tok?.type === 'word' && tok.value === value;
 }
 
+function nonLiteralArgument(tokens, argIndex) {
+  const arg = at(tokens, argIndex);
+  if (!arg) return { argumentKind: 'missing', argument: '' };
+  if (arg.type === 'template')
+    return { argumentKind: 'template', argument: arg.value };
+  const urlCall =
+    arg.type === 'word' &&
+    arg.value === 'new' &&
+    isWord(at(tokens, argIndex + 1), 'URL') &&
+    isPunct(at(tokens, argIndex + 2), '(');
+  if (urlCall) return { argumentKind: 'new-url', argument: '' };
+  return { argumentKind: arg.type, argument: arg.value ?? '' };
+}
+
 export function collectReferences(text) {
   const tokens = tokenize(text);
   const references = [];
@@ -305,7 +319,12 @@ export function collectReferences(text) {
           specifier: arg.value,
           line: arg.line,
         });
-      else nonLiteral.push({ form: 'import()', line: token.line });
+      else
+        nonLiteral.push({
+          form: 'import()',
+          line: token.line,
+          ...nonLiteralArgument(tokens, index + 2),
+        });
       continue;
     }
     if (token.value === 'import' && isLiteral(at(tokens, index + 1))) {
@@ -325,7 +344,12 @@ export function collectReferences(text) {
           specifier: arg.value,
           line: arg.line,
         });
-      else nonLiteral.push({ form: 'require()', line: token.line });
+      else
+        nonLiteral.push({
+          form: 'require()',
+          line: token.line,
+          ...nonLiteralArgument(tokens, index + 2),
+        });
       continue;
     }
     if (

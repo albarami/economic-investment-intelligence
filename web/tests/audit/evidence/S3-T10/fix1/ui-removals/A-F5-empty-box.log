@@ -1,0 +1,77 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/component/context-deck.test.tsx (3 tests | 2 failed) 65ms
+   × a withheld selected observation keeps its reason and lock, never its hidden value (en) 42ms
+   × a withheld selected observation keeps its reason and lock, never its hidden value (ar) 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/component/context-deck.test.tsx > a withheld selected observation keeps its reason and lock, never its hidden value (en)
+AssertionError: expected <button type="button" …(6)>…(1)</button> to be null
+
+- Expected:
+null
+
++ Received:
+<button
+  aria-label="Open the source chain"
+  class="chip"
+  data-fact-chip="value"
+  data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+  data-size="large"
+  data-state="withheld"
+  type="button"
+>
+  <span
+    class="chip-withheld"
+  />
+</button>
+
+ ❯ tests/component/context-deck.test.tsx:30:60
+     28|     expect(card.textContent).not.toMatch(/987|(?<![0-9])0(?![0-9])/);
+     29|     expect(card.querySelector('[data-fact-chip="value"] .chip-num')).t…
+     30|     expect(card.querySelector('[data-fact-chip="value"]')).toBeNull();
+       |                                                            ^
+     31|     expect(
+     32|       card.querySelector(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/component/context-deck.test.tsx > a withheld selected observation keeps its reason and lock, never its hidden value (ar)
+AssertionError: expected <button type="button" …(6)>…(1)</button> to be null
+
+- Expected:
+null
+
++ Received:
+<button
+  aria-label="فتح سلسلة المصدر"
+  class="chip"
+  data-fact-chip="value"
+  data-fact-id="f_abc3d4e5f6a7b8c3d4e5f6a7b8c3d4e5"
+  data-size="large"
+  data-state="withheld"
+  type="button"
+>
+  <span
+    class="chip-withheld"
+  />
+</button>
+
+ ❯ tests/component/context-deck.test.tsx:30:60
+     28|     expect(card.textContent).not.toMatch(/987|(?<![0-9])0(?![0-9])/);
+     29|     expect(card.querySelector('[data-fact-chip="value"] .chip-num')).t…
+     30|     expect(card.querySelector('[data-fact-chip="value"]')).toBeNull();
+       |                                                            ^
+     31|     expect(
+     32|       card.querySelector(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  12:15:06
+   Duration  465ms (environment 57%, tests 16%, transform 14%, import 12%, worker 1%)
+

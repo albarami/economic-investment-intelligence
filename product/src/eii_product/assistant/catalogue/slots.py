@@ -17,6 +17,8 @@ from eii_product.assistant.catalogue.schema import (
     PERIOD_PATTERNS,
     PROVENANCE_ALL,
     PUBLIC_BREAKDOWNS,
+    PUBLIC_REGISTER_CARD_METRICS,
+    REGISTER_COMPANY_METRICS,
     SIMULATED_BREAKDOWNS,
     Catalogue,
     Refusal,
@@ -26,7 +28,7 @@ from eii_product.assistant.catalogue.schema import (
 )
 
 _SCENARIO_METRICS = frozenset({"scenario_low", "scenario_middle", "scenario_high"})
-_TABULATED_SUBJECTS = frozenset({"municipality", "national", "sector"})
+_TABULATED_SUBJECTS = frozenset({"district", "municipality", "national", "sector"})
 _GRID_SEX_METRIC = "population_grid_people"
 
 
@@ -36,13 +38,20 @@ def subject_refusal(
     unit: str,
     provenances: tuple[str, ...],
     *,
+    geography: str,
+    geography_path: str,
     metric_path: str,
     unit_path: str,
     provenance_path: str,
 ) -> Refusal | None:
     """Refuse a metric, unit or provenance the subject does not accept."""
-    if metric_key == "employee_count" and subject != "register_company":
+    if metric_key in REGISTER_COMPANY_METRICS and subject != "register_company":
         return Refusal("SUBJECT_METRIC", metric_path)
+    if subject == "district":
+        if set(provenances) != {"public"}:
+            return Refusal("SUBJECT_PROVENANCE", provenance_path)
+        if geography != "public":
+            return Refusal("SUBJECT_GEOGRAPHY", geography_path)
     if subject != "area" and (
         metric_key in ESTIMATE_SHARE_SCORE or metric_key in _SCENARIO_METRICS
     ):
@@ -61,6 +70,8 @@ def subject_refusal(
         if subject == "register_company":
             return Refusal("SUBJECT_METRIC", metric_path)
         return Refusal("SUBJECT_PROVENANCE", provenance_path)
+    if subject == "register_company" and metric_key not in PUBLIC_REGISTER_CARD_METRICS:
+        return Refusal("SUBJECT_METRIC", metric_path)
     return None
 
 
@@ -202,6 +213,8 @@ def _match_one(
             slot.metric_key,
             slot.unit,
             (fact.provenance,),
+            geography=fact.geography_kind,
+            geography_path=path,
             metric_path=path,
             unit_path=path,
             provenance_path=path,

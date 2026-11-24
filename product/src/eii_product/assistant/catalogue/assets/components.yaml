@@ -1,0 +1,90 @@
+version: 1
+components:
+  - component_key: foundation_note
+    max_count: 1
+    props: []
+  - component_key: night_lights
+    max_count: 1
+    props:
+      - name: value
+        kind: fact_id
+  - component_key: venue_busyness
+    max_count: 1
+    props:
+      - name: value
+        kind: fact_id
+  - component_key: population_age_sex
+    max_count: 1
+    props:
+      - name: value
+        kind: fact_id
+stage_directives:
+  fly:
+    fields:
+      - name: target
+        kind: target
+      - name: zoom
+        kind: enumeration
+        values: [country, city, district, street]
+  layer:
+    fields:
+      - name: layer
+        kind: identifier
+      - name: visible
+        kind: boolean
+  highlight:
+    one_of:
+      - fields:
+          - name: fact_id
+            kind: fact_id
+      - fields:
+          - name: place_keys
+            kind: identifier_list
+            minimum: 1
+      - fields:
+          - name: unit_ids
+            kind: identifier_list
+            minimum: 1
+  rings:
+    fields:
+      - name: area_ids
+        kind: area_ids
+        minimum: 1
+        maximum: 2
+  dial:
+    fields:
+      - name: situation
+        kind: enumeration
+        values: [weekday_lunch, weekday_evening, friday_evening, ramadan_iftar]
+      - name: summer
+        kind: boolean
+  hour:
+    fields:
+      - name: hour_key
+        kind: identifier
+  day:
+    fields:
+      - name: day_key
+        kind: identifier
+  month:
+    fields:
+      - name: month_key
+        kind: identifier
+  split:
+    one_of:
+      - fields:
+          - name: area_ids
+            kind: area_ids
+            minimum: 2
+            maximum: 2
+      - fields:
+          - name: "off"
+            kind: boolean
+            const: true
+  set_scenario_inputs:
+    fields:
+      - name: open
+        kind: boolean
+      - name: focus
+        kind: enumeration
+        values: [rent, seats, average_bill, capture_rate, attractiveness]

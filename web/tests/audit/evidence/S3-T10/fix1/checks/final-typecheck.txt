@@ -1,0 +1,4 @@
+
+> [email-shaped-token] typecheck
+> tsc --noEmit
+

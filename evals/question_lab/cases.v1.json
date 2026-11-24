@@ -1,0 +1,2506 @@
+{
+  "version": "question-lab.v1",
+  "counting_unit": "N distinct question identities, each executed in English and Arabic; repetitions and captures never add identities",
+  "cases": [
+    {
+      "identity": "INVENTED-question-flagship-aa",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship aa, polygon selection at invented anchor 1.000001.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship aa\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000001."
+      },
+      "mode": "polygon",
+      "pin": 1.000001,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ab",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ab, distance selection at invented anchor 1.500002.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ab\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500002."
+      },
+      "mode": "distance",
+      "pin": 1.500002,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ac",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ac, walk selection at invented anchor 2.000003.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ac\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000003."
+      },
+      "mode": "walk",
+      "pin": 2.000003,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ad",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ad, drive selection at invented anchor 2.900004.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ad\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900004."
+      },
+      "mode": "drive",
+      "pin": 2.900004,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ae",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ae, polygon selection at invented anchor 1.000005.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ae\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000005."
+      },
+      "mode": "polygon",
+      "pin": 1.000005,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-flagship-af",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship af, distance selection at invented anchor 1.500006.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship af\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500006."
+      },
+      "mode": "distance",
+      "pin": 1.500006,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ag",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ag, walk selection at invented anchor 2.000007.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ag\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000007."
+      },
+      "mode": "walk",
+      "pin": 2.000007,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ah",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ah, drive selection at invented anchor 2.900008.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ah\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900008."
+      },
+      "mode": "drive",
+      "pin": 2.900008,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ai",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ai, polygon selection at invented anchor 1.000009.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ai\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000009."
+      },
+      "mode": "polygon",
+      "pin": 1.000009,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-flagship-aj",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship aj, distance selection at invented anchor 1.50001.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship aj\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500010."
+      },
+      "mode": "distance",
+      "pin": 1.50001,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ak",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ak, walk selection at invented anchor 2.000011.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ak\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000011."
+      },
+      "mode": "walk",
+      "pin": 2.000011,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-flagship-al",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship al, drive selection at invented anchor 2.900012.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship al\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900012."
+      },
+      "mode": "drive",
+      "pin": 2.900012,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-flagship-am",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship am, polygon selection at invented anchor 1.000013.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship am\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000013."
+      },
+      "mode": "polygon",
+      "pin": 1.000013,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-flagship-an",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship an, distance selection at invented anchor 1.500014.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship an\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500014."
+      },
+      "mode": "distance",
+      "pin": 1.500014,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ao",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ao, walk selection at invented anchor 2.000015.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ao\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000015."
+      },
+      "mode": "walk",
+      "pin": 2.000015,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ap",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ap, drive selection at invented anchor 2.900016.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ap\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900016."
+      },
+      "mode": "drive",
+      "pin": 2.900016,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-flagship-aq",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship aq, polygon selection at invented anchor 1.000017.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship aq\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000017."
+      },
+      "mode": "polygon",
+      "pin": 1.000017,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ar",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ar, distance selection at invented anchor 1.500018.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ar\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500018."
+      },
+      "mode": "distance",
+      "pin": 1.500018,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-flagship-as",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship as, walk selection at invented anchor 2.000019.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship as\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000019."
+      },
+      "mode": "walk",
+      "pin": 2.000019,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-flagship-at",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship at, drive selection at invented anchor 2.90002.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship at\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900020."
+      },
+      "mode": "drive",
+      "pin": 2.90002,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-flagship-au",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship au, polygon selection at invented anchor 1.000021.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship au\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000021."
+      },
+      "mode": "polygon",
+      "pin": 1.000021,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-flagship-av",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship av, distance selection at invented anchor 1.500022.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship av\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500022."
+      },
+      "mode": "distance",
+      "pin": 1.500022,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-flagship-aw",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship aw, walk selection at invented anchor 2.000023.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship aw\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000023."
+      },
+      "mode": "walk",
+      "pin": 2.000023,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ax",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ax, drive selection at invented anchor 2.900024.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ax\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900024."
+      },
+      "mode": "drive",
+      "pin": 2.900024,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ay",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ay, polygon selection at invented anchor 1.000025.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ay\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000025."
+      },
+      "mode": "polygon",
+      "pin": 1.000025,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-flagship-az",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship az, distance selection at invented anchor 1.500026.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship az\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500026."
+      },
+      "mode": "distance",
+      "pin": 1.500026,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-flagship-ba",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship ba, walk selection at invented anchor 2.000027.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship ba\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000027."
+      },
+      "mode": "walk",
+      "pin": 2.000027,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-flagship-bb",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship bb, drive selection at invented anchor 2.900028.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship bb\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900028."
+      },
+      "mode": "drive",
+      "pin": 2.900028,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-flagship-bc",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship bc, polygon selection at invented anchor 1.000029.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship bc\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000029."
+      },
+      "mode": "polygon",
+      "pin": 1.000029,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-flagship-bd",
+      "family": "flagship",
+      "questions": {
+        "en": "Show the checked public evidence for invented scenario flagship bd, distance selection at invented anchor 1.50003.",
+        "ar": "عرض الأدلة العامة المدققة للسيناريو المخترع \u2066flagship bd\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500030."
+      },
+      "mode": "distance",
+      "pin": 1.50003,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "evidence",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-map-aa",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map aa, polygon selection at invented anchor 1.000031.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map aa\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000031."
+      },
+      "mode": "polygon",
+      "pin": 1.000031,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-map-ab",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ab, distance selection at invented anchor 1.500032.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ab\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500032."
+      },
+      "mode": "distance",
+      "pin": 1.500032,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-map-ac",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ac, walk selection at invented anchor 2.000033.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ac\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000033."
+      },
+      "mode": "walk",
+      "pin": 2.000033,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-map-ad",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ad, drive selection at invented anchor 2.900034.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ad\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900034."
+      },
+      "mode": "drive",
+      "pin": 2.900034,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-map-ae",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ae, polygon selection at invented anchor 1.000035.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ae\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000035."
+      },
+      "mode": "polygon",
+      "pin": 1.000035,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-map-af",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map af, distance selection at invented anchor 1.500036.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map af\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500036."
+      },
+      "mode": "distance",
+      "pin": 1.500036,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-map-ag",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ag, walk selection at invented anchor 2.000037.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ag\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000037."
+      },
+      "mode": "walk",
+      "pin": 2.000037,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-map-ah",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ah, drive selection at invented anchor 2.900038.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ah\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900038."
+      },
+      "mode": "drive",
+      "pin": 2.900038,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-map-ai",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ai, polygon selection at invented anchor 1.000039.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ai\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000039."
+      },
+      "mode": "polygon",
+      "pin": 1.000039,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-map-aj",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map aj, distance selection at invented anchor 1.50004.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map aj\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500040."
+      },
+      "mode": "distance",
+      "pin": 1.50004,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-map-ak",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ak, walk selection at invented anchor 2.000041.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ak\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000041."
+      },
+      "mode": "walk",
+      "pin": 2.000041,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-map-al",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map al, drive selection at invented anchor 2.900042.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map al\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900042."
+      },
+      "mode": "drive",
+      "pin": 2.900042,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-map-am",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map am, polygon selection at invented anchor 1.000043.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map am\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000043."
+      },
+      "mode": "polygon",
+      "pin": 1.000043,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-map-an",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map an, distance selection at invented anchor 1.500044.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map an\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500044."
+      },
+      "mode": "distance",
+      "pin": 1.500044,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-map-ao",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ao, walk selection at invented anchor 2.000045.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ao\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000045."
+      },
+      "mode": "walk",
+      "pin": 2.000045,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-map-ap",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ap, drive selection at invented anchor 2.900046.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ap\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900046."
+      },
+      "mode": "drive",
+      "pin": 2.900046,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-map-aq",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map aq, polygon selection at invented anchor 1.000047.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map aq\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000047."
+      },
+      "mode": "polygon",
+      "pin": 1.000047,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-map-ar",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ar, distance selection at invented anchor 1.500048.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ar\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500048."
+      },
+      "mode": "distance",
+      "pin": 1.500048,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-map-as",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map as, walk selection at invented anchor 2.000049.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map as\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000049."
+      },
+      "mode": "walk",
+      "pin": 2.000049,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-map-at",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map at, drive selection at invented anchor 2.90005.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map at\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900050."
+      },
+      "mode": "drive",
+      "pin": 2.90005,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-map-au",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map au, polygon selection at invented anchor 1.000051.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map au\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000051."
+      },
+      "mode": "polygon",
+      "pin": 1.000051,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-map-av",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map av, distance selection at invented anchor 1.500052.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map av\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500052."
+      },
+      "mode": "distance",
+      "pin": 1.500052,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-map-aw",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map aw, walk selection at invented anchor 2.000053.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map aw\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000053."
+      },
+      "mode": "walk",
+      "pin": 2.000053,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-map-ax",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ax, drive selection at invented anchor 2.900054.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ax\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900054."
+      },
+      "mode": "drive",
+      "pin": 2.900054,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-map-ay",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ay, polygon selection at invented anchor 1.000055.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ay\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000055."
+      },
+      "mode": "polygon",
+      "pin": 1.000055,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-map-az",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map az, distance selection at invented anchor 1.500056.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map az\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500056."
+      },
+      "mode": "distance",
+      "pin": 1.500056,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-map-ba",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map ba, walk selection at invented anchor 2.000057.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map ba\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000057."
+      },
+      "mode": "walk",
+      "pin": 2.000057,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "map",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-map-bb",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map bb, drive selection at invented anchor 2.900058.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map bb\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900058."
+      },
+      "mode": "drive",
+      "pin": 2.900058,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-map-bc",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map bc, polygon selection at invented anchor 1.000059.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map bc\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000059."
+      },
+      "mode": "polygon",
+      "pin": 1.000059,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-map-bd",
+      "family": "map",
+      "questions": {
+        "en": "Keep the selected map shape and evidence for invented scenario map bd, distance selection at invented anchor 1.50006.",
+        "ar": "إبقاء الشكل المحدد على الخريطة وأدلته للسيناريو المخترع \u2066map bd\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500060."
+      },
+      "mode": "distance",
+      "pin": 1.50006,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "map",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-chip-aa",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip aa, polygon selection at invented anchor 1.000061.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip aa\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000061."
+      },
+      "mode": "polygon",
+      "pin": 1.000061,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-chip-ab",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ab, distance selection at invented anchor 1.500062.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ab\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500062."
+      },
+      "mode": "distance",
+      "pin": 1.500062,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-chip-ac",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ac, walk selection at invented anchor 2.000063.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ac\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000063."
+      },
+      "mode": "walk",
+      "pin": 2.000063,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-chip-ad",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ad, drive selection at invented anchor 2.900064.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ad\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900064."
+      },
+      "mode": "drive",
+      "pin": 2.900064,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-chip-ae",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ae, polygon selection at invented anchor 1.000065.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ae\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000065."
+      },
+      "mode": "polygon",
+      "pin": 1.000065,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-chip-af",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip af, distance selection at invented anchor 1.500066.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip af\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500066."
+      },
+      "mode": "distance",
+      "pin": 1.500066,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-chip-ag",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ag, walk selection at invented anchor 2.000067.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ag\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000067."
+      },
+      "mode": "walk",
+      "pin": 2.000067,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-chip-ah",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ah, drive selection at invented anchor 2.900068.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ah\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900068."
+      },
+      "mode": "drive",
+      "pin": 2.900068,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-chip-ai",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ai, polygon selection at invented anchor 1.000069.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ai\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000069."
+      },
+      "mode": "polygon",
+      "pin": 1.000069,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-chip-aj",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip aj, distance selection at invented anchor 1.50007.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip aj\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500070."
+      },
+      "mode": "distance",
+      "pin": 1.50007,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-chip-ak",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ak, walk selection at invented anchor 2.000071.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ak\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000071."
+      },
+      "mode": "walk",
+      "pin": 2.000071,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-chip-al",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip al, drive selection at invented anchor 2.900072.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip al\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900072."
+      },
+      "mode": "drive",
+      "pin": 2.900072,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-chip-am",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip am, polygon selection at invented anchor 1.000073.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip am\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000073."
+      },
+      "mode": "polygon",
+      "pin": 1.000073,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-chip-an",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip an, distance selection at invented anchor 1.500074.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip an\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500074."
+      },
+      "mode": "distance",
+      "pin": 1.500074,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-chip-ao",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ao, walk selection at invented anchor 2.000075.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ao\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000075."
+      },
+      "mode": "walk",
+      "pin": 2.000075,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-chip-ap",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ap, drive selection at invented anchor 2.900076.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ap\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900076."
+      },
+      "mode": "drive",
+      "pin": 2.900076,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-chip-aq",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip aq, polygon selection at invented anchor 1.000077.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip aq\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000077."
+      },
+      "mode": "polygon",
+      "pin": 1.000077,
+      "month": "2026-03",
+      "expected_value": 4,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-chip-ar",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip ar, distance selection at invented anchor 1.500078.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip ar\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500078."
+      },
+      "mode": "distance",
+      "pin": 1.500078,
+      "month": "2026-03",
+      "expected_value": 7,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "source",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-chip-as",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip as, walk selection at invented anchor 2.000079.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip as\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000079."
+      },
+      "mode": "walk",
+      "pin": 2.000079,
+      "month": "2026-03",
+      "expected_value": 10,
+      "refusal": null,
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-chip-at",
+      "family": "chip",
+      "questions": {
+        "en": "Open the source of the displayed fact for invented scenario chip at, drive selection at invented anchor 2.90008.",
+        "ar": "فتح مصدر المعلومة المعروضة للسيناريو المخترع \u2066chip at\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900080."
+      },
+      "mode": "drive",
+      "pin": 2.90008,
+      "month": "2026-03",
+      "expected_value": 5,
+      "refusal": null,
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "source",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-refusal-aa",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal aa, polygon selection at invented anchor 1.000081.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal aa\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000081."
+      },
+      "mode": "polygon",
+      "pin": 1.000081,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "missing_layer",
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ab",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ab, distance selection at invented anchor 1.500082.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ab\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500082."
+      },
+      "mode": "distance",
+      "pin": 1.500082,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unknown_tool",
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ac",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ac, walk selection at invented anchor 2.000083.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ac\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000083."
+      },
+      "mode": "walk",
+      "pin": 2.000083,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "invalid_property",
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ad",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ad, drive selection at invented anchor 2.900084.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ad\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900084."
+      },
+      "mode": "drive",
+      "pin": 2.900084,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unlisted_venue",
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ae",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ae, polygon selection at invented anchor 1.000085.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ae\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000085."
+      },
+      "mode": "polygon",
+      "pin": 1.000085,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "missing_layer",
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-refusal-af",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal af, distance selection at invented anchor 1.500086.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal af\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500086."
+      },
+      "mode": "distance",
+      "pin": 1.500086,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unknown_tool",
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ag",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ag, walk selection at invented anchor 2.000087.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ag\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000087."
+      },
+      "mode": "walk",
+      "pin": 2.000087,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "invalid_property",
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ah",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ah, drive selection at invented anchor 2.900088.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ah\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900088."
+      },
+      "mode": "drive",
+      "pin": 2.900088,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unlisted_venue",
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ai",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ai, polygon selection at invented anchor 1.000089.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ai\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000089."
+      },
+      "mode": "polygon",
+      "pin": 1.000089,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "missing_layer",
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-refusal-aj",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal aj, distance selection at invented anchor 1.50009.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal aj\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500090."
+      },
+      "mode": "distance",
+      "pin": 1.50009,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unknown_tool",
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ak",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ak, walk selection at invented anchor 2.000091.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ak\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000091."
+      },
+      "mode": "walk",
+      "pin": 2.000091,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "invalid_property",
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-refusal-al",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal al, drive selection at invented anchor 2.900092.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal al\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900092."
+      },
+      "mode": "drive",
+      "pin": 2.900092,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unlisted_venue",
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-refusal-am",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal am, polygon selection at invented anchor 1.000093.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal am\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000093."
+      },
+      "mode": "polygon",
+      "pin": 1.000093,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "missing_layer",
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-refusal-an",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal an, distance selection at invented anchor 1.500094.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal an\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500094."
+      },
+      "mode": "distance",
+      "pin": 1.500094,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unknown_tool",
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekday",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ao",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ao, walk selection at invented anchor 2.000095.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ao\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000095."
+      },
+      "mode": "walk",
+      "pin": 2.000095,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "invalid_property",
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "clarify",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ap",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ap, drive selection at invented anchor 2.900096.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ap\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900096."
+      },
+      "mode": "drive",
+      "pin": 2.900096,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unlisted_venue",
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "clarify",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekend",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    },
+    {
+      "identity": "INVENTED-question-refusal-aq",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal aq, polygon selection at invented anchor 1.000097.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal aq\u2069 مع اختيار مضلع عند نقطة الارتكاز المخترعة 1.000097."
+      },
+      "mode": "polygon",
+      "pin": 1.000097,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "missing_layer",
+      "angles": {
+        "activity": "craft",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "single"
+      },
+      "expected_anchor_cell": "619055948017172479"
+    },
+    {
+      "identity": "INVENTED-question-refusal-ar",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal ar, distance selection at invented anchor 1.500098.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal ar\u2069 مع اختيار مسافة عند نقطة الارتكاز المخترعة 1.500098."
+      },
+      "mode": "distance",
+      "pin": 1.500098,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unknown_tool",
+      "angles": {
+        "activity": "repair",
+        "place": "garden",
+        "intent": "decline",
+        "persona": "analyst",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "morning",
+        "day": "weekend",
+        "conversation": "clarification"
+      },
+      "expected_anchor_cell": "619058741356527615"
+    },
+    {
+      "identity": "INVENTED-question-refusal-as",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal as, walk selection at invented anchor 2.000099.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal as\u2069 مع اختيار نطاق المشي عند نقطة الارتكاز المخترعة 2.000099."
+      },
+      "mode": "walk",
+      "pin": 2.000099,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "invalid_property",
+      "angles": {
+        "activity": "craft",
+        "place": "square",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "stage",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "interrupt"
+      },
+      "expected_anchor_cell": "619059012610555903"
+    },
+    {
+      "identity": "INVENTED-question-refusal-at",
+      "family": "refusal",
+      "questions": {
+        "en": "Show the unavailable-input reason for invented scenario refusal at, drive selection at invented anchor 2.9001.",
+        "ar": "عرض سبب تعذر توفر المدخلات للسيناريو المخترع \u2066refusal at\u2069 مع اختيار نطاق القيادة عند نقطة الارتكاز المخترعة 2.900100."
+      },
+      "mode": "drive",
+      "pin": 2.9001,
+      "month": "2026-03",
+      "expected_value": null,
+      "refusal": "unlisted_venue",
+      "angles": {
+        "activity": "repair",
+        "place": "square",
+        "intent": "decline",
+        "persona": "founder",
+        "phrasing": "direct",
+        "device": "phone",
+        "hour": "evening",
+        "day": "weekday",
+        "conversation": "reset"
+      },
+      "expected_anchor_cell": "619058101044903935"
+    }
+  ]
+}

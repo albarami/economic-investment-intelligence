@@ -940,7 +940,9 @@ def _start(
             command = supervisor_command(control, passed, argv)
             process = subprocess.Popen(
                 command,
-                env={},
+                # ctypes startup otherwise asks NSS for a home directory.
+                # Use the fixed sandbox home, never the caller's environment.
+                env={"HOME": tables.SANDBOX_HOME},
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,

@@ -2,7 +2,7 @@
 
 Each result is None or Refusal("BREAKDOWN", path), written from the rules.
 Outside BREAKDOWNS is refused. "none" is allowed. sex and nationality are
-allowed only for public alone on municipality, national or sector, and on
+allowed only for public alone on district, municipality, national or sector, and on
 area when the breakdown is sex and the metric is the population grid.
 age_band, gender and nationality_group are allowed only on area with
 simulated alone.
@@ -238,6 +238,60 @@ _TABLE: tuple[_Row, ...] = (
     ("register_company", "SEX", ("simulated",), _OTHER, _R),
     ("register_company", "SEX", ("public", "simulated"), _GRID, _R),
     ("register_company", "SEX", ("public", "simulated"), _OTHER, _R),
+    ("district", "sex", ("public",), _GRID, None),
+    ("district", "sex", ("public",), _OTHER, None),
+    ("district", "sex", ("simulated",), _GRID, _R),
+    ("district", "sex", ("simulated",), _OTHER, _R),
+    ("district", "sex", ("public", "simulated"), _GRID, _R),
+    ("district", "sex", ("public", "simulated"), _OTHER, _R),
+    ("district", "nationality", ("public",), _GRID, None),
+    ("district", "nationality", ("public",), _OTHER, None),
+    ("district", "nationality", ("simulated",), _GRID, _R),
+    ("district", "nationality", ("simulated",), _OTHER, _R),
+    ("district", "nationality", ("public", "simulated"), _GRID, _R),
+    ("district", "nationality", ("public", "simulated"), _OTHER, _R),
+    ("district", "age_band", ("public",), _GRID, _R),
+    ("district", "age_band", ("public",), _OTHER, _R),
+    ("district", "age_band", ("simulated",), _GRID, _R),
+    ("district", "age_band", ("simulated",), _OTHER, _R),
+    ("district", "age_band", ("public", "simulated"), _GRID, _R),
+    ("district", "age_band", ("public", "simulated"), _OTHER, _R),
+    ("district", "gender", ("public",), _GRID, _R),
+    ("district", "gender", ("public",), _OTHER, _R),
+    ("district", "gender", ("simulated",), _GRID, _R),
+    ("district", "gender", ("simulated",), _OTHER, _R),
+    ("district", "gender", ("public", "simulated"), _GRID, _R),
+    ("district", "gender", ("public", "simulated"), _OTHER, _R),
+    ("district", "nationality_group", ("public",), _GRID, _R),
+    ("district", "nationality_group", ("public",), _OTHER, _R),
+    ("district", "nationality_group", ("simulated",), _GRID, _R),
+    ("district", "nationality_group", ("simulated",), _OTHER, _R),
+    ("district", "nationality_group", ("public", "simulated"), _GRID, _R),
+    ("district", "nationality_group", ("public", "simulated"), _OTHER, _R),
+    ("district", "none", ("public",), _GRID, None),
+    ("district", "none", ("public",), _OTHER, None),
+    ("district", "none", ("simulated",), _GRID, None),
+    ("district", "none", ("simulated",), _OTHER, None),
+    ("district", "none", ("public", "simulated"), _GRID, None),
+    ("district", "none", ("public", "simulated"), _OTHER, None),
+    ("district", "widget", ("public",), _GRID, _R),
+    ("district", "widget", ("public",), _OTHER, _R),
+    ("district", "widget", ("simulated",), _GRID, _R),
+    ("district", "widget", ("simulated",), _OTHER, _R),
+    ("district", "widget", ("public", "simulated"), _GRID, _R),
+    ("district", "widget", ("public", "simulated"), _OTHER, _R),
+    ("district", "age", ("public",), _GRID, _R),
+    ("district", "age", ("public",), _OTHER, _R),
+    ("district", "age", ("simulated",), _GRID, _R),
+    ("district", "age", ("simulated",), _OTHER, _R),
+    ("district", "age", ("public", "simulated"), _GRID, _R),
+    ("district", "age", ("public", "simulated"), _OTHER, _R),
+    ("district", "SEX", ("public",), _GRID, _R),
+    ("district", "SEX", ("public",), _OTHER, _R),
+    ("district", "SEX", ("simulated",), _GRID, _R),
+    ("district", "SEX", ("simulated",), _OTHER, _R),
+    ("district", "SEX", ("public", "simulated"), _GRID, _R),
+    ("district", "SEX", ("public", "simulated"), _OTHER, _R),
     ("municipality", "sex", ("public",), _GRID, None),
     ("municipality", "sex", ("public",), _OTHER, None),
     ("municipality", "sex", ("simulated",), _GRID, _R),
@@ -464,6 +518,17 @@ def test_breakdown_table_is_the_ruled_cross_product() -> None:
     provenances = {row[2] for row in _TABLE}
     metrics = {row[3] for row in _TABLE}
     keys = {(row[0], row[1], row[2], row[3]) for row in _TABLE}
+    assert subjects == {
+        "area",
+        "place_public",
+        "fdi_project",
+        "register_company",
+        "district",
+        "municipality",
+        "sector",
+        "national",
+        "scenario",
+    }
     assert subjects == SUBJECTS
     assert breakdowns >= BREAKDOWNS
     assert breakdowns - BREAKDOWNS == {"widget", "age", "SEX"}
@@ -473,8 +538,8 @@ def test_breakdown_table_is_the_ruled_cross_product() -> None:
     assert len(_TABLE) == (
         len(subjects) * len(breakdowns) * len(provenances) * len(metrics)
     )
-    assert [row[4] for row in _TABLE].count(None) == 67
-    assert [row[4] for row in _TABLE].count(_R) == 365
+    assert [row[4] for row in _TABLE].count(None) == 77
+    assert [row[4] for row in _TABLE].count(_R) == 409
 
 
 @pytest.mark.parametrize(

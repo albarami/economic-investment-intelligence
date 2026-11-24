@@ -1,0 +1,37 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/unit/opening-area.test.ts (4 tests | 1 failed) 6ms
+   × a late area answer cannot remember an escaped selection before the next accepted area 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/opening-area.test.ts > a late area answer cannot remember an escaped selection before the next accepted area
+AssertionError: expected { place_key: 'INVENTED-place-a', …(2) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "cutoff": 5,
+  "mode": "walk",
+  "place_key": "INVENTED-place-a",
+}
+
+ ❯ tests/unit/opening-area.test.ts:142:33
+    140|   finish(accepted());
+    141|   await pendingA;
+    142|   expect(selectedAreaRequest()).toBeNull();
+       |                                 ^
+    143|   // Submissions are serialized by the existing lock: B is accepted af…
+    144|   registerFetch(async () => accepted());
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  12:10:39
+   Duration  117ms (transform 63%, import 25%, tests 9%, worker 3%)
+

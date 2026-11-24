@@ -1,0 +1,911 @@
+{
+  "version": "question-lab.guards.v1",
+  "guards": [
+    {
+      "guard": "invented_figure",
+      "plant": "change a valid value while retaining identity and chain",
+      "diagnostic": "accuracy:value",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_accuracy_independent_expected_value_identity_and_chain_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "valid_identity_swap",
+      "plant": "swap independently expected fact identity",
+      "diagnostic": "accuracy:fact_id",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_accuracy_independent_expected_value_identity_and_chain_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "source_chain",
+      "plant": "remove a required source-chain link",
+      "diagnostic": "accuracy:chain",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_accuracy_independent_expected_value_identity_and_chain_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "closed_property",
+      "plant": "add an unknown prose property",
+      "diagnostic": "accuracy:property",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_accuracy_independent_expected_value_identity_and_chain_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "wrong_map_target",
+      "plant": "swap target identity",
+      "diagnostic": "map:target",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_wrong_target_and_applied_camera_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "applied_camera",
+      "plant": "change only applied camera coordinates",
+      "diagnostic": "map:camera",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_wrong_target_and_applied_camera_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "exact_shape",
+      "plant": "change outline coordinates",
+      "diagnostic": "map:outline",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_wrong_target_and_applied_camera_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "map_pins",
+      "plant": "remove an expected pin",
+      "diagnostic": "map:pins",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_wrong_target_and_applied_camera_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "hero_layer",
+      "plant": "substitute a disallowed layer",
+      "diagnostic": "map:layer",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_wrong_target_and_applied_camera_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "hidden_count",
+      "plant": "place withheld sentinel in JSON, text or an attribute",
+      "diagnostic": "disclosure:sentinel",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_hidden_count_json_dom_attribute_and_differencing_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "differencing",
+      "plant": "total minus published component reveals sentinel",
+      "diagnostic": "disclosure:difference",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_hidden_count_json_dom_attribute_and_differencing_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "suppressed_zero",
+      "plant": "replace suppressed value with zero",
+      "diagnostic": "disclosure:suppressed_value",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_hidden_count_json_dom_attribute_and_differencing_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "event_clock",
+      "plant": "make event time decrease",
+      "diagnostic": "smoothness:clock",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_monotonic_accounted_map_first_and_reset_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "accounting_order",
+      "plant": "remove accounting before brief",
+      "diagnostic": "smoothness:accounting",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_monotonic_accounted_map_first_and_reset_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "map_first",
+      "plant": "show chip before map action",
+      "diagnostic": "smoothness:map_first",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_monotonic_accounted_map_first_and_reset_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "late_reset_repaint",
+      "plant": "late brief after reset",
+      "diagnostic": "smoothness:late_repaint",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_monotonic_accounted_map_first_and_reset_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "interactions",
+      "plant": "exceed the prior interaction budget",
+      "diagnostic": "value:actions",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_value_presence_and_interaction_budget_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "value_presence",
+      "plant": "remove each required value component",
+      "diagnostic": "value:",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_value_presence_and_interaction_budget_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "card_parity",
+      "plant": "change a paired semantic field",
+      "diagnostic": "parity:",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_card_parity_exact_catalogue_and_identity_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "held_out_identity",
+      "plant": "author can read the canary file",
+      "diagnostic": "seal:author_readable",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_seal_is_actual_denied_author_read_not_a_label",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "held_out_missing",
+      "plant": "missing file presented as read denial",
+      "diagnostic": "seal:missing",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_seal_is_actual_denied_author_read_not_a_label",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "held_out_exposure",
+      "plant": "copy canary into author gallery",
+      "diagnostic": "seal:exposed",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_sealed_canary_in_the_author_gallery_is_a_failed_boundary",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "sample_domain",
+      "plant": "empty, negative or nonfinite timing samples",
+      "diagnostic": "timing_samples",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_nearest_rank_percentiles_never_drop_bad_samples",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "budget_identity",
+      "plant": "alter budget bytes after lock",
+      "diagnostic": "budget:changed_since_commit",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_pre_run_budget_commit_and_unchanged_bytes_plants",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "budget_history",
+      "plant": "loosen a stricter committed limit",
+      "diagnostic": "budget:loosened_after_run",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_no_later_commit_or_ledger_rewrite_cures_a_failed_run",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "ledger_immutability",
+      "plant": "rewrite or remove a committed row",
+      "diagnostic": "ledger:committed_prefix_changed",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_no_later_commit_or_ledger_rewrite_cures_a_failed_run",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "ledger_chain",
+      "plant": "duplicate a prior ledger row",
+      "diagnostic": "ledger:chain",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_no_later_commit_or_ledger_rewrite_cures_a_failed_run",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "missing_packet",
+      "plant": "omit a result or capture",
+      "diagnostic": "packet:",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_packet_missing_capture_and_result_fail_closed",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "gallery_seal",
+      "plant": "include sealed capture in author gallery",
+      "diagnostic": "gallery_sealed",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_packet_missing_capture_and_result_fail_closed",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "gallery_path",
+      "plant": "external URI, encoded traversal, absolute path or backslash",
+      "diagnostic": "capture_path",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_capture_path_cannot_become_a_gallery_egress_or_escape",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "socket_egress",
+      "plant": "caught non-loopback connect or resolver attempt",
+      "diagnostic": "non_loopback_attempt",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_loopback_denies_caught_egress_and_strips_credentials",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "udp_egress",
+      "plant": "non-loopback datagram with transport stub",
+      "diagnostic": "non_loopback_attempt",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_udp_egress_is_denied_before_the_transport_is_called",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "vectored_egress",
+      "plant": "non-loopback vectored datagram with transport stub",
+      "diagnostic": "non_loopback_attempt",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_vectored_egress_is_denied_before_the_transport_is_called",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "question_capacity",
+      "plant": "request insufficient or repeated identities",
+      "diagnostic": "question_capacity",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_distinct_identities_have_both_languages_and_closed_angles",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "closed_parser",
+      "plant": "duplicate, unknown or malformed command argument",
+      "diagnostic": "usage exit 2",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_closed_parser_does_not_start_for_malformed_or_duplicate_flags",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "receipt_booleans",
+      "plant": "replace each required accounting boolean",
+      "diagnostic": "accuracy:accounting",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_receipt_checks_are_five_booleans_with_separate_metadata",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_map_visible",
+      "plant": "set map_visible observation false",
+      "diagnostic": "visual:map_visible",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_answer_visible",
+      "plant": "set answer_visible observation false",
+      "diagnostic": "visual:answer_visible",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_no_overflow",
+      "plant": "set no_overflow observation false",
+      "diagnostic": "visual:no_overflow",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_no_clipping",
+      "plant": "set no_clipping observation false",
+      "diagnostic": "visual:no_clipping",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_contrast",
+      "plant": "set contrast observation false",
+      "diagnostic": "visual:contrast",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_targets",
+      "plant": "set targets observation false",
+      "diagnostic": "visual:targets",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_fonts",
+      "plant": "set fonts observation false",
+      "diagnostic": "visual:fonts",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_focus",
+      "plant": "set focus observation false",
+      "diagnostic": "visual:focus",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_legend",
+      "plant": "set legend observation false",
+      "diagnostic": "visual:legend",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_land",
+      "plant": "set land observation false",
+      "diagnostic": "visual:land",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_bottom_sheet",
+      "plant": "set bottom_sheet observation false",
+      "diagnostic": "visual:bottom_sheet",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_safe_margins",
+      "plant": "set safe_margins observation false",
+      "diagnostic": "visual:safe_margins",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_presenter_type",
+      "plant": "set presenter_type observation false",
+      "diagnostic": "visual:presenter_type",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_pixel_baseline",
+      "plant": "set pixel_baseline observation false",
+      "diagnostic": "visual:pixel_baseline",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_pixel_match",
+      "plant": "set pixel_match observation false",
+      "diagnostic": "visual:pixel_match",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_unmirrored_map",
+      "plant": "set unmirrored_map observation false",
+      "diagnostic": "visual:unmirrored_map",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_numeric_isolates",
+      "plant": "set numeric_isolates observation false",
+      "diagnostic": "visual:numeric_isolates",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "visual_reading_order",
+      "plant": "set reading_order observation false",
+      "diagnostic": "visual:reading_order",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_visual_fixture_every_proxy_has_a_plant",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "english_only_arabic_card",
+      "plant": "replace Arabic caveat with English while preserving keys",
+      "diagnostic": "uncatalogued-text",
+      "test_file": "web/tests/component/question-lab-parity.test.tsx",
+      "test_name": "exact bilingual card and evidence-depth parity",
+      "scope": "rendered_component_fixture"
+    },
+    {
+      "guard": "model_string",
+      "plant": "insert uncatalogued digit-free rendered text",
+      "diagnostic": "uncatalogued-text",
+      "test_file": "web/tests/component/question-lab-parity.test.tsx",
+      "test_name": "lab rejects model text",
+      "scope": "rendered_component_fixture"
+    },
+    {
+      "guard": "raw_numeral",
+      "plant": "insert raw numeral outside chip",
+      "diagnostic": "loose-numeral",
+      "test_file": "web/tests/component/question-lab-parity.test.tsx",
+      "test_name": "lab rejects model text",
+      "scope": "rendered_component_fixture"
+    },
+    {
+      "guard": "pixel_approval",
+      "plant": "missing, unapproved, local, changed, linked or escaping baseline",
+      "diagnostic": "pixel:",
+      "test_file": "web/tests/node/question-lab.node-test.mjs",
+      "test_name": "pixel gate fails missing",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "native_software",
+      "plant": "software",
+      "diagnostic": "timing:non_native",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_device",
+      "plant": "device",
+      "diagnostic": "timing:device",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_lock",
+      "plant": "lock",
+      "diagnostic": "timing:prior_lock",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_hash",
+      "plant": "hash",
+      "diagnostic": "timing:budget_identity",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_warmup_failure",
+      "plant": "warmup_failure",
+      "diagnostic": "timing:accounting",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_short",
+      "plant": "short",
+      "diagnostic": "timing:evidence_sample_count",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_late_warmup",
+      "plant": "late_warmup",
+      "diagnostic": "timing:warmup_order",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_shift",
+      "plant": "shift",
+      "diagnostic": "timing:layout_shift",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_bound",
+      "plant": "bound",
+      "diagnostic": "timing:map_p95",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_worst",
+      "plant": "worst",
+      "diagnostic": "timing:map_worst",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_missing",
+      "plant": "missing",
+      "diagnostic": "timing:missing_chip",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_duplicate",
+      "plant": "duplicate",
+      "diagnostic": "timing:duplicate_request",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_native_protocol_plants_fail_intended_guard",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "loaded_api_figure",
+      "plant": "figure",
+      "diagnostic": "accuracy:value",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_identity",
+      "plant": "exchange two valid emitted fact identities",
+      "diagnostic": "accuracy:fact_id",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_chain",
+      "plant": "chain",
+      "diagnostic": "accuracy:chain",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_map",
+      "plant": "substitute a second valid registered area target",
+      "diagnostic": "map:directive_target",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_accounting",
+      "plant": "accounting",
+      "diagnostic": "accuracy:accounting",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_model",
+      "plant": "model",
+      "diagnostic": "accuracy:writer",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "budget_scalar_domain",
+      "plant": "Boolean, NaN or infinite limit",
+      "diagnostic": "budget:raised_or_invalid_limit",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_budget_cannot_hide_a_limit_with_bool_or_nonfinite_numbers",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "actual_execution_coverage",
+      "plant": "planned case with only one language and no UI captures",
+      "diagnostic": "complete_bilingual_identities remains zero",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_execution_grid_does_not_credit_a_planned_case_or_an_absent_ui_capture",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "geocoding_target",
+      "plant": "replace resolved place key with a second valid place key",
+      "diagnostic": "map:geocoding_target",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "missing_stream_event",
+      "plant": "remove each required event",
+      "diagnostic": "smoothness:missing_",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_missing_event_is_uncovered_not_a_smoothness_pass",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "frozen_clock",
+      "plant": "unfixed constructor or invalid fixture clock",
+      "diagnostic": "fixture_clock or unequal constructor timestamp",
+      "test_file": "web/tests/unit/question-lab-clock.test.ts",
+      "test_name": "pins both Date.now and a new Date",
+      "scope": "clock_fixture_not_native_timing"
+    },
+    {
+      "guard": "loaded_api_refusal_facts",
+      "plant": "refusal_facts",
+      "diagnostic": "accuracy:refusal",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_refusal_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_refusal_status",
+      "plant": "refusal_status",
+      "diagnostic": "accuracy:refusal",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_refusal_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_area_identity",
+      "plant": "area_identity",
+      "diagnostic": "map:area_identity",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_outline",
+      "plant": "outline",
+      "diagnostic": "map:outline",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_caveat",
+      "plant": "caveat",
+      "diagnostic": "accuracy:caveat",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_evidence_status",
+      "plant": "evidence_status",
+      "diagnostic": "accuracy:public_only",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_fact_property",
+      "plant": "fact_property",
+      "diagnostic": "accuracy:property",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_fact_missing",
+      "plant": "fact_missing",
+      "diagnostic": "accuracy:fact_missing",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_stream_error",
+      "plant": "stream_error",
+      "diagnostic": "accuracy:stream",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_receipt_after_narrative",
+      "plant": "receipt_after_narrative",
+      "diagnostic": "accuracy:accounting_order",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "loaded_api_geocode_outline",
+      "plant": "geocode_outline",
+      "diagnostic": "map:geocoding_outline",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "runner_budget",
+      "plant": "budget",
+      "diagnostic": "budget:changed_during_run",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_runner_aggregates_planted_failures",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_input",
+      "plant": "input",
+      "diagnostic": "inputs:changed_during_run",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_runner_aggregates_planted_failures",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_provider",
+      "plant": "provider",
+      "diagnostic": "provider_attempt",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_runner_aggregates_planted_failures",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_typed",
+      "plant": "typed",
+      "diagnostic": "oracle:typed_case_failed",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_runner_aggregates_planted_failures",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_plant",
+      "plant": "plant",
+      "diagnostic": "plants:intended_guard_failed",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_runner_aggregates_planted_failures",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_ledger_prefix",
+      "plant": "edit a committed ledger line",
+      "diagnostic": "ledger_changed",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_runner_refuses_edited_committed_ledger_before_output",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_output_path",
+      "plant": "symlink the runs directory",
+      "diagnostic": "output_path",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_runner_refuses_linked_output_before_writing",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_budget_history",
+      "plant": "commit a higher p95 after a stricter revision",
+      "diagnostic": "budget:loosened_after_run",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_locked_budget_walks_committed_history",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_malformed_budget",
+      "plant": "replace a limit object by a scalar",
+      "diagnostic": "budget:raised_or_invalid_limit",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_malformed_budget_refuses_without_orphan_folder",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_git_unavailable",
+      "plant": "make git_text return None",
+      "diagnostic": "git_unavailable",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_git_unavailable_refuses_before_output",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_git_status_unknown",
+      "plant": "make git status unavailable",
+      "diagnostic": "head:working_tree_unknown",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_unknown_working_tree_status_never_silently_passes",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "runner_client_hash",
+      "plant": "remove the imported HTTP support input hash",
+      "diagnostic": "missing input hash",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_runner_control_binds_inputs_and_keeps_qualification_incomplete",
+      "scope": "temporary_git_repository_with_standins"
+    },
+    {
+      "guard": "native_undeclared_hardware",
+      "plant": "null hardware and unchanged unratified budget",
+      "diagnostic": "timing:device",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_unratified_budget_and_null_hardware_cannot_qualify",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_ratification",
+      "plant": "unchanged unratified budget",
+      "diagnostic": "timing:ratification",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_unratified_budget_and_null_hardware_cannot_qualify",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_group_fields",
+      "plant": "remove phase, language or temperature",
+      "diagnostic": "timing:group or timing:phase",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_missing_trace_group_field_is_a_named_refusal",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "native_sample_shape",
+      "plant": "replace sample list with scalar or mapping",
+      "diagnostic": "timing:invalid_samples",
+      "test_file": "scripts/tests/test_question_lab_timing.py",
+      "test_name": "test_non_list_metric_samples_are_a_named_refusal",
+      "scope": "invented_trace_fixture_not_device_evidence"
+    },
+    {
+      "guard": "arabic_question_isolates",
+      "plant": "Latin runs outside isolates or wrong family wording",
+      "diagnostic": "Latin runs require LTR isolates",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_arabic_questions_use_isolated_identifiers_and_reviewed_family_forms",
+      "scope": "question_manifest_not_native_approval"
+    },
+    {
+      "guard": "typed_judgement_prefix",
+      "plant": "attribute a map failure to accuracy",
+      "diagnostic": "map judgement failed and accuracy typed-only pass",
+      "test_file": "scripts/tests/test_question_lab_api.py",
+      "test_name": "test_actual_loaded_path_controls_and_plants",
+      "scope": "actual_loaded_invented_API_with_wire_corruption"
+    },
+    {
+      "guard": "budget_object_shape",
+      "plant": "replace each selected limit by a non-object",
+      "diagnostic": "budget:raised_or_invalid_limit",
+      "test_file": "scripts/tests/test_question_lab.py",
+      "test_name": "test_non_dict_budget_limit_is_a_named_refusal",
+      "scope": "deterministic_fixture"
+    },
+    {
+      "guard": "runner_git_executable",
+      "plant": "raise FileNotFoundError before git starts",
+      "diagnostic": "git_text returns None",
+      "test_file": "scripts/tests/test_question_lab_runner.py",
+      "test_name": "test_missing_git_executable_is_unavailable",
+      "scope": "offline_subprocess_standin"
+    }
+  ],
+  "external_gates": {
+    "held_out_identity": "waiting",
+    "native_stage": "waiting",
+    "native_phone": "waiting",
+    "CI_pixels": "waiting",
+    "independent_maker": "waiting",
+    "native_arabic": "waiting",
+    "owner_gallery": "waiting"
+  },
+  "rule": "A fixture result never substitutes for its external gate. Red process exits and green process exits are recorded separately in the return report."
+}

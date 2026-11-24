@@ -24,6 +24,7 @@ usage() {
     'build-release' \
     'load-release' \
     'freeze' \
+    'question-lab run --n N --seed S' \
     "CDSE backup boundary: possession of both CDSE values, held only by the lead's wrapper." >&2
   exit 2
 }
@@ -34,7 +35,7 @@ fi
 
 word=$1
 case "$word" in
-  preflight|db-up|db-down|up|down|build-public|build-world|build-release|load-release|freeze|test)
+  preflight|db-up|db-down|up|down|build-public|build-world|build-release|load-release|freeze|test|question-lab)
     ;;
   *)
     usage
@@ -55,7 +56,14 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 if [ "$word" = "test" ]; then
-  exec uv run --locked python -I scripts/run_tests.py "$@"
+  exec uv run --locked --offline --all-packages --group engine --quiet python -I scripts/run_tests.py "$@"
 fi
 
-exec uv run --locked python -I scripts/commands/main.py "$word" "$@"
+case "$word" in
+  build-public|build-world|build-release)
+    exec uv run --locked --offline --package eii-custodian --group engine --quiet python -I scripts/commands/main.py "$word" "$@"
+    ;;
+  *)
+    exec uv run --locked --offline --package eii-product --quiet python -I scripts/commands/main.py "$word" "$@"
+    ;;
+esac

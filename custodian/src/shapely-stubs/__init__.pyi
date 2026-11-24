@@ -3,3 +3,6 @@ from .geometry import Point
 from .geometry.base import BaseGeometry
 
 def point_on_surface(geometry: BaseGeometry) -> Point: ...
+
+# Scalar WKB read used by the fixed Public layer reader.
+def from_wkb(geometry: bytes) -> BaseGeometry: ...

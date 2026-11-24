@@ -131,6 +131,63 @@ jobs:
         run: ./eii test --seed 2026111201 --suite "$SUITE"
         env:
           SUITE: ${{ matrix.suite }}
+      - name: Start the database service
+        if: ${{ matrix.suite == 'python-guards' }}
+        run: |
+          set -euo pipefail
+          umask 077
+          install -m 600 /dev/null "$RUNNER_TEMP/pg-super"
+          openssl rand -hex 24 > "$RUNNER_TEMP/pg-super"
+          echo "::add-mask::$(cat "$RUNNER_TEMP/pg-super")"
+          docker run --detach --name eii-ci-db \
+            --publish 127.0.0.1:55440:5432 \
+            --env POSTGRES_PASSWORD_FILE=/run/secrets/pg-super \
+            --volume "$RUNNER_TEMP/pg-super:/run/secrets/pg-super:ro" \
+            postgis/postgis@sha256:4a43e3c3e5d55b9208240fc71db543b79c638766280c625a425bd0a2390989c4
+          ready=0
+          for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
+            if docker exec eii-ci-db pg_isready -h 127.0.0.1 -p 5432; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          test "$ready" -eq 1
+      - name: Create the owner role
+        if: ${{ matrix.suite == 'python-guards' }}
+        run: |
+          set -euo pipefail
+          umask 077
+          install -m 600 /dev/null "$RUNNER_TEMP/pg-owner"
+          openssl rand -hex 24 > "$RUNNER_TEMP/pg-owner"
+          echo "::add-mask::$(cat "$RUNNER_TEMP/pg-owner")"
+          {
+            printf '%s' "CREATE ROLE eii_owner LOGIN PASSWORD '"
+            tr -d '\n' < "$RUNNER_TEMP/pg-owner"
+            printf '%s\n' "';"
+          } | docker exec -i eii-ci-db psql -U postgres -v ON_ERROR_STOP=1
+          install -m 600 /dev/null "$RUNNER_TEMP/pgpass"
+          {
+            printf '%s' "127.0.0.1:55440:*:eii_owner:"
+            tr -d '\n' < "$RUNNER_TEMP/pg-owner"
+            printf '\n'
+          } > "$RUNNER_TEMP/pgpass"
+      - name: Load the public release
+        if: ${{ matrix.suite == 'python-guards' }}
+        run: |
+          set -euo pipefail
+          export PGPASSFILE="$RUNNER_TEMP/pgpass"
+          export EII_DATABASE_URL="postgresql://postgres:$(cat "$RUNNER_TEMP/pg-super")@127.0.0.1:55440/postgres"
+          uv run --locked python scripts/tests/live_public_release_load.py
+      - name: Load the public release with a planted difference
+        if: ${{ matrix.suite == 'python-guards' }}
+        run: |
+          set -euo pipefail
+          export PGPASSFILE="$RUNNER_TEMP/pgpass"
+          export EII_DATABASE_URL="postgresql://postgres:$(cat "$RUNNER_TEMP/pg-super")@127.0.0.1:55440/postgres"
+          code=0
+          uv run --locked python scripts/tests/live_public_release_load.py --diverge || code=$?
+          test "$code" -eq 3
 
   web-spikes:
     name: web-spikes

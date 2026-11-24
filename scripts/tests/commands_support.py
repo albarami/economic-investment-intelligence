@@ -143,7 +143,7 @@ def tree_problems(
 
 
 def architecture_table(root: Path) -> tuple[tuple[str, str], ...]:
-    """Read the twelve command rows from the architecture document."""
+    """Read the sixteen command rows from the architecture document."""
     lines = (
         (root / "docs" / "02_ARCHITECTURE.md").read_text(encoding="utf-8").splitlines()
     )
@@ -181,7 +181,7 @@ def expected_usage(root: Path) -> str:
 
 
 def pinned_words(root: Path) -> tuple[str, ...]:
-    """Return the eleven command words in architecture order."""
+    """Return the twelve command words in architecture order."""
     words: list[str] = []
     seen: set[str] = set()
     for command, _plane in architecture_table(root):
@@ -374,8 +374,8 @@ def one_compose_problems(
 def failure_problems(code: int, stderr: str, meaning: str) -> list[str]:
     """Report an exit that is outside the table or missing its lines."""
     problems: list[str] = []
-    if code < 0 or code > 7:
-        problems.append(f"exit {code} is outside 0 to 7")
+    if code < 0 or code > 8:
+        problems.append(f"exit {code} is outside 0 to 8")
     fail_lines = [line for line in stderr.splitlines() if line.startswith("FAIL ")]
     if not fail_lines:
         problems.append("FAIL line missing")

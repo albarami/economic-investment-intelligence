@@ -112,6 +112,27 @@ def run(
     )
 
 
+def _plant_store_probe(ws: Path) -> None:
+    """Put one invented query into the temporary copy only."""
+    folder = ws / "product" / "src" / "eii_product" / "store" / "sql"
+    (folder / "syn_probe.sql").write_text(
+        "-- name: syn_probe\n"
+        "-- params:\n"
+        "-- returns: label text\n"
+        "-- order: label\n"
+        "SELECT p.label AS label\n"
+        "FROM syn_probe AS p\n"
+        "ORDER BY p.label ASC NULLS LAST\n",
+        encoding="utf-8",
+    )
+    (folder / "syn_probe.toml").write_text(
+        '[[tables]]\nname = "syn_probe"\nanchor = "invented control table"\n'
+        'key = ["label"]\n\n[[tables.columns]]\nname = "label"\n'
+        'type = "string"\nnullable = false\n',
+        encoding="utf-8",
+    )
+
+
 def copy_workspace(dst: Path) -> None:
     """Copy workspace inputs into ``dst``."""
     for name in ("pyproject.toml", ".python-version", "uv.lock"):
@@ -640,6 +661,13 @@ def write_invented_workspace(
 class ExpectedInstalledNames(unittest.TestCase):
     """Invented workspaces pin the expected set to the lock's own resolution."""
 
+    def test_product_declares_server_dependencies(self) -> None:
+        project = member_manifest(REPO_ROOT, "product")["project"]
+        self.assertIsInstance(project, dict)
+        dependencies = cast(list[str], cast(dict[str, object], project)["dependencies"])
+        self.assertIn("fastapi==0.162.5", dependencies)
+        self.assertIn("uvicorn==0.54.0", dependencies)
+
     def expected_for(
         self,
         product_dependencies: Sequence[str],
@@ -795,6 +823,7 @@ class CleanEnvironment(unittest.TestCase):
         cls.work.mkdir()
         cls.env = base / "env"
         copy_workspace(cls.ws)
+        _plant_store_probe(cls.ws)
         seed_cache(cls.cache, cls.seed)
         cls.lock_before = (cls.ws / "uv.lock").read_bytes()
         cls.sync = run(
@@ -803,6 +832,90 @@ class CleanEnvironment(unittest.TestCase):
             child_env(cls.cache, cls.env),
         )
         cls.lock_after = (cls.ws / "uv.lock").read_bytes()
+
+    def test_server_imports_and_missing_dependency_plant(self) -> None:
+        code = "from fastapi.sse import EventSourceResponse, ServerSentEvent; import uvicorn"
+        control = run(
+            [str(env_python(self.env)), "-I", "-c", code],
+            self.work,
+            child_env(self.cache),
+        )
+        self.assertEqual(control.returncode, 0, control.stderr)
+        with tempfile.TemporaryDirectory(dir=self._tmp.name) as temporary:
+            root = Path(temporary)
+            cache, environment = root / "cache", root / "env"
+            seed_cache(cache, self.seed)
+            installed = run(
+                [UV, *SYNC_OFFLINE, "--no-install-package", "fastapi"],
+                self.ws,
+                child_env(cache, environment),
+            )
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            missing = run(
+                [str(env_python(environment)), "-I", "-c", code],
+                self.work,
+                child_env(cache),
+            )
+            self.assertNotEqual(missing.returncode, 0)
+            self.assertIn("No module named 'fastapi'", missing.stderr)
+
+    def test_server_missing_uvicorn_plant(self) -> None:
+        code = "from fastapi.sse import EventSourceResponse, ServerSentEvent; import uvicorn"
+        control = run(
+            [str(env_python(self.env)), "-I", "-c", code],
+            self.work,
+            child_env(self.cache),
+        )
+        self.assertEqual(control.returncode, 0, control.stderr)
+        with tempfile.TemporaryDirectory(dir=self._tmp.name) as temporary:
+            root = Path(temporary)
+            cache, environment = root / "cache", root / "env"
+            seed_cache(cache, self.seed)
+            installed = run(
+                [UV, *SYNC_OFFLINE, "--no-install-package", "uvicorn"],
+                self.ws,
+                child_env(cache, environment),
+            )
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            missing = run(
+                [str(env_python(environment)), "-I", "-c", code],
+                self.work,
+                child_env(cache),
+            )
+            self.assertNotEqual(missing.returncode, 0)
+            self.assertIn("No module named 'uvicorn'", missing.stderr)
+
+    def test_installed_store_enumeration_is_the_planted_probe(self) -> None:
+        # Another test reinstalls the class environment from an unplanted copy.
+        root = Path(self._tmp.name) / "probe"
+        cache = root / "cache"
+        env = root / "env"
+        cache.mkdir(parents=True)
+        seed_cache(cache, self.seed)
+        installed = run([UV, *SYNC_OFFLINE], self.ws, child_env(cache, env))
+        self.assertEqual(installed.returncode, 0, installed.stderr)
+        code = (
+            "import json, sys\n"
+            "import eii_product.store\n"
+            "from eii_product.store.registry import load_inventory, packaged_sql_dir\n"
+            "roots = {'duckdb', 'psycopg', 'sqlglot'}\n"
+            "loaded = sorted({name.split('.', 1)[0] for name in sys.modules "
+            "if name.split('.', 1)[0] in roots})\n"
+            "inventory = load_inventory(packaged_sql_dir())\n"
+            "names = sorted(path.name for path in packaged_sql_dir().iterdir())\n"
+            "print(json.dumps({'names': [inventory.lookup('syn_probe').name], "
+            "'drivers': loaded, 'sql': names}))\n"
+        )
+        proc = run(
+            [str(env_python(env)), "-I", "-c", code],
+            self.work,
+            child_env(cache),
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["names"], ["syn_probe"])
+        self.assertEqual(payload["drivers"], [])
+        self.assertIn("syn_probe.sql", payload["sql"])
 
     def test_lock_is_current(self) -> None:
         cache = Path(self._tmp.name) / "lock-cache"
@@ -821,11 +934,27 @@ class CleanEnvironment(unittest.TestCase):
         stripped, removed = re.subn(DEPENDENCY_GROUPS_TABLE, "", root_toml)
         self.assertEqual(removed, 1)
         (ws / "pyproject.toml").write_text(stripped, encoding="utf-8")
-        product = ws / "product/pyproject.toml"
-        text = product.read_text(encoding="utf-8")
-        requirement = ', "pyyaml==6.0.3"'
-        self.assertEqual(text.count(requirement), 1)
-        product.write_text(text.replace(requirement, "", 1), encoding="utf-8")
+        import ast
+
+        dropped: list[str] = []
+        for member in ("core", "custodian", "gateway", "product"):
+            pyproject = ws / member / "pyproject.toml"
+            lines = pyproject.read_text(encoding="utf-8").splitlines(keepends=True)
+            marked = [
+                index
+                for index, line in enumerate(lines)
+                if line.startswith("dependencies = [")
+            ]
+            self.assertEqual(len(marked), 1)
+            dep_line = lines[marked[0]].rstrip("\n")
+            entries = ast.literal_eval(dep_line.removeprefix("dependencies = "))
+            kept = [entry for entry in entries if entry.startswith("eii-")]
+            dropped.extend(entry for entry in entries if not entry.startswith("eii-"))
+            quoted = ", ".join(f'"{entry}"' for entry in kept)
+            lines[marked[0]] = f"dependencies = [{quoted}]\n"
+            pyproject.write_text("".join(lines), encoding="utf-8")
+        self.assertIn("pyyaml==6.0.3", dropped)
+        self.assertEqual(dropped.count("pyyaml==6.0.3"), 1)
         regen = run([UV, "lock", "--offline"], ws, child_env(cache))
         self.assertEqual(regen.returncode, 0, regen.stderr)
 
@@ -853,10 +982,10 @@ class CleanEnvironment(unittest.TestCase):
         )
         product = ws / "product/pyproject.toml"
         text = product.read_text(encoding="utf-8")
-        original = 'dependencies = ["eii-core"]'
+        original = 'dependencies = ["eii-core"'
         self.assertEqual(text.count(original), 1)
         product.write_text(
-            text.replace(original, 'dependencies = ["eii-core", "plant==0.0.0"]'),
+            text.replace(original, 'dependencies = ["eii-core", "plant==0.0.0"'),
             encoding="utf-8",
         )
         return index
@@ -919,6 +1048,66 @@ class CleanEnvironment(unittest.TestCase):
                 self.assertFalse(path.is_relative_to(src_ws))
                 self.assertFalse(path.is_relative_to(src_repo))
 
+    def test_installed_catalogue_assets_load_outside_source_workspace(self) -> None:
+        self.assertEqual(self.sync.returncode, 0, self.sync.stderr)
+        self.assertFalse(self.work.is_relative_to(self.ws))
+        code = """
+import hashlib
+import json
+from pathlib import Path
+from eii_product.assistant.catalogue import (
+    Catalogue, catalogue_directory, load_catalogue,
+)
+from eii_product.assistant.catalogue.schema import FILE_NAMES
+folder = catalogue_directory()
+loaded = load_catalogue(folder)
+assert isinstance(loaded, Catalogue), loaded
+print(json.dumps({
+    "folder": str(folder),
+    "hashes": {name: hashlib.sha256((folder / name).read_bytes()).hexdigest()
+               for name in FILE_NAMES},
+    "version": loaded.version,
+    "counts": [len(loaded.claims), len(loaded.components), len(loaded.fragments),
+               len(loaded.questions), len(loaded.directives)],
+}))
+"""
+        proc = run(
+            [str(env_python(self.env)), "-I", "-c", code],
+            self.work,
+            child_env(self.cache),
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        result = json.loads(proc.stdout)
+        folder = Path(result["folder"]).resolve()
+        self.assertIn("site-packages", folder.relative_to(self.env.resolve()).parts)
+        self.assertFalse(folder.is_relative_to(self.ws))
+        self.assertFalse(folder.is_relative_to(REPO_ROOT / "product"))
+        import hashlib
+
+        from eii_product.assistant.catalogue import Catalogue, load_catalogue
+        from eii_product.assistant.catalogue.schema import FILE_NAMES
+
+        source = REPO_ROOT / "product/src/eii_product/assistant/catalogue/assets"
+        expected = {
+            name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+            for name in FILE_NAMES
+        }
+        self.assertEqual(result["hashes"], expected)
+        loaded = load_catalogue(source)
+        self.assertIsInstance(loaded, Catalogue)
+        assert isinstance(loaded, Catalogue)
+        self.assertEqual(result["version"], loaded.version)
+        self.assertEqual(
+            result["counts"],
+            [
+                len(loaded.claims),
+                len(loaded.components),
+                len(loaded.fragments),
+                len(loaded.questions),
+                len(loaded.directives),
+            ],
+        )
+
     def test_bare_environment_cannot_import(self) -> None:
         tmp = tempfile.TemporaryDirectory(dir=self._tmp.name)
         self.addCleanup(tmp.cleanup)
@@ -973,6 +1162,7 @@ class CleanEnvironment(unittest.TestCase):
         plants = (
             ("undeclared", installed | {"eii-undeclared-plant"}),
             ("declared-missing", installed - {declared[0]}),
+            ("pyyaml-missing", installed - {"pyyaml"}),
         )
         for label, corrupted in plants:
             with self.subTest(plant=label):

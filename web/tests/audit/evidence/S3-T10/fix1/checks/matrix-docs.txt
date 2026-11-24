@@ -1,0 +1,2 @@
+FAIL email: web/tests/audit/evidence/S3-T10/fix1/captures/comparison-768x1024-ar-light.png:745: e-mail address: [email-shaped-token]
+checked 1721 text files, 130 Markdown files: 1 failure(s)

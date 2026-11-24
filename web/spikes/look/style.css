@@ -1,0 +1,1098 @@
+/*
+ * Component styles of the look page. Every colour, size, space, radius and
+ * duration is a token of tokens.css (DES-02), and every layout rule uses
+ * logical properties (DES-143, FE-65): the Arabic page mirrors by the
+ * document direction alone. The Stage is never mirrored. Rulings L-111 to
+ * L-114: no class word, class line, texture, hatch or watermark is drawn.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  margin: 0;
+  block-size: 100%;
+}
+
+:root:not([data-ready]) body {
+  visibility: hidden;
+}
+
+body {
+  overflow: hidden;
+  background-color: var(--eii-bg);
+  color: var(--eii-text);
+  font: var(--eii-type-body);
+  letter-spacing: var(--eii-type-tracking);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+h1,
+h2,
+p,
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+/* DES-17: the theme cross-fades in --eii-dur-scene. */
+:root[data-theme-change] *,
+:root[data-theme-change] body {
+  transition:
+    background-color var(--eii-dur-scene) var(--eii-ease-move),
+    color var(--eii-dur-scene) var(--eii-ease-move),
+    border-color var(--eii-dur-scene) var(--eii-ease-move),
+    box-shadow var(--eii-dur-scene) var(--eii-ease-move);
+}
+
+/* DES-51: under reduced motion cross-fades shorten to --eii-dur-fast. */
+:root[data-motion='reduced'][data-theme-change] * {
+  transition-duration: var(--eii-dur-fast);
+}
+
+/* DES-118: words fade; numerals never do. */
+[data-word] {
+  transition: opacity var(--eii-dur-fast) var(--eii-ease-move);
+}
+
+:root[data-flip='out'] [data-word] {
+  opacity: 0;
+}
+
+/* ---- The Stage: the full canvas, never mirrored. ---- */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  direction: ltr;
+  background-color: var(--eii-map-water);
+}
+
+.stage .maplibregl-canvas:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: calc(-1 * var(--eii-focus-ring));
+}
+
+/* ---- The wall grid: 12 columns of 122 px with 24 px gutters inside the
+   5% safe margins (section 6). Row 1 holds the top bar, rows 2 and 3 the
+   Brief, row 3 the Stage footer row: the legend at its inline-start and the
+   attribution at its inline-end (DES-53). The map is not mirrored and
+   Doha's dense coast lies to the east, so the legend sits low, where it
+   covers no lit core in either language. ---- */
+
+.overlay {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 1;
+  inline-size: var(--eii-wall-width);
+  block-size: var(--eii-wall-height);
+  padding-block: var(--eii-safe-block);
+  padding-inline: var(--eii-safe-inline);
+  zoom: var(--eii-wall-zoom, 1);
+  display: grid;
+  grid-template-columns: repeat(12, var(--eii-column));
+  grid-template-rows: var(--eii-topbar-height) minmax(0, 1fr) auto;
+  column-gap: var(--eii-gutter);
+  row-gap: var(--eii-space-4);
+  pointer-events: none;
+}
+
+.overlay > * {
+  pointer-events: auto;
+}
+
+/* DES-43 level 1: surface tone and a 1 px line; panels are opaque. In the
+   light theme the plates also take the level-2 shadow, because the light
+   surface and the light land are almost the same tone. */
+.plate {
+  background-color: var(--eii-surface-1);
+  border: var(--eii-edge) solid var(--eii-line);
+  border-radius: var(--eii-radius-m);
+  box-shadow: var(--eii-plate-shadow);
+}
+
+/* ---- Skip link: out of sight until it has the focus. ---- */
+
+.skip {
+  position: absolute;
+  inset-block-start: var(--eii-safe-block);
+  inset-inline-start: var(--eii-safe-inline);
+  z-index: 3;
+  padding-block: var(--eii-space-3);
+  padding-inline: var(--eii-space-5);
+  border-radius: var(--eii-radius-s);
+  background-color: var(--eii-surface-2);
+  color: var(--eii-text);
+  font: var(--eii-type-label);
+  text-decoration: none;
+  translate: 0 calc(-1 * var(--eii-wall-height));
+}
+
+.skip:focus-visible {
+  translate: 0 0;
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: var(--eii-focus-offset);
+}
+
+/* ---- Controls (DES-44: 56 px buttons, a visible focus ring; boundaries in
+   --eii-line-strong at 3:1 or better). ---- */
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--eii-space-3);
+  min-inline-size: var(--eii-target-min);
+  block-size: var(--eii-button-height);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--eii-space-5);
+  border: var(--eii-edge) solid var(--eii-line-strong);
+  border-radius: var(--eii-radius-s);
+  background-color: transparent;
+  color: var(--eii-text);
+  font: var(--eii-type-label);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.control:hover {
+  background-color: var(--eii-surface-2);
+}
+
+.control:focus-visible,
+.chip:focus-visible,
+.drawer-title:focus-visible,
+.brief:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: var(--eii-focus-offset);
+}
+
+/* The accent marks only a selected state (DES-18). */
+.control[aria-pressed='true'] {
+  background-color: var(--eii-surface-2);
+  box-shadow: inset 0 calc(-1 * var(--eii-space-1)) 0 var(--eii-accent);
+}
+
+.control-glyph {
+  display: inline-flex;
+}
+
+.glyph {
+  inline-size: var(--eii-glyph);
+  block-size: var(--eii-glyph);
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- Top bar: two quiet plates in one row, so the map runs between
+   them. ---- */
+
+.topbar {
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--eii-space-3);
+  block-size: var(--eii-topbar-height);
+}
+
+.topbar-start {
+  grid-column: 1 / span 7;
+  justify-self: start;
+  gap: var(--eii-space-5);
+  padding-inline: var(--eii-space-5);
+}
+
+.topbar-end {
+  grid-column: 8 / -1;
+  justify-self: stretch;
+  justify-content: space-between;
+  padding-inline: var(--eii-space-2);
+}
+
+/* P3 (the merged audit's craft point): the controls group spans the
+   Brief's five columns in English and six in Arabic, whose longer labels
+   need about sixty pixels more (round 5g, finding 6). No control shrinks
+   below its label: an overflow fails the plate test instead. */
+.topbar-end > .control,
+.topbar-end > .segmented {
+  flex: none;
+}
+
+.topbar-end .control {
+  padding-inline: var(--eii-space-3);
+}
+
+:root[dir='rtl'] .topbar-end {
+  grid-column: 7 / -1;
+}
+
+:root[dir='rtl'] .topbar-end .control {
+  padding-inline: var(--eii-space-4);
+}
+
+/* DES-47: the working title in IBM Plex Sans SemiBold; it does not mirror. */
+.wordmark {
+  font: var(--eii-type-title);
+  color: var(--eii-text);
+  direction: ltr;
+}
+
+.topbar-divider {
+  inline-size: var(--eii-edge);
+  block-size: var(--eii-glyph);
+  background-color: var(--eii-line);
+}
+
+/* DES-80 as amended: the seat glyph and the seat's name, never a colour. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--eii-space-3);
+  font: var(--eii-type-label);
+  color: var(--eii-text);
+  white-space: nowrap;
+}
+
+.badge-prefix {
+  color: var(--eii-text-2);
+}
+
+.segmented {
+  display: inline-flex;
+}
+
+.segmented .control:first-child {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.segmented .control:last-child {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  border-inline-start-width: 0;
+}
+
+/* ---- The Fact chip family (section 9.2, docs/10_FRONTEND.md section 5).
+   The root is an isolate in the page direction; the value is an inner
+   left-to-right isolate set in IBM Plex Sans with tabular figures. No class
+   line, texture or word is drawn (rulings L-111 to L-114). ---- */
+
+.chip {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--eii-radius-s);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+}
+
+button.chip {
+  min-inline-size: var(--eii-target-min);
+  min-block-size: var(--eii-target-min);
+  cursor: pointer;
+}
+
+button.chip:hover {
+  background-color: var(--eii-surface-2);
+}
+
+.chip-root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--eii-space-1);
+}
+
+.chip-figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--eii-space-3);
+}
+
+.chip-num {
+  display: inline-block;
+  color: var(--eii-text);
+  font: var(--eii-num-standard);
+  white-space: nowrap;
+}
+
+.chip[data-size='large'] .chip-num {
+  font: var(--eii-num-large);
+}
+
+.chip[data-chip='compact'] .chip-num,
+.chip[data-chip='reference'] .chip-num {
+  font: var(--eii-num-compact);
+}
+
+.chip[data-chip='reference'] .chip-num {
+  color: var(--eii-text-2);
+}
+
+/* DES-31: digits of equal advance; declared after every font shorthand. */
+.chip .chip-num,
+.chip[data-size] .chip-num,
+.chip[data-chip] .chip-num {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.chip-unit {
+  font: var(--eii-type-label);
+  color: var(--eii-text-2);
+}
+
+.chip-geography {
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+}
+
+/* A compact chip centres its value in a hit area of the target size. */
+.chip[data-chip='compact'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: var(--eii-space-2);
+}
+
+.chip[data-chip='compact'] .chip-root {
+  align-items: center;
+}
+
+/* ---- Legend plate at the lower inline-start of the Stage: four columns of
+   the wall grid. ---- */
+
+.legend {
+  grid-column: 1 / span 4;
+  grid-row: 3;
+  align-self: end;
+  justify-self: stretch;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-2);
+  /* Round 5g, finding 7: 16 px above and below, 24 px at the sides, so the
+     longest direction caption stays on one line. */
+  padding-block: var(--eii-space-4);
+  padding-inline: var(--eii-card-padding);
+}
+
+.legend-head {
+  display: flex;
+  flex-direction: column;
+}
+
+.legend-title {
+  font: var(--eii-type-label);
+  color: var(--eii-text);
+}
+
+.legend-scope,
+.legend-period,
+.legend-direction {
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+}
+
+.legend-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-1);
+}
+
+/* Legends do not mirror: low at the left in both languages (DES-144). */
+.legend-scale,
+.legend-breaks,
+.legend-span {
+  direction: ltr;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  column-gap: var(--eii-swatch-gap);
+}
+
+.legend-swatch {
+  display: block;
+  block-size: var(--eii-swatch-height);
+}
+
+/* Round 5g, finding 23 (DES-61): each swatch is its class's fill at the
+   class opacity over the land, as the map blends the lit cells (sRGB), so the
+   legend's darkest swatch is the darkest cell. The table's swatches too. */
+.legend-swatch[data-step='1'] {
+  background-color: color-mix(
+    in srgb,
+    var(--eii-seq-1) calc(var(--eii-unit-opacity-1) * 100%),
+    var(--eii-map-land)
+  );
+}
+
+.legend-swatch[data-step='2'] {
+  background-color: color-mix(
+    in srgb,
+    var(--eii-seq-2) calc(var(--eii-unit-opacity) * 100%),
+    var(--eii-map-land)
+  );
+}
+
+.legend-swatch[data-step='3'] {
+  background-color: color-mix(
+    in srgb,
+    var(--eii-seq-3) calc(var(--eii-unit-opacity) * 100%),
+    var(--eii-map-land)
+  );
+}
+
+.legend-swatch[data-step='4'] {
+  background-color: color-mix(
+    in srgb,
+    var(--eii-seq-4) calc(var(--eii-unit-opacity) * 100%),
+    var(--eii-map-land)
+  );
+}
+
+.legend-swatch[data-step='5'] {
+  background-color: color-mix(
+    in srgb,
+    var(--eii-seq-5) calc(var(--eii-unit-opacity) * 100%),
+    var(--eii-map-land)
+  );
+}
+
+.legend-scale .legend-swatch:first-child {
+  border-start-start-radius: var(--eii-radius-s);
+  border-end-start-radius: var(--eii-radius-s);
+}
+
+.legend-scale .legend-swatch:last-child {
+  border-start-end-radius: var(--eii-radius-s);
+  border-end-end-radius: var(--eii-radius-s);
+}
+
+/* Each break sits on the boundary between two classes. */
+.legend-breaks > .chip {
+  justify-self: start;
+  translate: -50% 0;
+}
+
+.legend-breaks > .chip:nth-child(1) {
+  grid-column: 2;
+}
+
+.legend-breaks > .chip:nth-child(2) {
+  grid-column: 3;
+}
+
+.legend-breaks > .chip:nth-child(3) {
+  grid-column: 4;
+}
+
+.legend-breaks > .chip:nth-child(4) {
+  grid-column: 5;
+}
+
+/* Round 5g, finding 24: a rule over the classes the share counts, from the
+   break where they start to the end of the scale. The label stays on one
+   line (round 5g, G4) and may run past the bracket. The ramp is left to
+   right in both languages, so in Arabic the label sits on the high end. */
+.legend-span-mark {
+  display: flex;
+  min-inline-size: 0;
+  border-block-start: var(--eii-edge) solid var(--eii-line-strong);
+  padding-block-start: var(--eii-space-1);
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+  white-space: nowrap;
+}
+
+:root[lang='ar'] .legend-span-mark {
+  justify-content: flex-end;
+}
+
+.legend-densest {
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+  vertical-align: middle;
+}
+
+.legend-table {
+  border-collapse: collapse;
+  font: var(--eii-type-label);
+  color: var(--eii-text);
+}
+
+.legend-table th {
+  padding-block-end: var(--eii-space-1);
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+  text-align: start;
+}
+
+.legend-table td {
+  padding-block: 0;
+  padding-inline-end: var(--eii-space-4);
+}
+
+.legend-swatch-row {
+  inline-size: var(--eii-space-7);
+  border-radius: var(--eii-radius-s);
+}
+
+.legend-range {
+  display: flex;
+  align-items: center;
+  gap: var(--eii-space-1);
+  direction: ltr;
+}
+
+.legend-dash {
+  color: var(--eii-text-2);
+}
+
+/* P2: the legend belongs to the answer; the home keeps its place free. */
+.legend[data-hide='true'] {
+  visibility: hidden;
+}
+
+.legend-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--eii-space-3);
+}
+
+.legend-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--eii-space-3);
+}
+
+.legend-actions .control {
+  min-inline-size: 0;
+  padding-inline: var(--eii-space-3);
+}
+
+.type-counts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-2);
+}
+
+.type-row {
+  display: flex;
+  align-items: center;
+  gap: var(--eii-space-3);
+  font: var(--eii-type-label);
+  color: var(--eii-text);
+}
+
+/* Round 5g, findings 1 and 16: one type is picked at a time; its row shows
+   the ink dot the map gives it, the other rows the ring of the dimmed
+   points. */
+.type-counts-title {
+  font: var(--eii-type-label);
+  color: var(--eii-text);
+}
+
+.type-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--eii-space-3);
+  min-block-size: var(--eii-target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.type-swatch {
+  flex: none;
+  inline-size: var(--eii-space-4);
+  block-size: var(--eii-space-4);
+  border-radius: 50%;
+  border: calc(var(--eii-edge) * 2) solid var(--eii-line-strong);
+}
+
+.type-pick[aria-pressed='true'] .type-swatch {
+  border-color: var(--eii-map-point-ring);
+  background-color: var(--eii-map-point);
+}
+
+/* Rounds 5g, findings 18 and 19: the key of the dots and the circles. */
+.legend-points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-1);
+}
+
+.legend-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--eii-space-3);
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+}
+
+.legend-mark-sample {
+  flex: none;
+  border-radius: 50%;
+  background-color: var(--eii-map-point);
+  border: calc(var(--eii-edge) * 2) solid var(--eii-map-point-ring);
+}
+
+.legend-mark-point {
+  inline-size: var(--eii-space-4);
+  block-size: var(--eii-space-4);
+}
+
+.legend-mark-cluster {
+  inline-size: var(--eii-space-6);
+  block-size: var(--eii-space-6);
+}
+
+.point-card {
+  grid-column: 5 / span 3;
+  grid-row: 2;
+  align-self: end;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-3);
+  max-block-size: calc(var(--eii-space-9) * 4);
+  overflow: auto;
+  padding: var(--eii-card-padding);
+  background-color: var(--eii-surface-1);
+  border: var(--eii-edge) solid var(--eii-line);
+  border-radius: var(--eii-radius-l);
+}
+
+.point-card[hidden] {
+  display: none;
+}
+
+.point-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eii-space-3);
+}
+
+.point-title {
+  font: var(--eii-type-label);
+  color: var(--eii-text);
+}
+
+.point-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-2);
+}
+
+.point-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eii-space-2);
+  font: var(--eii-type-caption);
+  color: var(--eii-text);
+}
+
+.point-label {
+  color: var(--eii-text-2);
+}
+
+.photoreal-credit {
+  grid-column: 8 / span 5;
+  grid-row: 3;
+  justify-self: end;
+  align-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--eii-space-3);
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+}
+
+.photoreal-credit[hidden] {
+  display: none;
+}
+
+/* ---- The Brief: the inline-end column, five columns, one card. ---- */
+
+.brief {
+  grid-column: 8 / span 5;
+  grid-row: 2 / 4;
+  align-self: start;
+  padding-block: var(--eii-space-6) var(--eii-card-padding);
+  padding-inline: var(--eii-space-6);
+}
+
+.brief[data-covered='true'] {
+  visibility: hidden;
+}
+
+/* While the source chain covers the Brief column down to the foot of the
+   Stage, the attribution (on every map view) keeps to the columns between
+   the legend and the chain. */
+.brief[data-covered='true'] ~ .attribution {
+  grid-column: 5 / span 3;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-card-gap);
+}
+
+.card-eyebrow {
+  font: var(--eii-type-label);
+  color: var(--eii-text-2);
+}
+
+/* ---- P2: the home starts from a decision. ---- */
+
+.home-headline {
+  font: var(--eii-type-display);
+  color: var(--eii-text);
+  text-wrap: balance;
+}
+
+.home-value {
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+}
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  border-block-start: var(--eii-edge) solid var(--eii-line);
+}
+
+.question-item {
+  border-block-end: var(--eii-edge) solid var(--eii-line);
+}
+
+.question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eii-space-4);
+  inline-size: 100%;
+  min-block-size: var(--eii-button-height);
+  margin: 0;
+  padding-block: var(--eii-space-4);
+  padding-inline: 0;
+  border: 0;
+  background: none;
+  color: var(--eii-text);
+  font: var(--eii-type-body);
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+}
+
+.question:hover {
+  background-color: var(--eii-surface-2);
+}
+
+.question:focus-visible {
+  outline: var(--eii-focus-ring) solid var(--eii-accent);
+  outline-offset: var(--eii-focus-offset);
+}
+
+.question-glyph {
+  color: var(--eii-text-2);
+}
+
+/* The chevron points to the inline end in both languages. */
+:root[dir='rtl'] .question-glyph {
+  scale: -1 1;
+}
+
+/* ---- V7: at street zoom the Brief and the legend fold to a slim strip
+   and give the map room; they come back at city zoom. Round 5g: the strip
+   keeps the question, the headline and the caveat (DES-05); the folded
+   legend keeps its swatches, its break chips and its direction in words
+   (DES-19, DES-20); only the scope line folds, and the table stays behind
+   its own control. ---- */
+
+:root[data-fold='street'] .brief {
+  padding-block: var(--eii-space-4);
+}
+
+:root[data-fold='street'] .card[data-card='answer'] {
+  gap: var(--eii-space-1);
+}
+
+:root[data-fold='street']
+  .card[data-card='answer']
+  > :not(.card-eyebrow, .card-headline, .card-caveat) {
+  display: none;
+}
+
+:root[data-fold='street'] .card[data-card='answer'] .card-headline {
+  font: var(--eii-type-label);
+}
+
+:root[data-fold='street'] .legend-scope,
+:root[data-fold='street'] .legend-span,
+:root[data-fold='street'] .legend-densest {
+  display: none;
+}
+
+/* ---- P1: a quiet plate names the lit district on the map, with a hairline
+   leader to its label point. Round 5e, E1: the map's marker places it by a
+   transform from the map's corner, so it stays out of the flow (absolute, as
+   MapLibre's own marker rule has it) and as wide as its name; a plate in the
+   flow fills the map's width with its name pushed off the screen (the band
+   of round 5d). ---- */
+
+.district-plate {
+  position: absolute;
+  inline-size: max-content;
+  margin: 0;
+  padding-block: var(--eii-space-1);
+  padding-inline: var(--eii-space-3);
+  border: var(--eii-edge) solid var(--eii-line);
+  border-radius: var(--eii-radius-s);
+  background-color: var(--eii-surface-1);
+  color: var(--eii-text);
+  font: var(--eii-type-label);
+  white-space: nowrap;
+  translate: 0 calc(-1 * var(--eii-space-7));
+  pointer-events: none;
+}
+
+.district-plate::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 50%;
+  inline-size: var(--eii-edge);
+  block-size: var(--eii-space-7);
+  background-color: var(--eii-line-strong);
+}
+
+.card-headline,
+.drawer-title {
+  font: var(--eii-type-title);
+  color: var(--eii-text);
+  text-wrap: balance;
+}
+
+.card-hero {
+  padding-block: var(--eii-space-3) var(--eii-space-2);
+}
+
+.card-facts {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  justify-content: start;
+  align-items: start;
+  column-gap: var(--eii-space-7);
+  padding-block-start: var(--eii-space-5);
+  border-block-start: var(--eii-edge) solid var(--eii-line);
+}
+
+.card-caveat {
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+}
+
+.card-footer {
+  display: flex;
+  gap: var(--eii-space-3);
+  padding-block-start: var(--eii-space-2);
+}
+
+/* ---- The source chain: over the Brief column at the Brief's width
+   (DES-95), level 2 of DES-43, entering from the inline-end in
+   --eii-dur-slow. ---- */
+
+.drawer {
+  --eii-slide: var(--eii-space-6);
+  grid-column: 8 / span 5;
+  grid-row: 2 / 4;
+  align-self: start;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--eii-space-3);
+  padding: var(--eii-card-padding);
+  padding-inline: var(--eii-space-6);
+  background-color: var(--eii-surface-2);
+  border: var(--eii-edge) solid var(--eii-line);
+  border-radius: var(--eii-radius-l);
+  box-shadow: var(--eii-shadow-2);
+  animation: eii-drawer-in var(--eii-dur-slow) var(--eii-ease-enter);
+}
+
+:root[dir='rtl'] .drawer {
+  --eii-slide: calc(-1 * var(--eii-space-6));
+}
+
+:root[data-motion='reduced'] .drawer {
+  animation-duration: var(--eii-dur-fast);
+  --eii-slide: 0;
+}
+
+@keyframes eii-drawer-in {
+  from {
+    opacity: 0;
+    translate: var(--eii-slide) 0;
+  }
+}
+
+.drawer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eii-space-4);
+}
+
+.drawer-head {
+  padding-block-end: var(--eii-space-3);
+  border-block-end: var(--eii-edge) solid var(--eii-line);
+}
+
+.thread-value {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--eii-space-3);
+}
+
+/* The why-path: a neutral line through the nodes, read top to bottom in
+   both languages (DES-96 as amended: no class line style). */
+.thread {
+  display: grid;
+  grid-template-columns: var(--eii-space-6) max-content minmax(0, 1fr);
+  column-gap: var(--eii-space-4);
+  list-style: none;
+}
+
+.thread-row {
+  position: relative;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: start;
+  padding-block: var(--eii-space-1);
+  font: var(--eii-type-caption);
+  color: var(--eii-text);
+}
+
+.thread-row::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--eii-space-6) / 2 - var(--eii-thread) / 2);
+  inline-size: var(--eii-thread);
+  background-color: var(--eii-line-strong);
+}
+
+.thread-row:first-child::before {
+  inset-block-start: calc(var(--eii-space-1) + 0.5lh);
+}
+
+.thread-row:last-child::before {
+  inset-block-end: calc(100% - var(--eii-space-1) - 0.5lh);
+}
+
+.thread-node {
+  position: relative;
+  justify-self: center;
+  margin-block-start: calc(0.5lh - var(--eii-space-3) / 2);
+  inline-size: var(--eii-space-3);
+  block-size: var(--eii-space-3);
+  border: var(--eii-thread) solid var(--eii-line-strong);
+  border-radius: 50%;
+  background-color: var(--eii-surface-2);
+}
+
+.thread-label {
+  color: var(--eii-text-2);
+}
+
+.thread-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.thread-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eii-space-3);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  font: var(--eii-type-caption);
+}
+
+.thread-source .chip[data-chip='reference'],
+.thread-source .chip-num {
+  max-inline-size: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.drawer-input-controls,
+.drawer-facts {
+  display: flex;
+  gap: var(--eii-space-3);
+}
+
+.drawer-facts [aria-pressed='true'] {
+  outline: var(--eii-edge) solid var(--eii-line-strong);
+}
+
+/* ---- Stage footer row: the map attribution at the inline-end, a licence
+   requirement visible on every map view (DES-53, FE-60). ---- */
+
+.attribution {
+  grid-column: 5 / -1;
+  grid-row: 3;
+  justify-self: end;
+  align-self: end;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding-block: var(--eii-space-1);
+  padding-inline: var(--eii-space-3);
+  border-radius: var(--eii-radius-s);
+  font: var(--eii-type-caption);
+  color: var(--eii-text-2);
+  text-align: end;
+}
+
+/* Round 5g, finding 9: each run resolves the caption under its own :lang, so
+   the credits keep the Latin 28/36 on one line and the note takes the
+   Arabic 31/50 on the Arabic page (DES-28). */
+.attribution-credits,
+.attribution-heights {
+  display: block;
+  font: var(--eii-type-caption);
+}

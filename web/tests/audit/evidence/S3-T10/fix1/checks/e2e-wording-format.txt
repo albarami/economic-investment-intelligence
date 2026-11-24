@@ -1,0 +1,1 @@
+tests/e2e/opening.spec.ts 195ms

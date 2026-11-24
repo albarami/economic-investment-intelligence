@@ -1,0 +1,39 @@
+
+ RUN  v5.1.0 [workspace]/.overnight[local-path]
+
+ ❯ tests/unit/opening-area.test.ts (4 tests | 2 failed) 7ms
+   × escape forgets the request of an accepted area 3ms
+   × select-tool forgets the request of an accepted area 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/unit/opening-area.test.ts > escape forgets the request of an accepted area
+ FAIL  tests/unit/opening-area.test.ts > select-tool forgets the request of an accepted area
+AssertionError: expected { place_key: 'INVENTED-place-a', …(2) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "cutoff": 5,
+  "mode": "walk",
+  "place_key": "INVENTED-place-a",
+}
+
+ ❯ tests/unit/opening-area.test.ts:126:35
+    124|     });
+    125|     dispatch(type === 'escape' ? { type } : { type, tool: 'polygon' });
+    126|     expect(selectedAreaRequest()).toBeNull();
+       |                                   ^
+    127|   },
+    128| );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 2 passed (4)
+   Start at  12:10:40
+   Duration  118ms (transform 63%, import 24%, tests 10%, worker 3%)
+
