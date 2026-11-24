@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
@@ -12,9 +13,11 @@ from custodian.tests.fixtures.places.invented import (
     receipt_for,
     write_places,
 )
+from hypothesis import example, given
+from hypothesis import strategies as st
 from shapely.geometry import box
 
-from eii_custodian.publicdata.places import PlacesError
+from eii_custodian.publicdata.places import PlacesError, display
 from eii_custodian.publicdata.places.areas import (
     AreaCutoff,
     AreaError,
@@ -48,6 +51,118 @@ _RELEASE = "2032-04-05"
 _LICENCE = "SYN-LICENCE"
 _ATTR = (("syn-source", _LICENCE),)
 _BOX = box(51.4, 25.2, 51.6, 25.4)
+
+
+@pytest.mark.parametrize("size", [2_000, 20_000])
+def test_distinct_names_need_at_most_linear_comparisons(
+    monkeypatch: pytest.MonkeyPatch, size: int
+) -> None:
+    """Count pair visits without repeating normalisation of known distinct labels."""
+    places = tuple(
+        _place(f"SYN-P-{index}", Decimal("0.8"), 51.5, 25.3, name=f"syn {index}")
+        for index in range(size)
+    )
+    calls = {"comparison": 0, "labels": 0, "within": 0}
+    labels = display._labels
+    within = display._within
+
+    def compare(left: PubPlace, right: PubPlace) -> bool:
+        calls["comparison"] += 1
+        # These names are already folded and have no Arabic aliases.
+        return left.name == right.name
+
+    def counted_labels(place: PubPlace) -> set[str]:
+        calls["labels"] += 1
+        return labels(place)
+
+    def counted_within(left: PubPlace, right: PubPlace) -> bool:
+        calls["within"] += 1
+        return within(left, right)
+
+    monkeypatch.setattr(display, "_same_name", compare)
+    monkeypatch.setattr(display, "_labels", counted_labels)
+    monkeypatch.setattr(display, "_within", counted_within)
+    assert display._pairs(places) == ()
+    print(f"distinct places={size}: {calls}")
+    assert calls["comparison"] <= size
+    assert calls["labels"] == size
+    assert calls["within"] == 0
+
+
+@pytest.mark.parametrize("keys", [("SYN-P-Z", "SYN-P-A", "SYN-P-M"), ("SYN-P-X",) * 3])
+def test_shared_labels_visit_each_pair_once_in_input_order(
+    monkeypatch: pytest.MonkeyPatch, keys: tuple[str, str, str]
+) -> None:
+    places = tuple(
+        _place(key, Decimal("0.8"), 51.5, 25.3, name="SYN Cafe", name_ar="مقهى تجريبي")
+        for key in keys
+    )
+    visited: list[tuple[str, str]] = []
+    within = display._within
+
+    def counted_within(left: PubPlace, right: PubPlace) -> bool:
+        visited.append((left.place_id, right.place_id))
+        return within(left, right)
+
+    monkeypatch.setattr(display, "_within", counted_within)
+    expected = ((keys[0], keys[1]), (keys[0], keys[2]), (keys[1], keys[2]))
+    assert display._pairs(places) == expected
+    assert tuple(visited) == expected
+
+
+_PAIR_NAME = st.one_of(
+    st.sampled_from(
+        [
+            "SYN Cafe",
+            " syn  cafe ",
+            "SYN Cafe!",
+            "مقهى تجريبي",
+            " مقهى  تجريبي ",
+            "",
+            " \t",
+        ]
+    ),
+    st.text(max_size=20),
+)
+
+
+@given(
+    st.lists(
+        st.tuples(_PAIR_NAME, st.none() | _PAIR_NAME, st.integers(0, 3)), max_size=16
+    )
+)
+@example([])
+@example([("", None, 0)])
+@example([("", None, 0), (" \t", "", 0), ("\n", "\t", 0)])
+@example([("SYN Cafe", "مقهى تجريبي", 0)] * 3)
+@example([("SYN Cafe", "مقهى تجريبي", 0), ("مقهى تجريبي", " syn  cafe ", 0)])
+@example([("SYN Cafe", None, 0), ("SYN Cafe!", "", 0)])
+@example([("SYN Cafe", "", index) for index in range(4)])
+def test_pairs_equal_naive_oracle(rows: list[tuple[str, str | None, int]]) -> None:
+    """Tuple equality covers bilingual aliases, blank folds, ties and distance steps."""
+    latitudes = (Decimal("25.300000"), *_boundary_step(), Decimal("25.320000"))
+    places = tuple(
+        _place(
+            f"SYN-P-{len(rows) - index}",
+            Decimal("0.8"),
+            Decimal("51.500000"),
+            latitudes[step],
+            name=name,
+            name_ar=name_ar,
+        )
+        for index, (name, name_ar, step) in enumerate(rows)
+    )
+    assert display._pairs(places) == _naive_pairs(places)
+
+
+def _naive_pairs(places: Sequence[PubPlace]) -> tuple[tuple[str, str], ...]:
+    """The original all-pairs implementation, retained only as an equivalence oracle."""
+    found: list[tuple[str, str]] = []
+    for index, left in enumerate(places):
+        for right in places[index + 1 :]:
+            if display._same_name(left, right) and display._within(left, right):
+                found.append((left.place_id, right.place_id))
+    return tuple(found)
 
 
 def test_threshold_shows_seven_tenths_and_hides_the_step_below(tmp_path: Path) -> None:
