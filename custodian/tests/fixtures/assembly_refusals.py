@@ -1641,8 +1641,8 @@ INVENTORY_CASES = [
             ["AdditionError", "bulletin_rows", "bulletin_rows"],
             [
                 "AdditionError",
-                "share_semantics_unconfirmed",
-                "share_semantics_unconfirmed",
+                "no_whole_property_deals",
+                "no_whole_property_deals",
             ],
             ["AdditionError", "source_field_missing", "source_field_missing"],
             ["AdditionError", "unknown_source_field", "unknown_source_field"],

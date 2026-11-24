@@ -1272,7 +1272,10 @@ The code-only FDI municipality target is a derived file at
 files such as district aliases. It is never committed (decision 0026 item 5,
 decision 0034 item 2; lead ruling L-1324). Its `target_sha256` in each reviewed
 `fdi_crosswalks.yaml` mapping pins the exact CSV bytes. The reader verifies that
-hash on every read and never substitutes a file beside the committed crosswalk.
+hash on every read and never substitutes a committed file for the cache target.
+Reviewed crosswalk rows live at `CACHE/review/fdi_crosswalks.yaml`; their other
+targets stay in the committed review folder, never beside the cache crosswalk
+(decision 0108 item 1).
 The public build and release assembly pass their cache root to the reader;
 standalone specification reads use the repository's public cache. The empty
 mapping list needs no target file and continues to leave those slots null.
@@ -1426,8 +1429,10 @@ in parser tests establish mechanics only. The lead supplies real mappings from t
 cache snapshot and another maker confirms them before AC3 can close (OI-182). Each mapping
 uses the source-issued `project_id`, snapshot hash and content-derived `project_key`, names
 one of the three derived columns, and pins its selected Public target resource and key.
-Target resources are direct CSV or YAML files beside the review file; their typed key
-column is `iso3`, `municipality_code` or `place_key`. Names are never lookup keys;
+Target resources are direct CSV or YAML files in the committed review folder,
+except `municipality_codes.csv`, which is read only from `CACHE/review/`;
+their typed key column is `iso3`, `municipality_code` or `place_key`.
+Names are never lookup keys;
 `municipality_names.csv` is explicitly refused in this route. Per-mapping lead role, date
 and reference are the review evidence for both sides, independently of shared target review
 flags. Missing review, changed hashes or source values, absent targets and duplicate or

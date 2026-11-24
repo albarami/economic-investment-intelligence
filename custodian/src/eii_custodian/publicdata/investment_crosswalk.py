@@ -7,9 +7,10 @@ import io
 import os
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
+from typing import Literal
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.fetch.registry import Entry, RegistryError, read_yaml
@@ -63,10 +64,11 @@ class MappingRow:
 
 @dataclass(frozen=True)
 class ReviewedCrosswalk:
-    """Immutable validated mappings and the hash of their committed resource."""
+    """Immutable validated mappings, resource hash and optional loader origin."""
 
     sha256: str
     mappings: tuple[MappingRow, ...]
+    origin: Literal["cache", "committed"] | None = None
 
 
 def _failure(check: str) -> InvestmentFailure:
@@ -76,12 +78,17 @@ def _failure(check: str) -> InvestmentFailure:
 
 
 def read_crosswalk(
-    path: Path, *, expected_sha256: str, cache: Path | None = None
+    path: Path,
+    *,
+    expected_sha256: str,
+    cache: Path | None = None,
+    targets: Path | None = None,
 ) -> ReviewedCrosswalk | InvestmentFailure:
     """Check a crosswalk against the caller's hash and validate its Public targets.
 
     Municipality codes live only in the supplied cache/review directory.
-    Other targets are direct files beside the crosswalk, pinned per mapping.
+    Other targets are direct files in targets (default: beside the crosswalk),
+    pinned per mapping.
     Only target keys are read, never a name-matching map or target review flags.
     The caller supplies the expected hash; this reader does not establish its
     approval or bind it to a separate trusted manifest.
@@ -90,7 +97,7 @@ def read_crosswalk(
         if path.is_symlink() or sha256_hex(path.read_bytes()) != expected_sha256:
             return _failure("crosswalk_hash")
         document = read_yaml(path)
-    except (OSError, RegistryError):
+    except (OSError, RegistryError, UnicodeError):
         return _failure("crosswalk_hash")
     if not isinstance(document, dict) or set(document) != {
         "schema_version",
@@ -115,7 +122,7 @@ def read_crosswalk(
                 and (snapshot, identifier, column) in seen
             ):
                 return _failure("crosswalk_duplicate")
-        checked = _mapping(item, path.parent, cache)
+        checked = _mapping(item, targets if targets is not None else path.parent, cache)
         if isinstance(checked, InvestmentFailure):
             return checked
         key = (checked.snapshot_sha256, checked.project_id, checked.column)
@@ -134,19 +141,33 @@ def read_crosswalk(
 
 
 def load_crosswalk(cache: Path | None = None) -> ReviewedCrosswalk | InvestmentFailure:
-    """Load the review file using a hash computed from its current bytes.
+    """Prefer cache review rows; the committed fallback must be schema-only.
 
     The hash checks read consistency, not approval against an independent pin.
     An empty mapping list leaves all slots null.
     """
-    path = _REVIEW / "fdi_crosswalks.yaml"
+    cache = _CACHE if cache is None else cache
+    path = cache / "review/fdi_crosswalks.yaml"
+    if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
+        return _failure("crosswalk_hash")
+    origin: Literal["cache", "committed"] = "cache"
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        path = _REVIEW / "fdi_crosswalks.yaml"
+        origin = "committed"
+    except OSError:
+        return _failure("crosswalk_hash")
     try:
         digest = sha256_hex(path.read_bytes())
     except OSError:
         return _failure("crosswalk_hash")
-    return read_crosswalk(
-        path, expected_sha256=digest, cache=_CACHE if cache is None else cache
-    )
+    checked = read_crosswalk(path, expected_sha256=digest, cache=cache, targets=_REVIEW)
+    if isinstance(checked, InvestmentFailure):
+        return checked
+    if origin == "committed" and checked.mappings:
+        return _failure("crosswalk_schema")
+    return replace(checked, origin=origin)
 
 
 def _mapping(

@@ -6,7 +6,7 @@ governed_sections:
   - "### C6 Typical neighbours"
   - "### C7 Shared reach between two doors"
   - "### C14 Sale price per square metre"
-governed_sections_sha256: 3fec4ff82c5b34fcee451e29c5f8fd6e7d46e57d7ada723b66d740f1d675d01b
+governed_sections_sha256: d7805c1d1899cba9a205656ea9aa5d2fa8a765a5608b574f71e876b913329121
 pins:
   - pin_id: wilson.period
     card_anchor: wilson

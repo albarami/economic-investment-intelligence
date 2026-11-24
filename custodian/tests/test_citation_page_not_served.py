@@ -33,6 +33,30 @@ ROW = (
 BASE_ROWS_SHA256 = "771b96a4afb3ffca7e914ab783663cfd2fca4542ce0b478aaab48b1627e69593"
 LATER_REVIEWED_FIELDS = frozenset({"stream_max_bytes"})
 BASE_ROW_COUNT = 891
+# S2-P86 (ruling L-1724 item 1) rewrote the last sentence of the prop_sales
+# basis note after this pin was taken. That row's note must equal the reviewed
+# text exactly, and its base text is restored before hashing, so no other byte
+# of any row may change.
+P86_ROW = "prop_sales"
+P86_BASE_BASIS_NOTE = (
+    "Columns are the observed export fields (S2-T08 part B source "
+    "review, mismatch 3; "
+    "custodian/publicdata/review/s2_t08_source_review.yaml). The shape "
+    "pack shows names only: the types of lstkhdm and of the four "
+    "numeric fields first declared there await the lead's live run. "
+    "Share fields refuse by name until their meaning is confirmed."
+)
+P86_BASIS_NOTE = (
+    "Columns are the observed export fields (S2-T08 part B source "
+    "review, mismatch 3; "
+    "custodian/publicdata/review/s2_t08_source_review.yaml). The shape "
+    "pack shows names only: the types of lstkhdm and of the four "
+    "numeric fields first declared there await the lead's live run. "
+    "Ruling L-1724 item 1 keeps whole-property deals only; "
+    "partial_share_deal and share_fields_inconsistent rows are excluded "
+    "and counted per row, never priced; share-field meaning remains "
+    "unconfirmed."
+)
 BASE_BASIS_NOTE = (
     "Document 04 S2-P53 landmark hand-list placement and citation snapshots; "
     "decision 0093 item 3. Publisher's restriction recorded as a record; "
@@ -168,12 +192,17 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     assert row["basis_note"].startswith(BASE_BASIS_NOTE + " ")
     assert "2026-11-24" in row["basis_note"]
     assert "0107" in row["basis_note"]
+    p86 = [row for row in rows if row["key"] == P86_ROW]
+    assert len(p86) == 1
+    assert p86[0]["basis_note"] == P86_BASIS_NOTE
     restored = [
         {
             field: value
             for field, value in (
                 dict(item, skip_reason="", basis_note=BASE_BASIS_NOTE)
                 if item["key"] == ROW
+                else dict(item, basis_note=P86_BASE_BASIS_NOTE)
+                if item["key"] == P86_ROW
                 else item
             ).items()
             if field not in LATER_REVIEWED_FIELDS

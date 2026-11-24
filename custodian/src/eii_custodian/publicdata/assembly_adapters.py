@@ -743,7 +743,7 @@ class Production:
         from .assembly_layers import build_layers
 
         before = dict(self.tables)
-        build_layers(self)
+        bulletin_coverage = build_layers(self)
         names = {
             name for name, rows in self.tables.items() if before.get(name) is not rows
         }
@@ -752,6 +752,7 @@ class Production:
             {
                 "tables": {name: self.tables[name] for name in sorted(names)},
                 "source_tables": self.source_tables,
+                "bulletin_coverage": bulletin_coverage,
             },
         )
 
