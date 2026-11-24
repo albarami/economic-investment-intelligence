@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from custodian.tests.singles_entries import tender_entry
 from custodian.tests.test_production_adapters import context
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.assembly import AssemblyError
@@ -56,6 +56,7 @@ def test_pending_selection_layer_and_gate_without_tender_output(tmp_path: Path) 
     assert completion_evidence(committed, row, None) == committed
 
 
+@settings(deadline=None)
 @given(st.text().filter(lambda value: value != "tenders_pub"))
 def test_pending_is_closed_to_every_other_key(value: str) -> None:
     row = replace(TENDER_ENTRY, key=value)

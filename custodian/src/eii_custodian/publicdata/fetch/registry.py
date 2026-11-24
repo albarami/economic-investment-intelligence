@@ -94,6 +94,7 @@ BANNED_SOURCE_IDS = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range"})
 FIELDS = frozenset(
     {
         "refetch",
+        "stream_max_bytes",
         "key",
         "source_id",
         "slug",
@@ -316,6 +317,7 @@ class Entry:
     cache_role: str = ""
     chain_intermediate_sha256: str = ""
     comtrade_policy: object | None = None
+    stream_max_bytes: int | None = None
     refetch: Cadence = _UNCONFIRMED_REFETCH
 
 
@@ -554,6 +556,12 @@ def _entry(row: object) -> Entry:
     folded_skip = skip_reason.casefold()
     if _SKIP_LICENCE in folded_skip or _SKIP_TERMS in folded_skip:
         raise RegistryError("skip_reason names a licence or terms")
+    if (
+        source_id.startswith("landmark_")
+        and skip_reason
+        and skip_reason not in CITATION_SKIP_REASONS
+    ):
+        raise RegistryError("citation_skip_reason")
     file_fields = _file_fields(row, source_id)
     try:
         refetch = parse_cadence(
@@ -630,6 +638,7 @@ def _entry(row: object) -> Entry:
         cache_role=file_fields.cache_role,
         chain_intermediate_sha256=_chain_pin(row),
         comtrade_policy=comtrade_policy,
+        stream_max_bytes=_stream_max_bytes(row),
     )
 
 
@@ -836,6 +845,11 @@ TECHNICAL_SKIP_REASONS = frozenset(
 )
 
 
+# Decision 0107 (proposed): the one reason a landmark citation row may be
+# skipped; any other non-empty reason on such a row is refused at load.
+CITATION_SKIP_REASONS = frozenset({"page_not_served"})
+
+
 def _technical_reason(reason: str) -> bool:
     """A layer may be omitted only for this closed vocabulary, one token or several."""
     tokens = [part.strip() for part in reason.split(";") if part.strip()]
@@ -895,6 +909,14 @@ def _bool(row: dict[object, object], name: str) -> bool:
     value = row[name]
     if not isinstance(value, bool):
         raise RegistryError(f"{name} is not a boolean")
+    return value
+
+
+def _stream_max_bytes(row: dict[object, object]) -> int | None:
+    """A reviewed positive byte ceiling; null is an explicit unconfirmed hold."""
+    value = row.get("stream_max_bytes")
+    if value is not None and (type(value) is not int or value <= 0):
+        raise RegistryError("stream_max_bytes")
     return value
 
 

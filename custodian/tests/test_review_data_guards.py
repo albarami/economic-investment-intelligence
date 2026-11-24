@@ -20,7 +20,11 @@ from eii_custodian.publicdata.additions.property_venues import (
 from eii_custodian.publicdata.busyness.build import BuildInputError, _inputs
 from eii_custodian.publicdata.places import PlacesError, build
 from eii_custodian.publicdata.places.display import PubPlace
-from eii_custodian.publicdata.places.review import load_categories, load_showcase_areas
+from eii_custodian.publicdata.places.review import (
+    load_categories,
+    load_showcase_areas,
+    review_file_row,
+)
 
 
 def _area(**changes: object) -> dict[str, object]:
@@ -29,14 +33,15 @@ def _area(**changes: object) -> dict[str, object]:
         mode="walk",
         cutoff_minutes=10,
         source_id="places_ovt",
-        record_key="SYN-PIN",
+        record_ref="SYN-PIN",
         **changes,
     )
 
 
 def _gazetteer(area: dict[str, object]) -> dict[str, object]:
     return {
-        **{name: area[name] for name in ("place_key", "source_id", "record_key")},
+        **{name: area[name] for name in ("place_key", "source_id")},
+        "record_key": area["record_ref"],
         "kind": "landmark",
         "name_en": "SYN Place",
         "name_ar": "مكان تجريبي",
@@ -89,7 +94,7 @@ def test_showcase_guard(tmp_path: Path, change: str, reason: str) -> None:
         }[change]
         gazetteer = (_gazetteer(row),)
     elif change == "pin":
-        row["record_key"] = "SYN-OTHER"
+        row["record_ref"] = "SYN-OTHER"
     else:
         row["place_key"] = "SYN-OTHER"
     path = tmp_path / "areas.yaml"
@@ -102,9 +107,11 @@ def test_empty_and_matching_showcase(tmp_path: Path) -> None:
     path = tmp_path / "areas.yaml"
     for rows in ([], [_area()]):
         path.write_text(yaml.safe_dump(rows))
-        assert load_showcase_areas(path, None, gazetteer=(_gazetteer(_area()),))[
-            1
-        ] == tuple(rows)
+        loaded = load_showcase_areas(path, None, gazetteer=(_gazetteer(_area()),))[1]
+        expected = [dict(row) for row in rows]
+        for row in expected:
+            row["record_key"] = row.pop("record_ref")
+        assert loaded == tuple(expected)
 
 
 @pytest.mark.parametrize(
@@ -289,19 +296,21 @@ def test_required_counts_in_stage(
     review = _review(tmp_path, verified="", candidates=False)
     areas = [
         _area(),
-        {**_area(), "place_key": "SYN-SECOND", "record_key": "SYN-SECOND-PIN"},
+        {**_area(), "place_key": "SYN-SECOND", "record_ref": "SYN-SECOND-PIN"},
     ]
     if failure is not None:
         areas.append(
             {
                 **_area(),
                 "place_key": "SYN-FAILED",
-                "record_key": "SYN-PIN",
+                "record_ref": "SYN-PIN",
             }
         )
     (review / "showcase_areas.yaml").write_text(yaml.safe_dump(areas))
     gazetteer = [_gazetteer(row) for row in areas]
-    (review / "showcase_gazetteer.yaml").write_text(yaml.safe_dump(gazetteer))
+    (review / "showcase_gazetteer.yaml").write_text(
+        yaml.safe_dump([review_file_row(row) for row in gazetteer])
+    )
     places = _places(
         tmp_path,
         [

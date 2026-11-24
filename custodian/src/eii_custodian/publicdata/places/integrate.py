@@ -261,6 +261,7 @@ def _place_from_registry(
             entry.source_id == _PLACES_SOURCE
             and entry.skip_reason == ""
             and entry.extension == "parquet"
+            and entry.key != _PLACES_SOURCE
         ):
             located = _receipt_of(cache, entry)
             if located is not None:
@@ -276,6 +277,7 @@ def _building_entries(registry: Sequence[Entry]) -> tuple[Entry, ...]:
         if entry.source_id == _BUILDINGS_SOURCE
         and entry.skip_reason == ""
         and entry.extension == "parquet"
+        and entry.key != _BUILDINGS_SOURCE
     )
 
 

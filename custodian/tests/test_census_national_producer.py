@@ -11,7 +11,7 @@ import pytest
 from custodian.tests.test_frame_census import entry
 from custodian.tests.test_frame_seventh import seventh_build
 from custodian.tests.test_pinned_c8 import workbook, write_source
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.fetch.page_html import ShapeError
@@ -163,6 +163,7 @@ def test_c8_vocabulary_is_national_only_and_not_an_audit_selector():
             assert census.unit_for(table, indicator) is None
 
 
+@settings(deadline=None)
 @given(
     counts=st.integers(min_value=1, max_value=99999999999999).flatmap(
         lambda total: st.tuples(

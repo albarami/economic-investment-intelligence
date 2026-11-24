@@ -708,6 +708,13 @@ class Production:
             for e in self.entries
             if e.source_id in ADDITION_FAMILIES and not e.skip_reason
         }
+        if any(
+            entry.source_id == "prop_resi_units" and entry.key in selected
+            for entry in self.entries
+        ):
+            from .assembly_layers import check_property_districts
+
+            check_property_districts(self)
         output = build_additions(
             self.cache,
             self.entries,
@@ -753,7 +760,7 @@ class Production:
         from .assembly_layers import build_layers
 
         before = dict(self.tables)
-        build_layers(self)
+        bulletin_coverage = build_layers(self)
         names = {
             name for name, rows in self.tables.items() if before.get(name) is not rows
         }
@@ -762,6 +769,7 @@ class Production:
             {
                 "tables": {name: self.tables[name] for name in sorted(names)},
                 "source_tables": self.source_tables,
+                "bulletin_coverage": bulletin_coverage,
             },
         )
 

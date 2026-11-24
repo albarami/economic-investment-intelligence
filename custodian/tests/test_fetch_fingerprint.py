@@ -28,7 +28,7 @@ from custodian.tests.test_build_resume import (
     entry,
     record,
 )
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.assembly import AssemblyError
@@ -285,6 +285,7 @@ def _listing_child(
         yield seen
 
 
+@settings(deadline=None)
 @given(
     names=st.lists(
         st.lists(_SEGMENT, min_size=1, max_size=4).map("/".join), max_size=12

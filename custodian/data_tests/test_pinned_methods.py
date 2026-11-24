@@ -3,6 +3,7 @@
 import importlib.util
 import json
 import sys
+import warnings
 from decimal import Decimal as D
 from fractions import Fraction
 from pathlib import Path
@@ -31,6 +32,7 @@ from eii_custodian.publicdata.frame.census import (
 from eii_custodian.publicdata.frame.census import (
     c8_block_rows as _c8_block_rows,
 )
+from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.crosswalk import (
     municipality_key,
     municipality_keys,
@@ -38,7 +40,7 @@ from eii_custodian.publicdata.frame.crosswalk import (
 )
 from eii_custodian.publicdata.frame.layers import COUNTS, layer_rows
 from eii_custodian.publicdata.frame.population import population_rows
-from eii_custodian.publicdata.review.activity import SpineError, committed_class_members
+from eii_custodian.publicdata.review.activity import committed_class_members
 from eii_custodian.publicdata.series.parse import customs_code, source_period
 
 _CACHE_NAME = "eii_data_tests_cache"
@@ -52,6 +54,8 @@ if _cache is None:
     sys.modules[_CACHE_NAME] = _cache
     _cache_spec.loader.exec_module(_cache)
 pinned = _cache.pinned
+closed_reason = _cache.closed_reason
+_closed_case = _cache.closed_case
 
 
 def reading(value, unit, period, chain, geography="national"):
@@ -145,7 +149,7 @@ def c1_replay(active, active_chain, population, population_chain, review, name):
     }
 
 
-def test_pinned_c1():
+def c1_check():
     active, active_chain = pinned("lic_active")
     population, population_chain = pinned("pop_muni")
     result = c1_replay(
@@ -156,20 +160,31 @@ def test_pinned_c1():
         _cache.ROOT / "custodian/publicdata/review",
         "Al Daayen",
     )
-    for key, expected in {
-        "local_all": 13600,
-        "national_all": 249622,
-        "local_restaurants": 361,
-        "national_restaurants": 4782,
-        "local_coffee": 173,
-        "national_coffee": 1042,
-        "local_population": 111282,
-        "national_population": 3219982,
-    }.items():
-        assert result[key] == D(expected), key
-    assert tuple(fact.value for fact in result["density"]) == (D(32), D(15))
-    for fact, expected in zip(result["lq"], ("1.39", "3.05"), strict=True):
-        assert abs(fact.value - D(expected)) <= D("0.01")
+    if any(
+        result[key] != D(expected)
+        for key, expected in {
+            "local_all": 13600,
+            "national_all": 249622,
+            "local_restaurants": 361,
+            "national_restaurants": 4782,
+            "local_coffee": 173,
+            "national_coffee": 1042,
+            "local_population": 111282,
+            "national_population": 3219982,
+        }.items()
+    ):
+        raise ValueError("C1:count_mismatch")
+    if tuple(fact.value for fact in result["density"]) != (D(32), D(15)):
+        raise ValueError("C1:density_mismatch")
+    if any(
+        abs(fact.value - D(expected)) > D("0.01")
+        for fact, expected in zip(result["lq"], ("1.39", "3.05"), strict=True)
+    ):
+        raise ValueError("C1:lq_mismatch")
+
+
+def test_pinned_c1():
+    return _closed_case("C1", c1_check, C1_REASONS)
 
 
 def _c8_share(private, total, chain, geography):
@@ -235,7 +250,7 @@ def _c8_check_sex_totals(sheet, both_row):
         raise ValueError("C8:national_sector_sum")
 
 
-def test_pinned_c8():
+def _c8_replay():
     """Lead-only: compare calc to plain raw-file division, never store its values."""
     national_body, national_chain = _cache.pinned_body(C8_SOURCES["national"])
     zone_body, zone_chain = _cache.pinned_body(C8_SOURCES["zone"])
@@ -276,6 +291,41 @@ def test_pinned_c8():
     _c8_agrees(high, max(expected_shares), "range_high")
 
 
+def c8_check():
+    try:
+        return _c8_replay()
+    except FrameError as error:
+        raise ValueError(str(error)) from None
+
+
+def test_pinned_c8():
+    return _closed_case("C8", c8_check, C8_REASONS)
+
+
+def c3_check(source, last, expected):
+    rows, chain = pinned(source)
+    dimension = "occupation" if source == "wage_occ" else "economic_activity"
+
+    def groups(year):
+        selected = [r for r in rows if str(r["year"]) == year]
+        result = {}
+        for row in selected:
+            key = str((row["gender"], row[dimension]))
+            if key in result:
+                raise ValueError("C3:duplicate_wage_group")
+            result[key] = (
+                reading(row["paid_employment_workers"], "count", year, chain),
+                reading(row["monthly_average_wage_qr"], "qar_per_month", year, chain),
+            )
+        return result
+
+    result = decomposition(groups("2020"), groups(last))
+    if any(result[key].value != D(literal) for key, literal in expected.items()):
+        raise ValueError("C3:decomposition_mismatch")
+    if any(result[key].sources != (chain,) for key in expected):
+        raise ValueError("C3:lineage")
+
+
 @pytest.mark.parametrize(
     "source,last,expected",
     [
@@ -297,28 +347,10 @@ def test_pinned_c8():
     ],
 )
 def test_pinned_c3(source, last, expected):
-    rows, chain = pinned(source)
-    dimension = "occupation" if source == "wage_occ" else "economic_activity"
-
-    def groups(year):
-        selected = [r for r in rows if str(r["year"]) == year]
-        result = {}
-        for row in selected:
-            key = str((row["gender"], row[dimension]))
-            assert key not in result, "duplicate wage group"
-            result[key] = (
-                reading(row["paid_employment_workers"], "count", year, chain),
-                reading(row["monthly_average_wage_qr"], "qar_per_month", year, chain),
-            )
-        return result
-
-    result = decomposition(groups("2020"), groups(last))
-    for key, literal in expected.items():
-        assert result[key].value == D(literal), key
-        assert result[key].sources == (chain,)
+    return _closed_case("C3", lambda: c3_check(source, last, expected), C3_REASONS)
 
 
-def test_pinned_c4():
+def c4_check():
     sources = {
         source: pinned(source)
         for source in ("sec_hr_ind", "sec_hr_size", "sec_hr_goods", "sec_hr_serv")
@@ -333,7 +365,8 @@ def test_pinned_c4():
             ]
             for source, pair in sources.items()
         }
-        assert len(chosen["sec_hr_ind"]) == 1
+        if len(chosen["sec_hr_ind"]) != 1:
+            raise ValueError("C4:industry_row")
         row = chosen["sec_hr_ind"][0]
 
         def m(value, unit, source="sec_hr_ind", year=year):
@@ -366,7 +399,8 @@ def test_pinned_c4():
                     for r in chosen[source]
                     if str(r[label]).casefold() == published_label.casefold()
                 ]
-                assert len(matching) == 1, "source component label:" + published_label
+                if len(matching) != 1:
+                    raise ValueError("C4:component_label")
                 components.append(
                     Component(
                         key,
@@ -393,29 +427,34 @@ def test_pinned_c4():
             ),
             components=components,
         )
-    for key, literal in {
-        "food": "29.3",
-        "beverages": "5.6",
-        "rent": "11.6",
-        "compensation_percent": "20.6",
-        "surplus_percent": "19.7",
-        "goods_percent": "40.6",
-        "services_percent": "16.5",
-    }.items():
-        assert results["2022"][key].value == D(literal)
+    if any(
+        results["2022"][key].value != D(literal)
+        for key, literal in {
+            "food": "29.3",
+            "beverages": "5.6",
+            "rent": "11.6",
+            "compensation_percent": "20.6",
+            "surplus_percent": "19.7",
+            "goods_percent": "40.6",
+            "services_percent": "16.5",
+        }.items()
+    ):
+        raise ValueError("C4:norms_mismatch")
     for key, low, high in (
         ("food", "28.0", "29.3"),
         ("rent", "11.6", "15.1"),
         ("compensation_percent", "20.6", "25.2"),
         ("surplus_percent", "6.9", "19.7"),
     ):
-        assert share_range([r[key].value for r in results.values()]) == (
-            D(low),
-            D(high),
-        )
+        if share_range([r[key].value for r in results.values()]) != (D(low), D(high)):
+            raise ValueError("C4:range_mismatch")
 
 
-def test_pinned_c9():
+def test_pinned_c4():
+    return _closed_case("C4", c4_check, C4_REASONS)
+
+
+def c9_check():
     rows, chain = pinned("util_elec")
     selected = [r for r in rows if str(r["year"]) in ("2021", "2025")]
     energies = [
@@ -438,20 +477,36 @@ def test_pinned_c9():
         )
 
     result = zone_momentum(energies, national(2021), national(2025))
-    assert result["national_ratio"].value == D("1.34")
-    assert result["zones"]["69"]["ratio"].value == D("3.34")
-    assert result["order_unrounded"][:4] == ("2", "72", "29", "69")
-    assert [
-        result["zones"][key]["ranked_ratio"].value for key in ("2", "72", "29", "69")
-    ] == [D("6.5"), D("5.4"), D("4.0"), D("3.3")]
+    if (
+        result["national_ratio"].value != D("1.34")
+        or result["zones"]["69"]["ratio"].value != D("3.34")
+        or [
+            result["zones"][key]["ranked_ratio"].value
+            for key in ("2", "72", "29", "69")
+        ]
+        != [D("6.5"), D("5.4"), D("4.0"), D("3.3")]
+    ):
+        raise ValueError("C9:momentum_mismatch")
+    if result["order_unrounded"][:4] != ("2", "72", "29", "69"):
+        raise ValueError("C9:order_mismatch")
     zero_zones = [r.zone for r in energies if r.year == 2021 and r.value == D(0)]
-    assert zero_zones
+    if not zero_zones:
+        raise ValueError("C9:zero_zone_missing")
     for zone in zero_zones:
-        for slot in ("ratio", "ranked_ratio", "relative"):
-            assert result["zones"][zone][slot] == NoData("no_denominator")
-        assert result["zones"][zone]["ratio_unrounded"] is None
-        assert result["zones"][zone]["ranked_unrounded"] is False
-        assert zone not in result["order_unrounded"]
+        if (
+            any(
+                result["zones"][zone][slot] != NoData("no_denominator")
+                for slot in ("ratio", "ranked_ratio", "relative")
+            )
+            or result["zones"][zone]["ratio_unrounded"] is not None
+            or result["zones"][zone]["ranked_unrounded"] is not False
+            or zone in result["order_unrounded"]
+        ):
+            raise ValueError("C9:zero_zone_mismatch")
+
+
+def test_pinned_c9():
+    return _closed_case("C9", c9_check, C9_REASONS)
 
 
 C2_CALENDAR = tuple(f"{2015 + i // 12}-{i % 12 + 1:02}" for i in range(125))
@@ -543,7 +598,7 @@ def c2_municipal_churn(
     return stock, cancelled_total, result
 
 
-def test_pinned_c2_national_cancellations():
+def c2_national_check():
     rows, chain = pinned("lic_cancelled")
     counts, dated, undated, months = c2_national_totals(rows, chain)
     active, active_chain = pinned("lic_active")
@@ -556,23 +611,91 @@ def test_pinned_c2_national_cancellations():
         reading(dated + undated, "count", "2025-05", chain),
         reading(dated, "count", "2025-05", chain),
     )
-    assert dated == D(153669)
-    assert undated == D(7386)
-    assert result["undated_count"].value == D(7386)
-    for month, expected_count in (
-        ("2020-07", 40791),
-        ("2022-06", 14212),
-        ("2024-09", 11232),
+    if (
+        dated != D(153669)
+        or undated != D(7386)
+        or result["undated_count"].value != D(7386)
     ):
-        assert month in result["bulk_months_unrounded"]
-        assert counts[month] == D(expected_count)
+        raise ValueError("C2-NATIONAL:totals_mismatch")
+    if any(
+        month not in result["bulk_months_unrounded"]
+        or counts[month] != D(expected_count)
+        for month, expected_count in (
+            ("2020-07", 40791),
+            ("2022-06", 14212),
+            ("2024-09", 11232),
+        )
+    ):
+        raise ValueError("C2-NATIONAL:bulk_month_mismatch")
     named_three = counts["2020-07"] + counts["2022-06"] + counts["2024-09"]
     named_share = D(rounded(ratio(named_three * 100, dated), 1))
-    assert abs(named_share - D("43.1")) <= D("0.1")
-    assert named_share == D("43.1")
-    assert abs(result["bulk_share_percent"].value - D("54.3")) <= D("0.1")
-    assert result["bulk_share_percent"].value == D("54.3")
-    assert result["bulk_months_unrounded"] == EXPECTED_C2_BULK_MONTHS
+    if (
+        abs(named_share - D("43.1")) > D("0.1")
+        or named_share != D("43.1")
+        or abs(result["bulk_share_percent"].value - D("54.3")) > D("0.1")
+        or result["bulk_share_percent"].value != D("54.3")
+    ):
+        raise ValueError("C2-NATIONAL:bulk_share_mismatch")
+    if result["bulk_months_unrounded"] != EXPECTED_C2_BULK_MONTHS:
+        raise ValueError("C2-NATIONAL:bulk_order_mismatch")
+
+
+def test_pinned_c2_national_cancellations():
+    return _closed_case("C2-NATIONAL", c2_national_check, C2_NATIONAL_REASONS)
+
+
+def c2_municipal_check(
+    municipality_ar: str,
+    slug: str,
+    expected_active: int,
+    expected_cancelled: int,
+    expected_percent: str,
+    expected_excluded: int,
+    expected_excluded_percent: str,
+):
+    active_rows, active_chain = pinned("lic_active")
+    cancelled_rows, cancelled_chain = pinned("lic_cancelled")
+    stock, cancelled_2024, result = c2_municipal_churn(
+        active_rows,
+        active_chain,
+        cancelled_rows,
+        cancelled_chain,
+        municipality_ar,
+        slug,
+    )
+    if cancelled_2024 != D(expected_cancelled):
+        raise ValueError("C2-MUNICIPAL:cancelled_mismatch")
+    if stock != D(expected_active) or result["active_count"].value != D(
+        expected_active
+    ):
+        raise ValueError("C2-MUNICIPAL:stock_mismatch")
+    if abs(result["including_percent"].value - D(expected_percent)) > D(
+        "0.1"
+    ) or result["including_percent"].value != D(expected_percent):
+        raise ValueError("C2-MUNICIPAL:including_mismatch")
+    # Assert the unrounded numerator as well as its displayed percentage.
+    if result[
+        "excluding_percent"
+    ].exact_unrounded * expected_active != expected_excluded * 100 or result[
+        "excluding_percent"
+    ].value != D(expected_excluded_percent):
+        raise ValueError("C2-MUNICIPAL:excluding_mismatch")
+    geography = f"municipality:{slug}"
+    if any(
+        (fact.geography, fact.geography_kind) != (geography, "public")
+        for fact in (
+            result["active_count"],
+            result["including_ratio"],
+            result["including_percent"],
+            result["excluding_percent"],
+            *result["including_interval"],
+            *result["excluding_interval"],
+        )
+    ) or any(
+        (fact.geography, fact.geography_kind) != ("national", "national")
+        for fact in (result["undated_count"], result["bulk_share_percent"])
+    ):
+        raise ValueError("C2-MUNICIPAL:geography_mismatch")
 
 
 @pytest.mark.parametrize(
@@ -596,39 +719,216 @@ def test_pinned_c2_municipal_restaurants(
     expected_excluded: int,
     expected_excluded_percent: str,
 ):
-    active_rows, active_chain = pinned("lic_active")
-    cancelled_rows, cancelled_chain = pinned("lic_cancelled")
-    stock, cancelled_2024, result = c2_municipal_churn(
-        active_rows,
-        active_chain,
-        cancelled_rows,
-        cancelled_chain,
-        municipality_ar,
-        slug,
+    return _closed_case(
+        "C2-MUNICIPAL",
+        lambda: c2_municipal_check(
+            municipality_ar,
+            slug,
+            expected_active,
+            expected_cancelled,
+            expected_percent,
+            expected_excluded,
+            expected_excluded_percent,
+        ),
+        C2_MUNICIPAL_REASONS,
     )
-    assert cancelled_2024 == D(expected_cancelled)
-    assert stock == D(expected_active)
-    assert result["active_count"].value == D(expected_active)
-    assert abs(result["including_percent"].value - D(expected_percent)) <= D("0.1")
-    assert result["including_percent"].value == D(expected_percent)
-    # Assert the unrounded numerator as well as its displayed percentage.
-    assert (
-        result["excluding_percent"].exact_unrounded * expected_active
-        == expected_excluded * 100
+
+
+WILSON_MUNICIPALITY = ("بلدية الشمال", "al_shamal")
+WILSON_STOCK = D(28)
+WILSON_CANCELLATIONS = D(6)
+# Pre-registered before any run (L-1717; L5c section 1 option B): label -> year.
+# Cancellations include flagged months. The 2025 cell is partial: the C2
+# calendar ends at 2025-05 and licence_churn refuses any later month.
+# custodian/tests/test_pinned_wilson.py pins this exact set; never widen it.
+WILSON_PERIOD_GRID = (
+    ("2015", "2015"),
+    ("2016", "2016"),
+    ("2017", "2017"),
+    ("2018", "2018"),
+    ("2019", "2019"),
+    ("2020", "2020"),
+    ("2021", "2021"),
+    ("2022", "2022"),
+    ("2023", "2023"),
+    ("2024", "2024"),
+    ("2025-partial", "2025"),
+)
+
+
+class WilsonPeriodIdentified(UserWarning):
+    """Names the one matching grid label; never a count."""
+
+
+def wilson_stock_check(active_rows, active_chain, cancelled_rows, cancelled_chain):
+    """n is the May 2025 stock, so the year argument does not change it."""
+    stock, _, _ = c2_municipal_churn(
+        active_rows, active_chain, cancelled_rows, cancelled_chain, *WILSON_MUNICIPALITY
     )
-    assert result["excluding_percent"].value == D(expected_excluded_percent)
-    geography = f"municipality:{slug}"
-    for fact in (
-        result["active_count"],
-        result["including_ratio"],
-        result["including_percent"],
-        result["excluding_percent"],
-        *result["including_interval"],
-        *result["excluding_interval"],
-    ):
-        assert (fact.geography, fact.geography_kind) == (geography, "public")
-    for fact in (result["undated_count"], result["bulk_share_percent"]):
-        assert (fact.geography, fact.geography_kind) == ("national", "national")
+    if stock != WILSON_STOCK:
+        raise ValueError("wilson_stock_mismatch")
+
+
+def wilson_period_label(active_rows, active_chain, cancelled_rows, cancelled_chain):
+    rows = (active_rows, active_chain, cancelled_rows, cancelled_chain)
+    wilson_stock_check(*rows)
+    matches = [
+        label
+        for label, year in WILSON_PERIOD_GRID
+        if c2_municipal_churn(*rows, *WILSON_MUNICIPALITY, year=year)[1]
+        == WILSON_CANCELLATIONS
+    ]
+    if not matches:
+        raise ValueError("wilson_period_no_match")
+    if len(matches) > 1:
+        raise ValueError("wilson_period_ambiguous")
+    return matches[0]
+
+
+def _pinned_reasons(*sources):
+    return {
+        f"{reason}:{source}": reason
+        for reason in ("public_cache_missing", "receipt_hash_mismatch")
+        for source in sources
+    }
+
+
+def _case_reasons(case, reasons, *sources):
+    return {f"{case}:{reason}": reason for reason in reasons} | _pinned_reasons(
+        *sources
+    )
+
+
+C1_REASONS = _case_reasons(
+    "C1",
+    (
+        "municipality_missing",
+        "population_indicator_unreviewed",
+        "population_duplicate",
+        "population_missing",
+        "count_mismatch",
+        "density_mismatch",
+        "lq_mismatch",
+    ),
+    "lic_active",
+    "pop_muni",
+)
+C3_REASONS = _case_reasons(
+    "C3",
+    ("duplicate_wage_group", "decomposition_mismatch", "lineage"),
+    "wage_occ",
+    "wage_act",
+)
+C4_REASONS = _case_reasons(
+    "C4",
+    ("industry_row", "component_label", "norms_mismatch", "range_mismatch"),
+    "sec_hr_ind",
+    "sec_hr_size",
+    "sec_hr_goods",
+    "sec_hr_serv",
+)
+C5_REASONS = _case_reasons(
+    "C5", ("total_mismatch", "unit_value_mismatch"), "cus_imp_2025"
+)
+C8_REASONS = _case_reasons(
+    "C8",
+    (
+        "national_header",
+        "national_block",
+        "sex_block",
+        "national_count",
+        "sex_count",
+        "activity_count",
+        "national_denominator",
+        "sector_sum",
+        "zone_denominator",
+        "activity_sum_mismatch",
+        "sex_sum_mismatch",
+        "national_sector_sum",
+        "national_mismatch",
+        "national_lineage",
+        "zone_keys",
+        "null_zone_mismatch",
+        "zone_mismatch",
+        "zone_lineage",
+        "no_complete_zones",
+        "range_low_mismatch",
+        "range_high_mismatch",
+    ),
+    "census_2020_workbook",
+    "census_zone_sector",
+)
+C9_REASONS = _case_reasons(
+    "C9",
+    ("momentum_mismatch", "order_mismatch", "zero_zone_missing", "zero_zone_mismatch"),
+    "util_elec",
+)
+LICENCE_REASONS = {
+    "month outside calendar": "month_outside_calendar",
+    **_pinned_reasons("lic_active", "lic_cancelled"),
+}
+C2_NATIONAL_REASONS = (
+    _case_reasons(
+        "C2-NATIONAL",
+        (
+            "totals_mismatch",
+            "bulk_month_mismatch",
+            "bulk_share_mismatch",
+            "bulk_order_mismatch",
+        ),
+    )
+    | LICENCE_REASONS
+)
+C2_MUNICIPAL_REASONS = (
+    _case_reasons(
+        "C2-MUNICIPAL",
+        (
+            "cancelled_mismatch",
+            "stock_mismatch",
+            "including_mismatch",
+            "excluding_mismatch",
+            "geography_mismatch",
+        ),
+    )
+    | LICENCE_REASONS
+)
+WILSON_REASONS = {
+    "wilson_stock_mismatch": "wilson_stock_mismatch",
+    "wilson_period_no_match": "wilson_period_no_match",
+    "wilson_period_ambiguous": "wilson_period_ambiguous",
+    **LICENCE_REASONS,
+}
+ISIC_REASONS = {
+    "spine_pins_differ": "spine_pins_differ",
+    "isic_stock_mismatch": "isic_stock_mismatch",
+    "isic_ratio_mismatch": "isic_ratio_mismatch",
+    "isic_lineage": "isic_lineage",
+    **LICENCE_REASONS,
+}
+
+
+def wilson_reason(error: Exception) -> str:
+    return closed_reason(error, WILSON_REASONS)
+
+
+def _licence_case(case, check, reasons):
+    """Read the two pinned licences through the shared closed-case boundary."""
+
+    def licence_check():
+        active_rows, active_chain = pinned("lic_active")
+        cancelled_rows, cancelled_chain = pinned("lic_cancelled")
+        return check(active_rows, active_chain, cancelled_rows, cancelled_chain)
+
+    return _closed_case(case, licence_check, reasons)
+
+
+def test_pinned_c2_wilson_stock():
+    _licence_case("C2-WILSON-STOCK", wilson_stock_check, WILSON_REASONS)
+
+
+def test_pinned_c2_wilson_period():
+    label = _licence_case("C2-WILSON-PERIOD", wilson_period_label, WILSON_REASONS)
+    warnings.warn(f"C2-WILSON-PERIOD:{label}", WilsonPeriodIdentified, stacklevel=1)
 
 
 def c2_class_members(isic_class: str) -> tuple[str, ...]:
@@ -640,19 +940,12 @@ def c2_class_members(isic_class: str) -> tuple[str, ...]:
     selected = reviewed_selections(_cache.CACHE)
     for key in ("lic_active", "lic_cancelled"):
         if selected.get(key) != _cache._pin(key):
-            pytest.fail(
-                "C2 ISIC 5610 spine and method pins name different snapshots: " + key
-            )
+            raise ValueError("spine_pins_differ")
     return committed_class_members(_cache.CACHE, isic_class, selections=selected)
 
 
-def test_pinned_c2_isic_5610():
-    cancelled_rows, cancelled_chain = pinned("lic_cancelled")
-    active_rows, active_chain = pinned("lic_active")
-    try:
-        members = set(c2_class_members("5610"))
-    except SpineError as error:
-        pytest.fail("C2 ISIC 5610 membership refused: " + error.detail)
+def isic_5610_check(active_rows, active_chain, cancelled_rows, cancelled_chain):
+    members = set(c2_class_members("5610"))
     class_cancelled = [
         row for row in cancelled_rows if row["rmz_lnsht_ltjry"] in members
     ]
@@ -684,15 +977,22 @@ def test_pinned_c2_isic_5610():
         reading(dated + undated, "count", "2025-05", cancelled_chain),
         reading(dated, "count", "2025-05", cancelled_chain),
     )
-    assert result["active_count"].value == D(7878)
-    assert result["including_ratio"].exact_unrounded * 7878 == 2510
-    assert result["including_ratio"].value == D("0.32")
-    assert {"lic_active", "lic_cancelled"} <= {
-        chain.lineage_ref for chain in result["including_ratio"].sources
-    }
+    if result["active_count"].value != D(7878):
+        raise ValueError("isic_stock_mismatch")
+    ratio = result["including_ratio"]
+    if ratio.exact_unrounded * 7878 != 2510 or ratio.value != D("0.32"):
+        raise ValueError("isic_ratio_mismatch")
+    if not {"lic_active", "lic_cancelled"} <= {
+        chain.lineage_ref for chain in ratio.sources
+    }:
+        raise ValueError("isic_lineage")
 
 
-def test_pinned_c5_heading_checks_only():
+def test_pinned_c2_isic_5610():
+    _licence_case("C2-ISIC-5610", isic_5610_check, ISIC_REASONS)
+
+
+def c5_check():
     rows, chain = pinned("cus_imp_2025")
     selected = [r for r in rows if str(r["year"]) == "2025"]
     months = tuple(f"2025-{i:02}" for i in range(1, 13))
@@ -719,7 +1019,8 @@ def test_pinned_c5_heading_checks_only():
     total = supplier_metrics(
         trades, sorted({r.product for r in trades}), months, months, reviewed=True
     )
-    assert rounded(total["total_value"].exact_unrounded / 10**9, 2) == "138.53"
+    if rounded(total["total_value"].exact_unrounded / 10**9, 2) != "138.53":
+        raise ValueError("C5:total_mismatch")
     for heading, origin, expected in (
         ("1902", "Italy", "8.69"),
         ("1902", "Saudi Arabia", "11.45"),
@@ -732,4 +1033,9 @@ def test_pinned_c5_heading_checks_only():
         result = supplier_metrics(
             chosen, sorted({r.product for r in chosen}), months, months, reviewed=True
         )
-        assert result["origins"][origin]["unit_value"].value == D(expected)
+        if result["origins"][origin]["unit_value"].value != D(expected):
+            raise ValueError("C5:unit_value_mismatch")
+
+
+def test_pinned_c5_heading_checks_only():
+    return _closed_case("C5", c5_check, C5_REASONS)

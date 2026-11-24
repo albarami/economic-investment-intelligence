@@ -11,7 +11,12 @@ from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any
 
 from .assembly import AssemblyError
-from .frame.crosswalk import district_keys, read_csv
+from .frame.crosswalk import (
+    DISTRICT_CROSSWALK_HEADER,
+    check_district_crosswalk,
+    district_keys,
+    read_csv,
+)
 from .method_card_validation import (
     CONFIGURATION_PINS,
     S7_DEFERRED_PINS,
@@ -75,10 +80,18 @@ def _c14_values(build: Production, settings: Mapping[str, object]) -> dict[str, 
     if not keys or any(key not in build.selected for key in keys):
         raise AssemblyError("pin_c14_snapshot_missing")
     rows = build.tables.get("pub_property_sale", [])
+    crosswalk = read_csv(
+        build.review / "district_crosswalk.csv", header=DISTRICT_CROSSWALK_HEADER
+    )
+    known = {
+        str(row["district_key"]) for row in build.needed_frame().tables["district"]
+    }
+    check_district_crosswalk(crosswalk, known)
     districts, reason = district_keys(
         str(settings["crosswalk_name"]),
-        read_csv(build.review / "district_crosswalk.csv"),
-        {str(row["district_key"]) for row in rows},
+        str(settings["municipality_code"]),
+        crosswalk,
+        known,
     )
     selected = [
         row

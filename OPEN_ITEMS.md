@@ -1710,6 +1710,8 @@
 - OPTIONS: **Recommendation:** leave to the crosswalk tasks that own the country, municipality and gazetteer maps.
 - NEEDED BY: the tasks owning the crosswalks and the cards that display mapped geography.
 
+- UPDATE 2026-11-24, S2-P85 (proposed decision 0108): the needed reviewed crosswalk rows stay in the uncommitted cache review folder after the lead's review, whose PROGRESS.md record binds their file hash; the committed file stays schema-only. This supersedes the storage wording above and in the later carry row, without closing OI-182 or claiming real mappings.
+
 ## OI-183 — Mutation-sweep pass over the merged-task survivors (with S2-T11, S2-T15)
 
 - ID: OI-183
@@ -2098,6 +2100,7 @@ The lead ruled on 2026-11-15 that the rows stay this open item: nothing is added
 - NEEDED: Complete the lead’s Part B live steps before ticking the eight criteria and before S2-T08.
 - WHY: Fixture approval does not verify a real showcase or select a real flagship.
 - DONE SO FAR: The DATA whole-task verdict P1 at b505c2d approves code but owes: the four concrete files and road receipts; attribution/category rows; Arabic tag; census lineage; places build/report; four showcase and seven candidate keys; showcase areas; real area manifest and rebuild comparison; verification rows; recorded check and provisional decision. Its P1 also says the header-only review-file test must change when real rows are entered. Part A rulings additionally owe the real confidence type (fixtures DOUBLE), record-level source entry rule, PUB-38 labels and the eleventh/withheld attribution-provider check; the withheld name is not reproduced here.
+- UPDATE: 2026-11-24, S2-P91 under ruling L-1769: the place review file identifier is `record_ref`; the live keys and evidence owed above remain pending and all committed values stay null.
 - OPTIONS: **Default:** Keep pending states until these records exist. Confirm the source-language tag under PUB-27 and keep PUB-59 owner confirmation distinct from the provisional choice.
 - NEEDED BY: S2-T06 live completion, before S2-T08 and dependent real-data uses.
 
@@ -2807,12 +2810,13 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 ## OI-308 — The list of files that the per-file ceiling refuses
 
 - ID: OI-308
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 11
 - CONCERNS: S2-T08 part B; L-975
 - WHY: Every refused file that feeds a figure or a card gets a named per-source ceiling or a bounded read; the table names the WSF 3D height file and two import exports, and records as to confirm whether the list of refused files is made.
 - NEEDED: The lead records whether the list is made and, if it is, the dated list of every file the ceiling of 300 MiB refuses, each with the figure or card it feeds, so that none is missed.
 - NEEDED BY: the next pass of S2-T08 part B.
+- CLOSED: 2026-11-24, by train S2-34: the list is made, and every file that feeds a figure or a card has a named per-source bound or an exact recorded size (section "OI-308 — closed (train S2-34, 2026-11-24)" below; review S2-L2g.rv2 APPROVED).
 
 ### OI-308 — S2-R8D dated inventory draft (2026-11-23; to complete after L6)
 
@@ -2837,6 +2841,54 @@ observed inventory; the two rows above are neither exhaustive nor a measured
 count. Do not reconstruct the list from `REQUIRED_KEYS`, invent byte counts or
 close S2-T08#13/OI-308 from this draft. Decision 0098 items 2, 6 and 8 and
 **Unresolved path holds**, U8, retain this evidence on the S2 path.
+
+### OI-308 — closed (train S2-34, 2026-11-24)
+
+OI-308 is CLOSED. The list of files that the ordinary per-file ceiling of
+300 MiB could refuse is made. It is the dated account of live step L2g, file
+sha256 `eff465424f632887445497f2691fafe02fcfba36499216be0d378e607032f753`,
+prepared on 2026-11-24 at `5eb45fab65` and APPROVED for that exact hash by
+the review S2-L2g.rv2 (OpenAI Codex B). Under ruling L-1733 the list is made
+from the current receipts and declared sizes (selected receipts retrieved
+2026-11-23, each recomputed hash equal to its receipt). The earlier seven-file
+list of the shape probe of 2026-11-18 is probe evidence with its stated
+limitation (no run identity and no surviving raw record); it is not relabelled
+as a build refusal. No run record shows a refusal by the ordinary ceiling.
+
+The account has 35 rows: the lead's 34 inventory rows and one account-only row,
+`bldg_ovt/part-00288` (PO-L2g-f2-01).
+
+| Rows | Sources | Disposition |
+|---|---|---|
+| 3 | `bldg_wsf3d` (8 GiB), `cus_imp_2019` and `trade_ext/qatar-imports-2014-2018` (2 GiB each), the three files decision 0064 item 11 names | Streamed, with the reviewed per-source `stream_max_bytes` of S2-P84 |
+| 2 | `bldg_gba/e050_n25_e055_n20`, `bldg_gba/e050_n30_e055_n25` (1 GiB each) | Streamed, with the reviewed per-source `stream_max_bytes` of S2-P84 |
+| 3 | `places_ovt/part-00014`, `bldg_ovt/part-00384`, `bldg_ovt/part-00385` | Streamed, with the exact recorded size |
+| 1 | `cus_imp_2025` | The ordinary ceiling applies and the file is admitted |
+| 12 | `awards_owner_scrape` (3), `bldg_ovt` (1), three landmark citation pages, `places_fsq/copy` (1), `tenders_pub` (3), `visits_museum` (1) | Refused for another reason, not by the ceiling |
+| 6 | `accident`, `events_visit_qatar`, `insurance_tables`, `manateq_tariffs`, `monaqasat_classified`, `schools_private_directory` | Never requested while their byte bound is unconfirmed; accounted under OI-309 |
+| 7 | `assembly` (4), `build-public`, `buildings`, `fetch_archive` | A run-level refusal, not a file |
+| 1 | `bldg_ovt/part-00288` (account-only row) | Excluded as a part that decision 0090 does not require, so never requested |
+
+Every file that feeds a figure or a card has a named per-source bound or an
+exact recorded size; the ordinary ceiling and its planted refusal stay for every
+other file. The five bounds are those of S2-P84 (train S2-31, PR 139, main
+`743433ae55`), and `custodian/publicdata/sources.yaml` on main `8d97268b0b`
+carries the same five values.
+
+Records points of the review, applied here:
+- PO-L2g-f2-01: 34 inventory rows plus one account-only row make 35; 34 is
+  not described as the complete combined list.
+- PO-L2g-f2-02: byte counts reach this file only in grouped or GiB form.
+- PO-L2g-f2-03: the f1 account's G1 item (no total-byte bound on five
+  streamed keys) is superseded by S2-P84; its canonical-key,
+  second-import-candidate and missing-part items are resolved by this account.
+- The refusal wording of the five bounded rows distinguishes an absent
+  recorded size with an unconfirmed bound (`bound_unconfirmed`) from a missing
+  declared length with a confirmed bound (`length_undeclared`); both refuse in
+  `fetch/large.py`. Under ruling L-1762 (S2-P90) the `length_undeclared`
+  refusal stands for the keys the imports row check does not parse; the two
+  `portal_dataset` keys it parses may stream undeclared and prove completeness
+  by the row parse reaching the closing `]` with only whitespace before EOF.
 
 ## OI-309 — The other six registry rows not read by the live build
 
@@ -7426,6 +7478,9 @@ introduced.
 - EVIDENCE: the review's targeted pass; the hosted failure of OI-408 shows the exposure on shared runners.
 - NEEDED: a sweep that re-enumerates every `@given` body in the repository and removes the exposure in the same way, with no assertion, strategy or example count changed.
 - NEEDED BY: before the S2 gate record.
+- RESOLVED 2026-11-24 (S2-P80, built by Anthropic Claude on base `d9b8862474`, uncommitted pending review): all 106 `@given` properties under `core/tests`, `custodian/tests`, `product/tests`, `scripts/tests` and `evals/` were re-enumerated. 23 do file or folder work in every example, confirmed by a static read and by an audit-hook run of every property. 12 already set `deadline=None`; 11 now do: the nine named above, plus `scripts/tests/test_spine_refusal_persistence.py` (the nested `check`) and `scripts/tests/test_stac_item_pins.py::test_snapshot_cardinality_property`. The four `test_register_tables.py` properties use `@settings(_REUSE, deadline=None)`, which keeps their health-check suppression. No assertion, strategy, example count, profile or seed changed. Guard: `scripts/tests/test_test_bootstrap.py::test_file_backed_properties_carry_no_deadline`, with its planted violations. The hosted-run evidence that OI-408 still needs is unchanged.
+- NOTE 2026-11-24 (S2-P80 round 2, from S2-P80.rv1, Cognition Devin, REJECTED `d6777c9118`): the guard missed several call forms and both import-alias forms (F1, F2). Round 2 widens the closed lists, resolves `from M import N [as A]`, `import M as A` and `from hypothesis import given as g`, and adds a plant for each form. The widened guard found one more property, `custodian/tests/test_census_national_producer.py::test_counts_preserve_exact_rational_values`. Its `ZipFile` works over `io.BytesIO`, in memory; the round-1 audit counted no file events for it. It now sets `deadline=None`. Recorded open by the review: the guard's comment names every form it still does not see (imported production code; calls through a dotted module such as `os.path.exists`; calls through a variable or `getattr`; helpers in another module; methods not on `self` or `cls`; `importlib` loads; file work in a strategy, fixture or `setUp`). The audit-hook evidence of round 1 is uncommitted; the committed guard is the durable control.
+- NOTE 2026-11-24 (S2-P80 round 3, from S2-P80.cf1, Cognition Devin, REJECTED `1f8c7d7f4e`): F3, a `from M import N [as A]` of a `FILE_METHODS`-only name (for example `from shutil import copytree`) bound nothing, so its bare call went unseen. Round 3 binds every `FILE_NAMES` and `FILE_METHODS` name and every N of an M.N in `FILE_QUALIFIED`, bare or aliased. A `from M import *` now binds every `FILE_METHODS` name and each N of an M.N in `FILE_QUALIFIED`. The widened guard flags no further property; `product/tests/test_released_imagery.py` has no `@given` property. Proposed by the confirmation reviewer and recorded open: (a) `pathlib.Path.walk()` and any other receiver-qualified `.walk()` stay unseen, because `walk` is qualified only (`os.walk`) so that `ast.walk` stays outside; acceptable today, and worth a comment line if a property ever uses it. (b) `os.path.*` calls and `Path.exists` or `Path.stat` stay unseen and are named in the guard's comment. The 11 qualified entries that a `FILE_NAMES` or `FILE_METHODS` twin also matches (`*.open`, `tempfile.TemporaryFile`, `tempfile.SpooledTemporaryFile`) are accepted as defence in depth. Round 3 widens this twin set on the from-import path: every `FILE_QUALIFIED` entry whose name is also in `FILE_METHODS` is now matched twice there too. The reviewer's third item (star imports) is closed by the fix above. The fourth (the read-only reviewer could not run pytest) is answered by the builder's run recorded in PROGRESS; the lead's run on the joined head stays the check.
 
 ## OI-410 — Module count of decision 0081 out of date after S2-P78
 
@@ -7438,6 +7493,133 @@ introduced.
 - NEEDED BY: train S2-27.
 - 2026-11-24, lead: S2-P78.rv1 counted 27 module files in the loaded-module digest of the seeded path, among them `review/graph.py`, `singles/families.py` and `gis/layers.py`, which decision 0081 lists as unbound. Decision 0081 has no notes heading, so the record is not edited here (an approved decision is amended only by a new record, rule 46); this item stays open for a dated amendment record of the count.
 
+- 2026-11-24, note to OI-409 (train S2-28): the static deadline guard of S2-P80 was approved at `cfadcd32e7` after two rejected rounds (cf2, Cognition Devin). The items the reviewers left open stay open here: receiver-qualified `.walk()` such as `pathlib.Path.walk()`, and `os.path.*` and `Path.exists` or `Path.stat` calls, are not seen by the guard.
+## OI-411 — Re-probe the landmark citation page the publisher no longer serves
+
+- ID: OI-411
+- TYPE: OPEN (watch)
+- RAISED BY: S2-P81, 2026-11-24
+- CONCERNS: the single registry row of `landmark_skyscraperpage_com` in `custodian/publicdata/sources.yaml`, registered as a SKIP with `skip_reason: page_not_served` under proposed [decision 0107](docs/decisions/0107-a-citation-page-the-publisher-no-longer-serves.md).
+- EVIDENCE: the lead's probe of 2026-11-24 (status codes only): the page answers 404 to every client and address variant tried, and the site root answers 403; the live step LIVE-S2.L2d3 on `1dba941bcf` failed that one row with `http_status`.
+- NEEDED: the lead re-probes the page, status codes only, at each live build and records the status here; when it answers 200, a new task removes the word and the dated sentence of `basis_note` and the row is fetched again. A different-maker review and acceptance of decision 0107.
+- NEEDED BY: each live build; acceptance before the S2 gate record.
+
+## PO-S2-P82-1 — Non-citation obstacle words still scan hidden markup
+
+- ID: PO-S2-P82-1
+- TYPE: PROPOSED
+- RAISED BY: S2-P82, 2026-11-24
+- CONCERNS: the non-citation `fc_register.acquire.obstacle` scan, outside S2-P82's citation-only scope.
+- EVIDENCE (code only): `custodian/src/eii_custodian/publicdata/fc_register/acquire.py`, `obstacle`, lowercases the complete response bytes and searches them for `sign in`, `sign-in`, `robot check` and `paywall`, including script bodies and attributes. `page_acquire.fetch` / `_read` dispatches every non-citation review kind to that function before parsing, including the `embedded_json` event sources identified in `validate_entry`. `test_non_citation_obstacle_still_raw_scans` pins an otherwise-valid invented embedded response with only a hidden marker added: `refusal_body` maps to `unavailable`. This establishes the same false-positive risk on a fetched path, not an observed failure on a real source.
+- NEEDED: lead assessment and a separate task if the non-citation policy should change; preserve its existing scan until then.
+- NEEDED BY: lead triage; no citation acceptance box is changed.
+
+## PO-S2-P82-rv1-a — Displayed attributes outside the citation word scan
+
+- ID: PO-S2-P82-rv1-a
+- TYPE: PROPOSED
+- RAISED BY: S2-P82 review rv1; recorded in fix round 1, 2026-11-24.
+- CONCERNS: citation-page attributes `alt`, `title`, `value`, `placeholder` and `aria-label`.
+- EVIDENCE (code only): `_citation_obstacle` reads joined `Node.text`, which traverses child text but never attribute values. Title element text is scanned after fix round 1; attribute values remain outside the word scan. The separate password-input rule still reads its existing `type` attribute. No observed real-source attribute-only wall case is claimed.
+- NEEDED: the lead decides whether a closed set of displayed attributes should enter the citation word scan in a separate task.
+- NEEDED BY: lead triage; records only, no rejection or gate approval.
+
+## PO-S2-P82-rv1-c — Import-boundary check depends on concurrent tree writers
+
+- ID: PO-S2-P82-rv1-c
+- TYPE: PROPOSED
+- RAISED BY: S2-P82 review rv1; recorded in fix round 1, 2026-11-24.
+- CONCERNS: `ImportBoundaryRealTest.test_guard_changes_nothing` and `_tree_fingerprint` in `scripts/tests/test_import_boundary_real.py`.
+- EVIDENCE: the original S2-P82 PROGRESS block and workspace alert preserve exit 1 with 21 additional bytecode entries while pytest collected tests concurrently, followed by a serial pass. The fingerprint includes directories and regular bytecode files. Fix-round verification ran the unchanged suite alone after pytest finished: exit 0, 37 tests. This supports the scheduling diagnosis; a green rerun does not close the original failure.
+- NEEDED: the lead decides the run-order treatment under AGENTS.md rule 39; keep boundary checks separate from concurrent package-tree writers. No guard or assertion is relaxed.
+- NEEDED BY: lead verification scheduling; remains open for triage.
+
+
+## PROPOSED PO-S2-P84-01 — Confirm required stream byte ceilings
+
+Under S2-P84 and ruling L-1717, the lead must supply separately reviewed positive
+`stream_max_bytes` values from receipted sizes for `cus_imp_2019`,
+`trade_ext/qatar-imports-2014-2018`, `bldg_wsf3d`,
+`bldg_gba/e050_n25_e055_n20` and `bldg_gba/e050_n30_e055_n25`.
+Each registry placeholder remains null and intake refuses `bound_unconfirmed`.
+No bound is guessed; this proposed item closes neither OI-308 nor the original
+S2-T08 acceptance criterion. Different-maker review and the lead's whole-suite
+run remain pending.
+- UPDATE (2026-11-24, ruling L-1723): the lead set the five ceilings from the
+  receipted sizes (2, 2, 8, 1 and 1 GiB), pinned by
+  `test_reviewed_ceilings_are_pinned`; the null hold now applies only to a
+  future key without a confirmed ceiling. The item stays open for the
+  different-maker acceptance and the lead's whole-suite run.
+
+## OI-412 — Review one-language district matches and unmapped property names
+
+- ID: OI-412
+- TYPE: OPEN (lead review)
+- RAISED BY: S2-P87, 2026-11-24
+- CONCERNS: ruling L-1725 M2 rows and every property district group left unmapped by M3.
+- EVIDENCE: `.overnight/OUT/P87-account.json` recomputes the complete account. Unmapped `prop_sales`: `ambiguous_in_municipality` 0 groups / 0 rows, `municipality_conflict` 19 / 1,008, `unreviewed_variant` 24 / 2,298, `name_missing` 2 / 3. Unmapped `prop_resi_units`: 0 / 0, 3 / 34, 2 / 177 and 0 / 0 in the same order. The 26 M2 groups awaiting review are:
+  - `prop_resi_units`: Thuaileb / غار ثعيلب, municipality 5, QAT001069114, 14 rows, Arabic; Legtaifiyah / لقطيفية, municipality 1, QAT006066105, 6 rows, Arabic.
+  - `prop_sales`, Arabic: Simaisma / سميسمة, municipality 5, QAT001070268, 428 rows; Leqtaifiya / لقطيفية, 1, QAT006066105, 130; Al Doha Al Jadeeda / الدوحة الجديدة, 1, QAT006015013, 87; Rayan Al-ateeq / الريان العتيق, 2, QAT003052061, 50; Bu Fasseela / بو فسيلة, 4, QAT007071129, 40; Al Ghuwariyah / لغويرية, 6, QAT002076336, 38; Al-Shahaniya / الشيحانية, 8, QAT008080451, 28; Al Mirqab al jadeed / المرقاب الجديد, 1, QAT006039039, 11; Msheireb 13 / مشيرب 13, 1, QAT006013778, 5; Al Wajbah / الوجبة, 2, QAT003053066, 4; Al Mazrouah / وادي المزروعه, 4, QAT007071150, 2; Al Ruwais / المشاف, 3, QAT005091640, 1; Al Ghashamia / الغشامية, 7, QAT004077375, 1; Jabal Thuaileb / غار ثعيلب, 5, QAT001069114, 1; Ras Abu Aboud 28 / راس بو عبود 28, 1, QAT006028787, 1; حالة اوبير / حالة اوبير, 5, QAT001070283, 1; Ain Sinan / عين سنان with a plain English space, 7, QAT004077366, 1; Ain Sinan / عين سنان with an English NO-BREAK SPACE, 7, QAT004077366, 1; Al Ghashamia / الغانم العتيق 6, 1, QAT006006779, 1.
+  - `prop_sales`, English: New Slata / السلطة الجديدة, municipality 1, QAT006040041, 272 rows; Lijmiliya / لجميليه, 8, QAT008073210, 25; Umm Besher / أم بشر, 3, QAT005091767, 10; Al Khulaifat / فريج الخليفات, 1, QAT006028025, 1; Al Souq / السلطة, 1, QAT006007009, 1.
+- NEEDED: the lead accepts or rejects every M2 group and reviews the spelling, article and zone-number proposals in `.overnight/RETURN.md`. No proposal adds a crosswalk row without a later reviewed generation. Unmapped municipality conflicts, missing names and ambiguous names stay excluded.
+- NEEDED BY: before the affected property district figures are treated as fully reviewed.
+
+## PO-S2-32-01 — A closed set for the district crosswalk basis at load
+
+- ID: PO-S2-32-01
+- TYPE: PROPOSED (records point of S2-P87.rv1)
+- RAISED BY: S2-P87.rv1 (Cognition Devin), 2026-11-24
+- CONCERNS: `basis` of the property district crosswalk rows is enforced on the committed file's contents but is not checked against a closed set when the file is loaded, so a later regeneration with a wrong basis value would not be refused.
+- NEEDED: a closed-set check on `basis` at load, with a planted violation, when the file is next regenerated.
+- NEEDED BY: the next regeneration of the district crosswalk.
+
+## OI-413 — Share-field meaning remains unconfirmed
+
+- ID: OI-413
+- TYPE: OPEN (source semantics)
+- RAISED BY: S2-P86, 2026-11-24
+- CONCERNS: S2-T19, document 07 cards C14 and C41, ruling L-1724 item 1.
+- EVIDENCE: the task brief admits exact whole-property patterns only; invented-input tests establish exclusion accounting, not publisher meaning or real-cache counts.
+- NEEDED: share-field meaning unconfirmed; partial deals are re-admitted only by a later decision. The lead compares the real-cache counts with its trace after independent review.
+- NEEDED BY: any later admission of partial deals.
+
+## PO-S2-33-01 — A public name for the place-file column reader
+
+- ID: PO-S2-33-01
+- TYPE: PROPOSED (records point of S2-L4fx.rv1b)
+- RAISED BY: S2-L4fx.rv1b (Cognition Devin), 2026-11-24
+- CONCERNS: `scripts/review_place_keys.py` imports the underscore-private `_column_names` from `eii_custodian.publicdata.places.read`. This is reuse, not a copied block.
+- NEEDED: promote it to a public name in `read.py` when that module is next changed.
+- NEEDED BY: the next change of `places/read.py`.
+
+## PO-S2-33-02 — Rule 44 wording of the place-key helper changed at task level
+
+- ID: PO-S2-33-02
+- TYPE: PROPOSED (records point of S2-L4fx.rv1b, mirroring the builder's PO-S2-L4fx1-4)
+- RAISED BY: S2-L4fx.rv1b (Cognition Devin), 2026-11-24
+- CONCERNS: the rule 44 description of `scripts/review_place_keys.py` was changed by the task without a decision record.
+- NEEDED: the lead confirms that the change only describes the helper's existing lead-shell behaviour and needs no decision record, or writes one.
+- NEEDED BY: the S2 gate record.
+
+## PO-S2-33-03 — Landmark category tokens need a cited taxonomy
+
+- ID: PO-S2-33-03
+- TYPE: PROPOSED (records point of S2-L4fx.rv1b, mirroring the builder's PO-S2-L4fx1-2)
+- RAISED BY: S2-L4fx.rv1b (Cognition Devin), 2026-11-24
+- CONCERNS: `LANDMARK_CATEGORIES` tokens come from the lead's diagnosis and are not yet checked against the source's published category taxonomy. A missing real token fails closed.
+- NEEDED: check the tokens against the published taxonomy, with its citation.
+- NEEDED BY: the S2 gate record.
+
+## PO-S2-P93-01 — The product suite's measured time is not reproduced
+
+- ID: PO-S2-P93-01
+- TYPE: PROPOSED (raised by the builder of S2-P93)
+- RAISED BY: S2-P93 builder (Anthropic Claude), 2026-11-24
+- CONCERNS: ruling L-1777 item 2a gives `python-product` 460 and 490 seconds alone (77 to 82 percent of its 600-second limit). At base `015647659a17c55407754eaeb72b0b90e9c855cc` the unsplit suite ran 816 passed in 10.84 seconds, its two new parts in 8.9 and 4.8 seconds, and PROGRESS.md's row "2026-11-23, Lead whole test on the train head" records 13.5 seconds. Proposed [decision 0109](docs/decisions/0109-the-product-suite-runs-in-two-named-parts.md) is therefore not marked Accepted.
+- NEEDED: the lead names the suite whose line read 460 and 490 seconds, with its run output, and then either confirms decision 0109 as it stands, or withdraws the split and applies decision 0060's method to that suite by its own record.
+- NEEDED BY: before S2-P93 joins a train.
+- ANSWER (lead, 2026-11-24, ruling L-1784): the 460 and 490 seconds, the 510.5 seconds and the two timeouts were measured on the slice S6 stacks, where `product/tests` holds 3706 tests (S6-T18rc2 and S6-T13rc2 product runs; whole test S6-3.wt1). The lead's brief gave them as main's figures by mistake. Decision 0109 is Accepted with that Context; the split lands with slice S2 as shared infrastructure the later slices are re-cut onto.
+- STATUS: answered.
 
 ## S3-1 move two — uncommitted merge handoff (2026-11-24)
 

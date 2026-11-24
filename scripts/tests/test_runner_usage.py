@@ -99,7 +99,8 @@ class RunnerUsage(unittest.TestCase):
             "python-custodian-3",
             "python-custodian-4",
             "python-custodian-5",
-            "python-product",
+            "python-product-1",
+            "python-product-2",
             "web-checks",
             "web-unit",
         )
@@ -162,7 +163,20 @@ class RunnerUsage(unittest.TestCase):
                 ),
                 1800,
             ),
-            ("python-product", ("product/tests",), 600),
+            *(
+                (
+                    f"python-product-{part}",
+                    (
+                        "product/tests",
+                        "-p",
+                        "pytest_custodian_part",
+                        "--product-part",
+                        part,
+                    ),
+                    600,
+                )
+                for part in "12"
+            ),
         )
         self.assertEqual(
             tuple(

@@ -56,7 +56,11 @@ def _frame(folder: Path) -> Path:
         encoding="utf-8",
     )
     (folder / "district_crosswalk.csv").write_text(
-        "name,district_keys\nSYN North,syn_north\nSYN North AR,syn_north\n",
+        "name,municipality_code,district_keys,basis\n"
+        "SYN North,syn_coast,syn_north,two_language_exact\n"
+        "SYN North AR,syn_coast,syn_north,two_language_exact\n"
+        "SYN North,syn_inland,syn_inland,two_language_exact\n"
+        "SYN North AR,syn_inland,syn_inland,two_language_exact\n",
         encoding="utf-8",
     )
     return folder
@@ -222,7 +226,7 @@ def test_nonpositive_price_is_excluded_and_identifiers_stay_out(tmp_path: Path) 
 def test_unmatched_ambiguous_and_unmapped_districts_are_not_guessed(
     tmp_path: Path,
 ) -> None:
-    """An unmatched district is left out. An ambiguous name and an unmapped municipality stop assignment."""
+    """Unmatched names stay out; municipality-qualified names map exactly."""
     unmatched = _property(
         tmp_path / "unmatched",
         [_deal(), _deal(district_name="SYN Absent", sm_lmntq="SYN Absent AR")],
@@ -241,8 +245,11 @@ def test_unmatched_ambiguous_and_unmapped_districts_are_not_guessed(
             ),
         ],
     )
-    assert ambiguous.rows == ()
-    assert _coverage(ambiguous, "ambiguous_district") == 2
+    assert {row["district_key"] for row in ambiguous.rows} == {
+        "syn_north",
+        "syn_inland",
+    }
+    assert _coverage(ambiguous, "ambiguous_district") == 0
     with pytest.raises(AdditionError) as unmapped:
         _property(tmp_path / "unmapped", [_deal(municipality_name="SYN Missing")])
     assert unmapped.value.name == "unmapped_municipality"
@@ -256,9 +263,9 @@ def test_a_district_name_with_two_keys_is_not_stored(tmp_path: Path) -> None:
     """One published name that maps to two keys does not fit a single district_key."""
     frame = _frame(tmp_path / "frame")
     (frame / "district_crosswalk.csv").write_text(
-        "name,district_keys\n"
-        "SYN North,syn_north;syn_south\n"
-        "SYN North AR,syn_north;syn_south\n",
+        "name,municipality_code,district_keys,basis\n"
+        "SYN North,syn_coast,syn_north;syn_south,two_language_exact\n"
+        "SYN North AR,syn_coast,syn_north;syn_south,two_language_exact\n",
         encoding="utf-8",
     )
     parsed = parse_property(

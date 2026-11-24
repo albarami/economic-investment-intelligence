@@ -66,7 +66,22 @@ SUITES: tuple[Suite, ...] = (
         )
         for part in range(1, 6)
     ),
-    Suite("python-product", "pytest", ".", ("product/tests",), 600),
+    *(
+        Suite(
+            f"python-product-{part}",
+            "pytest",
+            ".",
+            (
+                "product/tests",
+                "-p",
+                "pytest_custodian_part",
+                "--product-part",
+                str(part),
+            ),
+            600,
+        )
+        for part in range(1, 3)
+    ),
     Suite(
         "web-checks",
         "node",

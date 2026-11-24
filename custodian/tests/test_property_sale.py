@@ -63,7 +63,18 @@ def _producer(tmp_path: Path, row, raw: list[dict[str, object]], *, additional=(
     build = context(tmp_path, tuple(entries))
     build.review = tmp_path
     build.selected = selected
-    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.frame_result = FrameResult(
+        {
+            "grid_cell": [],
+            "district": [
+                {"district_key": "syn_north", "municipality_code": "syn_coast"},
+                {"district_key": "syn_inland", "municipality_code": "syn_inland"},
+                {"district_key": "syn_one", "municipality_code": "syn_coast"},
+            ],
+        },
+        [],
+        {},
+    )
     return build
 
 
@@ -282,8 +293,28 @@ def test_invalid_deal_among_valid_deals_is_excluded_with_exact_count(
     assert row["median_price_per_m2"] == Decimal("1000.00")
 
 
+def test_producer_checks_every_crosswalk_key_against_the_frame(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.frame.checks import FrameError
+
+    row = replace(
+        next(e for e in load_registry() if e.source_id == "prop_sales"),
+        key="prop_sales",
+    )
+    build = _producer(tmp_path, row, _rows("c14_worked_example.json"))
+    path = tmp_path / "district_crosswalk.csv"
+    path.write_text(
+        path.read_text(encoding="utf-8")
+        + "SYN Unused,syn_coast,ZZZ999999999,two_language_exact\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(FrameError, match=r"^district_crosswalk: outside_frame$"):
+        build.gis_property_singles()
+
+
 def test_unmatched_crosswalk_row_is_excluded_with_exact_count(tmp_path: Path) -> None:
-    parsed = _parse_export([_export(district_name="SYN Unmapped")], tmp_path)
+    parsed = _parse_export(
+        [_export(district_name="SYN Unmapped", sm_lmntq="SYN Unmapped AR")], tmp_path
+    )
     assert parsed.deals == ()
     assert _blocked(parsed, "unmatched_district") == 1
     assert sale_aggregates(parsed.deals) == ()
@@ -465,7 +496,50 @@ def test_group_keys_and_ties_stay_distinct_and_sorted() -> None:
 
 def test_bulletin_shape_adapter_is_used_by_the_producer(tmp_path: Path) -> None:
     raw = _rows("c14_worked_example.json")
-    adapted = sales_export_rows(raw)
+    adapted = sales_export_rows(raw).rows
     assert all("usage" not in row for row in adapted)
     parsed = _parse(adapted, tmp_path, _map(), source_id="prop_sales")
     assert sale_aggregates(parsed.deals) == (C14_ROW,)
+
+
+def test_share_exclusions_reach_the_phase_record_and_neither_price_card(
+    tmp_path: Path,
+) -> None:
+    from custodian.tests.test_property_sales_export import _whole
+
+    entry = next(e for e in load_registry() if e.key == "prop_sales")
+    build = _producer(
+        tmp_path,
+        entry,
+        [
+            _export(),
+            _whole(encrypted_transaction_number="SYN-TX-WHOLE"),
+            _whole(share_area=50, share_value=50000, number_of_shares_2400=1200),
+            _whole(share_value=50000),
+        ],
+    )
+    build.gis_property_singles()
+    record = json.loads((tmp_path / "assembly/gis_property_singles.json").read_text())
+    assert record["bulletin_coverage"][entry.key] == [
+        {"reason": "partial_share_deal", "count": 1},
+        {"reason": "share_fields_inconsistent", "count": 1},
+    ]
+    (sale,) = build.tables["pub_property_sale"]
+    assert (sale["deal_count"], sale["median_price_per_m2"]) == (2, Decimal("1000.00"))
+    quarter = next(
+        r for r in build.tables["pub_property_quarter"] if r["unit_type"] == "all"
+    )
+    assert (
+        quarter["deal_count"],
+        quarter["deal_value"],
+        quarter["median_price_per_ft2"],
+    ) == (2, Decimal("200000"), Decimal("92.90"))
+
+
+def test_all_share_rows_excluded_writes_no_price_table(tmp_path: Path) -> None:
+    entry = next(e for e in load_registry() if e.key == "prop_sales")
+    build = _producer(tmp_path, entry, [_export(share_value=0)])
+    with pytest.raises(AdditionError, match=r"^no_whole_property_deals$"):
+        build.gis_property_singles()
+    assert build.tables == {}
+    assert not (tmp_path / "assembly/gis_property_singles.json").exists()

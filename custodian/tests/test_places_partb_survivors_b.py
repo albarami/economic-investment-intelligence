@@ -59,7 +59,8 @@ def _yaml(row: Mapping[str, object]) -> str:
     for position, name in enumerate(names):
         value = row[name]
         text = f"'{value}'" if isinstance(value, str) else str(value)
-        lines.append(f"{'- ' if position == 0 else '  '}{name}: {text}\n")
+        field = "record_ref" if name == "record_key" else name
+        lines.append(f"{'- ' if position == 0 else '  '}{field}: {text}\n")
     return "".join(lines)
 
 

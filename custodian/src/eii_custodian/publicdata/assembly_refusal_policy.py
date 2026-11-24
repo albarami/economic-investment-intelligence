@@ -28,6 +28,7 @@ from .comtrade.parse import ParseError
 from .comtrade.policy import SafeRefusal
 from .fetch.award_checks import AwardError
 from .fetch.decimals import DecimalRefusal
+from .fetch.large import IntakeError
 from .fetch.page_records import PageError
 from .fetch.registry import RegistryError
 from .fetch.snapshots import SnapshotError
@@ -78,6 +79,8 @@ REASON_ATTRIBUTES: Mapping[type[Exception], str] = MappingProxyType(
 
 NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
     {
+        IntakeError: frozenset({"bound_unconfirmed", "length_undeclared"}),
+        RegistryError: frozenset({"stream_max_bytes"}),
         AdditionError: frozenset(
             """
         activity_code_form arabic_twin_mismatch bilingual_municipality
@@ -91,7 +94,7 @@ NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
         mixed_price_basis municipality_disagreement municipality_spellings period_absent
         period_field_empty period_field_unconfirmed period_field_unreadable period_form
         period_sit period_unreadable price_as_of_mismatch price_as_of_missing
-        quarter_period second_mapping selected_input_refused share_semantics_unconfirmed
+        no_whole_property_deals quarter_period second_mapping selected_input_refused
         slug_absent slug_unmapped source_field_absent source_field_missing
         table_columns_mismatch table_name unknown_source_field unknown_table
         unknown_unit_type unmapped_label unmapped_municipality unmapped_unit_type

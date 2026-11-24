@@ -3069,7 +3069,12 @@ def test_a_landmark_citation_missing_its_cache_receipt_refuses_the_build(
 ) -> None:
     from eii_custodian.publicdata.fetch.registry import load_registry
 
-    row = next(entry for entry in load_registry() if entry.kind == "public_page")
+    # An unskipped page: a skipped row refuses earlier as registry_skipped.
+    row = next(
+        entry
+        for entry in load_registry()
+        if entry.kind == "public_page" and not entry.skip_reason
+    )
     document = _landmark_document()
     citation = document["entries"][0]["citation"]
     citation["page_url"] = row.url
@@ -4405,6 +4410,7 @@ def test_gba_keys_use_stream_publication_and_verified_read(tmp_path, tile):
         fetch_host="data.source.coop",
         url="https://data.source.coop/SYN/tile.parquet",
     )
+    row = replace(row, stream_max_bytes=65536)
     assert row.key in REQUIRED_KEYS
     body = invented.gba_parquet(tmp_path / "tile.parquet", _GBA_GOOD)
     cache = tmp_path / "cache"

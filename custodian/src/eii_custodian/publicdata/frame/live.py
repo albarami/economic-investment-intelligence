@@ -3,13 +3,14 @@
 import csv
 import json
 from collections.abc import Mapping
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
 from typing import Any
 
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.grids.build import build_grids
+from eii_custodian.publicdata.places.review import review_file_spec
 
 from .build import FrameResult, read_cached
 from .census import census_rows, validate_tables, workbook_rows
@@ -35,6 +36,22 @@ from .population import population_rows
 from .raw import read_archive
 
 
+@dataclass(frozen=True)
+class GridStage:
+    """The frame's grid with the joined boundaries the live build needs next."""
+
+    grid: list[dict[str, Any]]
+    entries: dict[str, Entry]
+    report: list[str]
+    raw_layers: dict[str, list[dict[str, Any]]]
+    district_map: dict[Any, Any]
+    municipalities: list[Boundary]
+    zones: list[Boundary]
+    districts: list[Boundary]
+    staged_population: list[dict[str, Any]]
+    free_zones: set[str]
+
+
 def build_live_frame(
     cache: Path,
     registry: tuple[Entry, ...],
@@ -45,8 +62,166 @@ def build_live_frame(
     *,
     build_date: date | None = None,
 ) -> FrameResult:
-    entries = {e.source_id: e for e in registry}
+    stage = frame_grid(cache, registry, review, selections, result, output=output)
     tables, sources, inventory = result.tables, result.sources, result.inventory
+    entries, report, grid = stage.entries, stage.report, stage.grid
+    municipalities, zones, districts = (
+        stage.municipalities,
+        stage.zones,
+        stage.districts,
+    )
+    raw_layers, district_map = stage.raw_layers, stage.district_map
+    staged_population, free_zones = stage.staged_population, stage.free_zones
+    tables["grid_cell"] = grid
+    grids = build_grids(
+        cache,
+        registry,
+        {
+            int(row["cell"]): row["geometry"]
+            for row in grid
+            if "cell" in row and "geometry" in row
+        },
+    )
+    for name, rows in grids.tables.items():
+        tables[name] = rows
+    sources.update(grids.sources)
+    for key, reason in sorted(grids.coverage.items()):
+        report.append(f"grids: {key} {reason}")
+    for kind, boundaries in (
+        ("municipality", municipalities),
+        ("zone", zones),
+        ("district", districts),
+    ):
+        tables[kind] = licensed_rows(boundaries, kind)
+    tables["gazetteer"] = administrative_rows(
+        municipalities, zones, districts, grid, report
+    )
+    from eii_custodian.publicdata.places.integrate import run_places_before_gazetteer
+
+    run_places_before_gazetteer(
+        cache,
+        review,
+        registry,
+        tuple(item.geometry for item in municipalities),
+        grid,
+        {item.key: item.geometry for item in zones},
+        build_date=build_date,
+    )
+    points = _place_points(cache)
+    resolved: list[dict[str, Any]] = []
+    for filename in ("showcase_gazetteer.yaml", "flagship_candidates.yaml"):
+        specs = [
+            review_file_spec(row)
+            for row in json.loads((review / filename).read_text(encoding="utf-8"))
+        ]
+        resolved.extend(
+            resolve_reviewed_specs(specs, points, tables["grid_cell"], report)
+        )
+    if resolved:
+        tables["gazetteer"].extend(resolved)
+    staged = []
+    for row in raw_layers["census_district_pop"]:
+        pair = (row["ZONENO"], row["DISTRICTNO"])
+        if pair in district_map and row["POP2020"] is not None:
+            staged.append(
+                {
+                    "district_key": district_map[pair],
+                    "period": "2020",
+                    "indicator": "residents",
+                    "value": row["POP2020"],
+                    "unit": "persons",
+                }
+            )
+    if "census_district_pop" in sources:
+        entry = entries["census_district_pop"]
+        tables["pub_census_district"], ignored = census_rows(
+            entry,
+            staged,
+            sources[entry.source_id]["retrieved_utc"],
+            "pub_census_district",
+        )
+        report.extend(ignored)
+    zone_layers = {}
+    for name in COUNTS:
+        if name != "census_district_pop" and name in sources:
+            payload, _ = read_cached(
+                cache, entries[name], digest=selections.get(entries[name].key, "")
+            )
+            zone_layers[name] = layer_rows(name, payload)
+    staged_zones, ignored = zone_measures(zone_layers, entries)
+    report.extend(ignored)
+    for name, rows in zone_layers.items():
+        check_census_zones(name, rows, {z.key: z.municipality_code for z in zones})
+    for name, rows in staged_zones.items():
+        loaded, ignored = census_rows(
+            entries[name], rows, sources[name]["retrieved_utc"], "pub_census_zone"
+        )
+        tables["pub_census_zone"].extend(loaded)
+        report.extend(ignored)
+    if "pop_muni" in sources:
+        tables["pub_population_municipality"], ignored = census_rows(
+            entries["pop_muni"],
+            staged_population,
+            sources["pop_muni"]["retrieved_utc"],
+            "pub_population_municipality",
+        )
+        report.extend(ignored)
+    if "est_census" in sources:
+        payload, _ = read_cached(
+            cache,
+            entries["est_census"],
+            digest=selections.get(entries["est_census"].key, ""),
+        )
+        tables["pub_census_national"], ignored = census_rows(
+            entries["est_census"],
+            inspect_source("est_census", payload).rows,
+            sources["est_census"]["retrieved_utc"],
+            "pub_census_national",
+        )
+        sources["est_census"]["method"] = (
+            "frame.v1: sum count columns over source activity rows"
+        )
+        report.extend(ignored)
+    workbook = entries.get("census_2020_workbook")
+    if workbook is not None and not workbook.skip_reason:
+        payload, receipt = read_cached(
+            cache, workbook, digest=selections.get(workbook.key, ""), decode=bytes
+        )
+        loaded, ignored = census_rows(
+            workbook,
+            workbook_rows(payload),
+            receipt["retrieved_utc"],
+            "pub_census_national",
+        )
+        tables["pub_census_national"].extend(loaded)
+        receipt["method"] = "frame.census.table76.v1: Both Sexes Private / Total"
+        sources[workbook.source_id] = receipt
+        report.extend(ignored)
+    validate_frame_tables(tables, free_zones)
+    validate_tables(
+        tables,
+        {
+            "municipality_code": {m.key for m in municipalities},
+            "zone_code": {z.key for z in zones},
+            "district_key": {d.key for d in districts},
+        },
+    )
+    report.append("frame: partial; place points remain")
+    return FrameResult(tables, report, sources, inventory)
+
+
+def frame_grid(
+    cache: Path,
+    registry: tuple[Entry, ...],
+    review: Path,
+    selections: Mapping[str, str],
+    result: FrameResult,
+    *,
+    output: Path | None = None,
+) -> GridStage:
+    """The live build's steps up to its grid; with no output it writes nothing."""
+    entries = {e.source_id: e for e in registry}
+    sources, inventory = result.sources, result.inventory
     report = [
         r
         for r in result.report
@@ -142,139 +317,18 @@ def build_live_frame(
             raise FrameError(f"pop_muni: {population_reason}")
     free_zones = district_free_zones(review)
     grid = build_grid(municipalities, zones, districts, doha, free_zones, report)
-    tables["grid_cell"] = grid
-    grids = build_grids(
-        cache,
-        registry,
-        {
-            int(row["cell"]): row["geometry"]
-            for row in grid
-            if "cell" in row and "geometry" in row
-        },
-    )
-    for name, rows in grids.tables.items():
-        tables[name] = rows
-    sources.update(grids.sources)
-    for key, reason in sorted(grids.coverage.items()):
-        report.append(f"grids: {key} {reason}")
-    for kind, boundaries in (
-        ("municipality", municipalities),
-        ("zone", zones),
-        ("district", districts),
-    ):
-        tables[kind] = licensed_rows(boundaries, kind)
-    tables["gazetteer"] = administrative_rows(
-        municipalities, zones, districts, grid, report
-    )
-    from eii_custodian.publicdata.places.integrate import run_places_before_gazetteer
-
-    run_places_before_gazetteer(
-        cache,
-        review,
-        registry,
-        tuple(item.geometry for item in municipalities),
+    return GridStage(
         grid,
-        {item.key: item.geometry for item in zones},
-        build_date=build_date,
+        entries,
+        report,
+        raw_layers,
+        district_map,
+        municipalities,
+        zones,
+        districts,
+        staged_population,
+        free_zones,
     )
-    points = _place_points(cache)
-    resolved: list[dict[str, Any]] = []
-    for filename in ("showcase_gazetteer.yaml", "flagship_candidates.yaml"):
-        specs = json.loads((review / filename).read_text(encoding="utf-8"))
-        resolved.extend(
-            resolve_reviewed_specs(specs, points, tables["grid_cell"], report)
-        )
-    if resolved:
-        tables["gazetteer"].extend(resolved)
-    staged = []
-    for row in raw_layers["census_district_pop"]:
-        pair = (row["ZONENO"], row["DISTRICTNO"])
-        if pair in district_map and row["POP2020"] is not None:
-            staged.append(
-                {
-                    "district_key": district_map[pair],
-                    "period": "2020",
-                    "indicator": "residents",
-                    "value": row["POP2020"],
-                    "unit": "persons",
-                }
-            )
-    if "census_district_pop" in sources:
-        entry = entries["census_district_pop"]
-        tables["pub_census_district"], ignored = census_rows(
-            entry,
-            staged,
-            sources[entry.source_id]["retrieved_utc"],
-            "pub_census_district",
-        )
-        report.extend(ignored)
-    zone_layers = {}
-    for name in COUNTS:
-        if name != "census_district_pop" and name in sources:
-            payload, _ = read_cached(
-                cache, entries[name], digest=selections.get(entries[name].key, "")
-            )
-            zone_layers[name] = layer_rows(name, payload)
-    staged_zones, ignored = zone_measures(zone_layers, entries)
-    report.extend(ignored)
-    for name, rows in zone_layers.items():
-        check_census_zones(name, rows, {z.key: z.municipality_code for z in zones})
-    for name, rows in staged_zones.items():
-        loaded, ignored = census_rows(
-            entries[name], rows, sources[name]["retrieved_utc"], "pub_census_zone"
-        )
-        tables["pub_census_zone"].extend(loaded)
-        report.extend(ignored)
-    if "pop_muni" in sources:
-        tables["pub_population_municipality"], ignored = census_rows(
-            entries["pop_muni"],
-            staged_population,
-            sources["pop_muni"]["retrieved_utc"],
-            "pub_population_municipality",
-        )
-        report.extend(ignored)
-    if "est_census" in sources:
-        payload, _ = read_cached(
-            cache,
-            entries["est_census"],
-            digest=selections.get(entries["est_census"].key, ""),
-        )
-        tables["pub_census_national"], ignored = census_rows(
-            entries["est_census"],
-            inspect_source("est_census", payload).rows,
-            sources["est_census"]["retrieved_utc"],
-            "pub_census_national",
-        )
-        sources["est_census"]["method"] = (
-            "frame.v1: sum count columns over source activity rows"
-        )
-        report.extend(ignored)
-    workbook = entries.get("census_2020_workbook")
-    if workbook is not None and not workbook.skip_reason:
-        payload, receipt = read_cached(
-            cache, workbook, digest=selections.get(workbook.key, ""), decode=bytes
-        )
-        loaded, ignored = census_rows(
-            workbook,
-            workbook_rows(payload),
-            receipt["retrieved_utc"],
-            "pub_census_national",
-        )
-        tables["pub_census_national"].extend(loaded)
-        receipt["method"] = "frame.census.table76.v1: Both Sexes Private / Total"
-        sources[workbook.source_id] = receipt
-        report.extend(ignored)
-    validate_frame_tables(tables, free_zones)
-    validate_tables(
-        tables,
-        {
-            "municipality_code": {m.key for m in municipalities},
-            "zone_code": {z.key for z in zones},
-            "district_key": {d.key for d in districts},
-        },
-    )
-    report.append("frame: partial; place points remain")
-    return FrameResult(tables, report, sources, inventory)
 
 
 def district_aliases(review: Path, cache: Path) -> list[dict[str, str]]:

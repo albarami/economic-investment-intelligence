@@ -28,7 +28,7 @@ _GAZETTEER_ROW = (
     "  name_ar: 'مكان تجريبي'\n"
     "  aliases: ''\n"
     "  source_id: places_ovt\n"
-    "  record_key: SYN-P-CACHE\n"
+    "  record_ref: SYN-P-CACHE\n"
     "  arabic_review: reviewed\n"
 )
 
@@ -105,7 +105,7 @@ def test_every_auxiliary_loader_prefers_an_existing_cache(tmp_path: Path) -> Non
         "  mode: walk\n"
         "  cutoff_minutes: 10\n"
         "  source_id: places_ovt\n"
-        "  record_key: SYN-P-CACHE\n"
+        "  record_ref: SYN-P-CACHE\n"
     )
     (committed / "areas.yaml").write_text("[]\n", encoding="utf-8")
     (cache / "areas.yaml").write_text(area, encoding="utf-8")

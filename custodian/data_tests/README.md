@@ -52,7 +52,8 @@ both Male and Female blocks are required. Each block ends at the next sex
 label (or sheet end), and its activity rows have nonempty ISIC codes in column
 A; trailing code whitespace and text mirror columns K and L are preserved.
 The sheet reader explicitly accepts stored formula caches; formulas are never
-evaluated, and a formula without a cached value still fails with `schema_missing`.
+evaluated, and a formula without a cached value still fails, and the case prints
+`C8:source_invalid`.
 Independent plain `Fraction` arithmetic checks each block row against the sum
 of its activity rows in every column C through J, Both Sexes against Male plus
 Female in each of those columns, and the Both Sexes Total against its seven
@@ -64,6 +65,62 @@ raw-file arithmetic within the unchanged half-percentage-point tolerance.
 It prints no file values. Its invented-cache proof and wrong-value plants are
 in `custodian/tests/test_pinned_c8.py`. The separate PUB-71 replay and its
 lead-proof failure accounting are unchanged.
+
+Case `C1` fails only as `C1:<reason>`. Its case reasons are
+`municipality_missing`, `population_indicator_unreviewed`,
+`population_duplicate`, `population_missing`, `count_mismatch`,
+`density_mismatch` and `lq_mismatch`; its other reasons are
+`public_cache_missing`, `receipt_hash_mismatch`, `source_invalid` and
+`spine_refused`. Its child-run proof is in
+`custodian/tests/test_pinned_closed_methods.py`.
+
+Case `C3` covers both parametrized wage sources and fails only as
+`C3:<reason>`, where the reason is `duplicate_wage_group`,
+`decomposition_mismatch`, `lineage`, `public_cache_missing`,
+`receipt_hash_mismatch`, `source_invalid` or `spine_refused`. Its invented
+child runs cover each reason for the occupation case and include a passing
+activity case.
+
+Case `C4` fails only as `C4:<reason>`, where the reason is `industry_row`,
+`component_label`, `norms_mismatch`, `range_mismatch`,
+`public_cache_missing`, `receipt_hash_mismatch`, `source_invalid` or
+`spine_refused`. Its invented setup keeps each source and year otherwise valid.
+
+Case `C5` fails only as `C5:<reason>`, where the reason is
+`total_mismatch`, `unit_value_mismatch`, `public_cache_missing`,
+`receipt_hash_mismatch`, `source_invalid` or `spine_refused`. Its invented
+child runs cover the total and each heading check without printing a value.
+
+Case `C8` fails only as `C8:<reason>`. Its reasons are `national_header`,
+`national_block`, `sex_block`, `national_count`, `sex_count`,
+`activity_count`, `national_denominator`, `sector_sum`,
+`zone_denominator`, `activity_sum_mismatch`, `sex_sum_mismatch`,
+`national_sector_sum`, `national_mismatch`, `national_lineage`,
+`zone_keys`, `null_zone_mismatch`, `zone_mismatch`, `zone_lineage`,
+`no_complete_zones`, `range_low_mismatch`, `range_high_mismatch`,
+`public_cache_missing`, `receipt_hash_mismatch`, `source_invalid` and
+`spine_refused`. Every expectation in `custodian/tests/test_pinned_c8.py`
+uses the exact child summary and checks that its sentinel is absent.
+
+Case `C9` fails only as `C9:<reason>`, where the reason is
+`momentum_mismatch`, `order_mismatch`, `zero_zone_missing`,
+`zero_zone_mismatch`, `public_cache_missing`, `receipt_hash_mismatch`,
+`source_invalid` or `spine_refused`. Its invented child runs cover both the
+ranked and zero-denominator branches.
+
+Case `C2-NATIONAL` fails only as `C2-NATIONAL:<reason>`, where the reason
+is `totals_mismatch`, `bulk_month_mismatch`, `bulk_share_mismatch`,
+`bulk_order_mismatch`, `month_outside_calendar`, `public_cache_missing`,
+`receipt_hash_mismatch`, `source_invalid` or `spine_refused`. Its invented
+child runs cover the named months, share, ordering and cache failures.
+
+Case `C2-MUNICIPAL` fails only as `C2-MUNICIPAL:<reason>`, where the reason
+is `cancelled_mismatch`, `stock_mismatch`, `including_mismatch`,
+`excluding_mismatch`, `geography_mismatch`, `month_outside_calendar`,
+`public_cache_missing`, `receipt_hash_mismatch`, `source_invalid` or
+`spine_refused`. A municipality or activity guard whose literal message is
+not in the closed map is `source_invalid`; the three guards have separate
+child cases.
 
 The fixture restores attribution for both sources from their registry rows,
 without census counts or shares. A registry row has no file retrieval date:
@@ -82,6 +139,41 @@ signed activity spine and its input binding (OI-16 and OI-203, after the basket
 confirmation OI-172). There is no skipped or prefix-based C2 class replay.
 The new pinned C1 test was not run by P05; helper tests use invented temporary
 snapshots only. No task or slice gate is closed by those helper tests.
+
+## Wilson example: stock and pre-registered period (S2-P83)
+
+`test_pinned_c2_wilson_stock` (case `C2-WILSON-STOCK`) reuses
+`c2_municipal_churn` on the pinned `lic_active` and `lic_cancelled` and
+asserts that the May 2025 stock of activity 5610101 in Al Shamal equals
+document 07 section 3's n. The stock does not depend on the period.
+`test_pinned_c2_wilson_period` (case `C2-WILSON-PERIOD`) checks the same stock
+first. It then counts cancellations, flagged months included, over the fixed
+grid `WILSON_PERIOD_GRID`: calendar years 2015 to 2024 and `2025-partial`
+(January to May 2025, because the C2 calendar ends at 2025-05 and any later
+month is refused as `month_outside_calendar`). The grid was written before any
+run (lead ruling L-1717, L5c section 1 option B). It asserts that exactly one
+cell gives section 3's k. On a pass, one `WilsonPeriodIdentified` warning in
+pytest's default warnings summary names the cell's label and nothing else.
+No match fails `C2-WILSON-PERIOD:wilson_period_no_match` and several matches
+fail `C2-WILSON-PERIOD:wilson_period_ambiguous`. Every failure is
+`<CASE>:<reason>`, and no case prints a count. The grid is never widened to find
+a match (MTH-04): `custodian/tests/test_pinned_wilson.py` pins its exact
+set, and its invented-cache tests cover one, none and two matches, a stock
+other than n, a month after the calendar, and grid mutations. A unique match
+identifies the period. The research did not record it, so the k assertion is
+not independent evidence. This task writes no configuration pin. Lead shell:
+
+```sh
+uv run --locked python -m pytest custodian/data_tests/test_pinned_methods.py -k "wilson" -vv -p no:cacheprovider
+```
+
+`test_pinned_c2_isic_5610` (case `C2-ISIC-5610`) runs through the same
+safe-failure wrapper. Its failure prints only `C2-ISIC-5610:<reason>`. The
+reason is `spine_refused` for any activity-spine refusal, whatever its detail,
+`spine_pins_differ`, `isic_stock_mismatch`, `isic_ratio_mismatch` or
+`isic_lineage`, a closed cache reason, or `source_invalid`. The spine
+refusal's own text is never printed. Its invented child runs are in
+`custodian/tests/test_pinned_isic.py`.
 
 ## Inventory and preparation
 
@@ -113,6 +205,16 @@ checks the same receipt identities as `read_cached`, then calls `_parse_body`.
 not assert a recovered real recipe. H2 cannot become ready until its recipe
 and partition-to-assembled-snapshot binding are confirmed and implemented.
 `bnd_muni_2025`'s row count is pinned by its registry `row_count_min`/`row_count_max`, checked by `fetch/checks.py` at fetch; it is not an inventory case.
+
+Every restricted-finding case fails only as `<case_id>:<reason>`. Its closed
+reasons are `awaiting_routine`, `awaiting_expectation`,
+`expectation_mismatch`, `missing_record`, `record_invalid`,
+`record_checksum_mismatch`, `source_pin_mismatch`, `path_refused`,
+`source_invalid`, `zone_missing` and `spine_refused`. Any other exception
+is `source_invalid`. The reporting boundary is the same `closed_case`
+helper as the method replays, and its `pytest.fail` is outside the handler
+with `pytrace=False`; no parser detail, source row, expectation or exception
+text reaches the summary.
 
 The lead prepares these **uncommitted** files by independent inspection of
 the selected source snapshots, never from output of the replay code under test:

@@ -1,1 +1,256 @@
-name,district_keys
+name,municipality_code,district_keys,basis
+Al Dafna 61,1,QAT006061806,two_language_exact
+Al Hilal,1,QAT006042043,two_language_exact
+Al Khulaifat,1,QAT006028025,one_language_exact
+Al Maamoura 43,1,QAT006043803,two_language_exact
+Al Mansoura,1,QAT006025021,two_language_exact
+Al Markhiya,1,QAT006033031,two_language_exact
+Al Messila,1,QAT006036034,two_language_exact
+Al Mirqab,1,QAT006018017,two_language_exact
+Al Rufaa,1,QAT006017014,two_language_exact
+Al Sadd 38,1,QAT006038789,two_language_exact
+Al Sadd 39,1,QAT006039790,two_language_exact
+Al Souq,1,QAT006007009,two_language_exact
+Al Thumama 46,1,QAT006046794,two_language_exact
+Al Thumama 47,1,QAT006047795,two_language_exact
+Al Thumama 50,1,QAT006050796,two_language_exact
+Barahat Al Jufairi,1,QAT006005006,two_language_exact
+Dahl Al Hamam,1,QAT006032030,two_language_exact
+Doha International Airport,1,QAT006048045,two_language_exact
+Duhail,1,QAT006030027,two_language_exact
+Fereej Abdel Aziz,1,QAT006014012,two_language_exact
+Fereej Al Asmakh,1,QAT006005007,two_language_exact
+Fereej Al Nasr,1,QAT006039040,two_language_exact
+Fereej Bin Derhem,1,QAT006025022,two_language_exact
+Fereej Bin Mahmoud 22,1,QAT006022785,two_language_exact
+Fereej Bin Mahmoud 23,1,QAT006023786,two_language_exact
+Fereej Bin Omran,1,QAT006037035,two_language_exact
+Fereej Kulaib,1,QAT006035033,two_language_exact
+Hamad Medical City,1,QAT006037037,two_language_exact
+Hazm Al Markhiya,1,QAT006067107,two_language_exact
+Jelaiah,1,QAT006068108,two_language_exact
+Jeryan Nejaima,1,QAT006068109,two_language_exact
+Lejbailat,1,QAT006064104,two_language_exact
+Madinat Khalifa North,1,QAT006032029,two_language_exact
+Madinat Khalifa South,1,QAT006034032,two_language_exact
+Najma,1,QAT006026023,two_language_exact
+New Al Hitmi,1,QAT006037036,two_language_exact
+New Slata,1,QAT006040041,one_language_exact
+Nuaija 41,1,QAT006041791,two_language_exact
+Nuaija 43,1,QAT006043792,two_language_exact
+Nuaija 44,1,QAT006044793,two_language_exact
+Old Airport,1,QAT006045044,two_language_exact
+Old Al Ghanim 16,1,QAT006016780,two_language_exact
+Old Al Ghanim 6,1,QAT006006779,two_language_exact
+Onaiza 63,1,QAT006063807,two_language_exact
+Onaiza 65,1,QAT006065808,two_language_exact
+Onaiza 66,1,QAT006066809,two_language_exact
+Rawdat Al Khail,1,QAT006024020,two_language_exact
+The Pearl,1,QAT006066765,two_language_exact
+Umm Ghuwailina,1,QAT006027024,two_language_exact
+Umm Lekhba,1,QAT006031028,two_language_exact
+Wadi Al Sail 20,1,QAT006020782,two_language_exact
+الثمامة 46,1,QAT006046794,two_language_exact
+الثمامة 47,1,QAT006047795,two_language_exact
+الثمامة 50,1,QAT006050796,two_language_exact
+الدفنة 61,1,QAT006061806,two_language_exact
+الدوحة الجديدة,1,QAT006015013,one_language_exact
+الرفاع,1,QAT006017014,two_language_exact
+السد 38,1,QAT006038789,two_language_exact
+السد 39,1,QAT006039790,two_language_exact
+السوق,1,QAT006007009,two_language_exact
+الغانم العتيق 16,1,QAT006016780,two_language_exact
+الغانم العتيق 6,1,QAT006006779,two_language_exact
+اللؤلؤة,1,QAT006066765,two_language_exact
+المرخية,1,QAT006033031,two_language_exact
+المرقاب,1,QAT006018017,two_language_exact
+المرقاب الجديد,1,QAT006039039,one_language_exact
+المسيلة,1,QAT006036034,two_language_exact
+المطار العتيق,1,QAT006045044,two_language_exact
+المعمورة 43,1,QAT006043803,two_language_exact
+المنصورة,1,QAT006025021,two_language_exact
+الهتمي الجديد,1,QAT006037036,two_language_exact
+الهلال,1,QAT006042043,two_language_exact
+ام غويلينة,1,QAT006027024,two_language_exact
+ام لخبا,1,QAT006031028,two_language_exact
+براحة الجفيري,1,QAT006005006,two_language_exact
+جريان نجيمة,1,QAT006068109,two_language_exact
+جليعة,1,QAT006068108,two_language_exact
+حزم المرخية,1,QAT006067107,two_language_exact
+دحل الحمام,1,QAT006032030,two_language_exact
+دحيل,1,QAT006030027,two_language_exact
+راس بو عبود 28,1,QAT006028787,one_language_exact
+روضة الخيل,1,QAT006024020,two_language_exact
+عنيزة 63,1,QAT006063807,two_language_exact
+عنيزة 65,1,QAT006065808,two_language_exact
+عنيزة 66,1,QAT006066809,two_language_exact
+فريج الاصمخ,1,QAT006005007,two_language_exact
+فريج النصر,1,QAT006039040,two_language_exact
+فريج بن درهم,1,QAT006025022,two_language_exact
+فريج بن عمران,1,QAT006037035,two_language_exact
+فريج بن محمود 22,1,QAT006022785,two_language_exact
+فريج بن محمود 23,1,QAT006023786,two_language_exact
+فريج عبد العزيز,1,QAT006014012,two_language_exact
+فريج كليب,1,QAT006035033,two_language_exact
+لجبيلات,1,QAT006064104,two_language_exact
+لقطيفية,1,QAT006066105,one_language_exact
+مدينة حمد الطبية,1,QAT006037037,two_language_exact
+مدينة خليفة الجنوبية,1,QAT006034032,two_language_exact
+مدينة خليفة الشمالية,1,QAT006032029,two_language_exact
+مشيرب 13,1,QAT006013778,one_language_exact
+مطار الدوحة الدولي,1,QAT006048045,two_language_exact
+نجمة,1,QAT006026023,two_language_exact
+نعيجة 41,1,QAT006041791,two_language_exact
+نعيجة 43,1,QAT006043792,two_language_exact
+نعيجة 44,1,QAT006044793,two_language_exact
+وادي السيل 20,1,QAT006020782,two_language_exact
+Ain Khaled,2,QAT003056095,two_language_exact
+Al Aziziya,2,QAT003055084,two_language_exact
+Al Ghanim Al Jadeed,2,QAT003055085,two_language_exact
+Al Gharrafa,2,QAT003051047,two_language_exact
+Al Luqta,2,QAT003052060,two_language_exact
+Al Maamoura 56,2,QAT003056804,two_language_exact
+Al Mearad,2,QAT003055090,two_language_exact
+Al Sailiya,2,QAT003055091,two_language_exact
+Al Seej,2,QAT003051052,two_language_exact
+Al Shagub,2,QAT003052063,two_language_exact
+Al Themaid,2,QAT003051053,two_language_exact
+Al Waab,2,QAT003055083,two_language_exact
+Baaya,2,QAT003054082,two_language_exact
+Bani Hajer,2,QAT003051050,two_language_exact
+Bu Hamour,2,QAT003056094,two_language_exact
+Bu Sidra,2,QAT003055089,two_language_exact
+Fereej Al Amir,2,QAT003054077,two_language_exact
+Fereej Al Manaseer,2,QAT003055087,two_language_exact
+Fereej Al Murra,2,QAT003055086,two_language_exact
+Fereej Al Soudan 54,2,QAT003054799,two_language_exact
+Fereej Al Soudan 55,2,QAT003055800,two_language_exact
+Fereej Al Zaeem,2,QAT003052062,two_language_exact
+Gharrafat Al Rayyan,2,QAT003051049,two_language_exact
+Izghawa 51,2,QAT003051797,two_language_exact
+Lebday,2,QAT003052064,two_language_exact
+Luaib,2,QAT003054080,two_language_exact
+Mebaireek,2,QAT003081472,two_language_exact
+Mehairja,2,QAT003054081,two_language_exact
+Mesaimeer,2,QAT003056098,two_language_exact
+Muaither 53,2,QAT003053801,two_language_exact
+Muaither 55,2,QAT003055802,two_language_exact
+Muraikh,2,QAT003054078,two_language_exact
+New Al Rayyan,2,QAT003053065,two_language_exact
+Rawdat Abal Heeran,2,QAT003053067,two_language_exact
+Rawdat Al Jahhaniya,2,QAT003051056,two_language_exact
+Rawdat Egdaim,2,QAT003051051,two_language_exact
+Umm Al Seneem,2,QAT003056099,two_language_exact
+ازغوى 51,2,QAT003051797,two_language_exact
+الثميد,2,QAT003051053,two_language_exact
+الريان الجديد,2,QAT003053065,two_language_exact
+الريان العتيق,2,QAT003052061,one_language_exact
+السيج,2,QAT003051052,two_language_exact
+السيلية,2,QAT003055091,two_language_exact
+الشقب,2,QAT003052063,two_language_exact
+العزيزية,2,QAT003055084,two_language_exact
+الغانم الجديد,2,QAT003055085,two_language_exact
+الغرافة,2,QAT003051047,two_language_exact
+اللقطة,2,QAT003052060,two_language_exact
+المعراض,2,QAT003055090,two_language_exact
+المعمورة 56,2,QAT003056804,two_language_exact
+الوجبة,2,QAT003053066,one_language_exact
+الوعب,2,QAT003055083,two_language_exact
+ام السنيم,2,QAT003056099,two_language_exact
+بعيا,2,QAT003054082,two_language_exact
+بني هاجر,2,QAT003051050,two_language_exact
+بو سدرة,2,QAT003055089,two_language_exact
+بو هامور,2,QAT003056094,two_language_exact
+روضة ابا الحيران,2,QAT003053067,two_language_exact
+روضة اقديم,2,QAT003051051,two_language_exact
+روضة الجهانية,2,QAT003051056,two_language_exact
+عين خالد,2,QAT003056095,two_language_exact
+غرافة الريان,2,QAT003051049,two_language_exact
+فريج الأمير,2,QAT003054077,two_language_exact
+فريج الزعيم,2,QAT003052062,two_language_exact
+فريج السودان 54,2,QAT003054799,two_language_exact
+فريج السودان 55,2,QAT003055800,two_language_exact
+فريج المرة,2,QAT003055086,two_language_exact
+فريج المناصير,2,QAT003055087,two_language_exact
+لبديع,2,QAT003052064,two_language_exact
+لوعيب,2,QAT003054080,two_language_exact
+مبيريك,2,QAT003081472,two_language_exact
+محيرجة,2,QAT003054081,two_language_exact
+مريخ,2,QAT003054078,two_language_exact
+مسيمير,2,QAT003056098,two_language_exact
+معيذر 53,2,QAT003053801,two_language_exact
+معيذر 55,2,QAT003055802,two_language_exact
+Afjat Muaither,3,QAT005091644,two_language_exact
+Al Meshaf,3,QAT005091640,two_language_exact
+Al Nigyan,3,QAT005095478,two_language_exact
+Al Wakra,3,QAT005090635,two_language_exact
+Al Wukair,3,QAT005091639,two_language_exact
+Muaither Al Wukair,3,QAT005091642,two_language_exact
+Umm Besher,3,QAT005091767,one_language_exact
+المشاف,3,QAT005091640,two_language_exact
+النقيان,3,QAT005095478,two_language_exact
+الوكرة,3,QAT005090635,two_language_exact
+الوكير,3,QAT005091639,two_language_exact
+عفجة معيذر,3,QAT005091644,two_language_exact
+معيذر الوكير,3,QAT005091642,two_language_exact
+Al Froosh,4,QAT007071134,two_language_exact
+Al Kharaitiyat,4,QAT007071127,two_language_exact
+Izghawa 71,4,QAT007071798,two_language_exact
+Umm Al Amad,4,QAT007071132,two_language_exact
+Umm Ebairiya,4,QAT007071131,two_language_exact
+Umm Slal Ali,4,QAT007071130,two_language_exact
+Umm Slal Mohammed,4,QAT007071128,two_language_exact
+ازغوى 71,4,QAT007071798,two_language_exact
+الخريطيات,4,QAT007071127,two_language_exact
+الفروش,4,QAT007071134,two_language_exact
+ام العمد,4,QAT007071132,two_language_exact
+ام صلال علي,4,QAT007071130,two_language_exact
+ام صلال محمد,4,QAT007071128,two_language_exact
+ام عبيرية,4,QAT007071131,two_language_exact
+بو فسيلة,4,QAT007071129,one_language_exact
+وادي المزروعه,4,QAT007071150,one_language_exact
+Al Ebb,5,QAT001070116,two_language_exact
+Al Kharayej,5,QAT001069113,two_language_exact
+Al Kheesa,5,QAT001070117,two_language_exact
+Al Sakhama,5,QAT001070120,two_language_exact
+Jeryan Jenaihat,5,QAT001070118,two_language_exact
+Leabaib,5,QAT001070115,two_language_exact
+Lusail 69,5,QAT001069812,two_language_exact
+Rawdat Al Hamama,5,QAT001070119,two_language_exact
+Tenbek,5,QAT001070287,two_language_exact
+Umm Garn,5,QAT001070126,two_language_exact
+الخرايج,5,QAT001069113,two_language_exact
+الخيسة,5,QAT001070117,two_language_exact
+الصخامة,5,QAT001070120,two_language_exact
+العب,5,QAT001070116,two_language_exact
+ام قرن,5,QAT001070126,two_language_exact
+تنبك,5,QAT001070287,two_language_exact
+جريان جنيحات,5,QAT001070118,two_language_exact
+حالة اوبير,5,QAT001070283,one_language_exact
+روضة الحمامة,5,QAT001070119,two_language_exact
+سميسمة,5,QAT001070268,one_language_exact
+غار ثعيلب,5,QAT001069114,one_language_exact
+لعبيب,5,QAT001070115,two_language_exact
+لوسيل 69,5,QAT001069812,two_language_exact
+Al Khor,6,QAT002074269,two_language_exact
+Al Thakhira,6,QAT002075307,two_language_exact
+Madinat Al Kaaban,6,QAT002075361,two_language_exact
+الخور,6,QAT002074269,two_language_exact
+الذخيرة,6,QAT002075307,two_language_exact
+لغويرية,6,QAT002076336,one_language_exact
+مدينة الكعبان,6,QAT002075361,two_language_exact
+Aba Al Duloof,7,QAT004078396,two_language_exact
+Al Ruwais,7,QAT004079423,two_language_exact
+Madinat Al Shamal,7,QAT004079424,two_language_exact
+ابا الظلوف,7,QAT004078396,two_language_exact
+الرويس,7,QAT004079423,two_language_exact
+الغشامية,7,QAT004077375,one_language_exact
+عين سنان,7,QAT004077366,one_language_exact
+مدينة الشمال,7,QAT004079424,two_language_exact
+Al Nasraniya,8,QAT008085568,two_language_exact
+Lijmiliya,8,QAT008073210,two_language_exact
+Rawdat Rashed,8,QAT008082492,two_language_exact
+الشيحانية,8,QAT008080451,one_language_exact
+النصرانية,8,QAT008085568,two_language_exact
+روضة راشد,8,QAT008082492,two_language_exact
+لجمليه,8,QAT008073210,two_language_exact

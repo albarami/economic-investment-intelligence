@@ -31,10 +31,10 @@ GAZETTEER_KEYS = (
     "name_ar",
     "aliases",
     "source_id",
-    "record_key",
+    "record_ref",
     "arabic_review",
 )
-AREA_KEYS = ("place_key", "mode", "cutoff_minutes", "source_id", "record_key")
+AREA_KEYS = ("place_key", "mode", "cutoff_minutes", "source_id", "record_ref")
 STATUSES = frozenset({"verified_open", "closed_or_moved", "not_found", "duplicate"})
 ACCEPTED_SOURCES = frozenset(
     {"tenant_directory", "official_website", "public_authority"}
@@ -312,7 +312,27 @@ def _keys(item: object, required: tuple[str, ...]) -> Mapping[str, object]:
     missing = [key for key in required if key not in item]
     if missing:
         raise PlacesError("missing_key")
-    return item
+    return review_file_spec(item)
+
+
+def review_file_spec(row: Mapping[str, object]) -> dict[str, object]:
+    """Translate a file row without changing the other fields' treatment."""
+    if "record_key" in row:
+        raise PlacesError("missing_key")
+    return {
+        ("record_key" if name == "record_ref" else name): value
+        for name, value in row.items()
+    }
+
+
+def review_file_row(row: Mapping[str, object]) -> dict[str, object]:
+    """Translate an internal review row to its on-disk field names, in order."""
+    if "record_key" not in row:
+        raise KeyError("record_key")
+    return {
+        ("record_ref" if name == "record_key" else name): value
+        for name, value in row.items()
+    }
 
 
 def _area(item: object) -> Mapping[str, object]:

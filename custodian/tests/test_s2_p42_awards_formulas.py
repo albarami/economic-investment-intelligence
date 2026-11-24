@@ -10,7 +10,7 @@ from zipfile import ZipFile
 import pytest
 from custodian.tests.test_awards_incremental import intake
 from custodian.tests.test_s2_t29_awards import STAMP
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.fetch import awards
@@ -116,6 +116,7 @@ def test_formula_in_another_column_is_read_by_cached_value(tmp_path):
     assert batch.rows[0]["original"]["Approved Value"] == "12.50"
 
 
+@settings(deadline=None)
 @given(
     st.one_of(
         st.decimals(allow_nan=False, allow_infinity=False, places=2).map(str),

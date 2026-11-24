@@ -1,19 +1,37 @@
 """Propose reviewed place keys from the receipted cache; lead-shell only, offline.
 
-``review_place_keys.py CACHE REVIEW_DIR [--check]`` fills a null ``record_key``
+``review_place_keys.py CACHE REVIEW_DIR [--check]`` fills a null ``record_ref``
 of ``flagship_candidates.yaml`` (a building id, ``bldg_ovt``) and of
-``showcase_gazetteer.yaml`` (a place id, ``places_ovt``) only when exactly one
-receipted open place carries one of the row's names after
-``trim_collapse_whitespace_casefold``; a building also needs that point in
-exactly one footprint, inside the boundary set the build uses. The matched
-place must also survive the build's own ``_keep`` exclusions, read with the
+``showcase_gazetteer.yaml`` (a place id, ``places_ovt``). Names compare after
+``trim_collapse_whitespace_casefold`` (N0). Each row records its basis:
+
+- ``building_name`` (building rows, tried first): exactly one verified
+  footprint carries one of the row's names among its own names (primary,
+  common values and rules values), and it is inside the boundary set. Two or
+  more such footprints refuse with ``building_name_n``; more than one once
+  combining marks and tatweel are also dropped (N1) refuses with
+  ``building_name_folded_n``; a place-point footprint (below) that differs
+  refuses with ``basis_conflict``. No named footprint falls back to
+  ``place_point``. No nearest-footprint rule exists.
+- ``place_point`` (building rows): exactly one place that the build keeps
+  carries one of the row's names, and its point lies in exactly one footprint,
+  inside the boundary set.
+- ``place_name`` (gazetteer rows): exactly one place that the build keeps
+  carries one of the row's names, and its category is in the closed area list
+  ``LANDMARK_CATEGORIES``; any other category refuses with
+  ``landmark_category_refused``.
+
+Only places that survive the build's own ``_keep`` exclusions, read with the
 reviewed attribution table (so ``attribution_missing`` withholds the key; H2
-and the reviewer's table come first), and ``resolve_duplicates``. A repeated
-``place_key`` and a selected building part that does not verify are refused.
-Every other row stays null with a closed reason. It prints counts and booleans
-per place_key, never a name, id or coordinate; an expected failure prints one
-closed reason and no text of the failure. ``--check`` re-derives every filled
-key and fails one whose place the build excludes.
+and the reviewer's table come first), and ``resolve_duplicates`` are counted
+for ``match_0`` and ``match_n``; the excluded count is printed beside them,
+and a row whose one match is excluded keeps that match's own reason. A
+repeated ``place_key`` and a selected building part that does not verify are
+refused. Every other row stays null with a closed reason. It prints counts and
+booleans per place_key, never a name, id or coordinate; an expected failure
+prints one closed reason and no text of the failure. ``--check`` re-derives
+every filled key with the same rules, the area list included, and fails one
+whose place the build excludes.
 
 The writing contract. At each filesystem call of ``write_reviewed`` and its
 helpers (each write, copy, ``copymode``, reload, ``os.replace``, restore,
@@ -42,8 +60,9 @@ import os
 import shutil
 import sys
 import tempfile
+import unicodedata
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import yaml
@@ -68,6 +87,8 @@ from eii_custodian.publicdata.places.integrate import (
 from eii_custodian.publicdata.places.read import (
     ReadBuilding,
     ReadPlace,
+    _column_names,
+    connect_parquet,
     decode_wkb,
     load_boundary_buildings,
     read_building_file,
@@ -78,6 +99,7 @@ from eii_custodian.publicdata.places.review import (
     load_attribution,
     load_flagship_candidates,
     load_showcase_gazetteer,
+    review_file_row,
 )
 from eii_custodian.publicdata.places_fsq.policy import normalise_duplicate_name
 
@@ -91,6 +113,15 @@ FILES: tuple[tuple[str, str, Loader], ...] = (
 )
 UNPARSABLE = (yaml.YAMLError, UnicodeError, csv.Error)
 ROLLBACK_FAILED = "rollback_failed"
+BUILDING_NAME = "building_name"
+PLACE_POINT = "place_point"
+PLACE_NAME = "place_name"
+# The closed list of area categories a gazetteer row may resolve to. The
+# tokens are those the lead's diagnosis of the live L4 run names; they are
+# not checked against the source's published taxonomy (open item proposed).
+LANDMARK_CATEGORIES = frozenset({"district", "neighbourhood", "island"})
+TATWEEL = "ـ"
+NAME_FIELDS = frozenset({"primary", "common", "rules"})
 
 
 class ReviewError(Exception):
@@ -106,26 +137,34 @@ class Inputs:
     """The receipted places, every receipted footprint and the inside ids.
 
     fates holds each place's outcome under the build's own filters ("ok" or a
-    closed reason).
+    closed reason). named holds each named footprint's own names, as stored.
     """
 
     places: tuple[ReadPlace, ...]
     buildings: tuple[ReadBuilding, ...]
     inside: frozenset[str]
     fates: Mapping[str, str]
+    named: Mapping[str, frozenset[str]]
 
 
 @dataclass(frozen=True)
 class Proposal:
-    """One row's outcome. key is None unless every rule holds."""
+    """One row's outcome. key is None unless every rule holds.
+
+    matches counts kept places only and excluded the other name matches;
+    footprint is the one footprint the row's basis reached, inside or not.
+    """
 
     place_key: str
-    matches: int
+    matches: int | None
     kept: bool | None
     footprints: int | None
     inside: bool | None
     key: str | None
     reason: str
+    basis: str
+    excluded: int | None = None
+    footprint: str | None = None
 
 
 def candidate_names(spec: Mapping[str, object]) -> frozenset[str]:
@@ -154,30 +193,146 @@ def matching_places(
     return found
 
 
+def folded_name(value: str) -> str:
+    """N1: the N0 name with combining marks and tatweel also dropped."""
+    decomposed = unicodedata.normalize("NFKD", normalise_duplicate_name(value))
+    kept = (
+        item
+        for item in decomposed
+        if unicodedata.category(item) != "Mn" and item != TATWEEL
+    )
+    return normalise_duplicate_name(unicodedata.normalize("NFC", "".join(kept)))
+
+
+def named_footprints(
+    names: frozenset[str],
+    named: Mapping[str, frozenset[str]],
+    compare: Callable[[str], str],
+) -> list[str]:
+    """Footprints one of whose own names equals one of names under compare."""
+    wanted = {compare(name) for name in names} - {""}
+    return [
+        building
+        for building, own in named.items()
+        if wanted & {compare(name) for name in own}
+    ]
+
+
 def propose(spec: Mapping[str, object], source_id: str, inputs: Inputs) -> Proposal:
     """Derive one row's key, or the closed reason it stays null."""
     place_key = str(spec.get("place_key"))
-    matches = matching_places(candidate_names(spec), inputs.places)
-    if len(matches) != 1:
-        reason = "match_0" if not matches else "match_n"
-        return Proposal(place_key, len(matches), None, None, None, None, reason)
-    place = matches[0]
-    fate = inputs.fates[place.place_id]
-    if fate != "ok":
-        return Proposal(place_key, 1, False, None, None, None, fate)
+    names = candidate_names(spec)
+    if source_id == BUILDINGS:
+        found = by_building_name(place_key, names, inputs)
+        if found is not None:
+            return found
+    return by_place(place_key, names, source_id, inputs)
+
+
+def by_building_name(
+    place_key: str, names: frozenset[str], inputs: Inputs
+) -> Proposal | None:
+    """The footprint that carries the row's name itself; None when none does."""
+    exact = named_footprints(names, inputs.named, normalise_duplicate_name)
+    folded = named_footprints(names, inputs.named, folded_name)
+    base = Proposal(place_key, None, None, len(exact), None, None, "", BUILDING_NAME)
+    if len(exact) > 1:
+        return replace(base, reason="building_name_n")
+    if len(folded) > 1:
+        return replace(base, reason="building_name_folded_n")
+    if not exact:
+        return None
+    building = exact[0]
+    base = replace(base, footprint=building, inside=building in inputs.inside)
+    if not base.inside:
+        return replace(base, reason="outside_boundary")
+    point = by_place(place_key, names, BUILDINGS, inputs).footprint
+    if point is not None and point != building:
+        return replace(base, reason="basis_conflict")
+    return replace(base, key=building, reason="ok")
+
+
+def by_place(
+    place_key: str, names: frozenset[str], source_id: str, inputs: Inputs
+) -> Proposal:
+    """The one kept place that carries the row's name, then its point's footprint."""
+    found = matching_places(names, inputs.places)
+    kept = [place for place in found if inputs.fates[place.place_id] == "ok"]
+    basis = PLACE_NAME if source_id == PLACES else PLACE_POINT
+    base = Proposal(
+        place_key, len(kept), None, None, None, None, "", basis, len(found) - len(kept)
+    )
+    if len(found) == 1 and not kept:
+        return replace(base, kept=False, reason=inputs.fates[found[0].place_id])
+    if len(kept) != 1:
+        return replace(base, reason="match_0" if not kept else "match_n")
+    place = kept[0]
     if source_id == PLACES:
-        return Proposal(place_key, 1, True, None, None, place.place_id, "ok")
+        if place.category not in LANDMARK_CATEGORIES:
+            return replace(base, kept=True, reason="landmark_category_refused")
+        return replace(base, kept=True, key=place.place_id, reason="ok")
     point = Point(float(place.lon), float(place.lat))
     holding = [
         row for row in inputs.buildings if decode_wkb(row.footprint_wkb).covers(point)
     ]
     if len(holding) != 1:
         reason = "footprint_0" if not holding else "footprint_n"
-        return Proposal(place_key, 1, True, len(holding), None, None, reason)
+        return replace(base, kept=True, footprints=len(holding), reason=reason)
     building = holding[0].building_id
+    base = replace(base, kept=True, footprints=1, footprint=building)
     if building not in inputs.inside:
-        return Proposal(place_key, 1, True, 1, False, None, "outside_boundary")
-    return Proposal(place_key, 1, True, 1, True, building, "ok")
+        return replace(base, inside=False, reason="outside_boundary")
+    return replace(base, inside=True, key=building, reason="ok")
+
+
+def footprint_names(value: object) -> frozenset[str]:
+    """A footprint's primary, common and rules names as stored; a wrong form refuses.
+
+    ``names`` is null or a struct with the fields ``primary`` (null or text),
+    ``common`` (null or a map of null or text) and ``rules`` (null or a list of
+    structs, each with a ``value`` field of null or text). Empty names are
+    dropped.
+    """
+    if value is None:
+        return frozenset()
+    if not isinstance(value, dict) or not NAME_FIELDS <= value.keys():
+        raise ReviewError("building_names_form")
+    found = [value.get("primary")]
+    common, rules = value.get("common"), value.get("rules")
+    if common is not None:
+        if not isinstance(common, dict):
+            raise ReviewError("building_names_form")
+        found.extend(common.values())
+    if rules is not None:
+        if not isinstance(rules, list) or not all(
+            isinstance(rule, dict) and "value" in rule for rule in rules
+        ):
+            raise ReviewError("building_names_form")
+        found.extend(rule.get("value") for rule in rules)
+    if any(item is not None and not isinstance(item, str) for item in found):
+        raise ReviewError("building_names_form")
+    return frozenset(item for item in found if isinstance(item, str) and item.strip())
+
+
+def building_names(paths: Sequence[Path]) -> dict[str, frozenset[str]]:
+    """Each named footprint's own names, from the verified parts only."""
+    named: dict[str, frozenset[str]] = {}
+    for path in paths:
+        connection = connect_parquet()
+        try:
+            if "names" not in _column_names(connection, path):
+                raise ReviewError("building_names_missing")
+            rows = connection.execute(
+                "SELECT id, names FROM read_parquet(?) WHERE names IS NOT NULL",
+                [str(path)],
+            ).fetchall()
+        finally:
+            connection.close()
+        for building, value in rows:
+            own = footprint_names(value)
+            if own:
+                named[str(building)] = own
+    return named
 
 
 def place_fates(
@@ -222,13 +377,13 @@ def apply(
     """Fill each row from its own proposal; a row already set is refused."""
     result = []
     for row, item in zip(rows, proposals, strict=True):
-        updated = dict(row)
+        updated = review_file_row(row)
         key = None if item is None else item.key
         if key is not None:
             if row.get("record_key") is not None or row.get("source_id") is not None:
                 raise ReviewError("overwrite_refused")
             updated["source_id"] = source_id
-            updated["record_key"] = key
+            updated["record_ref"] = key
         result.append(updated)
     return result
 
@@ -269,7 +424,8 @@ def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> P
     text = json.dumps(list(rows), ensure_ascii=False, indent=2) + "\n"
     staged = write_beside(path, text.encode("utf-8"))
     try:
-        if list(loader(staged, None)[1]) != json.loads(text):
+        reloaded = [review_file_row(row) for row in loader(staged, None)[1]]
+        if reloaded != json.loads(text):
             raise ReviewError("reload_mismatch")
     except BaseException:
         discard([staged])
@@ -361,9 +517,11 @@ def load_inputs(
                 raise ReviewError("buildings_file_unverified")
     inside, _receipts, _outside = load_boundary_buildings(paths, receipts, boundary)
     every = tuple(row for item in paths for row in read_building_file(item))
+    named = building_names(paths)
     places = read_place_file(path, tag)
     fates = place_fates(places, boundary, licences)
-    return Inputs(places, every, frozenset(row.building_id for row in inside), fates)
+    ids = frozenset(row.building_id for row in inside)
+    return Inputs(places, every, ids, fates, named)
 
 
 def frame_boundary(cache: Path, registry: Sequence[Entry]) -> BaseGeometry:
@@ -426,7 +584,8 @@ def fill(review: Path, inputs: Inputs) -> list[str]:
                 f"{item.place_key} matches={_bucket(item.matches)} "
                 f"kept={_flag(item.kept)} "
                 f"footprints={_bucket(item.footprints)} inside={_flag(item.inside)} "
-                f"written={_flag(item.key is not None)} reason={item.reason}"
+                f"written={_flag(item.key is not None)} reason={item.reason} "
+                f"basis={item.basis} excluded={_bucket(item.excluded)}"
             )
     write_reviewed(planned)
     return lines

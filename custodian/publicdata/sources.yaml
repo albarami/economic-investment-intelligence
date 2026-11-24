@@ -174,6 +174,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "cus_imp_2019"
+    stream_max_bytes: 2147483648
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cus_imp_2019"
     slug: "qatar-imports-2019-2024-copy"
@@ -863,7 +864,7 @@ sources:
         type: "number"
       - name: "property_value"
         type: "integer"
-    basis_note: "Columns are the observed export fields (S2-T08 part B source review, mismatch 3; custodian/publicdata/review/s2_t08_source_review.yaml). The shape pack shows names only: the types of lstkhdm and of the four numeric fields first declared there await the lead's live run. Share fields refuse by name until their meaning is confirmed."
+    basis_note: "Columns are the observed export fields (S2-T08 part B source review, mismatch 3; custodian/publicdata/review/s2_t08_source_review.yaml). The shape pack shows names only: the types of lstkhdm and of the four numeric fields first declared there await the lead's live run. Ruling L-1724 item 1 keeps whole-property deals only; partial_share_deal and share_fields_inconsistent rows are excluded and counted per row, never priced; share-field meaning remains unconfirmed."
     row_count_min: 26719
     row_count_max: 26719
     reconciliation: "none"
@@ -3801,8 +3802,8 @@ sources:
     period_field: "sit=row;form=year_text;field=year"
     period_first: "2019"
     period_last: "2024"
-    row_count_min: 1162
-    row_count_max: 1162
+    row_count_min: 1142
+    row_count_max: 1142
     reconciliation: "none"
     skip_reason: ""
     extension: "json"
@@ -28065,6 +28066,7 @@ sources:
     period_field: "sit=row;form=year_text;field=year"
     basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: trade_ext/qatar-imports-2014-2018
+    stream_max_bytes: 2147483648
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
     slug: qatar-imports-2014-2018
@@ -28392,6 +28394,7 @@ sources:
     skip_reason: ""
     extension: "zip"
   - key: "bldg_wsf3d"
+    stream_max_bytes: 8589934592
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_wsf3d"
     slug: ""
@@ -28419,6 +28422,7 @@ sources:
     skip_reason: ""
     extension: "tif"
   - key: "bldg_gba/e050_n25_e055_n20"
+    stream_max_bytes: 1073741824
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_gba"
     slug: ""
@@ -28448,6 +28452,7 @@ sources:
     basis_note: "Hosted GeoParquet conversion; original dataset https://github.com/zhu-xlab/GlobalBuildingAtlas/ and DOI 10.14459/2025mp1782307; hosted conversion https://source.coop/tge-labs/globalbuildingatlas-lod1. Supplied footer research dated 2026-11-22; ODbL component notice quoted in terms_words from the original repository's License Notice, read 2026-11-22; publisher meaning of declared nodata remains pending. Calibration only, no published building class."
 
   - key: "bldg_gba/e050_n30_e055_n25"
+    stream_max_bytes: 1073741824
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_gba"
     slug: ""
@@ -29624,7 +29629,7 @@ sources:
     terms_url: https://skyscraperpage.com/site/copyright/
     terms_words: Reproduction of content in whole or in part is not permitted without prior written permission by Skyscraper Source Media.
     terms_read_on: '2026-11-22'
-    basis_note: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3. Publisher's restriction recorded as a record; no reuse permission inferred.
+    basis_note: Document 04 S2-P53 landmark hand-list placement and citation snapshots; decision 0093 item 3. Publisher's restriction recorded as a record; no reuse permission inferred. Page not served (HTTP 404) on 2026-11-24; decision 0107 (proposed); re-probed at each live build.
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
@@ -29637,7 +29642,7 @@ sources:
     period_last: ''
     period_field: ''
     reconciliation: none
-    skip_reason: ''
+    skip_reason: page_not_served
     extension: html
   - key: landmark_stadiumdb_com/page-315e32f6547b80db29d25db49bed81b61871d6d48512b5fd7e6da793831c810c
     refetch:

@@ -366,6 +366,14 @@ from a source record into the repository.
 | `landmark_wikiarquitectura` | 2 | WikiArquitectura | `en.wikiarquitectura.com` | `owner_decision`; decision 0026 item 3 |
 | `landmark_wikipedia` | 19 | Wikipedia | `en.wikipedia.org` | `dataset`; CC-BY-SA-4.0 text |
 
+The one page of `landmark_skyscraperpage_com` answered 404 on 2026-11-24 and is
+registered with `skip_reason: page_not_served` under proposed
+[decision 0107](decisions/0107-a-citation-page-the-publisher-no-longer-serves.md):
+build-public reports it as a SKIP and sends no request for it. A landmark citation
+row accepts that one reason word or none; the parser refuses any other. The lead
+re-probes the page at each live build (OI-411), and the word is removed when it
+answers again.
+
 ### 2.2 Coverage, use and traps
 
 Coverage facts of the rows above `prop_resi_units` are from the project research, retrieved
@@ -431,7 +439,7 @@ no table (PUB-109).
 | `trade_wr` | 2015 to 2022; national; by type of trade, wholesale and retail; 864 rows; modified 2026-11-01 | market context in the market entry pack (D1, S1) | `pub_trade_wr` | context only, never a forecast; national |
 | `pop_muni_age` | 2014 to 2024; municipality x age group; 1,584 rows; modified 2026-08-19 | customer segments by area and age (D3) | `pub_population_age` | estimates; spelling variants of municipality names (PUB-27) |
 | `hotels_muni` | 2022 to 2024; municipality; 48 rows; modified 2026-08-02 | visitor accommodation supply (D1); calibrates the visitor share of the simulated footfall ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md)) | `pub_hotels_municipality` | counts of facilities, not rooms or guests |
-| `trade_logistics` | certificates of origin by type and importing country, 2019 to 2024, 1,162 rows, modified 2025-05-29; arriving vessels, gross and net tonnage by type of vessel and country of previous port, 2016 to 2022, 1,890 rows, modified 2026-06-20; the same by country of registration (Hamad Port), 2019 to 2023, 717 rows, modified 2026-04-27 | serving the region and logistics access (D7) | `pub_trade_logistics` | a second certificates dataset with fewer rows exists on the portal and is not used; vessel series end in 2022 and 2023 |
+| `trade_logistics` | certificates of origin by type and importing country, 2019 to 2024, 1,142 rows, modified 2026-11-24 (1,162 rows, modified 2025-05-29, until the publisher's revision of 2026-11-24); arriving vessels, gross and net tonnage by type of vessel and country of previous port, 2016 to 2022, 1,890 rows, modified 2026-06-20; the same by country of registration (Hamad Port), 2019 to 2023, 717 rows, modified 2026-04-27 | serving the region and logistics access (D7) | `pub_trade_logistics` | a second certificates dataset with fewer rows exists on the portal and is not used; vessel series end in 2022 and 2023 |
 | `est_census_2015_muni` | census 2015; municipality; 8 rows; modified 2025-06-02 | the fidelity report by municipality ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md)); firm counts and firm density come from the public business register (`biz_register`, [decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md)) | `pub_census_2015_municipality` | dated 2015: every use says so; carries municipality geometry, which the frame does not use (section 5) |
 | `lf_muni_sex` | 2020 to 2025; municipality x sex; female and male population and labour force, 240 rows each, modified 2026-09-30; employed persons 15 years and above, 96 rows, modified 2026-09-10; unemployed persons 15 years and above, 96 rows, modified 2026-09-06 | workforce available by area and sex, including the unemployed pool: D5 staffing; services aimed at women | `pub_labour_sex_municipality` | survey estimates (Labour Force Sample Survey); Public split by sex on the source's municipality geography only (PUB-90) |
 | `pop_muni_age_sex` | 2014 to 2023; municipality x age group x sex; 1,440 rows each; modified 2025-06-02 (females) and 2025-05-07 (males) | customer segments by area, age and sex (D3), for example women aged 25 to 44; cited anchor for the movement generator's age and gender shares, summed over the source's own categories ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md) SYN-89, `mob.split_anchor.population_age_sex`) | `pub_population_age_sex` | titled December 2020 but holding 2014 to 2023; both files hold the year as four-digit text in `years`; Public split by sex (PUB-90) |
@@ -1110,6 +1118,37 @@ Optional `satellite_cdse_backup` covers Qatar at the owner-targeted resolution w
 
 ### 3.1 Registry and sidecar record
 
+**Required large-source intake (S2-P84, L-1717).** Every key admitted by
+`fetch/large.py` has a total-byte bound and a completeness check. The existing
+Overture path retains its reviewed exact size and ETag checks. Other admitted
+keys require the registry's `stream_max_bytes`: a positive integer byte ceiling,
+with null or absence meaning unconfirmed. Malformed non-null values refuse
+`stream_max_bytes` in the closed registry loader. Without an exact size or a
+confirmed ceiling, intake refuses `bound_unconfirmed` before opening the stream.
+Without an exact size, a missing Content-Length refuses `length_undeclared`
+before reading any body. Under ruling L-1762 (S2-P90) the completeness proof
+has two forms. That refusal stands for every key the imports row check does
+not parse (the binary keys). A `portal_dataset` key whose staged body the
+imports check parses — `cus_imp_2019` and
+`trade_ext/qatar-imports-2014-2018`, whose portal export is chunked and never
+sends Content-Length — may stream undeclared; completeness is then proved by
+the stream ending without a transport error and the row parse reaching the
+closing `]` with only whitespace before EOF, under the unchanged row-count,
+schema, split and period gates. A declared length must match the bytes received
+(`length_mismatch`); exceeding the source ceiling or a tighter existing scoped
+cap refuses `body_bytes`, before writing the over-limit chunk. The existing
+chunk, host, exact-size, ETag and empty-body refusals remain. Each successful
+stream adds the closed boolean `declared_length_present` to its receipt and
+immutable acquisition-check record; a repeated identical snapshot retains its
+original receipt and records the current observation in `checks/`.
+The five non-Overture keys, `cus_imp_2019`,
+`trade_ext/qatar-imports-2014-2018`, `bldg_wsf3d` and both registered
+`bldg_gba` tiles, carry the reviewed ceilings of ruling L-1723 (the smallest
+whole number of GiB at or above four times each key's receipted size), pinned
+by `test_reviewed_ceilings_are_pinned`. A future streamed key without a
+confirmed ceiling keeps the null hold and refuses `bound_unconfirmed`. No
+ceiling value is derived from a response header.
+
 The dedicated national imagery archive follows [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) item 3 and `custodian/src/eii_custodian/publicdata/gis/SNAPSHOT.md`: its closed registry is `custodian/publicdata/review/gis_snapshot.json`, with ordinary and nightly eligibility false. A shard receipt includes imagery date, metadata/boundary/enumeration hashes, member names and hashes, publisher, terms/basis, retrieval UTC, byte size and generator version. Completion is published last after every enumerated key is accounted for as a verified tile or a recorded gap; staging is never complete. Resume verifies every skipped shard and its receipt. A release selects a reviewed all-date manifest hash explicitly; it never selects the newest directory.
 
 S2-T51 uses one boundary-chain check at resume and selection over source id/key,
@@ -1166,7 +1205,13 @@ still refuse `schema_missing`; every shape parser keeps the refusing default.
 On a citation snapshot page a `sign in`/`sign-in` word alone does not refuse:
 the credentials obstacle is a rendered `input` of `type=password`, the page
 requires exactly status 200 with any other status refusing `http_status`,
-and `robot check`/`paywall` words still refuse every kind.
+and `robot check`/`paywall` words refuse a citation snapshot only in joined
+text nodes outside `script`, `style`, `noscript` and `template`, never
+in attribute values; the page title is scanned (S2-P82). The scan reuses the
+same first-wins tree and its text walker; entities decode and adjacent text
+nodes join without added spacing. A visible marker returns `refusal_body`,
+mapped to `unavailable`.
+Other kinds keep the raw-byte obstacle scan.
 A bare sign-in wall this scan admits — a sign-in link and button with no
 password field — still refuses `excerpt_absent` under the landmark row's
 verbatim excerpt check when the page holds no height text (decision 0093).
@@ -1235,7 +1280,10 @@ The code-only FDI municipality target is a derived file at
 files such as district aliases. It is never committed (decision 0026 item 5,
 decision 0034 item 2; lead ruling L-1324). Its `target_sha256` in each reviewed
 `fdi_crosswalks.yaml` mapping pins the exact CSV bytes. The reader verifies that
-hash on every read and never substitutes a file beside the committed crosswalk.
+hash on every read and never substitutes a committed file for the cache target.
+Reviewed crosswalk rows live at `CACHE/review/fdi_crosswalks.yaml`; their other
+targets stay in the committed review folder, never beside the cache crosswalk
+(decision 0108 item 1).
 The public build and release assembly pass their cache root to the reader;
 standalone specification reads use the repository's public cache. The empty
 mapping list needs no target file and continues to leave those slots null.
@@ -1389,8 +1437,10 @@ in parser tests establish mechanics only. The lead supplies real mappings from t
 cache snapshot and another maker confirms them before AC3 can close (OI-182). Each mapping
 uses the source-issued `project_id`, snapshot hash and content-derived `project_key`, names
 one of the three derived columns, and pins its selected Public target resource and key.
-Target resources are direct CSV or YAML files beside the review file; their typed key
-column is `iso3`, `municipality_code` or `place_key`. Names are never lookup keys;
+Target resources are direct CSV or YAML files in the committed review folder,
+except `municipality_codes.csv`, which is read only from `CACHE/review/`;
+their typed key column is `iso3`, `municipality_code` or `place_key`.
+Names are never lookup keys;
 `municipality_names.csv` is explicitly refused in this route. Per-mapping lead role, date
 and reference are the review evidence for both sides, independently of shared target review
 flags. Missing review, changed hashes or source values, absent targets and duplicate or
@@ -1748,7 +1798,7 @@ cell. The frame is not an exact cover of the land.
 | PUB-25 | A committed `custodian/publicdata/review/zone_crosswalk.csv` lists every zone number seen in any source with one column per source (`bnd_zone_2020`, `bnd_hdx`, `util_elec`, census tables, `bnd_geob`) and a status: `matched`, `absent_in_source`, `merged`, `no_polygon`. Zone numbers 10 and 11 in the utility series and the merged geoBoundaries zones (for example '18-19') must appear with an explicit status. |
 | PUB-26 | A utility row whose zone has no polygon is kept in national totals and listed as "zone without boundary" in the coverage note; it is never assigned to a neighbouring zone. |
 | PUB-27 | A committed `municipality_names.csv` maps every spelling seen in sources (for example Al Sheehaniya and Al Shahaniya, Umm Slal and Umm Salal, Al Khor and Al Thakhira) to one municipality key. An unmapped spelling fails the build. |
-| PUB-28 | A committed `district_crosswalk.csv` maps each `prop_sales` and `prop_resi_units` district name (Arabic and English) to one or more boundary districts, including renamed districts such as 'Lusail' and 'Lusail 69'. Unmatched names are listed and excluded from district figures, never guessed. |
+| PUB-28 | The committed `district_crosswalk.csv` has columns `name,municipality_code,district_keys,basis`. Lookup normalises whitespace, including NO-BREAK SPACE, in the source and reviewed names and then requires an exact name and municipality-code match. Under ruling L-1725, M1 writes both language rows only when they identify the same single key in that municipality; M2 writes only the one exactly matching language row. Every key on every row, including an unused row, must belong to the actual frame's district set. All other names stay unmapped under the closed reasons of document 03 and are excluded from district figures. Spelling, article, zone-number, fuzzy and cross-municipality name-only inference are forbidden. |
 | PUB-29 | A pin finds its zone, district and municipality by point-in-polygon on the pin itself. A pin in a reviewed district-free zone has no district and carries the reason key `zone_without_district`, never a neighbouring or invented district. A pin whose point has no base cell ([03](03_DATA_CONTRACTS.md) section 1.1) gets this Public context, and the Public layers of its exact `distance`, `walk` or free-flow `drive` outline only, with no protected or Simulated figure ([decision 0030](decisions/0030-frame-grid-by-index-ownership-and-two-nullable-keys.md) item 10). A drawn area (a drawn shape, a radius, or a walk or drive time from a point) finds every official geography its shape overlaps, by polygon intersection, not only those that hold its vertices. Public point layers (places, venues, and FDI projects with a point location) are counted inside the drawn shape exactly, by point-in-polygon; a count of places is a count of listed records with the note of PUB-50, never a count of businesses. A statistic published on an official geography is shown on that geography, which is named. Where it is apportioned to the drawn shape, the result is labelled Inferred, names the apportioning method of [07 Economic methods](07_ECONOMIC_METHODS.md) and the source geography, and takes its provenance under PUB-20. Public splits by sex or nationality are never apportioned (PUB-90); the one case that is not an apportionment is the sum of whole cells of a published population grid over a chosen area (PUB-99). No public figure is apportioned to grid cells or release units, or blended into a protected figure; the aggregation of a raster measurement by whole pixels (PUB-100) and that whole-cell sum are not apportionments. Figures from the protected record types (business register, employment, residence, wages) snap to whole release units, with the snap sentence, before any figure is read ([decision 0016](decisions/0016-version-1-covers-the-whole-initiative.md)). |
 | PUB-30 | The `gazetteer` table uses the contract fields `place_key`, `kind`, `name_en`, `name_ar`, `aliases`, `lon`, `lat`, `cell`, `showcase_verified` and `source_id` for every municipality, zone, district, showcase area and flagship building. A row's point is never moved to find a cell. `cell` is null only where [03](03_DATA_CONTRACTS.md) section 7.3 allows it, and a row of any other kind without a base cell fails the build. |
 | PUB-31 | Arabic search keys remove diacritics and tatweel, unify alef forms, map final ta marbuta to ha and alef maqsura to ya; English keys are lower-cased with punctuation removed. The same function is used by `resolve`; keys are computed in memory and are not release columns. |

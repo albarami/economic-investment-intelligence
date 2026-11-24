@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.test_baskets import invented_review
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
@@ -502,6 +502,7 @@ def _cases(draw):
     return tuple(rows), isic_class, model, bad, tuple(sorted(unreviewed))
 
 
+@settings(deadline=None)
 @given(_cases())
 def test_class_members_matches_an_independent_oracle(case) -> None:
     """The property: the answer is the class's admitted mapped codes, or the

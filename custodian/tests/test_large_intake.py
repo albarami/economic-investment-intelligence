@@ -22,7 +22,11 @@ from eii_custodian.publicdata.fetch.transport import Response, StreamResponse
 
 @pytest.fixture(scope="module")
 def entries():
-    return {e.key: e for e in load_registry()}
+    # Synthetic test ceilings; the production ceilings are pinned in test_large_bounds.py.
+    return {
+        e.key: replace(e, stream_max_bytes=300 * 1024 * 1024 + 9)
+        for e in load_registry()
+    }
 
 
 class Sink:
@@ -107,7 +111,14 @@ def test_oversize_chunk_is_named_and_never_written(entries, key):
     sink = Sink()
     with pytest.raises(large.IntakeError, match="stream_chunk"):
         large.receive(
-            entry, stream(entry, [b"x" * 65537], etag=large.recorded_etag(entry)), sink
+            entry,
+            stream(
+                entry,
+                [b"x" * 65537],
+                65537 if large.recorded_size(entry) is None else None,
+                etag=large.recorded_etag(entry),
+            ),
+            sink,
         )
     assert sink.count == 0
 
@@ -142,10 +153,10 @@ def test_lower_source_cap_still_prevails(entries):
     "declared,body,reason",
     [
         (4, [b"abc"], "length_mismatch"),
-        (None, [b""], "empty_body"),
+        (0, [b""], "empty_body"),
         (True, [b"a"], "declared_length"),
         (-1, [b"a"], "declared_length"),
-        (None, ["text"], "stream_chunk"),
+        (4, ["text"], "stream_chunk"),
     ],
 )
 def test_stream_refusals(entries, declared, body, reason):
@@ -345,7 +356,7 @@ def test_invalid_imports_never_publish(entries, tmp_path, change, raw, reason):
         large.fetch_large(
             entry,
             lambda _url: response,
-            stream(entry, [raw]),
+            stream(entry, [raw], len(raw)),
             tmp_path,
             lambda: "2026-11-18T00:00:00Z",
             lambda _s: None,
@@ -457,7 +468,7 @@ def test_older_imports_stream_observes_text_year_bounds(entries, tmp_path):
     result = large.fetch_large(
         entry,
         lambda _url: meta(entry),
-        stream(entry, [raw]),
+        stream(entry, [raw], len(raw)),
         tmp_path,
         lambda: "2026-11-21T00:00:00Z",
         lambda _s: None,
@@ -494,7 +505,7 @@ def test_older_imports_keep_planned_card_input_and_strict_period_gate(
         return large.fetch_large(
             entry,
             lambda _url: meta(entry),
-            stream(entry, [raw]),
+            stream(entry, [raw], len(raw)),
             tmp_path,
             lambda: "2026-11-18T00:00:00Z",
             lambda _s: None,
@@ -692,7 +703,7 @@ def test_publication_rehashes_the_whole_staged_body(entries, tmp_path, monkeypat
         large.fetch_large(
             entry,
             lambda _url: meta(entry),
-            stream(entry, [b'[{"value":1}]']),
+            stream(entry, [b'[{"value":1}]'], len(b'[{"value":1}]')),
             tmp_path,
             lambda: "2026-11-18T00:00:00Z",
             lambda _s: None,
@@ -706,7 +717,7 @@ def test_changed_import_period_contract_refuses(entries, tmp_path):
         large.fetch_large(
             entry,
             lambda _url: meta(entry),
-            stream(entry, [b"[]"]),
+            stream(entry, [b"[]"], 2),
             tmp_path,
             lambda: "2026-11-18T00:00:00Z",
             lambda _s: None,
@@ -731,7 +742,7 @@ def test_older_imports_refuse_other_period_contracts(entries, tmp_path, form):
         large.fetch_large(
             entry,
             lambda _url: meta(entry),
-            stream(entry, [raw]),
+            stream(entry, [raw], len(raw)),
             tmp_path,
             lambda: "2026-11-21T00:00:00Z",
             lambda _s: None,
@@ -766,10 +777,13 @@ def test_json_rows_matches_stdlib_oracle_for_every_chunk_boundary(rows, chunk_si
 def test_lower_source_cap_counts_undeclared_body(entries):
     from eii_custodian.publicdata.fetch.transport import metadata_limit
 
-    entry = entries["bldg_wsf3d"]
+    entry = replace(
+        entries["places_ovt/part-00014"],
+        basis_note="recorded_bytes: 3\nrecorded_etag: SYN-tag",
+    )
     sink = Sink()
     with metadata_limit(2), pytest.raises(large.IntakeError, match="body_bytes"):
-        large.receive(entry, stream(entry, [b"a", b"bc"]), sink)
+        large.receive(entry, stream(entry, [b"a", b"bc"], etag='"SYN-tag"'), sink)
     assert sink.count == 1
 
 
@@ -815,7 +829,11 @@ def test_older_imports_refuse_undeclared_public_split(entries, tmp_path):
         large.fetch_large(
             entry,
             lambda _url: meta(entry),
-            stream(entry, [b'[{"year":"2018","gender":"SYN"}]']),
+            stream(
+                entry,
+                [b'[{"year":"2018","gender":"SYN"}]'],
+                len(b'[{"year":"2018","gender":"SYN"}]'),
+            ),
             tmp_path,
             lambda: "2026-11-18T00:00:00Z",
             lambda _s: None,
