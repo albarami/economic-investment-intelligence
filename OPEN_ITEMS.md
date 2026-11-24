@@ -2879,7 +2879,10 @@ Records points of the review, applied here:
 - The refusal wording of the five bounded rows distinguishes an absent
   recorded size with an unconfirmed bound (`bound_unconfirmed`) from a missing
   declared length with a confirmed bound (`length_undeclared`); both refuse in
-  `fetch/large.py`.
+  `fetch/large.py`. Under ruling L-1762 (S2-P90) the `length_undeclared`
+  refusal stands for the keys the imports row check does not parse; the two
+  `portal_dataset` keys it parses may stream undeclared and prove completeness
+  by the row parse reaching the closing `]` with only whitespace before EOF.
 
 ## OI-309 — The other six registry rows not read by the live build
 

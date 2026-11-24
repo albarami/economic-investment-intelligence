@@ -53878,3 +53878,45 @@ S2-P84 lead ceiling commit (ruling L-1723, 2026-11-24): `custodian/publicdata/so
 | 2026-11-24 | S2-L4cnt approval (`frame_grid`, read-only) | `ed7828552b269b8061cd81ee5afa555a9a4ebde6` extracts `frame_grid` from `build_live_frame` with a no-write test (`custodian/tests/test_frame_grid_read_only.py`), so the L4 counts extract reads the build's own grid over the reviewed selections (ruling L-1748 items 2 and 3). Builder Anthropic (the lead); review S2-L4cnt.rv2 (Factory Droid) APPROVED this commit. The counts extract itself is a lead-shell tool kept outside the repository; its final form (sha256 prefix `1fcd0afee0`, tests `fe3b1b5408`) was APPROVED by S2-L4cnt.rv5 (OpenAI Codex A) after plants A, B and D (warning filter, log disable, descriptor-two mute) each turned their named test red alone and were restored byte for byte, with plants E, G, C and H recorded earlier; 35 passed before and after. | lead |
 | 2026-11-24 | S2-L4cnt records point of rv3 | The fix-round account that `logging.disable(logging.NOTSET)` restores the previous threshold was wrong: it resets it. The final extract saves `logging.root.manager.disable` before muting and restores that saved value in its `finally` block. rv3 confirmed that the extract's lines, refusal reasons and exact-output expectations are unchanged by these diagnostic fixes, so the counts run of the earlier form stands for the data review. | lead |
 | 2026-11-24 | Train S2-36 identity | One approved commit cherry-picked with `-x` onto main `91b3ab1186`, with no conflict: `ed7828552b` as `462135184b`. `train_identity.py` reports 2 files identical in their added and removed lines, 0 differences. The S2-L4 fill `fa4aa86907` (approved by S2-L4.rv2d) was held out of this train: the pinned history scan reports `generic-api-key` on its filled `record_key` lines, which carry public building identifiers. No scanner rule or allow-list changes; ruling L-1769 renames the review-file field, and the fill joins a later train with its approval and records points. | lead |
+
+## S2-P90 — streamed JSON exports prove completeness by the closing bracket — 2026-11-24
+
+- Builder Devin (Cognition), uncommitted in worktree S2-P90 on base
+  `91b3ab1186c6e855b81e4a04cd251257662a265a`. Persona: senior data-acquisition
+  engineer owning `fetch/large.py`; strict self-review personas: strict-reviewer
+  and sharp-edges. Lead ruling L-1762 amending S2-P84 (L-1717); L-1409 negative
+  tests. No branch or commit was created.
+- Change: `receive` gained one keyword-only `parse_proved: bool = False`; the
+  `length_undeclared` guard became `size is None and length is None and not
+  parse_proved`. `fetch_large` passes `parse_proved=info is not None`, the same
+  gate that runs `_check_imports`, so the two `portal_dataset` keys
+  (`cus_imp_2019`, `trade_ext/qatar-imports-2014-2018`) may stream the portal's
+  chunked export without Content-Length; completeness is proved by the clean
+  stream end and the row parse reaching `]` with whitespace-only to EOF. Binary
+  keys, declared-length checks, the `body_bytes` ceiling and
+  `declared_length_present` are unchanged. `json_rows` and `sources.yaml`
+  untouched. `portal_metadata` exposes no record count; none is reported.
+- Tests: 14 new cases in `custodian/tests/test_large_bounds.py` covering
+  undeclared admission with `declared_length_present: false`, mid-object and
+  pre-`]` cuts, trailing content, over-ceiling undeclared (`body_bytes`), the
+  binary-key `length_undeclared` refusal before any body read, a server-cut
+  chunked transfer raising `TransportFault("unreachable")` through
+  `open_https_stream`, and one Hypothesis property over every strict byte
+  prefix of a generated valid array (never publishes, reason in
+  {`empty_body`, `portal_json`}). Red first: 11 failed, 44 passed, exit 1;
+  green: 55 passed, exit 0; both large files 128 passed, exit 0; filtered
+  `custodian/tests -k "large or stream or intake or ceiling"` 406 passed,
+  exit 0.
+- Guard deletions, each alone and restored byte-for-byte: removing
+  `and not parse_proved` made the 11 new cases fail (exit 1, `length_undeclared`);
+  removing the post-`]` trailing check in `json_rows` made the three
+  trailing-content cases and the existing `[{}]x` case fail (4 failed,
+  exit 1). Restored: 55 passed and 128 passed, exit 0.
+- Records: doc 04 §3.1 names both completeness forms under L-1762; the OI-308
+  records-point sentence now records the parsed-keys exception; no change to
+  `sources.yaml`, the ceilings or the pinned-ceiling test.
+- Checks: ruff check 0, ruff format --check 0 (1007 files), mypy 0 (530 files),
+  check_docs 0 (1358 text files, 158 Markdown), check_tree 0 (8 rules),
+  import-boundary discovery 0 (37 tests), `git diff --check` 0. Environment
+  WSL2 Linux, Python 3.14, `UV_OFFLINE=1`, no network. `data/`, `.env` and
+  `.private` were never read; the whole `./eii test` remains the lead's run.

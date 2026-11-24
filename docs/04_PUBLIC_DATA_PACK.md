@@ -1126,7 +1126,15 @@ with null or absence meaning unconfirmed. Malformed non-null values refuse
 `stream_max_bytes` in the closed registry loader. Without an exact size or a
 confirmed ceiling, intake refuses `bound_unconfirmed` before opening the stream.
 Without an exact size, a missing Content-Length refuses `length_undeclared`
-before reading any body. A declared length must match the bytes received
+before reading any body. Under ruling L-1762 (S2-P90) the completeness proof
+has two forms. That refusal stands for every key the imports row check does
+not parse (the binary keys). A `portal_dataset` key whose staged body the
+imports check parses — `cus_imp_2019` and
+`trade_ext/qatar-imports-2014-2018`, whose portal export is chunked and never
+sends Content-Length — may stream undeclared; completeness is then proved by
+the stream ending without a transport error and the row parse reaching the
+closing `]` with only whitespace before EOF, under the unchanged row-count,
+schema, split and period gates. A declared length must match the bytes received
 (`length_mismatch`); exceeding the source ceiling or a tighter existing scoped
 cap refuses `body_bytes`, before writing the over-limit chunk. The existing
 chunk, host, exact-size, ETag and empty-body refusals remain. Each successful
