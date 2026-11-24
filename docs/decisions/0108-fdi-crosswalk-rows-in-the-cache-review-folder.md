@@ -29,6 +29,8 @@ through its pinned hash. The same placement can hold the crosswalk rows.
    SHA-256 and origin `cache`. Symlinks at the file, review directory or any
    ancestor refuse as `crosswalk_hash`, including dangling file links.
    An invalid cache file refuses rather than selecting the committed file.
+   Non-municipality targets stay committed and are read from the committed
+   review folder; only `municipality_codes.csv` is read from `CACHE/review/`.
 2. The committed `custodian/publicdata/review/fdi_crosswalks.yaml` stays
    schema-only, with `mappings: []`. It is selected only when the cache file
    is absent, with origin `committed`; all three mapped slots stay null.
