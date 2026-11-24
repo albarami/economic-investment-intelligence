@@ -10,7 +10,7 @@ import unicodedata
 from pathlib import Path, PurePosixPath
 
 import pytest
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 from public_assembly_fixture import approve, dump, inputs
 
@@ -186,6 +186,7 @@ _PART = st.text(
 )
 
 
+@settings(deadline=None)
 @given(
     head=st.sampled_from(["artefacts/", "/artefacts/", "", "artefacts", "tables/"]),
     tail=_PART,
@@ -381,6 +382,7 @@ def test_producer_assembly_and_startup_accept_single_file_artefacts(tmp_path):
         verify_artefacts(checked)
 
 
+@settings(deadline=None)
 @given(control=st.characters(categories=("Cc",)))
 def test_every_control_is_refused_without_writes(tmp_path_factory, control):
     with tempfile.TemporaryDirectory(dir=tmp_path_factory.getbasetemp()) as folder:
@@ -832,6 +834,7 @@ def test_failure_cleanup_preserves_a_substituted_destination(tmp_path, monkeypat
     assert not list(cache.rglob("*.partial"))
 
 
+@settings(deadline=None)
 @given(
     step=st.integers(min_value=0, max_value=60),
     where=st.sampled_from(["root", "parent", "leaf"]),

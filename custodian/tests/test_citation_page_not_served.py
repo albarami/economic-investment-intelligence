@@ -41,6 +41,14 @@ P86_ROW = "prop_sales"
 # S2-P92 reviewed the publisher's revised counts; restore only those two fields
 # to their base values before hashing, as for S2-P86's reviewed note.
 P92_ROW = "trade_logistics/annual-certificates-of-origin-by-type-and-importing-country"
+# S3-T12 (train S3-E1) gave the accident row its release table and its NO_DATA
+# caveat; both must equal the reviewed values exactly and are restored to the
+# base's empty lists before hashing, as for S2-P86 and S2-P92.
+S3_T12_ROW = "accident"
+S3_T12_FIELDS = {
+    "release_tables": ["pub_accident_zone"],
+    "caveat_keys": ["accident_source_missing"],
+}
 P86_BASE_BASIS_NOTE = (
     "Columns are the observed export fields (S2-T08 part B source "
     "review, mismatch 3; "
@@ -202,6 +210,9 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     assert len(p92) == 1
     assert p92[0]["row_count_min"] == 1142
     assert p92[0]["row_count_max"] == 1142
+    t12 = [row for row in rows if row["key"] == S3_T12_ROW]
+    assert len(t12) == 1
+    assert {field: t12[0][field] for field in S3_T12_FIELDS} == S3_T12_FIELDS
     restored = [
         {
             field: value
@@ -212,6 +223,8 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
                 if item["key"] == P86_ROW
                 else dict(item, row_count_min=1162, row_count_max=1162)
                 if item["key"] == P92_ROW
+                else dict(item, release_tables=[], caveat_keys=[])
+                if item["key"] == S3_T12_ROW
                 else item
             ).items()
             if field not in LATER_REVIEWED_FIELDS

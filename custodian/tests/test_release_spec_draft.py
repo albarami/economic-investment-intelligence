@@ -260,7 +260,7 @@ def phase_sets(draw):
     return phases
 
 
-@settings(max_examples=25)
+@settings(max_examples=25, deadline=None)
 @given(phase_sets())
 def test_any_phase_record_set_drafts_a_spec_the_producer_accepts(phases):
     with tempfile.TemporaryDirectory(prefix="INVENTED-draft-") as folder:

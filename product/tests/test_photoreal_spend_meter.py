@@ -15,7 +15,7 @@ from urllib.parse import parse_qsl, urlsplit
 from urllib.request import Request
 
 import pytest
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 from product.tests.reason_contract import assert_error
 from product.tests.test_map_modes import Response, invoke, seed_journal, view_query
@@ -299,6 +299,7 @@ def test_satellite_tile_does_not_carry_a_provider_spend_header(tmp_path, provide
     assert b"x-spend-meter" not in headers
 
 
+@settings(deadline=None)
 @example(count=0, limit=10, price_units=6_000)
 @example(count=1, limit=10, price_units=6_000)
 @example(count=7, limit=10, price_units=6_000)

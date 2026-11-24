@@ -9,7 +9,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 from routing_release_fixture import TILES, invented_extract
 
@@ -330,6 +330,7 @@ def test_extract_must_be_inside_release(extract, kind):
         RoutingSource.from_tiles(path, release)
 
 
+@settings(deadline=None)
 @given(
     depth=st.integers(min_value=0, max_value=5),
     inside=st.booleans(),

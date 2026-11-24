@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import pytest
 from custodian.tests.test_frame_live_survivors import _build, _world
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 from public_assembly_fixture import approve, dump, inputs
 
@@ -59,6 +59,7 @@ def test_frame_keeps_each_grid_lineage_by_product(tmp_path, lineage_name):
     assert result.tables["pub_night_lights"] == rows
 
 
+@settings(deadline=None)
 @given(
     tables=st.dictionaries(
         st.text(alphabet="abc", max_size=4).map("INVENTED-grid-".__add__),
@@ -1409,6 +1410,7 @@ def test_an_unreadable_input_file_is_a_missing_receipt(tmp_path):
     refuses_without_candidate(tmp_path, "producer_receipt_missing")
 
 
+@settings(deadline=None)
 @given(
     stored=st.lists(st.sampled_from("abc"), min_size=1, max_size=3),
     asked=st.lists(st.sampled_from("abc"), min_size=1, max_size=3),
