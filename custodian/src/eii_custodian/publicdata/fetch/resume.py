@@ -399,6 +399,8 @@ class RunRecord:
             ):
                 raise ValueError("proof_required")
             started = utc(self.row["started_utc"])
+            if utc(state["retrieved_utc"]) < started:
+                raise ValueError("lineage_changed")
             for position, proof in enumerate(proofs):
                 if (
                     not isinstance(proof, dict)
@@ -425,25 +427,29 @@ class RunRecord:
                 }:
                     raise ValueError("proof_files_missing")
                 side = snapshot.sidecar
+                if position == 0 and snapshot.sha256 != state["digest"]:
+                    raise ValueError("lineage_changed")
+                # Equal-byte publication keeps the original primary receipt.
+                # Only this run's proven fetch of that digest admits its age;
+                # auxiliary receipts have no such per-fetch digest proof.
+                kept_receipt = position == 0 and utc(side["retrieved_utc"]) < started
                 if (
                     side["publisher"] != proof["publisher"]
                     or side["retrieved_utc"] != proof["retrieved_utc"]
-                    or utc(side["retrieved_utc"]) < started
+                    or (utc(side["retrieved_utc"]) < started and not kept_receipt)
                 ):
                     raise ValueError("lineage_changed")
                 for name, digest in proof["files"].items():
                     path = self._local(name, entry)
                     if (
-                        path.stat().st_mtime < started.timestamp()
-                        or file_hash(path) != digest
-                    ):
+                        path.stat().st_mtime < started.timestamp() and not kept_receipt
+                    ) or file_hash(path) != digest:
                         raise ValueError("stored_bytes_changed")
             primary = read_snapshot(
                 self._local(proofs[0]["directory"], entry), state["digest"]
             )
             if (
                 primary.sidecar["source_id"] != entry.source_id
-                or primary.sidecar["retrieved_utc"] != state["retrieved_utc"]
                 or primary.sidecar["publisher"] != item["publisher"]
                 or primary.sidecar["fetch_host"] != state["fetch_host"]
             ):
