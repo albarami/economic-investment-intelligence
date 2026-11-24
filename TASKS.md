@@ -15,7 +15,7 @@ The queue was re-planned on 2026-11-12 for [decision 0016](docs/decisions/0016-v
 - The builder and first reviewer must come from different makers.
 - Every task brief starts with the stated builder persona and reviewer persona.
 - A task is done only when it is built, verified, reviewed, merged and green in CI.
-- A reviewer returns only `APPROVED` or `REJECTED`; a rejection includes exact fixes. After round 1 only the kinds of finding of REV-39 reject; other valid points are proposed open items ([decision 0015](docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md)).
+- A reviewer returns only `APPROVED` or `REJECTED`; a rejection includes exact fixes. During the pilot of [decision 0110](docs/decisions/0110-approved-with-small-fixes-pilot.md) only, `APPROVED-WITH-SMALL-FIXES` is a third verdict on that record's items 2 to 4; every finding is fixed before merge and closed by its script. After round 1 only the kinds of finding of REV-39 reject; other valid points are proposed open items ([decision 0015](docs/decisions/0015-review-rounds-and-the-scope-of-repository-checks.md)).
 - Acceptance evidence records the command or check, result, full commit hash and review verdict.
 - Files outside the task's scope are read-only.
 - Parallel tasks must have disjoint writable scopes; otherwise the lead serializes them.

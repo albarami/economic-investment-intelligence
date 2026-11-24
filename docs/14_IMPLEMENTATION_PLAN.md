@@ -37,7 +37,7 @@
 | PLN-05 | Commits must follow Conventional Commits and remain atomic to the task. |
 | PLN-06 | Pushes to GitHub must be strictly sequential: the lead permits one task branch to push, waits for that push to finish, then permits the next. |
 | PLN-07 | Each acceptance claim must name its evidence: exact command or recorded check, exit code or result, full commit hash and reviewer verdict. |
-| PLN-08 | The reviewer verdict must be exactly `APPROVED` or `REJECTED`; a rejection must give the file, line, defect and exact fix. |
+| PLN-08 | The reviewer verdict must be exactly `APPROVED` or `REJECTED`; a rejection must give the file, line, defect and exact fix. During the pilot of [decision 0110](decisions/0110-approved-with-small-fixes-pilot.md) only, `APPROVED-WITH-SMALL-FIXES` is also allowed on that record's items 2 to 4. |
 | PLN-09 | The lead must coordinate tasks, verify evidence, resolve conflicts and make final scope decisions; tools from other makers must build and give the first review. |
 | PLN-10 | Model routing must use a fast, low-cost model for mechanical work and a strong mid-tier model for most planning, building and review; the top model is reserved for architecture, privacy and security rules, hard debugging, phase reviews and final disagreement rulings. Other makers' models perform independent review, and agent counts remain lean. |
 | PLN-11 | Every task brief must start with the builder persona and reviewer persona, and the writer and reviewer must always come from different makers. |
