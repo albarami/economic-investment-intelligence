@@ -12,6 +12,10 @@ from zipfile import ZipFile
 
 import pytest
 from custodian.data_tests import test_pinned_methods as methods
+from custodian.tests.test_pinned_wilson import CHILD, SENTINEL, summary
+from custodian.tests.test_restricted_expectation_guards import child_run
+from hypothesis import given
+from hypothesis import strategies as st
 
 from eii_core.calc.facts import NoData
 from eii_custodian.publicdata.fetch.page_html import ShapeError
@@ -20,6 +24,19 @@ from eii_custodian.publicdata.fetch.receipts import commit_pair, sha256_hex, sid
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame import census
 from eii_custodian.publicdata.frame.layers import COUNTS, SCHEMAS
+from eii_custodian.publicdata.review.activity import SpineError
+
+C8_CHILD = CHILD.replace(
+    "methods.pinned = invented.child_pinned({shamal!r}, {parts!r})\n",
+    "from custodian.tests import test_pinned_c8 as c8\n"
+    "c8.plant_c8(methods, Path(__file__).parent / 'invented_cache', {config!r})\n",
+).replace(
+    "from custodian.data_tests.test_pinned_methods import (\n"
+    "    test_pinned_c2_wilson_period,\n"
+    "    test_pinned_c2_wilson_stock,\n"
+    ")\n",
+    "from custodian.data_tests.test_pinned_methods import test_pinned_c8\n",
+)
 
 
 def workbook(*, both_row=8, plant=""):
@@ -150,10 +167,17 @@ def workbook(*, both_row=8, plant=""):
             del cells[ref]
     elif plant.startswith("count_"):
         _, scope, kind = plant.split("_")
-        delta = D("-4" if kind == "negative" else "0.5")
+        delta = (
+            D("-4")
+            if kind == "negative"
+            else D("-0.5" if scope in {"female", "activity21"} else "0.5")
+        )
+        # Fractional transfers must not also make a count negative. The first
+        # two female activities have no Non-Profit counts; balance in Household.
+        balancing_column = "I" if (scope, kind) == ("activity42", "fraction") else "D"
 
         def transfer(number, amount):
-            for column, change in (("C", amount), ("D", -amount)):
+            for column, change in (("C", amount), (balancing_column, -amount)):
                 ref = f"{column}{number}"
                 cells[ref] = str(D(cells[ref]) + change)
 
@@ -231,19 +255,40 @@ def workbook(*, both_row=8, plant=""):
     return output.getvalue()
 
 
-def zones(null_field="Private"):
+def zones(null_field="Private", *, mixed=0):
     result = []
     source = "census_zone_sector"
-    for zone, private in ((101, 10), (102, 20), (103, 15)):
+    for zone, private, mixed_count in ((101, 10, mixed), (102, 20, 0), (103, 15, 0)):
         attrs = {
             name: "INVENTED" if kinds == (str,) else 0
             for name, kinds in SCHEMAS[source].items()
         }
-        attrs.update(ZONE_NO=zone, Private=private, Government=30 - private)
+        attrs.update(
+            ZONE_NO=zone,
+            Private=private,
+            Mixed=mixed_count,
+            Government=30 - private - mixed_count,
+        )
         attrs[COUNTS[source][0]] = 30
         result.append({"attributes": attrs, "geometry": {"rings": []}})
     result[-1]["attributes"][null_field] = None
     return {"count": len(result), "features": result}
+
+
+@given(st.integers(min_value=0, max_value=20))
+def test_c8_zone_nonprivate_parameter_preserves_valid_counts(mixed):
+    baseline = zones()
+    payload = zones(mixed=mixed)
+    attrs = payload["features"][0]["attributes"]
+    original = baseline["features"][0]["attributes"]
+    fields = COUNTS["census_zone_sector"]
+    assert attrs["Mixed"] == mixed
+    assert sum(Fraction(attrs[field]) for field in fields[1:]) == attrs[fields[0]]
+    assert all(attrs[field] >= 0 for field in fields)
+    assert attrs[fields[0]] > 0
+    assert attrs["Private"] == original["Private"] <= attrs[fields[0]]
+    assert attrs[fields[0]] == original[fields[0]]
+    assert payload["features"][1:] == baseline["features"][1:]
 
 
 def write_source(cache, key, body):
@@ -274,6 +319,19 @@ def invented_cache(
     elif plant == "zone_zero":
         for field in ("Private", "Government", COUNTS["census_zone_sector"][0]):
             payload["features"][0]["attributes"][field] = 0
+    elif plant == "zone_negative":
+        payload = zones(null_field, mixed=-1)
+        attrs = payload["features"][0]["attributes"]
+        fields = COUNTS["census_zone_sector"]
+        assert sum(attrs[field] for field in fields[1:]) == attrs[fields[0]]
+        assert attrs[fields[0]] > 0
+        assert 0 <= attrs["Private"] <= attrs[fields[0]]
+        baseline = zones(null_field)["features"][0]["attributes"]
+        assert attrs["Private"] == baseline["Private"]
+        assert attrs[fields[0]] == baseline[fields[0]]
+        assert all(attrs[field] >= 0 for field in fields if field != "Mixed")
+    elif plant == "zone_empty":
+        payload = {"count": 0, "features": []}
     elif plant == "zone_duplicate_key":
         payload["features"][1]["attributes"]["ZONE_NO"] = payload["features"][0][
             "attributes"
@@ -292,6 +350,122 @@ def invented_cache(
     (tmp_path / "method_pins.json").write_text(json.dumps(pins))
     monkeypatch.setattr(methods._cache, "CACHE", tmp_path)
     return pins
+
+
+def _c8_raiser(error):
+    def raise_it(*_args, **_kwargs):
+        raise error
+
+    return raise_it
+
+
+def _c8_missing_lineage(original, slot):
+    def missing(private, employed):
+        result = original(private, employed)
+        if not isinstance(result, NoData) and (
+            (private.geography == "national") == (slot == "national")
+        ):
+            object.__setattr__(result["percent"], "sources", ())
+        return result
+
+    return missing
+
+
+def _c8_wrong_value(original, slot):
+    def wrong(private, employed):
+        result = original(private, employed)
+        if not isinstance(result, NoData) and (
+            private.geography == "national"
+            if slot == "national"
+            else private.geography != "national"
+        ):
+            result["percent"] = replace(result["percent"], value=D(SENTINEL))
+        return result
+
+    return wrong
+
+
+def plant_c8(methods_module, cache, config):
+    """Build an invented cache and plant exactly one named C8 failure."""
+    kind = config.get("kind", "pass")
+    if kind in {"source_invalid", "spine_refused"}:
+        error = {
+            "source_invalid": KeyError(str(SENTINEL)),
+            "spine_refused": SpineError(f"INVENTED {SENTINEL}"),
+        }[kind]
+        methods_module._cache.pinned_body = _c8_raiser(error)
+        return
+    cache.mkdir()
+    patch = pytest.MonkeyPatch()
+    pins = invented_cache(
+        cache,
+        patch,
+        both_row=config.get("both_row", 8),
+        null_field=config.get("null_field", "Private"),
+        plant=config.get("plant", ""),
+    )
+    if kind == "null_zone":
+        original = methods_module.c8_zone_share
+
+        def wrong(row, chain):
+            return {} if row["Private"] is None else original(row, chain)
+
+        patch.setattr(methods_module, "c8_zone_share", wrong)
+    elif kind in {"national_lineage", "zone_lineage"}:
+        slot = kind.removesuffix("_lineage")
+        patch.setattr(
+            methods_module,
+            "coverage_share",
+            _c8_missing_lineage(methods_module.coverage_share, slot),
+        )
+    elif kind in {"national", "zone"}:
+        patch.setattr(
+            methods_module,
+            "coverage_share",
+            _c8_wrong_value(methods_module.coverage_share, kind),
+        )
+    elif kind in {"range", "range_high"}:
+        if kind == "range":
+            patch.setattr(methods_module, "share_range", lambda _values: (D(0), D(100)))
+        else:
+            patch.setattr(
+                methods_module,
+                "share_range",
+                lambda values: (min(values), D(SENTINEL)),
+            )
+    elif kind in {"pin", "bytes", "receipt", "snapshot", "index", "path"}:
+        key = config["key"]
+        digest = pins[key]
+        if kind == "pin":
+            del pins[key]
+            (cache / "method_pins.json").write_text(json.dumps(pins))
+        elif kind == "bytes":
+            extension = "xlsx" if key == "census_2020_workbook" else "json"
+            (cache / key / f"{digest}.{extension}").write_bytes(b"INVENTED wrong bytes")
+        elif kind == "receipt":
+            path = cache / key / f"{digest}.meta.json"
+            receipt = json.loads(path.read_text())
+            receipt["source_id"] = "est_census"
+            path.write_text(json.dumps(receipt))
+        else:
+            index_path = cache / key / "index" / f"{digest}.json"
+            if kind == "index":
+                index_path.unlink()
+            elif kind == "path":
+                index = json.loads(index_path.read_text())
+                index["path"] = "INVENTED invalid path"
+                index_path.write_text(json.dumps(index))
+            else:
+                index = json.loads(index_path.read_text())
+                (cache / key / index["path"]).unlink()
+
+
+def assert_c8_closed(tmp_path, config, reason):
+    failing = child_run(tmp_path, C8_CHILD.format(config=config))
+    output = failing.stdout + failing.stderr
+    assert failing.returncode == 1, "child_not_failed"
+    assert str(SENTINEL) not in output, "sentinel_leaked"
+    assert summary(failing) == {f"C8:{reason}"}
 
 
 def test_c8_source_binding_and_attribution():
@@ -401,25 +575,23 @@ def test_c8_invented_table_matches_lead_described_structure():
     ],
 )
 def test_c8_block_row_schema_plants(tmp_path, monkeypatch, plant, reason):
-    invented_cache(tmp_path, monkeypatch, plant=plant)
-    with pytest.raises(ValueError, match=f"C8:{reason}$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(tmp_path, {"plant": plant}, reason)
 
 
 @pytest.mark.parametrize("offset", [0, 21, 42])
 @pytest.mark.parametrize("column", list("CDEFGHIJ"))
 def test_c8_each_block_equals_its_activity_sum(tmp_path, monkeypatch, offset, column):
-    invented_cache(tmp_path, monkeypatch, plant=f"activity_{offset}_{column}_sum")
-    with pytest.raises(ValueError, match=r"^C8:activity_sum_mismatch$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(
+        tmp_path, {"plant": f"activity_{offset}_{column}_sum"}, "activity_sum_mismatch"
+    )
 
 
 @pytest.mark.parametrize("offset", [0, 21, 42])
 @pytest.mark.parametrize("kind", ["missing", "text"])
 def test_c8_activity_counts_are_required(tmp_path, monkeypatch, offset, kind):
-    invented_cache(tmp_path, monkeypatch, plant=f"activity_{offset}_C_{kind}")
-    with pytest.raises(ValueError, match=r"^C8:activity_count$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(
+        tmp_path, {"plant": f"activity_{offset}_C_{kind}"}, "activity_count"
+    )
 
 
 @pytest.mark.parametrize(
@@ -437,22 +609,29 @@ def test_c8_counts_are_nonnegative_whole_numbers(
 ):
     plant = f"count_{scope}_{kind}"
     assert _fixture_equalities(plant) == (True, True, True)
-    invented_cache(tmp_path, monkeypatch, plant=plant)
-    with pytest.raises(ValueError, match=f"^C8:{reason}$"):
-        methods.test_pinned_c8()
+    sheet = read_sheet(workbook(plant=plant), "76", cached_formulas=True)
+    values = [
+        Fraction(sheet.cells[f"{column}{row}"])
+        for start in (8, 29, 50)
+        for row in range(start, start + 21)
+        for column in "CDEFGHIJ"
+    ]
+    if kind == "negative":
+        assert any(value < 0 for value in values)
+        assert all(value.denominator == 1 for value in values)
+    else:
+        assert all(value >= 0 for value in values)
+        assert any(value.denominator != 1 for value in values)
+    assert_c8_closed(tmp_path, {"plant": plant}, reason)
 
 
 @pytest.mark.parametrize("column", list("CDEFGHIJ"))
 def test_c8_sex_totals_reconcile_every_column(tmp_path, monkeypatch, column):
-    invented_cache(tmp_path, monkeypatch, plant=f"sex_sum_{column}")
-    with pytest.raises(ValueError, match=r"^C8:sex_sum_mismatch$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(tmp_path, {"plant": f"sex_sum_{column}"}, "sex_sum_mismatch")
 
 
 def test_c8_national_sectors_equal_total(tmp_path, monkeypatch):
-    invented_cache(tmp_path, monkeypatch, plant="national_sector_sum")
-    with pytest.raises(ValueError, match=r"^C8:national_sector_sum$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(tmp_path, {"plant": "national_sector_sum"}, "national_sector_sum")
 
 
 def _fixture_equalities(plant):
@@ -498,9 +677,7 @@ def test_c8_arithmetic_plants_isolate_the_named_equality(plant, expected):
 
 
 def test_c8_formula_without_cached_value_refuses(tmp_path, monkeypatch):
-    invented_cache(tmp_path, monkeypatch, plant="uncached_formula")
-    with pytest.raises(ShapeError, match=r"^schema_missing$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(tmp_path, {"plant": "uncached_formula"}, "source_invalid")
 
 
 @pytest.mark.parametrize(
@@ -509,9 +686,7 @@ def test_c8_formula_without_cached_value_refuses(tmp_path, monkeypatch):
 )
 @pytest.mark.parametrize("both_row", [8, 11])
 def test_c8_sex_totals_must_reconcile(tmp_path, monkeypatch, plant, reason, both_row):
-    invented_cache(tmp_path, monkeypatch, plant=plant, both_row=both_row)
-    with pytest.raises(ValueError, match=f"C8:{reason}$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(tmp_path, {"plant": plant, "both_row": both_row}, reason)
 
 
 @pytest.mark.parametrize(
@@ -522,9 +697,7 @@ def test_c8_sex_totals_must_reconcile(tmp_path, monkeypatch, plant, reason, both
     ],
 )
 def test_c8_sex_reconciliation_schema_plants(tmp_path, monkeypatch, plant, reason):
-    invented_cache(tmp_path, monkeypatch, plant=plant)
-    with pytest.raises(ValueError, match=f"C8:{reason}$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(tmp_path, {"plant": plant}, reason)
 
 
 def test_c8_zone_null_and_lineage_are_observable(tmp_path, monkeypatch):
@@ -540,18 +713,8 @@ def test_c8_zone_null_and_lineage_are_observable(tmp_path, monkeypatch):
     assert chain.retrieved == "2026-11-21"
 
 
-def test_c8_null_zone_must_never_return_a_share(tmp_path, monkeypatch):
-    invented_cache(tmp_path, monkeypatch)
-    original = methods.c8_zone_share
-
-    def wrong(row, chain):
-        if row["Private"] is None:
-            return {}
-        return original(row, chain)
-
-    monkeypatch.setattr(methods, "c8_zone_share", wrong)
-    with pytest.raises(ValueError, match=r"^C8:null_zone_mismatch$"):
-        methods.test_pinned_c8()
+def test_c8_null_zone_must_never_return_a_share(tmp_path):
+    assert_c8_closed(tmp_path, {"kind": "null_zone"}, "null_zone_mismatch")
 
 
 @pytest.mark.parametrize(
@@ -570,82 +733,74 @@ def test_c8_null_zone_must_never_return_a_share(tmp_path, monkeypatch):
         ("national_total_infinite", "national_denominator"),
         ("national_total_nan", "national_denominator"),
         ("zone_zero", "zone_denominator"),
+        ("zone_negative", "zone_denominator"),
+        ("zone_empty", "zone_keys"),
         ("zone_duplicate_key", "zone_keys"),
         ("no_complete_zones", "no_complete_zones"),
     ],
 )
 def test_c8_raw_schema_plants(tmp_path, monkeypatch, plant, reason):
-    invented_cache(tmp_path, monkeypatch, plant=plant)
-    with pytest.raises(ValueError, match=f"C8:{reason}$"):
-        methods.test_pinned_c8()
+    assert_c8_closed(tmp_path, {"plant": plant}, reason)
 
 
 @pytest.mark.parametrize("slot", ["national", "zone"])
-def test_c8_lineage_plants(tmp_path, monkeypatch, slot):
-    invented_cache(tmp_path, monkeypatch)
-    original = methods.coverage_share
-
-    def missing_lineage(private, employed):
-        result = original(private, employed)
-        if not isinstance(result, NoData) and (
-            (private.geography == "national") == (slot == "national")
-        ):
-            # Deliberately corrupt a valid fact after construction: the fact's
-            # own constructor would otherwise refuse before the replay guard.
-            object.__setattr__(result["percent"], "sources", ())
-        return result
-
-    monkeypatch.setattr(methods, "coverage_share", missing_lineage)
-    reason = slot + "_lineage"
-    with pytest.raises(ValueError, match=f"C8:{reason}$"):
-        methods.test_pinned_c8()
+def test_c8_lineage_plants(tmp_path, slot):
+    assert_c8_closed(tmp_path, {"kind": slot + "_lineage"}, slot + "_lineage")
 
 
-@pytest.mark.parametrize("slot", ["national", "zone", "range"])
-def test_c8_planted_wrong_calculated_value_fails(tmp_path, monkeypatch, slot):
-    invented_cache(tmp_path, monkeypatch)
-    if slot == "range":
-        monkeypatch.setattr(methods, "share_range", lambda values: (D(0), D(100)))
-    else:
-        original = methods.coverage_share
-
-        def wrong(private, employed):
-            result = original(private, employed)
-            if not isinstance(result, NoData) and (
-                private.geography == "national"
-                if slot == "national"
-                else private.geography != "national"
-            ):
-                result["percent"] = replace(result["percent"], value=D(1))
-            return result
-
-        monkeypatch.setattr(methods, "coverage_share", wrong)
-    reason = "range_low" if slot == "range" else slot
-    with pytest.raises(ValueError, match=f"^C8:{reason}_mismatch$"):
-        methods.test_pinned_c8()
+@pytest.mark.parametrize("slot", ["national", "zone", "range", "range_high"])
+def test_c8_planted_wrong_calculated_value_fails(tmp_path, slot):
+    reason = {"range": "range_low"}.get(slot, slot)
+    assert_c8_closed(tmp_path, {"kind": slot}, reason + "_mismatch")
 
 
 @pytest.mark.parametrize("key", ["census_zone_sector", "census_2020_workbook"])
-@pytest.mark.parametrize("plant", ["pin", "bytes", "receipt"])
-def test_c8_each_pin_and_receipt_is_required(tmp_path, monkeypatch, key, plant):
-    pins = invented_cache(tmp_path, monkeypatch)
-    digest = pins[key]
-    if plant == "pin":
-        del pins[key]
-        (tmp_path / "method_pins.json").write_text(json.dumps(pins))
-    elif plant == "bytes":
-        extension = "xlsx" if key == "census_2020_workbook" else "json"
-        (tmp_path / key / f"{digest}.{extension}").write_bytes(b"INVENTED wrong bytes")
-    else:
-        path = tmp_path / key / f"{digest}.meta.json"
-        receipt = json.loads(path.read_text())
-        receipt["source_id"] = "est_census"
-        path.write_text(json.dumps(receipt))
-    source_id = next(row.source_id for row in load_registry() if row.key == key)
-    reason = (
-        f"public_cache_missing:{key}"
-        if plant == "pin"
-        else f"{source_id}: snapshot_hash_mismatch"
+@pytest.mark.parametrize(
+    "plant", ["pin", "bytes", "receipt", "snapshot", "index", "path"]
+)
+def test_c8_each_pin_and_receipt_is_required(tmp_path, key, plant):
+    reason = {
+        "pin": "public_cache_missing",
+        "bytes": "receipt_hash_mismatch",
+        "receipt": "receipt_hash_mismatch",
+        "snapshot": "public_cache_missing",
+        "index": "public_cache_missing",
+        "path": "public_cache_missing",
+    }[plant]
+    assert_c8_closed(tmp_path, {"kind": plant, "key": key}, reason)
+
+
+def test_c8_case_passes_on_invented_child_setup(tmp_path):
+    passing = child_run(tmp_path, C8_CHILD.format(config={}))
+    assert passing.returncode == 0, passing.stdout + passing.stderr
+
+
+@pytest.mark.parametrize(
+    ("kind", "reason"),
+    [
+        ("source_invalid", "source_invalid"),
+        ("spine_refused", "spine_refused"),
+    ],
+)
+def test_c8_unexpected_and_cache_errors_are_closed(tmp_path, kind, reason):
+    assert_c8_closed(tmp_path, {"kind": kind}, reason)
+
+
+@given(
+    st.data(),
+    st.sampled_from([ValueError, KeyError, TypeError, SpineError, AssertionError]),
+)
+def test_c8_reason_map_is_closed(data, kind):
+    message = data.draw(
+        st.one_of(st.sampled_from(sorted(methods.C8_REASONS)), st.text())
     )
-    with pytest.raises(ValueError, match=f"^{re.escape(reason)}$"):
-        methods.test_pinned_c8()
+    reason = methods.closed_reason(kind(message), methods.C8_REASONS)
+    admitted = methods.C8_REASONS.get(message)
+    if kind is SpineError:
+        expected = "spine_refused"
+    elif kind is ValueError and admitted:
+        expected = admitted
+    else:
+        expected = "source_invalid"
+    assert reason == expected
+    assert re.fullmatch(r"[a-z_]+", reason)
