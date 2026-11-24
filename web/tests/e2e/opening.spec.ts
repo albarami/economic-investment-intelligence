@@ -337,12 +337,13 @@ for (const lang of ['en', 'ar'] as const) {
       reason: 'missing_input',
       facts: [],
     });
-    // The fixture's thin response is outside the mounted layer projection.
-    // Its transport refusal uses the same unavailable alert as a refused chain.
+    // S3-P02 part C (D32-D35): the governed NO_DATA refusal carries its
+    // closed reason into the refusal state, shown through its existing
+    // catalogue key layers.not_ranked.missing_input.
     await expect(page.getByRole('alert')).toHaveText(
       lang === 'en'
-        ? 'This map layer is unavailable.'
-        : 'طبقة الخريطة هذه غير متاحة.',
+        ? 'The source series is missing.'
+        : 'سلسلة المصدر غير متاحة.',
     );
     await expect(
       page.getByText(

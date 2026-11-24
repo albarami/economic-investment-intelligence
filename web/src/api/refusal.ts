@@ -1,5 +1,5 @@
 /** BE-91: diagnostics are data; only an existing bilingual key reaches text. */
-import codes from './reason-codes.generated.json';
+import codes from './reason-codes.generated.json' with { type: 'json' };
 import type { StringKey } from '../i18n';
 
 const CLOSED = new Set<string>(codes);
