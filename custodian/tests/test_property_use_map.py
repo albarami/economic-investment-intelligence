@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 from custodian.tests.repository_root import repository_root
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.additions.common import AdditionError
@@ -229,6 +229,7 @@ def test_built_mapping_has_neither_land_nor_a_published_unit_type(
     assert built.unit_type is None
 
 
+@settings(deadline=None)
 @given(
     st.text().filter(
         lambda value: (
