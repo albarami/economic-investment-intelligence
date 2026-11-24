@@ -38,6 +38,9 @@ BASE_ROW_COUNT = 891
 # text exactly, and its base text is restored before hashing, so no other byte
 # of any row may change.
 P86_ROW = "prop_sales"
+# S2-P92 reviewed the publisher's revised counts; restore only those two fields
+# to their base values before hashing, as for S2-P86's reviewed note.
+P92_ROW = "trade_logistics/annual-certificates-of-origin-by-type-and-importing-country"
 P86_BASE_BASIS_NOTE = (
     "Columns are the observed export fields (S2-T08 part B source "
     "review, mismatch 3; "
@@ -195,6 +198,10 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     p86 = [row for row in rows if row["key"] == P86_ROW]
     assert len(p86) == 1
     assert p86[0]["basis_note"] == P86_BASIS_NOTE
+    p92 = [row for row in rows if row["key"] == P92_ROW]
+    assert len(p92) == 1
+    assert p92[0]["row_count_min"] == 1142
+    assert p92[0]["row_count_max"] == 1142
     restored = [
         {
             field: value
@@ -203,6 +210,8 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
                 if item["key"] == ROW
                 else dict(item, basis_note=P86_BASE_BASIS_NOTE)
                 if item["key"] == P86_ROW
+                else dict(item, row_count_min=1162, row_count_max=1162)
+                if item["key"] == P92_ROW
                 else item
             ).items()
             if field not in LATER_REVIEWED_FIELDS
