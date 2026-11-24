@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 from custodian.tests import test_investment_build as b
-from custodian.tests.test_busyness_bootstrap import leaves, replace_leaf
+from custodian.tests.support.payload_leaves import leaves, replace_leaf
 from hypothesis import example, given, settings
 from hypothesis import strategies as st
 

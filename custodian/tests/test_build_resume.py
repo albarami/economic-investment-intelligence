@@ -4,12 +4,18 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import replace
+import sys
+import tempfile
+from dataclasses import asdict, replace
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
 import pytest
 from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+from custodian.tests.support.payload_leaves import leaves, replace_leaf
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 
 from commands import build_public
 from eii_custodian.publicdata.assembly import AssemblyError
@@ -17,6 +23,8 @@ from eii_custodian.publicdata.assembly_adapters import Production
 from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import Entry
+from eii_custodian.publicdata.fetch.resume import RunRecord
+from eii_custodian.publicdata.fetch.snapshots import utc
 from eii_custodian.publicdata.fetch.transport import Response, TransportFault
 
 START = "2026-11-21T00:00:00Z"
@@ -420,31 +428,12 @@ def test_secondary_receipt_proofs_are_required(
     harness: Harness, plant: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     if plant == "auxiliary":
-        from eii_custodian.publicdata.fetch import build
-        from eii_custodian.publicdata.fetch.receipts import archive_auxiliary
-
-        original = build._fetch_row
-
-        def fetch(*args: Any, **kwargs: Any) -> Any:
-            fetched, failure = original(*args, **kwargs)
-            if fetched is not None:
-                source = args[0]
-                archive_auxiliary(
-                    source,
-                    harness.cache / source.key,
-                    "inputs",
-                    b"SYN auxiliary bytes",
-                    START,
-                    source.url,
-                )
-            return fetched, failure
-
-        monkeypatch.setattr(build, "_fetch_row", fetch)
+        archive_auxiliary_on_fetch(harness, monkeypatch)
     harness.interrupt()
     folder = harness.cache / "SYN-first"
     row = record(harness)
     if plant == "state":
-        row["entries"]["SYN-first"]["fetch"]["retrieved_utc"] = LATER
+        row["entries"]["SYN-first"]["fetch"]["retrieved_utc"] = EARLIER
     elif plant == "proof_schema":
         row["entries"]["SYN-first"]["proofs"] = [None]
     elif plant == "auxiliary":
@@ -788,31 +777,18 @@ def test_review_auxiliary_retrieved_before_start_is_refetched(
     harness: Harness, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Fresh mtimes cannot override an auxiliary receipt's older retrieval."""
-    from eii_custodian.publicdata.fetch import build
-    from eii_custodian.publicdata.fetch.receipts import archive_auxiliary
-
-    original = build._fetch_row
-
-    def fetch(*args: Any, **kwargs: Any) -> Any:
-        fetched, failure = original(*args, **kwargs)
-        if fetched is not None:
-            source = args[0]
-            archive_auxiliary(
-                source,
-                harness.cache / source.key,
-                "inputs",
-                b"SYN auxiliary bytes",
-                EARLIER,
-                source.url,
-            )
-        return fetched, failure
-
-    monkeypatch.setattr(build, "_fetch_row", fetch)
+    # Keep the auxiliary's clock earlier while the primary fetch uses START.
+    auxiliary = Harness(harness.cache)
+    auxiliary.stamp = EARLIER
+    archive_auxiliary_on_fetch(auxiliary, monkeypatch)
     harness.interrupt()
+    reasons = capture_reuse_reason(monkeypatch)
     outcome = harness.run(resume=True)
     assert outcome.failure is None
     assert harness.entries[0].url in harness.seen
     assert not any(line.startswith("REUSE SYN-first ") for line in outcome.lines)
+    assert "REFETCH SYN-first resume_input_unproven" in outcome.lines
+    assert reasons == ["lineage_changed"]
 
 
 @pytest.mark.parametrize("terms_url", [False, True])
@@ -1000,3 +976,337 @@ def test_section10_refusal_reaches_the_record_by_its_closed_name(
     result = harness.run()
     assert result.failure is not None
     assert result.failure.check == "assembly_section10_input_invalid"
+
+
+@pytest.mark.parametrize("fresh", [False, True])
+def test_identical_refetch_is_reused_on_next_resume(
+    harness: Harness, fresh: bool
+) -> None:
+    harness.interrupt()
+    row = record(harness)
+    first = harness.entries[0]
+    proof = row["entries"][first.key]["proofs"][0]
+    # Make every retained file genuinely older than the next fresh journal.
+    for name in proof["files"]:
+        os.utime(harness.cache / name, (utc(START).timestamp(),) * 2)
+    if not fresh:
+        # An unavailable completion marker forces this resume to fetch again.
+        row["entries"][first.key] = {"completed": False}
+        (harness.cache / "build-run.json").write_text(json.dumps(row))
+    harness.fail = True
+    result = harness.run(resume=not fresh)
+    assert result.failure is not None
+    saved = record(harness)["entries"][first.key]
+    assert saved["fetch"]["retrieved_utc"] == LATER
+    assert saved["proofs"][0]["retrieved_utc"] == START
+    harness.seen.clear()
+    harness.fail = False
+    result = harness.run(resume=True)
+    assert result.failure is None
+    assert harness.seen == [harness.entries[1].url]
+    assert (
+        f"REUSE {first.key} interrupted_start={LATER if fresh else START} "
+        f"publisher={first.publisher} retrieved_utc={START} "
+        f"sha256={saved['fetch']['digest']}"
+    ) in result.lines
+
+
+def capture_reuse_reason(monkeypatch: pytest.MonkeyPatch) -> list[str]:
+    reasons: list[str] = []
+    invalidate = RunRecord._invalidate
+
+    def capture(self: RunRecord, source: Entry, lines: list[str]) -> None:
+        reasons.append(str(sys.exception()))
+        invalidate(self, source, lines)
+
+    monkeypatch.setattr(RunRecord, "_invalidate", capture)
+    return reasons
+
+
+def plant_reuse_input(cache: Path, row: dict[str, Any], key: str, plant: str) -> None:
+    """Change one proof input; retain all independent checks for that input."""
+    saved = row["entries"][key]
+    proof = saved["proofs"][0]
+    if plant in {"bytes", "file_time"}:
+        name = next(
+            name
+            for name in proof["files"]
+            if name.endswith(".bin") and name.count("/") == 1
+        )
+        path = cache / name
+        if plant == "bytes":
+            path.unlink()  # Compatibility aliases may be hard links.
+            path.write_bytes(b"SYN changed stored bytes")
+        else:
+            os.utime(path, (utc(EARLIER).timestamp(),) * 2)
+    elif plant == "receipt_time":
+        proof["retrieved_utc"] = LATER
+    elif plant == "publisher":
+        proof["publisher"] = "SYN another publisher"
+    elif plant == "fetch_host":
+        saved["fetch"]["fetch_host"] = "SYN-another-host"
+    elif plant == "fetch_time":
+        saved["fetch"]["retrieved_utc"] = EARLIER
+    elif plant in {"digest", "old_different_digest"}:
+        saved["fetch"]["digest"] = "b" * 64
+
+
+@pytest.mark.parametrize(
+    "plant,reason",
+    [
+        ("bytes", "stored_bytes_changed"),
+        ("file_time", "stored_bytes_changed"),
+        ("receipt_time", "lineage_changed"),
+        ("publisher", "lineage_changed"),
+        ("fetch_host", "lineage_changed"),
+        ("fetch_time", "lineage_changed"),
+        ("digest", "lineage_changed"),
+        ("old_different_digest", "lineage_changed"),
+    ],
+)
+def test_reuse_requires_independent_fetch_and_receipt_proofs(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch, plant: str, reason: str
+) -> None:
+    harness.interrupt()
+    if plant == "old_different_digest":
+        harness.fail = True
+        assert harness.run().failure is not None
+    row = record(harness)
+    plant_reuse_input(harness.cache, row, harness.entries[0].key, plant)
+    if plant in {"digest", "old_different_digest"}:
+        from eii_custodian.publicdata.fetch.build import _fetch_row
+
+        # Both digests resolve to valid snapshots. Deleting the digest binding
+        # must not let the fetch state select an unjournalled primary instead.
+        other, failure = _fetch_row(
+            harness.entries[0],
+            lambda url: Response(url, b"SYN other bytes", ()),
+            harness.cache,
+            lambda: LATER,
+            lambda _: None,
+        )
+        assert other is not None and failure is None
+        row["entries"][harness.entries[0].key]["fetch"]["digest"] = other.digest
+    (harness.cache / "build-run.json").write_text(json.dumps(row))
+    reasons = capture_reuse_reason(monkeypatch)
+    result = harness.run(resume=True)
+    assert f"REFETCH {harness.entries[0].key} resume_input_unproven" in result.lines
+    assert reasons == [reason]
+    assert harness.entries[0].url in harness.seen
+
+
+def archive_auxiliary_on_fetch(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Each completed fetch also archives one auxiliary at the harness clock."""
+    from eii_custodian.publicdata.fetch import build
+    from eii_custodian.publicdata.fetch.receipts import archive_auxiliary
+
+    original = build._fetch_row
+
+    def fetch(*args: Any, **kwargs: Any) -> Any:
+        fetched, failure = original(*args, **kwargs)
+        if fetched is not None:
+            source = args[0]
+            archive_auxiliary(
+                source,
+                harness.cache / source.key,
+                "inputs",
+                b"SYN auxiliary bytes",
+                harness.stamp,
+                source.url,
+            )
+        return fetched, failure
+
+    monkeypatch.setattr(build, "_fetch_row", fetch)
+
+
+def test_kept_auxiliary_receipt_cannot_ride_a_kept_primary(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    archive_auxiliary_on_fetch(harness, monkeypatch)
+    harness.interrupt()  # journal START: primary START, auxiliary START
+    harness.fail = True
+    assert harness.run().failure is not None  # fresh journal at LATER
+    saved = record(harness)["entries"]["SYN-first"]
+    assert record(harness)["started_utc"] == LATER
+    assert saved["fetch"]["retrieved_utc"] == LATER
+    assert [proof["retrieved_utc"] for proof in saved["proofs"]] == [START, START]
+    harness.fail = False
+    harness.seen.clear()
+    reasons = capture_reuse_reason(monkeypatch)
+    outcome = harness.run(resume=True)
+    assert "REFETCH SYN-first resume_input_unproven" in outcome.lines
+    assert reasons == ["lineage_changed"]
+    assert harness.entries[0].url in harness.seen
+
+
+def test_old_auxiliary_file_cannot_ride_a_kept_primary(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    harness.interrupt()  # primary START, no auxiliary yet
+    archive_auxiliary_on_fetch(harness, monkeypatch)
+    harness.fail = True
+    assert harness.run().failure is not None  # fresh journal; auxiliary LATER
+    saved = record(harness)["entries"]["SYN-first"]
+    assert [proof["retrieved_utc"] for proof in saved["proofs"]] == [START, LATER]
+    name = next(n for n in saved["proofs"][1]["files"] if n.endswith(".html"))
+    os.utime(harness.cache / name, (utc(EARLIER).timestamp(),) * 2)
+    harness.fail = False
+    harness.seen.clear()
+    reasons = capture_reuse_reason(monkeypatch)
+    outcome = harness.run(resume=True)
+    assert "REFETCH SYN-first resume_input_unproven" in outcome.lines
+    assert reasons == ["stored_bytes_changed"]
+
+
+def test_reuse_refuses_a_primary_receipt_of_another_source(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    harness.interrupt()
+    # Hold the fingerprint equal so only the receipt's source differs.
+    monkeypatch.setattr(RunRecord, "_fingerprint_matches", lambda *_: True)
+    harness.entries = (
+        replace(harness.entries[0], source_id="SYN-other-source"),
+        harness.entries[1],
+    )
+    reasons = capture_reuse_reason(monkeypatch)
+    outcome = harness.run(resume=True)
+    assert "REFETCH SYN-first resume_input_unproven" in outcome.lines
+    assert reasons == ["lineage_changed"]
+    assert harness.entries[0].url in harness.seen
+
+
+@settings(deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture])
+@given(
+    runs=st.lists(
+        st.tuples(
+            st.sampled_from(["same", "new", "failure"]),
+            st.booleans(),
+            st.sampled_from(
+                [
+                    "valid",
+                    "receipt_time",
+                    "publisher",
+                    "fetch_host",
+                    "fetch_time",
+                    "digest",
+                ]
+            ),
+        ),
+        min_size=2,
+        max_size=4,
+    )
+)
+def test_fetch_sequence_reuses_exactly_current_journal_proofs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, runs: list[tuple[str, bool, str]]
+) -> None:
+    from eii_custodian.publicdata.fetch.build import _fetch_row
+
+    # Fingerprinting is covered separately; exercise the real fetch publisher,
+    # journal writer and reuse reader against a last-completed-fetch oracle.
+    monkeypatch.setattr(RunRecord, "_fingerprint", lambda *_: ({}, None))
+    monkeypatch.setattr(RunRecord, "_fingerprint_matches", lambda *_: True)
+    with tempfile.TemporaryDirectory(dir=tmp_path) as temporary:
+        cache = Path(temporary)
+        source = entry("SYN-sequence")
+        body = b"SYN initial bytes"
+        journal: RunRecord | None = None
+        for number, (outcome, fresh, plant) in enumerate(runs):
+            stamp = (utc(START) + timedelta(days=number)).isoformat()
+            if journal is None or fresh:
+                journal = RunRecord(
+                    cache,
+                    {
+                        "started_utc": stamp,
+                        "entries": {source.key: {"completed": False}},
+                    },
+                    True,
+                )
+            # Refetch after a missing/unproven completion, including failures
+            # after an earlier completed fetch in this same journal.
+            journal._invalidate(source, [])
+            if outcome == "new":
+                body += b" SYN new"
+
+            def transport(
+                url: str, *, outcome: str = outcome, body: bytes = body
+            ) -> Response:
+                if outcome == "failure":
+                    raise TransportFault("unreachable", url)
+                return Response(url, body, ())
+
+            fetched, failure = _fetch_row(
+                source, transport, cache, lambda stamp=stamp: stamp, lambda _: None
+            )
+            if fetched is not None:
+                assert failure is None
+                journal.fetched(source, asdict(fetched))
+                saved = journal.row["entries"][source.key]
+                for proof in saved["proofs"]:
+                    for name in proof["files"]:
+                        os.utime(
+                            cache / name, (utc(proof["retrieved_utc"]).timestamp(),) * 2
+                        )
+            else:
+                assert failure is not None
+                assert failure.check == "unreachable"
+            restored = RunRecord(
+                cache, json.loads((cache / "build-run.json").read_bytes()), True
+            )
+            if fetched is not None:
+                # A different proof timestamp must differ from the retained
+                # receipt even when the retained time happens to be LATER.
+                if plant == "receipt_time":
+                    restored.row["entries"][source.key]["proofs"][0][
+                        "retrieved_utc"
+                    ] = EARLIER
+                else:
+                    plant_reuse_input(cache, restored.row, source.key, plant)
+            lines: list[str] = []
+            reused = restored.reuse(source, lines)
+            assert (reused is not None) == (outcome != "failure" and plant == "valid")
+            if reused is not None:
+                assert reused == asdict(fetched)
+                saved = restored.row["entries"][source.key]
+                assert lines == [
+                    f"REUSE {source.key} interrupted_start={journal.row['started_utc']} "
+                    f"publisher={source.publisher} retrieved_utc={saved['proofs'][0]['retrieved_utc']} "
+                    f"sha256={reused['digest']}"
+                ]
+            else:
+                assert lines == (
+                    []
+                    if outcome == "failure"
+                    else [f"REFETCH {source.key} resume_input_unproven"]
+                )
+
+
+@pytest.mark.parametrize("kept", [False, True])
+def test_every_reuse_proof_leaf_refuses_hostile_types(
+    harness: Harness, kept: bool
+) -> None:
+    harness.interrupt()
+    baseline = record(harness)
+    source = harness.entries[0]
+    if kept:
+        baseline["started_utc"] = LATER
+        baseline["entries"][source.key]["fetch"]["retrieved_utc"] = LATER
+    run = RunRecord.begin(harness.cache, harness.entries, 17, LATER, resume=True)
+    run.row = baseline
+    assert run.reuse(source, []) is not None
+    # Completion and fingerprint are validated by begin / separate tests.
+    # Exhaust every leaf of the receipt/fetch proof accepted by this reader.
+    item = baseline["entries"][source.key]
+    paths = [
+        (field, *leaf)
+        for field in ("fetch", "proofs", "publisher")
+        for leaf in leaves(item[field])
+    ]
+    assert len(paths) == 17
+    for path in paths:
+        for hostile in ({"toString": None}, 7, None, []):
+            run.row = replace_leaf(baseline, ("entries", source.key, *path), hostile)
+            lines: list[str] = []
+            assert run.reuse(source, lines) is None, path
+            assert lines == [f"REFETCH {source.key} resume_input_unproven"], path

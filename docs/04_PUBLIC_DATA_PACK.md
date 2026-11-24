@@ -1118,6 +1118,8 @@ Optional `satellite_cdse_backup` covers Qatar at the owner-targeted resolution w
 
 ### 3.1 Registry and sidecar record
 
+For interrupted-build reuse (S2-P94, L-1797), an identical-byte refetch may retain the primary receipt and files from before the journal's start only when that journal records a fetch at or after its start with the same primary digest and fetch host, the receipt names the row's source and still matches its journalled publisher and retrieval time, and every proven file rehashes unchanged; auxiliary receipt age checks remain strict.
+
 **Required large-source intake (S2-P84, L-1717).** Every key admitted by
 `fetch/large.py` has a total-byte bound and a completeness check. The existing
 Overture path retains its reviewed exact size and ETag checks. Other admitted

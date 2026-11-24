@@ -4,6 +4,7 @@ import json
 from dataclasses import replace
 
 import pytest
+from custodian.tests.support.payload_leaves import leaves, replace_leaf
 from custodian.tests.test_publicdata_besttime_build import setup
 from custodian.tests.test_publicdata_besttime_parse import encode, forecast
 from hypothesis import example, given
@@ -408,33 +409,6 @@ def test_busyness_bootstrap_bad_selection_refused_before_inputs(
         command.run(tmp_path, {}, args, transport=lambda req: pytest.fail("sent")) == 2
     )
     assert "usage error" in capsys.readouterr().err
-
-
-def leaves(value, path=()):
-    if isinstance(value, dict) and value:
-        return [
-            leaf for key, item in value.items() for leaf in leaves(item, (*path, key))
-        ]
-    if isinstance(value, list) and value:
-        return [
-            leaf
-            for index, item in enumerate(value)
-            for leaf in leaves(item, (*path, index))
-        ]
-    return [path]
-
-
-def replace_leaf(value, path, hostile):
-    from copy import deepcopy
-
-    changed = deepcopy(value)
-    if not path:
-        return hostile
-    parent = changed
-    for key in path[:-1]:
-        parent = parent[key]
-    parent[path[-1]] = hostile
-    return changed
 
 
 def test_busyness_exhaustive_hostile_payload_leaves():
