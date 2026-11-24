@@ -35,6 +35,9 @@ The area producer refuses an unpinned fixed building-part directory with
 `places_file_unreceipted`, and a fixed or reviewed registry building part whose
 receipt or body check fails with `places_file_digest`. The listing key
 `bldg_ovt` is not subject to the unpinned-directory rule: it parents the parts.
+The two listing parents `places_ovt` and `bldg_ovt`, whose pinned release
+listing the fetch stores under `<key>/listing`, are never read as Parquet parts:
+the place and building readers pass over those two exact keys only.
 A reviewed flagship with no resolved point
 refuses area requests with `flagship_point_missing`, recorded in the build log
 as `REFUSED flagship_point_missing`. With an area manifest present, the same
