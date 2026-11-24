@@ -10,6 +10,7 @@
 
 ## In brief
 
+- Proposed [decision 0113](decisions/0113-activity-spine-sign-off-in-the-background-lane.md) records the lead's ruling L-1817 item 2: the activity-spine review sign-off (S2-T04#1 and S2-T04#2) and the category allow-list leave the S2 gate path for the background lane ordered for S3, consumer S3-T03, with every code kept and the refetch cost named; different-maker review remains pending.
 - Proposed [decision 0107](decisions/0107-a-citation-page-the-publisher-no-longer-serves.md) records the S2-P81 registration of one landmark citation page the publisher no longer serves as a SKIP with the closed word `page_not_served`; different-maker review remains pending.
 - Proposed [decision 0097](decisions/0097-custodian-shard-headroom.md) records the S2-P67 custodian shard-headroom implementation under ruling L-1517 item 2, retaining decision 0086's limit and watch; different-maker review remains pending.
 
@@ -159,6 +160,7 @@
 | [0108](decisions/0108-fdi-crosswalk-rows-in-the-cache-review-folder.md) | FDI crosswalk rows in the uncommitted cache review folder; committed template schema-only, with origin and byte-hash binding retained | Proposed, 2026-11-24 |
 | [0109](decisions/0109-the-product-suite-runs-in-two-named-parts.md) | The product suite runs in two named parts under the unchanged 600-second limit, by decision 0060's method | Accepted, 2026-11-24; the slow figures are of the slice S6 stack (ruling L-1784) |
 | [0110](decisions/0110-approved-with-small-fixes-pilot.md) | A pilot of a third review verdict, APPROVED-WITH-SMALL-FIXES, for exact small fixes outside numbers, privacy, calculations, gates, security controls and test bounds, closed by a scope script and green checks | Accepted, 2026-11-24; the pilot starts with briefs and a closure script enforcing items 2 to 4 |
+| [0113](decisions/0113-activity-spine-sign-off-in-the-background-lane.md) | The activity-spine review sign-off (S2-T04#1 and S2-T04#2) and the category allow-list move from the S2 gate path to the background lane ordered for S3, consumer S3-T03; every code kept, the batches at full priority, the refetch cost named, the S3 gate condition recorded | Proposed by the lead, 2026-11-24 (ruling L-1817 item 2) |
 
 ## Identifiers and change control
 
