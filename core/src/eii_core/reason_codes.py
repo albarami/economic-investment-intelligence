@@ -40,6 +40,8 @@ CODES = frozenset(
         "area_status_invalid",
         "asset_missing",
         "asset_path_refused",
+        "hash_unlisted",
+        "hash_mismatch",
         "attribution_unavailable",
         "bundle_mismatch",
         "candidate_code_missing",

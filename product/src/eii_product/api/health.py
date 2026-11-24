@@ -47,7 +47,18 @@ def _font_assets(checked: CheckedRelease, web: Path) -> AssetStatus:
     root = checked.folder / "artefacts/fonts"
     for entry in entries:
         parts = PurePosixPath(entry).parts
-        if _font_path(root, parts[2], parts[3]) is None:
+        try:
+            if _font_path(root, parts[2], parts[3]) is None:
+                return "invalid"
+        except ValueError as error:
+            if reason(error) not in (
+                "asset_missing",
+                "asset_path_refused",
+                "font_stack_refused",
+                "font_span_refused",
+                "font_range_refused",
+            ):
+                raise
             return "invalid"
     return "ok"
 

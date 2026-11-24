@@ -9,9 +9,10 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
-from hypothesis import given, settings
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 from product.tests.test_layers_fc_firms import _features, _get
 from product.tests.test_release_check import _document
@@ -112,16 +113,18 @@ def test_the_hash_is_compared_before_any_row_is_parsed(
     broken.write_text("{", encoding="utf-8")
     with pytest.raises(RegisterRefusal, match=r"^hash_mismatch$"):
         _read(monkeypatch, broken, "0" * 64)
-    with pytest.raises(RegisterRefusal, match=r"^row_shape$"):
+    with pytest.raises(RegisterRefusal, match=r"^register_json_invalid$"):
         _read(monkeypatch, broken, _sha(broken))
 
 
-def test_undecodable_bytes_with_a_matching_hash_refuse_as_row_shape(
+def test_undecodable_bytes_with_a_matching_hash_refuse_as_json_invalid(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     raw = tmp_path / "raw.json"
     raw.write_bytes(b"\xff\xfe{")
-    with pytest.raises(RegisterRefusal, match=r"^row_shape$") as caught:
+    with pytest.raises(RegisterRefusal, match=r"^hash_mismatch$"):
+        _read(monkeypatch, raw, "0" * 64)
+    with pytest.raises(RegisterRefusal, match=r"^register_json_invalid$") as caught:
         _read(monkeypatch, raw, _sha(raw))
     assert caught.value.__cause__ is None
     assert "xff" not in repr(caught.value)
@@ -150,6 +153,9 @@ def test_the_listed_hash_is_a_required_keyword(tmp_path: Path) -> None:
 
 
 @settings(max_examples=200, deadline=None)
+@example(body=b"0", listed="0" * 64)
+@example(body=b"{}", listed="0" * 64)
+@example(body=b'{"rows":[0]}', listed="0" * 64)
 @given(
     body=st.binary(max_size=64),
     listed=st.text(alphabet="0123456789abcdef", min_size=64, max_size=64),
@@ -162,13 +168,26 @@ def test_property_only_the_exact_digest_of_the_bytes_passes_the_hash_gate(
     actual = hashlib.sha256(body).hexdigest()
     with pytest.MonkeyPatch.context() as patch:
         patch.setenv(NAME, str(path))
+        # Isolate the hash/decoder boundary without copying the row parser.
+        rows = Mock(side_effect=RegisterRefusal("register_rows_invalid"))
+        patch.setattr("eii_product.register_file._rows", rows)
         if listed != actual:
             with pytest.raises(RegisterRefusal, match=r"^hash_mismatch$"):
                 read_fc_register_rows(str(path), listed_sha256=listed)
+            rows.assert_not_called()
         try:
+            parsed = json.loads(body.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            expected = "register_json_invalid"
+        else:
+            expected = (
+                "register_rows_invalid"
+                if type(parsed) is dict
+                else "register_document_invalid"
+            )
+        with pytest.raises(RegisterRefusal, match="^" + expected + "$"):
             read_fc_register_rows(str(path), listed_sha256=actual)
-        except RegisterRefusal as refusal:
-            assert refusal.reason == "row_shape"
+        assert rows.call_count == (expected == "register_rows_invalid")
 
 
 # --- the release document field ----------------------------------------------
@@ -335,8 +354,10 @@ def test_a_file_changed_after_the_start_refuses_at_the_request(
     copy = _copy(tmp_path)
     app = _app(tmp_path, monkeypatch, copy, _sha(copy))
     copy.write_bytes(copy.read_bytes() + b"\n")
-    with pytest.raises(RegisterRefusal, match=r"^hash_mismatch$"):
-        _get(app, ROUTE)
+    status, body = _get(app, ROUTE)
+    assert status == 500
+    assert body["error"]["code"] == "INTERNAL"
+    assert body["error"]["message_key"] == "hash_mismatch"
 
 
 def test_a_matching_hash_serves_only_the_public_card_and_the_count(

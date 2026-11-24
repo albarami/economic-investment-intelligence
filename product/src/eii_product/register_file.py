@@ -140,8 +140,10 @@ def read_register_bytes(path: str) -> bytes:
     """
     try:
         descriptor = os.open(path, _OPEN_FLAGS)
-    except (OSError, ValueError):
+    except OSError:
         raise RegisterRefusal("read_refused") from None
+    except ValueError as error:
+        raise RegisterRefusal(reason(error, "read_refused")) from None
     try:
         return _regular_file_bytes(descriptor, path)
     finally:

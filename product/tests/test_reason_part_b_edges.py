@@ -1,5 +1,6 @@
 """Specific negative cases and hostile leaf replacements for the reason boundary."""
 
+import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -168,7 +169,7 @@ def test_every_register_leaf_has_closed_outcome(tmp_path, hostile):
         target = tmp_path / "INVENTED.json"
         target.write_text(json.dumps(body))
         try:
-            _read_path(str(target))
+            _read_path(str(target), hashlib.sha256(target.read_bytes()).hexdigest())
         except RegisterRefusal as error:
             assert error.reason in CODES
             assert error.reason.startswith("register_")

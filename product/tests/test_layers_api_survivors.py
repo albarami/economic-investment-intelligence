@@ -207,9 +207,10 @@ def test_missing_lower_break_keeps_later_break(tmp_path: Path) -> None:
 def test_default_reader_refuses_without_a_listed_hash(tmp_path: Path) -> None:
     app = FastAPI()
     app.include_router(layers.build_layer_router(str(_copy(tmp_path))))
-    with pytest.raises(RegisterRefusal) as caught:
-        _get(app, "/api/layers/fc_firms_per_tower")
-    _message(caught.value, "hash_unlisted")
+    status, body = _get(app, "/api/layers/fc_firms_per_tower")
+    assert status == 500
+    assert body["error"]["code"] == "INTERNAL"
+    assert body["error"]["message_key"] == "hash_unlisted"
 
 
 def test_listed_reader_and_exact_success_contract(tmp_path: Path) -> None:

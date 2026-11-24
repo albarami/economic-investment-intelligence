@@ -267,6 +267,19 @@ def test_a_path_with_a_null_character_refuses() -> None:
         read_register_bytes("register\x00.json")
 
 
+def test_an_open_value_error_preserves_its_closed_reason(tmp_path: Path) -> None:
+    target = _folder(tmp_path) / "register.json"
+    target.write_bytes(BODY)
+    with (
+        patch(
+            "eii_product.register_file.os.open",
+            side_effect=ValueError("path_refused"),
+        ),
+        pytest.raises(RegisterRefusal, match=r"^path_refused$"),
+    ):
+        read_register_bytes(str(target))
+
+
 def _swap_after_the_read(action: Callable[[], None]) -> Any:
     """Call ``action`` at the descriptor check that follows the read."""
     real = os.fstat
