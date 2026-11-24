@@ -2221,6 +2221,23 @@ class DistrictRows(World):
         )
 
 
+SAFE_TEXT = st.text(alphabet="syn SYN\t", max_size=8)
+HOSTILE_VALUE = st.one_of(
+    st.none(),
+    st.integers(),
+    st.lists(SAFE_TEXT, max_size=3),
+    st.dictionaries(SAFE_TEXT, SAFE_TEXT, max_size=3),
+    st.just(""),
+    st.text(alphabet=" \t\n", min_size=1, max_size=4),
+)
+CHOICE_REFUSAL = {
+    "record_ref": "reviewed_choice_not_candidate",
+    "source_id": "reviewed_choice_kind",
+    "kind": "reviewed_choice_kind",
+    "choice_reason": "reviewed_choice_reason_missing",
+}
+
+
 class ReviewedChoice(World):
     """A reviewed choice fills the row the name route leaves ambiguous.
 
@@ -2333,6 +2350,59 @@ class ReviewedChoice(World):
                 self.assertEqual(
                     self.run_tool(*argv), (2, "REFUSED reviewed_choice_kind\n")
                 )
+
+    def review_bytes(self) -> dict[str, bytes]:
+        return {
+            name: (self.review / name).read_bytes() for name in (FLAGSHIP, GAZETTEER)
+        }
+
+    def test_a_choice_reason_needs_the_stored_source_and_kind(self) -> None:
+        """One-field negatives: a wrong or null stored source or kind refuses."""
+        for change in (
+            {"source_id": None},
+            {"source_id": "places_ovt"},
+            {"kind": "restaurant"},
+        ):
+            for argv in ((), ("--check",)):
+                with self.subTest(change=change, argv=argv):
+                    self.setUp()
+                    self.world()
+                    self.review_files(flagship=[self.choice_row(**change)])
+                    before = self.review_bytes()
+                    self.assertEqual(
+                        self.run_tool(*argv), (2, "REFUSED reviewed_choice_kind\n")
+                    )
+                    self.assertEqual(self.review_bytes(), before)
+
+    def test_a_list_or_mapping_reference_is_refused(self) -> None:
+        """One-field negatives: an unhashable record_ref gets a closed refusal."""
+        references: tuple[list[str], dict[str, str]] = ([], {})
+        for ref in references:
+            for argv in ((), ("--check",)):
+                with self.subTest(ref=ref, argv=argv):
+                    self.setUp()
+                    self.world()
+                    self.review_files(flagship=[self.choice_row(record_ref=ref)])
+                    before = self.review_bytes()
+                    self.assertEqual(
+                        self.run_tool(*argv),
+                        (2, "REFUSED reviewed_choice_not_candidate\n"),
+                    )
+                    self.assertEqual(self.review_bytes(), before)
+
+    @settings(deadline=None)
+    @given(st.sampled_from(tuple(CHOICE_REFUSAL)), HOSTILE_VALUE, st.booleans())
+    def test_a_hostile_value_on_one_choice_field_refuses_closed(
+        self, field: str, value: object, check: bool
+    ) -> None:
+        """Each hostile field of the valid choice refuses; never a traceback."""
+        self.world()
+        self.review_files(flagship=[self.choice_row(**{field: value})])
+        before = self.review_bytes()
+        argv = ("--check",) if check else ()
+        reason = f"REFUSED {CHOICE_REFUSAL[field]}\n"
+        self.assertEqual(self.run_tool(*argv), (2, reason))
+        self.assertEqual(self.review_bytes(), before)
 
 
 if __name__ == "__main__":

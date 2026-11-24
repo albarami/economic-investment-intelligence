@@ -20,7 +20,8 @@ of ``flagship_candidates.yaml`` (a building id, ``bldg_ovt``) and of
   carries one of the row's names, and its category is in the closed area list
   ``LANDMARK_CATEGORIES``; any other category refuses with
   ``landmark_category_refused``.
-- ``reviewed_choice`` (``--check`` only): a building row carrying a non-empty
+- ``reviewed_choice`` (``--check`` only): a building row — stored ``kind``
+  ``building`` and ``source_id`` ``bldg_ovt`` — carrying a non-empty
   ``choice_reason`` beside its ``record_ref`` is accepted when the helper
   cannot re-derive the key and the chosen footprint is in the row's own
   exact-or-folded name-candidate set and inside the boundary set. A
@@ -298,12 +299,17 @@ def by_place(
 def reviewed_choice(row: Mapping[str, object], source_id: str, inputs: Inputs) -> None:
     """Refuse a reviewed ``choice_reason`` that breaks its closed contract.
 
-    The field is a building row's only; its reason must be non-empty text; a
-    choice is needed only when the helper cannot re-derive the key; and the
-    chosen footprint must be in the row's own exact-or-folded name-candidate
-    set and inside the boundary set.
+    The field is a building row's only — a stored ``kind`` of ``building``
+    and a stored ``source_id`` of ``bldg_ovt``; its reason must be non-empty
+    text; a choice is needed only when the helper cannot re-derive the key;
+    and the chosen footprint must be in the row's own exact-or-folded
+    name-candidate set and inside the boundary set.
     """
-    if source_id != BUILDINGS:
+    if (
+        source_id != BUILDINGS
+        or row.get("kind") != "building"
+        or row.get("source_id") != BUILDINGS
+    ):
         raise ReviewError("reviewed_choice_kind")
     reason = row.get("choice_reason")
     if not isinstance(reason, str) or not reason.strip():
@@ -318,7 +324,7 @@ def reviewed_choice(row: Mapping[str, object], source_id: str, inputs: Inputs) -
         )
     )
     chosen = row.get("record_key")
-    if chosen not in candidates:
+    if not isinstance(chosen, str) or chosen not in candidates:
         raise ReviewError("reviewed_choice_not_candidate")
     if chosen not in inputs.inside:
         raise ReviewError("reviewed_choice_outside")
