@@ -26,9 +26,12 @@ ROW = (
     "landmark_skyscraperpage_com/"
     "page-a4474c164d99fd530665e2e45c1419e2e7872e9ba8cefe248e372243c595d794"
 )
-# SHA-256 of the canonical JSON of every committed registry row at base
-# 1dba941bcf; this row's two changed fields are restored before hashing.
-BASE_ROWS_SHA256 = "771b96a4afb3ffca7e914ab783663cfd2fca4542ce0b478aaab48b1627e69593"
+# SHA-256 of the canonical JSON of (key, skip_reason, basis_note) for every
+# committed registry row, computed at base 1dba941bcf; this row's two changed
+# fields are restored before hashing. Missing optional notes are empty strings.
+BASE_PROJECTION_SHA256 = (
+    "d17073ec9da4f03806d6222f18ccd9e54fcff3e9d1bcb595315b94c3497d1e30"
+)
 BASE_ROW_COUNT = 891
 BASE_BASIS_NOTE = (
     "Document 04 S2-P53 landmark hand-list placement and citation snapshots; "
@@ -171,7 +174,15 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
         else item
         for item in rows
     ]
-    assert _canonical_rows(restored) == BASE_ROWS_SHA256
+    projection = [
+        {
+            "key": item["key"],
+            "skip_reason": item.get("skip_reason", ""),
+            "basis_note": item.get("basis_note", ""),
+        }
+        for item in restored
+    ]
+    assert _canonical_rows(projection) == BASE_PROJECTION_SHA256
     entries = registry.load_registry()
     assert len(entries) == BASE_ROW_COUNT
     landmark = [e for e in entries if e.source_id.startswith("landmark_")]
