@@ -452,7 +452,7 @@ the duration the page states is shown beside the second result, or "duration not
 
 **Inputs.** `pub_customs_import` (National Planning Council imports by tariff code, origin and month; 2025–2026 at twelve digits, 2019–2024 at eight digits; fields include value in QAR and weight in kg); the reviewed basket configuration (activity → at most eight input lines), held as `graph_edge` rows from activity to input to tariff line; `pub_licence_active` for licensed wholesale depth by municipality.
 
-**Formula.** For basket line `h`, origin `o`, window of the latest 12 complete months in the release:
+**Formula.** For basket line `h`, origin `o`, window of the latest complete calendar year in the release ([decision 0112](decisions/0112-c5-windows-are-calendar-years.md)):
 
 ```
 Vkg_o = sum of value (QAR) over rows with kg > 0
@@ -464,7 +464,7 @@ HHI   = 10,000 * sum_o s_o^2            near 0 = many small origins; 10,000 = on
 trend = (V_last12 - V_prior12) / V_prior12
 ```
 
-`UV_o` is `NO_DATA` when `K_o = 0`. The trend is `NO_DATA` when the prior-12-month value is zero. Also shown: the top origin's share and the number of origins. Rows with no weight are excluded from the unit value and counted on the card; they stay inside `V_o`. A month with no row for an origin is drawn as a gap, not as a zero. The HHI is the sum of squared shares, as defined by the United States Department of Justice; no competition-law threshold is applied. Shares, the HHI and the trend use every origin.
+`UV_o` is `NO_DATA` when `K_o = 0`. `V_last12` is the value of that calendar year and `V_prior12` the value of the calendar year before it. The trend is `NO_DATA` when the prior-12-month value is zero. Also shown: the top origin's share and the number of origins. Rows with no weight are excluded from the unit value and counted on the card; they stay inside `V_o`. A month with no row for an origin is drawn as a gap, not as a zero. The HHI is the sum of squared shares, as defined by the United States Department of Justice; no competition-law threshold is applied. Shares, the HHI and the trend use every origin.
 
 The component is named `supplier_lens`. It is drawn as ranked bars, one block per basket input, at most five origins per input. That drawing limit does not drop origins from the sums. The fifteen-node limit applies only to the source chain shown in the Source chain (the evidence drawer).
 
