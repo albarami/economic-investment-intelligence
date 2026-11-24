@@ -1,15 +1,20 @@
 """L-1717: invented bounded streams, completeness and receipt evidence."""
 
 import hashlib
+import http.client
 import io
+import json
+import tempfile
 from dataclasses import replace
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
-from custodian.tests.test_large_intake import stream
-from hypothesis import example, given
+from custodian.tests.test_large_intake import meta, stream
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
-from eii_custodian.publicdata.fetch import large, registry
+from eii_custodian.publicdata.fetch import large, registry, transport
 from eii_custodian.publicdata.fetch.snapshots import read_snapshot
 
 
@@ -242,3 +247,153 @@ def test_chunk_splits_accept_iff_complete_and_bounded(
         assert received.sha256 == hashlib.sha256(body).hexdigest()
         assert received.declared_length_present is (declared is not None)
     assert len(sink.getvalue()) <= bound
+
+
+IMPORTS_BODY = b'[{"value": 1}, {"value": 2}]'
+
+
+def _imports_entry(entries, **changes):
+    fields = {"columns": (("value", "number"),), "row_count_min": 2, "row_count_max": 2}
+    return replace(entries["cus_imp_2019"], **{**fields, **changes})
+
+
+def _imports_fetch(entry, chunks, cache, declared=None):
+    return large.fetch_large(
+        entry,
+        lambda _url: meta(entry),
+        stream(entry, chunks, declared),
+        cache,
+        lambda: "2026-11-24T00:00:00Z",
+        lambda _seconds: None,
+    )
+
+
+def _unpublished(entry, cache):
+    assert not list((cache / entry.key).rglob("*"))
+    assert not list(cache.glob(".large-*"))
+
+
+@pytest.mark.parametrize("body", [IMPORTS_BODY, IMPORTS_BODY + b" \n\t"])
+def test_parsed_key_admits_undeclared_complete_array(entries, tmp_path, body):
+    """L-1762: the portal's chunked JSON export never declares a length."""
+    entry = _imports_entry(entries)
+    result = _imports_fetch(entry, [body], tmp_path)
+    stored = read_snapshot(tmp_path / entry.key, result.digest)
+    assert stored.body == body
+    assert stored.sidecar["declared_length_present"] is False
+    assert stored.sidecar["row_count"] == 2
+
+
+@pytest.mark.parametrize("cut", [8, len(IMPORTS_BODY) - 4])
+def test_parsed_key_cut_mid_object_refuses_portal_json(entries, tmp_path, cut):
+    entry = _imports_entry(entries)
+    with pytest.raises(large.IntakeError, match=r"^portal_json$"):
+        _imports_fetch(entry, [IMPORTS_BODY[:cut]], tmp_path)
+    _unpublished(entry, tmp_path)
+
+
+def test_parsed_key_cut_before_closing_bracket_refuses(entries, tmp_path):
+    entry = _imports_entry(entries)
+    with pytest.raises(large.IntakeError, match=r"^portal_json$"):
+        _imports_fetch(entry, [IMPORTS_BODY[:-1]], tmp_path)
+    _unpublished(entry, tmp_path)
+
+
+@pytest.mark.parametrize("trailing", [b"x", b" ]", b",[{}]"])
+def test_parsed_key_trailing_content_refuses(entries, tmp_path, trailing):
+    entry = _imports_entry(entries)
+    with pytest.raises(large.IntakeError, match=r"^portal_json$"):
+        _imports_fetch(entry, [IMPORTS_BODY + trailing], tmp_path)
+    _unpublished(entry, tmp_path)
+
+
+def test_parsed_key_undeclared_over_ceiling_refuses(entries, tmp_path):
+    entry = _imports_entry(entries, stream_max_bytes=len(IMPORTS_BODY) - 1)
+    with pytest.raises(large.IntakeError, match=r"^body_bytes$"):
+        _imports_fetch(entry, [IMPORTS_BODY], tmp_path)
+    _unpublished(entry, tmp_path)
+
+
+def test_binary_key_undeclared_refuses_before_any_body(entries, tmp_path):
+    """The parse-proved admission never reaches a key _check_imports skips."""
+    entry = entries["bldg_wsf3d"]
+
+    def unread():
+        pytest.fail("unverifiable body read")
+        yield b"x" * 10
+
+    with pytest.raises(large.IntakeError, match=r"^length_undeclared$"):
+        large.fetch_large(
+            entry,
+            lambda _url: pytest.fail("binary metadata read"),
+            stream(entry, unread()),
+            tmp_path,
+            lambda: "2026-11-24T00:00:00Z",
+            lambda _seconds: None,
+        )
+    _unpublished(entry, tmp_path)
+
+
+def test_cut_chunked_transfer_is_unreachable_and_publishes_nothing(
+    entries, tmp_path, monkeypatch
+):
+    """A server-cut chunked body raises in the stream opener, not at parse."""
+    entry = _imports_entry(entries)
+
+    class CutBody:
+        def __init__(self):
+            self.reads = 0
+            self.headers: dict[str, str] = {}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def geturl(self):
+            return entry.url
+
+        def read(self, _count=-1):
+            self.reads += 1
+            if self.reads == 1:
+                return IMPORTS_BODY[:10]
+            raise http.client.IncompleteRead(IMPORTS_BODY[:10])
+
+    response = CutBody()
+    monkeypatch.setattr(
+        transport.urllib.request,
+        "build_opener",
+        lambda *_a: SimpleNamespace(open=lambda *_a, **_k: response),
+    )
+    with pytest.raises(transport.TransportFault) as caught:
+        large.fetch_large(
+            entry,
+            lambda _url: meta(entry),
+            transport.open_https_stream,
+            tmp_path,
+            lambda: "2026-11-24T00:00:00Z",
+            lambda _seconds: None,
+        )
+    assert caught.value.kind == "unreachable"
+    assert response.reads == 2
+    _unpublished(entry, tmp_path)
+
+
+@settings(deadline=None)
+@given(
+    rows=st.lists(
+        st.fixed_dictionaries({"value": st.integers()}), min_size=1, max_size=5
+    ),
+    data=st.data(),
+)
+def test_no_strict_prefix_of_a_valid_array_ever_publishes(entries, rows, data):
+    body = json.dumps(rows).encode()
+    cut = data.draw(st.integers(min_value=0, max_value=len(body) - 1))
+    entry = _imports_entry(entries, row_count_min=len(rows), row_count_max=len(rows))
+    with tempfile.TemporaryDirectory() as folder:
+        cache = Path(folder)
+        with pytest.raises(large.IntakeError) as caught:
+            _imports_fetch(entry, [body[:cut]], cache)
+        assert str(caught.value) in {"empty_body", "portal_json"}
+        _unpublished(entry, cache)

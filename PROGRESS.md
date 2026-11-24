@@ -53867,3 +53867,65 @@ S2-P84 lead ceiling commit (ruling L-1723, 2026-11-24): `custodian/publicdata/so
 | 2026-11-24 | S2-P88 approval | S2-P88.rv4 (Anthropic, Claude B) APPROVED `0032fb77c23cc8e4912f95801b22e400d3900477` (every pinned data-test case fails closed with one closed reason; cache refusals keep their hash and missing reasons; near-value plants for the exact operands; `zone_negative` changes one input, Mixed −1 with Government balancing), findings none blocking. Builders Factory (build, fix rounds 1 and 2) and OpenAI (fix round 3). Rounds: rv1 (Anthropic) REJECTED, rv2 (Anthropic) REJECTED, rv3 (OpenAI) REJECTED, rv4 APPROVED; the reviewer of each round differs from every builder of the commit it reviewed. The lead's run on the working copy committed as that commit: seven files 448 passed, ruff, format, document check and diff check exit 0; deleting the `any(value < 0 ...)` operand of the C8 zone guard turns `zone_negative` red (exit 1). The reviewer's own run: `custodian/tests/test_pinned_c8.py` 176 passed, exit 0. | lead |
 | 2026-11-24 | S2-P88 records points of rv4 | (1) The fix-round-3 row above says "activity42 balances against Household": the plant moves a count from column C (Household) to column I (Ministry \ Government Department); the code is right and the wording is corrected here. The same misnaming stands in the test comment of `custodian/tests/test_pinned_c8.py` (rv4 N1, not blocking) and goes to the next change of that file. (2) The same row's "exact finite-domain audits exit 0" includes a sweep over the Mixed domain 0 to 20 that was run once and not stored; the reviewer re-ran it independently and every value is valid. It is recorded as an unstored check, not committed evidence. | lead |
 | 2026-11-24 | Train S2-35 identity | Four approved commits of S2-P88 cherry-picked onto main `43537696a8`: `e159a41270` as `640545a9`, `60c3e84846` as `61d2f6f0`, `238bcb038d` as `a86fa92b`, `0032fb77c2` as `36fb838b`; `train_identity.py` reports 9, 7, 3 and 2 files identical in their added and removed lines, 0 differences. The only join step was the PROGRESS.md append conflict, resolved as a union (main's lines, then the task's block). No forced code or test difference. The records commit changes PROGRESS.md only. | lead |
+
+
+## Train S2-36 of slice S2 — 2026-11-24
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-24 | S2-35 merge record | [PR 145](https://github.com/albarami/economic-investment-intelligence/pull/145) (train S2-35: S2-P88 pinned data tests fail closed) merged into main as `91b3ab1186`, whose tree equals the approved head `9529ca40af`. Conditions held on that exact head: the train confirmation S2-35.cf1 (xAI Cursor) APPROVED, posted on the pull request word for word; seventeen hosted checks passed; the lead's whole test S2-35.wt1 exited 0 (seed two billion seven hundred seventy-seven million eight hundred twenty-five thousand nine hundred sixty-five) on the merge base `43537696a8`, the train head's parent. | lead |
+| 2026-11-24 | Correction to the S2-P88 records-point row of train S2-35 | S2-35.cf1 records point: the activity42 plant raises column C (Household) and lowers column I, so the count moves from I to C, and column C balances against column I. The earlier row stays unchanged; this row corrects its direction. | lead |
+| 2026-11-24 | S2-L4cnt approval (`frame_grid`, read-only) | `ed7828552b269b8061cd81ee5afa555a9a4ebde6` extracts `frame_grid` from `build_live_frame` with a no-write test (`custodian/tests/test_frame_grid_read_only.py`), so the L4 counts extract reads the build's own grid over the reviewed selections (ruling L-1748 items 2 and 3). Builder Anthropic (the lead); review S2-L4cnt.rv2 (Factory Droid) APPROVED this commit. The counts extract itself is a lead-shell tool kept outside the repository; its final form (sha256 prefix `1fcd0afee0`, tests `fe3b1b5408`) was APPROVED by S2-L4cnt.rv5 (OpenAI Codex A) after plants A, B and D (warning filter, log disable, descriptor-two mute) each turned their named test red alone and were restored byte for byte, with plants E, G, C and H recorded earlier; 35 passed before and after. | lead |
+| 2026-11-24 | S2-L4cnt records point of rv3 | The fix-round account that `logging.disable(logging.NOTSET)` restores the previous threshold was wrong: it resets it. The final extract saves `logging.root.manager.disable` before muting and restores that saved value in its `finally` block. rv3 confirmed that the extract's lines, refusal reasons and exact-output expectations are unchanged by these diagnostic fixes, so the counts run of the earlier form stands for the data review. | lead |
+| 2026-11-24 | Train S2-36 identity | One approved commit cherry-picked with `-x` onto main `91b3ab1186`, with no conflict: `ed7828552b` as `462135184b`. `train_identity.py` reports 2 files identical in their added and removed lines, 0 differences. The S2-L4 fill `fa4aa86907` (approved by S2-L4.rv2d) was held out of this train: the pinned history scan reports `generic-api-key` on its filled `record_key` lines, which carry public building identifiers. No scanner rule or allow-list changes; ruling L-1769 renames the review-file field, and the fill joins a later train with its approval and records points. | lead |
+
+## S2-P90 — streamed JSON exports prove completeness by the closing bracket — 2026-11-24
+
+- Builder Devin (Cognition), uncommitted in worktree S2-P90 on base
+  `91b3ab1186c6e855b81e4a04cd251257662a265a`. Persona: senior data-acquisition
+  engineer owning `fetch/large.py`; strict self-review personas: strict-reviewer
+  and sharp-edges. Lead ruling L-1762 amending S2-P84 (L-1717); L-1409 negative
+  tests. No branch or commit was created.
+- Change: `receive` gained one keyword-only `parse_proved: bool = False`; the
+  `length_undeclared` guard became `size is None and length is None and not
+  parse_proved`. `fetch_large` passes `parse_proved=info is not None`, the same
+  gate that runs `_check_imports`, so the two `portal_dataset` keys
+  (`cus_imp_2019`, `trade_ext/qatar-imports-2014-2018`) may stream the portal's
+  chunked export without Content-Length; completeness is proved by the clean
+  stream end and the row parse reaching `]` with whitespace-only to EOF. Binary
+  keys, declared-length checks, the `body_bytes` ceiling and
+  `declared_length_present` are unchanged. `json_rows` and `sources.yaml`
+  untouched. `portal_metadata` exposes no record count; none is reported.
+- Tests: 14 new cases in `custodian/tests/test_large_bounds.py` covering
+  undeclared admission with `declared_length_present: false`, mid-object and
+  pre-`]` cuts, trailing content, over-ceiling undeclared (`body_bytes`), the
+  binary-key `length_undeclared` refusal before any body read, a server-cut
+  chunked transfer raising `TransportFault("unreachable")` through
+  `open_https_stream`, and one Hypothesis property over every strict byte
+  prefix of a generated valid array (never publishes, reason in
+  {`empty_body`, `portal_json`}). Red first: 11 failed, 44 passed, exit 1;
+  green: 55 passed, exit 0; both large files 128 passed, exit 0; filtered
+  `custodian/tests -k "large or stream or intake or ceiling"` 406 passed,
+  exit 0.
+- Guard deletions, each alone and restored byte-for-byte: removing
+  `and not parse_proved` made the 11 new cases fail (exit 1, `length_undeclared`);
+  removing the post-`]` trailing check in `json_rows` made the three
+  trailing-content cases and the existing `[{}]x` case fail (4 failed,
+  exit 1). Restored: 55 passed and 128 passed, exit 0.
+- Records: doc 04 §3.1 names both completeness forms under L-1762; the OI-308
+  records-point sentence now records the parsed-keys exception; no change to
+  `sources.yaml`, the ceilings or the pinned-ceiling test.
+- Checks: ruff check 0, ruff format --check 0 (1007 files), mypy 0 (530 files),
+  check_docs 0 (1358 text files, 158 Markdown), check_tree 0 (8 rules),
+  import-boundary discovery 0 (37 tests), `git diff --check` 0. Environment
+  WSL2 Linux, Python 3.14, `UV_OFFLINE=1`, no network. `data/`, `.env` and
+  `.private` were never read; the whole `./eii test` remains the lead's run.
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-24 | S2-P90 approval | S2-P90.rv1 (OpenAI Codex B) APPROVED `7e74ebdcfd7103e7aaed1115d5835e35903045e2`, findings none. The two `portal_dataset` keys that the imports row check parses may stream without a declared length; their completeness is proved by the parse reaching the closing `]` with only whitespace before EOF, a clean end of the chunked transfer and the unchanged count, schema, split and period gates (ruling L-1762). The byte ceiling still caps every received byte, and binary keys keep `length_undeclared`. Builder Cognition (Devin); the lead committed the builder's change unchanged, and removed one review input file that the commit had staged by mistake. The lead's own run on that change: both large intake test files 128 passed; plant one (the call site passes no flag) turned 11 tests red, plant two (the flag always set) turned the binary-key test red, each restored byte for byte; ruff, format, mypy, check_docs, check_tree and the import boundary exited 0. | lead |
+| 2026-11-24 | S2-P90 records points of rv1 | (1) The review read files only and ran no test; the run evidence is the lead's run above. (2) The builder's return was archived before the review under the run folder's own name, so the brief's return path was absent at review time; nothing of the return is a repository file. | lead |
+| 2026-11-24 | Train S2-36 identity, with S2-P90 | `7e74ebdcfd` cherry-picked with `-x` onto the train as `0d92a3931a`; the only join step was the PROGRESS.md append conflict, resolved as a union of both sides' appended rows. `train_identity.py` reports S2-L4cnt 2 files and S2-P90 5 files identical in their added and removed lines, 0 differences. | lead |
+| 2026-11-24 | Train S2-36 whole test wt2 | Seed four billion one hundred fifty-four million one hundred sixty-nine thousand one hundred seventy-eight, head `d814b5a161`: exit 1. Every suite passed except python-guards, 1460 passed and 1 failed: `scripts/tests/test_test_bootstrap.py::TestBootstrap::test_file_backed_properties_carry_no_deadline`. It named S2-P90's new property `test_no_strict_prefix_of_a_valid_array_ever_publishes`, which writes files under `tmp_path` without `settings(deadline=None)`. Neither S2-P90's own run (it ran the two large intake test files only) nor its review caught this. | lead |
+| 2026-11-24 | S2-P90 fx1 | Lead fix `9f0e06fda36b601f357a003dbe0ff9e1bcdf52ae` on `7e74ebdcfd`: `@settings(deadline=None)` on that one property, plus its import. Nothing else changes. The guard and its plant: 2 passed. Large intake tests: 55 passed. Ruff and format exited 0. Cherry-picked with `-x` onto the train as `f8bcc085c1`. Confirmation of the fix is by another maker (the builder is Cognition and the fixer Anthropic). | lead |
+| 2026-11-24 | Correction to the S2-35 merge row | Records point of S2-36.cf1 (xAI Cursor). `43537696a8` is the main under the five commits of train S2-35, not the parent of its approved head `9529ca40af`. The merge evidence holds the head `9529ca40afee60ff1c42a71ad005aae5a9662595`, the merge commit `91b3ab1186c6e855b81e4a04cd251257662a265a` and the state MERGED. The whole test record holds exit 0 and seed two billion seven hundred seventy-seven million eight hundred twenty-five thousand nine hundred sixty-five. The row's other clauses (the pull request number 145, the hosted checks and the confirmation by xAI Cursor) rest on the pull request page and `REVIEW-S2-35.cf1.md`, not on those two files. The earlier row is left unchanged. | lead |

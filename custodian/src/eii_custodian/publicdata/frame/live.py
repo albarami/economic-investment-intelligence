@@ -3,7 +3,7 @@
 import csv
 import json
 from collections.abc import Mapping
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -35,6 +35,22 @@ from .population import population_rows
 from .raw import read_archive
 
 
+@dataclass(frozen=True)
+class GridStage:
+    """The frame's grid with the joined boundaries the live build needs next."""
+
+    grid: list[dict[str, Any]]
+    entries: dict[str, Entry]
+    report: list[str]
+    raw_layers: dict[str, list[dict[str, Any]]]
+    district_map: dict[Any, Any]
+    municipalities: list[Boundary]
+    zones: list[Boundary]
+    districts: list[Boundary]
+    staged_population: list[dict[str, Any]]
+    free_zones: set[str]
+
+
 def build_live_frame(
     cache: Path,
     registry: tuple[Entry, ...],
@@ -45,103 +61,16 @@ def build_live_frame(
     *,
     build_date: date | None = None,
 ) -> FrameResult:
-    entries = {e.source_id: e for e in registry}
+    stage = frame_grid(cache, registry, review, selections, result, output=output)
     tables, sources, inventory = result.tables, result.sources, result.inventory
-    report = [
-        r
-        for r in result.report
-        if not r.startswith(("frame:", "bnd_hdx: cache_shape_unconfirmed"))
-    ]
-    hdx = entries["bnd_hdx"]
-    for table in ("municipality", "zone", "district", "gazetteer"):
-        if table not in hdx.release_tables:
-            raise FrameError(f"bnd_hdx: invalid release source for {table}")
-    body, receipt = read_cached(cache, hdx, digest=selections.get(hdx.key, ""))
-    sources["bnd_hdx"] = receipt
-    frame = read_archive(body)
-    raw_layers: dict[str, list[dict[str, Any]]] = {}
-    for name in ("bnd_zone_2020", "bnd_district_2020", "census_district_pop"):
-        if name not in entries or entries[name].skip_reason:
-            if name == "census_district_pop":
-                raw_layers[name] = []
-                report.append(f"{name}: unavailable; no census rows")
-                continue
-            raise FrameError(f"{name}: required join source unavailable")
-        payload, receipt = read_cached(
-            cache, entries[name], digest=selections.get(entries[name].key, "")
-        )
-        sources[name] = receipt
-        raw_layers[name] = layer_rows(name, payload)
-    mapping, municipality_review = join_municipalities(
-        frame["municipality"], frame["zone"], raw_layers["bnd_zone_2020"]
+    entries, report, grid = stage.entries, stage.report, stage.grid
+    municipalities, zones, districts = (
+        stage.municipalities,
+        stage.zones,
+        stage.districts,
     )
-    if output is not None:
-        output.mkdir(parents=True, exist_ok=True)
-        with (output / "municipality_names.csv").open(
-            "w", encoding="utf-8", newline=""
-        ) as handle:
-            writer = csv.DictWriter(
-                handle,
-                fieldnames=[
-                    "hdx_code",
-                    "municipality_code",
-                    "name_en",
-                    "name_ar",
-                    "layer_name_en",
-                    "layer_name_ar",
-                ],
-            )
-            writer.writeheader()
-            writer.writerows(municipality_review)
-    aliases = district_aliases(review, cache)
-    district_map, differences = join_districts(
-        frame["district"],
-        raw_layers["bnd_district_2020"],
-        raw_layers["census_district_pop"],
-        aliases,
-    )
-    report.extend(differences)
-    names = load_municipality_names(review, set(mapping.values()))
-    check_municipality_names(municipality_review, names)
-    doha = greater_doha_keys(review, set(mapping.values()))
-    municipalities = [
-        replace(m, key=mapping[m.key], municipality_code=mapping[m.key])
-        for m in frame["municipality"]
-    ]
-    zones = [
-        replace(z, municipality_code=mapping[z.municipality_code])
-        for z in frame["zone"]
-    ]
-    districts = [
-        replace(d, municipality_code=mapping[d.municipality_code])
-        for d in frame["district"]
-    ]
-    inventory["bnd_hdx"] = {"zone_code": tuple(sorted(z.key for z in zones))}
-    report = [line for line in report if "unlisted zone numbers" not in line]
-    propose_reviews(review, output, {z.key for z in zones}, inventory, report)
-    check_zones(
-        read_csv(review / "zone_crosswalk.csv"),
-        observed_zones(inventory),
-        {z.key for z in zones},
-    )
-    report = [line for line in report if "unlisted zone numbers" not in line]
-    staged_population: list[dict[str, Any]] = []
-    if "pop_muni" in sources:
-        payload, _ = read_cached(
-            cache,
-            entries["pop_muni"],
-            digest=selections.get(entries["pop_muni"].key, ""),
-        )
-        staged_population, population_reason = population_rows(
-            payload,
-            review,
-            names,
-            output / "build_report.json" if output is not None else None,
-        )
-        if population_reason.startswith("unreviewed_indicator"):
-            raise FrameError(f"pop_muni: {population_reason}")
-    free_zones = district_free_zones(review)
-    grid = build_grid(municipalities, zones, districts, doha, free_zones, report)
+    raw_layers, district_map = stage.raw_layers, stage.district_map
+    staged_population, free_zones = stage.staged_population, stage.free_zones
     tables["grid_cell"] = grid
     grids = build_grids(
         cache,
@@ -275,6 +204,127 @@ def build_live_frame(
     )
     report.append("frame: partial; place points remain")
     return FrameResult(tables, report, sources, inventory)
+
+
+def frame_grid(
+    cache: Path,
+    registry: tuple[Entry, ...],
+    review: Path,
+    selections: Mapping[str, str],
+    result: FrameResult,
+    *,
+    output: Path | None = None,
+) -> GridStage:
+    """The live build's steps up to its grid; with no output it writes nothing."""
+    entries = {e.source_id: e for e in registry}
+    sources, inventory = result.sources, result.inventory
+    report = [
+        r
+        for r in result.report
+        if not r.startswith(("frame:", "bnd_hdx: cache_shape_unconfirmed"))
+    ]
+    hdx = entries["bnd_hdx"]
+    for table in ("municipality", "zone", "district", "gazetteer"):
+        if table not in hdx.release_tables:
+            raise FrameError(f"bnd_hdx: invalid release source for {table}")
+    body, receipt = read_cached(cache, hdx, digest=selections.get(hdx.key, ""))
+    sources["bnd_hdx"] = receipt
+    frame = read_archive(body)
+    raw_layers: dict[str, list[dict[str, Any]]] = {}
+    for name in ("bnd_zone_2020", "bnd_district_2020", "census_district_pop"):
+        if name not in entries or entries[name].skip_reason:
+            if name == "census_district_pop":
+                raw_layers[name] = []
+                report.append(f"{name}: unavailable; no census rows")
+                continue
+            raise FrameError(f"{name}: required join source unavailable")
+        payload, receipt = read_cached(
+            cache, entries[name], digest=selections.get(entries[name].key, "")
+        )
+        sources[name] = receipt
+        raw_layers[name] = layer_rows(name, payload)
+    mapping, municipality_review = join_municipalities(
+        frame["municipality"], frame["zone"], raw_layers["bnd_zone_2020"]
+    )
+    if output is not None:
+        output.mkdir(parents=True, exist_ok=True)
+        with (output / "municipality_names.csv").open(
+            "w", encoding="utf-8", newline=""
+        ) as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=[
+                    "hdx_code",
+                    "municipality_code",
+                    "name_en",
+                    "name_ar",
+                    "layer_name_en",
+                    "layer_name_ar",
+                ],
+            )
+            writer.writeheader()
+            writer.writerows(municipality_review)
+    aliases = district_aliases(review, cache)
+    district_map, differences = join_districts(
+        frame["district"],
+        raw_layers["bnd_district_2020"],
+        raw_layers["census_district_pop"],
+        aliases,
+    )
+    report.extend(differences)
+    names = load_municipality_names(review, set(mapping.values()))
+    check_municipality_names(municipality_review, names)
+    doha = greater_doha_keys(review, set(mapping.values()))
+    municipalities = [
+        replace(m, key=mapping[m.key], municipality_code=mapping[m.key])
+        for m in frame["municipality"]
+    ]
+    zones = [
+        replace(z, municipality_code=mapping[z.municipality_code])
+        for z in frame["zone"]
+    ]
+    districts = [
+        replace(d, municipality_code=mapping[d.municipality_code])
+        for d in frame["district"]
+    ]
+    inventory["bnd_hdx"] = {"zone_code": tuple(sorted(z.key for z in zones))}
+    report = [line for line in report if "unlisted zone numbers" not in line]
+    propose_reviews(review, output, {z.key for z in zones}, inventory, report)
+    check_zones(
+        read_csv(review / "zone_crosswalk.csv"),
+        observed_zones(inventory),
+        {z.key for z in zones},
+    )
+    report = [line for line in report if "unlisted zone numbers" not in line]
+    staged_population: list[dict[str, Any]] = []
+    if "pop_muni" in sources:
+        payload, _ = read_cached(
+            cache,
+            entries["pop_muni"],
+            digest=selections.get(entries["pop_muni"].key, ""),
+        )
+        staged_population, population_reason = population_rows(
+            payload,
+            review,
+            names,
+            output / "build_report.json" if output is not None else None,
+        )
+        if population_reason.startswith("unreviewed_indicator"):
+            raise FrameError(f"pop_muni: {population_reason}")
+    free_zones = district_free_zones(review)
+    grid = build_grid(municipalities, zones, districts, doha, free_zones, report)
+    return GridStage(
+        grid,
+        entries,
+        report,
+        raw_layers,
+        district_map,
+        municipalities,
+        zones,
+        districts,
+        staged_population,
+        free_zones,
+    )
 
 
 def district_aliases(review: Path, cache: Path) -> list[dict[str, str]]:

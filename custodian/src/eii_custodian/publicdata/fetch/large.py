@@ -3,8 +3,10 @@
 The owner ruling of 2026-11-18 requires retaining these inputs' value. Binary
 files and the imports array stream to a staged file; only individual import
 objects are decoded, under the existing general intake bound. Overture keeps
-its recorded exact size and ETag. Other streams require a reviewed byte ceiling
-and a declared length. No incomplete body can become a snapshot.
+its recorded exact size and ETag. Other streams require a reviewed byte
+ceiling; a body that the imports check parses proves completeness by reaching
+its closing bracket, while every other undeclared body is refused. No
+incomplete body can become a snapshot.
 """
 
 from __future__ import annotations
@@ -96,8 +98,19 @@ def recorded_etag(entry: Entry) -> str | None:
     return None
 
 
-def receive(entry: Entry, stream: StreamTransport, output: IO[bytes]) -> Received:
-    """Hash and write each fixed chunk; never concatenate the response body."""
+def receive(
+    entry: Entry,
+    stream: StreamTransport,
+    output: IO[bytes],
+    *,
+    parse_proved: bool = False,
+) -> Received:
+    """Hash and write each fixed chunk; never concatenate the response body.
+
+    parse_proved marks a staged body that _check_imports parses completely:
+    ruling L-1762 admits it without a declared length, and the parse reaching
+    the closing bracket is its completeness proof.
+    """
     if entry.key not in REQUIRED_KEYS:
         raise IntakeError("stream_source")
     if not approve(entry.url).ok:
@@ -116,7 +129,7 @@ def receive(entry: Entry, stream: StreamTransport, output: IO[bytes]) -> Receive
         length = response.declared_length
         if length is not None and (type(length) is not int or length < 0):
             raise IntakeError("declared_length")
-        if size is None and length is None:
+        if size is None and length is None and not parse_proved:
             raise IntakeError("length_undeclared")
         if size is not None and length is not None and length != size:
             raise IntakeError("size_mismatch")
@@ -300,7 +313,7 @@ def fetch_large(
     with tempfile.TemporaryDirectory(prefix=".large-", dir=cache) as folder:
         staged = Path(folder) / "body"
         with staged.open("wb") as output:
-            received = receive(entry, stream, output)
+            received = receive(entry, stream, output, parse_proved=info is not None)
         summary = _check_imports(entry, staged) if info is not None else None
         retrieved = clock()
         sidecar = sidecar_for(
