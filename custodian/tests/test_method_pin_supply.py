@@ -576,6 +576,13 @@ def test_tracked_configuration_binds_ruled_settings(tmp_path):
             "travel_mode": "drive",
         },
         "c7.speed_regime": {"value": "free_flow"},
+        "c6.category_ids": {
+            "value": '["italian_restaurant", "pizza_restaurant"]',
+            "taxonomy": "places_ovt taxonomy.primary",
+            "rule": "italian_restaurant and its descendants in the release taxonomy",
+            "excluded": "pizza_delivery_service",
+            "basis": "PUB-38 ISIC 5610 restaurant and its Italian subcategory; C6 illustrative focal set",
+        },
         "wilson.period": {
             "activity_code": "5610101",
             "municipality": "Al Shamal",
@@ -660,7 +667,6 @@ def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
             pin: "OI-283: " + pin + ": latest_months awaits R1 complete-month evidence"
             for pin in ("c5.hhi", "c5.prior12", "c5.latest12", "c5.trend")
         },
-        "c6.category_ids": "OI-283: c6.category_ids: reviewed allow-list awaits review (L5c section 4)",
         "c7.coordinates": "OI-283: c7.coordinates: landmark keys await ruling (L5c section 6)",
         **{
             pin: "OI-283: " + pin + ": computed by S6-T10"
