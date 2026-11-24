@@ -254,7 +254,7 @@ def summary(result):
     for line in (result.stdout + result.stderr).splitlines():
         if line.startswith(("FAILED ", "ERROR ")):
             found = re.fullmatch(
-                r"FAILED \S+ - Failed: (C2-WILSON-[A-Z]+:[a-z_]+)", line
+                r"FAILED \S+ - Failed: (C2-(?:WILSON-[A-Z]+|ISIC-5610):[a-z_]+)", line
             )
             assert found is not None, "summary_unparsed"
             reasons.add(found.group(1))
