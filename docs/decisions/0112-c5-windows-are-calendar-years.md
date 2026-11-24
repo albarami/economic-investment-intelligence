@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted by the owner, 2026-11-24 ("yes", relayed by the advisor in note owner-relayed-20261124-2142); review by another maker (OpenAI, 2026-11-24): APPROVED, no findings |
 | Date | 2026-11-24 |
 | Owner | The owner |
 | Amends | Document 07 section "C5 Customs supplier lens", its **Formula** window sentence and its trend sentence |

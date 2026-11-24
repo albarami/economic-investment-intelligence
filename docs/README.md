@@ -159,7 +159,7 @@
 | [0108](decisions/0108-fdi-crosswalk-rows-in-the-cache-review-folder.md) | FDI crosswalk rows in the uncommitted cache review folder; committed template schema-only, with origin and byte-hash binding retained | Proposed, 2026-11-24 |
 | [0109](decisions/0109-the-product-suite-runs-in-two-named-parts.md) | The product suite runs in two named parts under the unchanged 600-second limit, by decision 0060's method | Accepted, 2026-11-24; the slow figures are of the slice S6 stack (ruling L-1784) |
 | [0110](decisions/0110-approved-with-small-fixes-pilot.md) | A pilot of a third review verdict, APPROVED-WITH-SMALL-FIXES, for exact small fixes outside numbers, privacy, calculations, gates, security controls and test bounds, closed by a scope script and green checks | Accepted, 2026-11-24; the pilot starts with briefs and a closure script enforcing items 2 to 4 |
-| [0112](decisions/0112-c5-windows-are-calendar-years.md) | C5's two windows are calendar years: the latest complete year in the release and the year before it (2025 against 2024 in version 1) | Proposed |
+| [0112](decisions/0112-c5-windows-are-calendar-years.md) | C5's two windows are calendar years: the latest complete year in the release and the year before it (2025 against 2024 in version 1) | Accepted |
 
 ## Identifiers and change control
 
