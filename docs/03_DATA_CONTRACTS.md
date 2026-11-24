@@ -1830,8 +1830,10 @@ route and fails its range/geometry proof; it is never replaced by another
 archive.
 
 The browser independently reads this closed summary before requesting an
-extract. With no mount, a refused summary, or a null name, it keeps the
-asset-absent land/sea stage and requests no tile or glyph. A named extract can
+extract. With a null name it keeps the asset-absent land/sea stage and
+requests no tile or glyph; an absent mount or a refused summary shows the
+closed refusal state of document 08, **Closed web reasons (S3-T11 early round,
+Part C)**, and mounts no stage. A named extract can
 load even when the opening Public figure is unavailable. Unknown summary
 properties and names still refuse; no pathname, external URL or identifier is
 inferred from a fact. The local map browser server now loads its disposable
