@@ -6943,12 +6943,39 @@ run remain pending.
 - NEEDED: a closed-set check on `basis` at load, with a planted violation, when the file is next regenerated.
 - NEEDED BY: the next regeneration of the district crosswalk.
 
-## OI-412 — Share-field meaning remains unconfirmed
+## OI-413 — Share-field meaning remains unconfirmed
 
-- ID: OI-412
+- ID: OI-413
 - TYPE: OPEN (source semantics)
 - RAISED BY: S2-P86, 2026-11-24
 - CONCERNS: S2-T19, document 07 cards C14 and C41, ruling L-1724 item 1.
 - EVIDENCE: the task brief admits exact whole-property patterns only; invented-input tests establish exclusion accounting, not publisher meaning or real-cache counts.
 - NEEDED: share-field meaning unconfirmed; partial deals are re-admitted only by a later decision. The lead compares the real-cache counts with its trace after independent review.
 - NEEDED BY: any later admission of partial deals.
+
+## PO-S2-33-01 — A public name for the place-file column reader
+
+- ID: PO-S2-33-01
+- TYPE: PROPOSED (records point of S2-L4fx.rv1b)
+- RAISED BY: S2-L4fx.rv1b (Cognition Devin), 2026-11-24
+- CONCERNS: `scripts/review_place_keys.py` imports the underscore-private `_column_names` from `eii_custodian.publicdata.places.read`. This is reuse, not a copied block.
+- NEEDED: promote it to a public name in `read.py` when that module is next changed.
+- NEEDED BY: the next change of `places/read.py`.
+
+## PO-S2-33-02 — Rule 44 wording of the place-key helper changed at task level
+
+- ID: PO-S2-33-02
+- TYPE: PROPOSED (records point of S2-L4fx.rv1b, mirroring the builder's PO-S2-L4fx1-4)
+- RAISED BY: S2-L4fx.rv1b (Cognition Devin), 2026-11-24
+- CONCERNS: the rule 44 description of `scripts/review_place_keys.py` was changed by the task without a decision record.
+- NEEDED: the lead confirms that the change only describes the helper's existing lead-shell behaviour and needs no decision record, or writes one.
+- NEEDED BY: the S2 gate record.
+
+## PO-S2-33-03 — Landmark category tokens need a cited taxonomy
+
+- ID: PO-S2-33-03
+- TYPE: PROPOSED (records point of S2-L4fx.rv1b, mirroring the builder's PO-S2-L4fx1-2)
+- RAISED BY: S2-L4fx.rv1b (Cognition Devin), 2026-11-24
+- CONCERNS: `LANDMARK_CATEGORIES` tokens come from the lead's diagnosis and are not yet checked against the source's published category taxonomy. A missing real token fails closed.
+- NEEDED: check the tokens against the published taxonomy, with its citation.
+- NEEDED BY: the S2 gate record.
