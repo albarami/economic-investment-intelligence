@@ -63,7 +63,18 @@ def _producer(tmp_path: Path, row, raw: list[dict[str, object]], *, additional=(
     build = context(tmp_path, tuple(entries))
     build.review = tmp_path
     build.selected = selected
-    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.frame_result = FrameResult(
+        {
+            "grid_cell": [],
+            "district": [
+                {"district_key": "syn_north", "municipality_code": "syn_coast"},
+                {"district_key": "syn_inland", "municipality_code": "syn_inland"},
+                {"district_key": "syn_one", "municipality_code": "syn_coast"},
+            ],
+        },
+        [],
+        {},
+    )
     return build
 
 
@@ -282,8 +293,28 @@ def test_invalid_deal_among_valid_deals_is_excluded_with_exact_count(
     assert row["median_price_per_m2"] == Decimal("1000.00")
 
 
+def test_producer_checks_every_crosswalk_key_against_the_frame(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.frame.checks import FrameError
+
+    row = replace(
+        next(e for e in load_registry() if e.source_id == "prop_sales"),
+        key="prop_sales",
+    )
+    build = _producer(tmp_path, row, _rows("c14_worked_example.json"))
+    path = tmp_path / "district_crosswalk.csv"
+    path.write_text(
+        path.read_text(encoding="utf-8")
+        + "SYN Unused,syn_coast,ZZZ999999999,two_language_exact\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(FrameError, match=r"^district_crosswalk: outside_frame$"):
+        build.gis_property_singles()
+
+
 def test_unmatched_crosswalk_row_is_excluded_with_exact_count(tmp_path: Path) -> None:
-    parsed = _parse_export([_export(district_name="SYN Unmapped")], tmp_path)
+    parsed = _parse_export(
+        [_export(district_name="SYN Unmapped", sm_lmntq="SYN Unmapped AR")], tmp_path
+    )
     assert parsed.deals == ()
     assert _blocked(parsed, "unmatched_district") == 1
     assert sale_aggregates(parsed.deals) == ()

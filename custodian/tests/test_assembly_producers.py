@@ -314,9 +314,7 @@ def test_frame_keeps_stac_lineage_without_claiming_a_metadata_release_table(
         assert (row.key in build.table_sources["gazetteer"]) == (row.key in PARTS)
 
 
-def test_additions_runs_real_bulletin_and_indexes_its_written_table(
-    tmp_path: Path,
-) -> None:
+def _property_additions_build(tmp_path: Path):
     from custodian.tests import test_additions_property_venues as fixture
 
     row = fixture._entry("prop_resi_units")
@@ -328,12 +326,45 @@ def test_additions_runs_real_bulletin_and_indexes_its_written_table(
     build = context(cache, (row,))
     build.selected = {row.key: digest}
     build.review = review
+    build.frame_result = FrameResult(
+        {
+            "district": [
+                {"district_key": "syn_north", "municipality_code": "syn_coast"},
+                {"district_key": "syn_inland", "municipality_code": "syn_inland"},
+            ]
+        },
+        [],
+        {},
+    )
     build.reviewed_selections()
+    return build, review
+
+
+def test_additions_runs_real_bulletin_and_indexes_its_written_table(
+    tmp_path: Path,
+) -> None:
+    build, _ = _property_additions_build(tmp_path)
     build.additions()
     assert build.tables["pub_property_resi"][0]["median_price"] == 10
-    record = json.loads((cache / "assembly/additions.json").read_text())
+    record = json.loads((build.cache / "assembly/additions.json").read_text())
     assert record["tables"]["pub_property_resi"][0]["deal_count"] == 1
-    assert build.source_tables[row.key] == ["pub_property_resi"]
+    assert build.source_tables[build.entries[0].key] == ["pub_property_resi"]
+
+
+def test_additions_checks_unused_crosswalk_keys_against_the_frame(
+    tmp_path: Path,
+) -> None:
+    from eii_custodian.publicdata.frame.checks import FrameError
+
+    build, review = _property_additions_build(tmp_path)
+    path = review / "district_crosswalk.csv"
+    path.write_text(
+        path.read_text(encoding="utf-8")
+        + "SYN Unused,syn_coast,ZZZ999999999,two_language_exact\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(FrameError, match=r"^district_crosswalk: outside_frame$"):
+        build.additions()
 
 
 def test_fsq_reads_real_manifest_and_file_archive(tmp_path: Path) -> None:

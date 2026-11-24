@@ -691,6 +691,13 @@ class Production:
             for e in self.entries
             if e.source_id in ADDITION_FAMILIES and not e.skip_reason
         }
+        if any(
+            entry.source_id == "prop_resi_units" and entry.key in selected
+            for entry in self.entries
+        ):
+            from .assembly_layers import check_property_districts
+
+            check_property_districts(self)
         output = build_additions(
             self.cache,
             self.entries,

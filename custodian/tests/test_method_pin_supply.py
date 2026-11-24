@@ -104,7 +104,19 @@ def supplied_build(tmp_path):
     _stage_sources(build)
     _frame(review)
     shutil.copy(USE_MAP, review / "property_use_map.csv")
-    build.frame_result = FrameResult({"grid_cell": []}, [], {}, {})
+    build.frame_result = FrameResult(
+        {
+            "grid_cell": [],
+            "district": [
+                {"district_key": "syn_north", "municipality_code": "syn_coast"},
+                {"district_key": "syn_inland", "municipality_code": "syn_inland"},
+                {"district_key": "syn_one", "municipality_code": "syn_coast"},
+            ],
+        },
+        [],
+        {},
+        {},
+    )
     build.gis_property_singles()
     _write_basket(review)
     config = _generation_config()
@@ -254,6 +266,7 @@ def _generation_config():
     for year in ("2024", "2025"):
         config["pins"]["c14.medians_" + year] = {
             "crosswalk_name": "SYN North",
+            "municipality_code": "syn_coast",
             "period": year,
         }
     for pin in S7_DEFERRED_PINS:
@@ -350,6 +363,7 @@ def plain_cli(build, monkeypatch):
         actual.review = build.review
         actual.selected = build.selected
         actual.receipts = build.receipts
+        actual.frame_result = build.frame_result
         actual.tables = build.tables
         actual.table_sources = build.table_sources
         actual.method_pins()
