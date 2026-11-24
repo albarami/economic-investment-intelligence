@@ -18,10 +18,10 @@ Launch = Callable[[Sequence[str], Path, Mapping[str, str], float], "int | None"]
 
 
 def default_launch() -> Launch:
-    """The one child launch of this command, kept out of the command modules."""
-    from remote_check_browser import launch
+    """The one child launch of this command, in the process-control home."""
+    from operations.process import bounded_launch
 
-    return launch
+    return bounded_launch
 
 
 def browse(root: Path, environ: Mapping[str, str], host: str, launch: Launch) -> bytes:

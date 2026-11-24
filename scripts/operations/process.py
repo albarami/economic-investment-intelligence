@@ -1,4 +1,7 @@
-"""Owned detached process lifecycle. Database executables are never admitted."""
+"""Owned detached process lifecycle and the one bounded command child.
+
+Database executables are never admitted.
+"""
 
 from __future__ import annotations
 
@@ -155,6 +158,39 @@ def launch(
         child.terminate()
         child.wait(timeout=READY_SECONDS)
         raise
+
+
+def bounded_launch(
+    argv: Sequence[str], cwd: Path, env: Mapping[str, str], seconds: float
+) -> int | None:
+    """The one bounded child of ``./eii remote-check``: silent, closed.
+
+    The caller names the fixed argument list; nothing of the child's own
+    output is printed or kept. The child's exit code, or ``None`` when it was
+    stopped at its bound; a child that exits early or outlives its bound
+    leaves no process of its group running.
+    """
+    child = subprocess.Popen(
+        list(argv),
+        cwd=cwd,
+        env=dict(env),
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    try:
+        return child.wait(timeout=seconds)
+    except subprocess.TimeoutExpired:
+        return None
+    finally:
+        # The group, not the child: a child that exited early can still leave
+        # a descendant running under its session.
+        try:
+            os.killpg(child.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        child.wait()
 
 
 def terminate(record: Mapping[str, Any], environment: str) -> None:

@@ -29,14 +29,13 @@ from s3_t20_support import REMOTE, EntryCase, LiveState, Upstream, dead_port, re
 from s3_t28_support import IDENTITY, ROOT
 from test_s3_t28_controls import without_refusal
 
-import remote_check_browser
 from commands import remote_check as command
 from eii_core.reason_codes import CODES
-from operations import remote, remote_check
+from operations import process, remote, remote_check
 from operations.common import Refusal, encoded
 from operations.remote_check import Frames, Limits, Outcome
 
-REAL_LAUNCH = remote_check_browser.launch
+REAL_LAUNCH = process.bounded_launch
 DEFAULT_OPENER = remote_check.default_opener
 ANSWER = "0a1b2c3d-e4f5-4a6b-8c7d-9e0f1a2b3c4d"
 EVENTS = "/api/answers/" + ANSWER + "/events"
@@ -164,7 +163,7 @@ SEAMS = [
     for target in (
         "operations.remote_check.system_addresses",
         "operations.remote_check.default_opener",
-        "remote_check_browser.launch",
+        "operations.process.bounded_launch",
     )
 ]
 
@@ -974,6 +973,30 @@ class Browser(CheckCase):
         self.assertFalse(marker.exists(), "a process of the child outlived its bound")
         with self.assertRaises(FileNotFoundError):
             REAL_LAUNCH(("INVENTED-no-such-program",), self.root, env, 1)
+
+    def test_exited_parent_cannot_leave_a_descendant_running(self) -> None:
+        python = (sys.executable, "-I", "-B", "-c")
+        env = {"HOME": str(self.root)}
+        for code in (0, 3):
+            with self.subTest(exit=code):
+                marker = self.root / f"INVENTED-late-exit-{code}"
+                touch = (
+                    "import time, pathlib; time.sleep(0.6); "
+                    f"pathlib.Path({str(marker)!r}).touch()"
+                )
+                # The parent spawns a delayed child of its own and exits at once.
+                early = (
+                    "import subprocess; "
+                    f"subprocess.Popen([*{python!r}, {touch!r}], "
+                    "stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, "
+                    f"stderr=subprocess.DEVNULL); raise SystemExit({code})"
+                )
+                self.assertEqual(REAL_LAUNCH((*python, early), self.root, env, 5), code)
+                time.sleep(0.8)
+                self.assertFalse(
+                    marker.exists(),
+                    "a descendant of an exited parent outlived the bound",
+                )
 
 
 class ClosingLine(unittest.TestCase):
