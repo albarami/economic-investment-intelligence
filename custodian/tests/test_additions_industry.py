@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import csv
 from dataclasses import replace
 from decimal import ROUND_DOWN, Context, Decimal, localcontext
 from pathlib import Path
@@ -9,6 +10,8 @@ from pathlib import Path
 import duckdb
 import pytest
 import yaml
+from hypothesis import given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.additions.build import parsers
 from eii_custodian.publicdata.additions.common import (
@@ -17,6 +20,7 @@ from eii_custodian.publicdata.additions.common import (
     require_lineage,
 )
 from eii_custodian.publicdata.additions.industry import (
+    _crosswalk,
     parse_establishment_size,
     parse_logistics,
     parse_manufacturing,
@@ -886,7 +890,6 @@ def test_an_unknown_trade_breakdown_stops_and_a_null_is_not_a_blocked_row() -> N
 
 def test_country_crosswalk_is_an_exact_label_match() -> None:
     """A published label matches one reviewed row. A prefix, a case change and a near label do not."""
-    assert _map()["country_crosswalk"] == []
     parsed = parse_logistics(
         _entry("trade_logistics", CERTIFICATES),
         [_certificate("SYN Land", "Certificates of Origin", 6)],
@@ -916,8 +919,8 @@ def test_country_crosswalk_is_an_exact_label_match() -> None:
         assert caught.value.name == "country_unreviewed"
 
 
-def test_the_committed_crosswalk_has_no_row_and_stops_on_a_label() -> None:
-    """With the empty committed crosswalk, a country label stops the build by name."""
+def test_the_committed_crosswalk_stops_on_a_label_it_has_no_row_for() -> None:
+    """With the committed crosswalk, a label without a reviewed row stops by name."""
     with pytest.raises(AdditionError) as caught:
         parse_logistics(
             _entry("trade_logistics", CERTIFICATES),
@@ -927,6 +930,23 @@ def test_the_committed_crosswalk_has_no_row_and_stops_on_a_label() -> None:
             {},
         )
     assert caught.value.name == "country_unreviewed"
+
+
+def test_the_committed_crosswalk_loads_with_one_iso_code_per_label() -> None:
+    """Every committed row loads, no label repeats, and every code is in the ISO list."""
+    review = _map()
+    rows = review["country_crosswalk"]
+    assert isinstance(rows, list)
+    labels = [row["published_label"] for row in rows]
+    assert len(labels) == len(set(labels))
+    walk = _crosswalk(review)
+    assert len(walk) == len(rows)
+    with (REVIEW / "country_iso3.csv").open(encoding="utf-8", newline="") as stream:
+        iso = {row["iso3"] for row in csv.DictReader(stream)}
+    assert set(walk.values()) <= iso
+    regions = review["regions_not_countries"]
+    assert isinstance(regions, list)
+    assert not set(walk) & set(regions)
 
 
 def test_an_unpublished_certificate_type_is_omitted() -> None:
@@ -1003,6 +1023,150 @@ def test_previous_port_regions_are_not_written_as_iso_countries() -> None:
             {},
         )
     assert caught.value.name == "country_unreviewed"
+
+
+def _with_region(label: str) -> dict[str, object]:
+    review = _with_countries(WALK)
+    regions = review["regions_not_countries"]
+    assert isinstance(regions, list)
+    review["regions_not_countries"] = [*regions, label]
+    return review
+
+
+def test_a_listed_region_is_left_out_of_certificates_and_counted() -> None:
+    """A listed region is not an importing country. It is counted, not written."""
+    parsed = parse_logistics(
+        _entry("trade_logistics", CERTIFICATES),
+        [
+            _certificate("SYN Region", "Certificates of Origin", 3),
+            _certificate("SYN Land", "Certificates of Origin", 6),
+        ],
+        RECEIPT,
+        _with_region("SYN Region"),
+        {},
+    )
+    assert [row["breakdown_key"] for row in parsed.rows] == [
+        "certificate_type=Certificates of Origin|importing_country=SLL"
+    ]
+    assert _coverage(parsed, "region_not_country") == 1
+    assert parsed.questions == ()
+
+
+def test_a_listed_region_is_left_out_of_registration_and_counted() -> None:
+    """A listed region is not a country of registration. Its row is counted once."""
+    region = _hamad(oil_tankers=4)
+    region["country_of_registration"] = "SYN Region"
+    parsed = parse_logistics(
+        _entry("trade_logistics", HAMAD),
+        [region, _hamad(oil_tankers=4)],
+        RECEIPT,
+        _with_region("SYN Region"),
+        {},
+    )
+    assert len(parsed.rows) == 9
+    assert all("=SLL|" in str(row["breakdown_key"]) for row in parsed.rows)
+    assert _coverage(parsed, "region_not_country") == 1
+    assert parsed.questions == ()
+
+
+def test_an_unlisted_non_country_label_still_stops_each_parser() -> None:
+    """Only a listed region is skipped. A near or unlisted label stops by name."""
+    review = _with_region("SYN Region")
+    for label in ("SYN Elsewhere", "SYN Region ", "syn region", "SYN"):
+        with pytest.raises(AdditionError) as certificate:
+            parse_logistics(
+                _entry("trade_logistics", CERTIFICATES),
+                [_certificate(label, "Certificates of Origin", 3)],
+                RECEIPT,
+                review,
+                {},
+            )
+        assert certificate.value.name == "country_unreviewed"
+        row = _hamad()
+        row["country_of_registration"] = label
+        with pytest.raises(AdditionError) as registration:
+            parse_logistics(
+                _entry("trade_logistics", HAMAD), [row], RECEIPT, review, {}
+            )
+        assert registration.value.name == "country_unreviewed"
+
+
+def test_a_malformed_region_list_stops_certificates_and_registration() -> None:
+    """A region list that is not a list of text stops both parsers by name."""
+    for bad in (5, None, ["SYN Region", 7]):
+        review = _with_countries(WALK)
+        review["regions_not_countries"] = bad
+        with pytest.raises(AdditionError) as certificate:
+            parse_logistics(
+                _entry("trade_logistics", CERTIFICATES),
+                [_certificate("SYN Land", "Certificates of Origin", 3)],
+                RECEIPT,
+                review,
+                {},
+            )
+        assert certificate.value.name == "field_map_unreadable"
+        with pytest.raises(AdditionError) as registration:
+            parse_logistics(
+                _entry("trade_logistics", HAMAD), [_hamad()], RECEIPT, review, {}
+            )
+        assert registration.value.name == "field_map_unreadable"
+
+
+def test_the_committed_registration_group_label_is_a_listed_region() -> None:
+    """The published group label of the registration file is skipped, not mapped."""
+    review = _map()
+    regions = review["regions_not_countries"]
+    assert isinstance(regions, list)
+    assert "OTHER EUROPEAN COUNTRIES" in regions
+    row = _hamad(oil_tankers=4)
+    row["country_of_registration"] = "OTHER EUROPEAN COUNTRIES"
+    parsed = parse_logistics(
+        _entry("trade_logistics", HAMAD), [row], RECEIPT, review, {}
+    )
+    assert parsed.rows == ()
+    assert _coverage(parsed, "region_not_country") == 1
+
+
+_LABEL_MAP = _map()
+_LABEL_ENTRIES = {
+    slug: _entry("trade_logistics", slug) for slug in (CERTIFICATES, HAMAD)
+}
+
+
+@given(
+    label=st.text(min_size=1, max_size=12),
+    listed=st.booleans(),
+    mapped=st.booleans(),
+    layout=st.sampled_from((CERTIFICATES, HAMAD)),
+)
+def test_a_label_is_skipped_only_when_listed_and_mapped_only_by_exact_row(
+    label: str, listed: bool, mapped: bool, layout: str
+) -> None:
+    """Over any label: listed is skipped, else an exact row maps it, else it stops."""
+    review = dict(_LABEL_MAP)
+    review["regions_not_countries"] = [label] if listed else []
+    review["country_crosswalk"] = (
+        [{"published_label": label, "iso3": "SLL"}] if mapped else []
+    )
+    if layout == CERTIFICATES:
+        row = _certificate(label, "Certificates of Origin", 3)
+    else:
+        row = _hamad(oil_tankers=4)
+        row["country_of_registration"] = label
+    entry = _LABEL_ENTRIES[layout]
+    if not listed and not mapped:
+        with pytest.raises(AdditionError) as caught:
+            parse_logistics(entry, [row], RECEIPT, review, {})
+        assert caught.value.name == "country_unreviewed"
+        return
+    parsed = parse_logistics(entry, [row], RECEIPT, review, {})
+    if listed:
+        assert parsed.rows == ()
+        assert _coverage(parsed, "region_not_country") == 1
+    else:
+        assert parsed.rows
+        assert all("SLL" in str(item["breakdown_key"]) for item in parsed.rows)
+        assert _coverage(parsed, "region_not_country") == 0
 
 
 def test_an_unknown_vessel_indicator_stops() -> None:

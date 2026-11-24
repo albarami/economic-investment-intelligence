@@ -142,7 +142,7 @@ def parse_logistics(
     if layout == "vessels":
         return _vessels(entry, raw, receipt, spec, review, walk)
     if layout == "wide":
-        return _wide(entry, raw, receipt, spec, walk)
+        return _wide(entry, raw, receipt, spec, review, walk)
     raise AdditionError("slug_unmapped")
 
 
@@ -368,6 +368,7 @@ def _certificates(
     allowed = _string_set(spec.get("fields"))
     unpublished = _string_set(review.get("certificate_types_unpublished"))
     kinds = _string_set(review.get("certificate_types"))
+    regions = _string_set(review.get("regions_not_countries"))
     counts: dict[str, int] = {}
     rows: list[dict[str, object]] = []
     for source in raw:
@@ -388,7 +389,11 @@ def _certificates(
             _add(counts, "certificate_type_unpublished")
             continue
         kind = require_closed(kind, kinds, "unknown_certificate_type")
-        country = _country(_text(source, _name(spec, "country_field")), walk)
+        label = _text(source, _name(spec, "country_field"))
+        if label in regions:
+            _add(counts, "region_not_country")
+            continue
+        country = _country(label, walk)
         rows.append(
             _attach(
                 entry,
@@ -471,16 +476,22 @@ def _wide(
     raw: list[dict[str, object]],
     receipt: Mapping[str, object],
     spec: Mapping[str, object],
+    review: Mapping[str, object],
     walk: Mapping[str, str],
 ) -> FamilyParse:
     allowed = _string_set(spec.get("fields"))
     columns = tuple(sorted(_string_set(spec.get("columns"))))
+    regions = _string_set(review.get("regions_not_countries"))
     counts: dict[str, int] = {}
     rows: list[dict[str, object]] = []
     for source in raw:
         _own_fields(source, allowed)
         period = parse_period_value(source.get("year"), "year_text")
-        country = _country(_text(source, _name(spec, "country_field")), walk)
+        label = _text(source, _name(spec, "country_field"))
+        if label in regions:
+            _add(counts, "region_not_country")
+            continue
+        country = _country(label, walk)
         indicator = _mapped(
             _text(source, "number_tonnage"), spec.get("indicators"), "unknown_indicator"
         )
