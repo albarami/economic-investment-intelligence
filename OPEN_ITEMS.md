@@ -7052,3 +7052,12 @@ run remain pending.
 - NEEDED BY: before S2-P93 joins a train.
 - ANSWER (lead, 2026-11-24, ruling L-1784): the 460 and 490 seconds, the 510.5 seconds and the two timeouts were measured on the slice S6 stacks, where `product/tests` holds 3706 tests (S6-T18rc2 and S6-T13rc2 product runs; whole test S6-3.wt1). The lead's brief gave them as main's figures by mistake. Decision 0109 is Accepted with that Context; the split lands with slice S2 as shared infrastructure the later slices are re-cut onto.
 - STATUS: answered.
+
+## OI-415 — Venue identity across renamed or footnoted museum names
+
+- ID: OI-415
+- TYPE: OPEN (slice S2)
+- RAISED BY: S2-N02.rv1 (OpenAI), 2026-11-25; ruled by the lead (L-1864)
+- CONCERNS: `custodian/publicdata/review/venue_crosswalk.csv` gives each connected component of exact bilingual source spellings its own venue key. Six sets of keys may name one venue across years, but no receipted source states that identity, so none is merged on spelling, the trailing asterisk included: `venue:visits_museum:3`, `:4` and `:5`; `:21` and `:22`; `:1`, `:2` and `:27`; `:6`, `:30` and `:31`; `:17` and `:18`; `:12` and `:13`. Every published name resolves to a key. Only the joining of one venue's series across a rename waits.
+- NEEDED: a source statement of each set's identity (the source's footnote meaning, or a published rename), then a decision record that merges a confirmed set under one key and keeps the others separate with the source's distinction.
+- NEEDED BY: none before go-live; the joined series is an enhancement.
