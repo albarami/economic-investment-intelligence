@@ -167,10 +167,17 @@ def workbook(*, both_row=8, plant=""):
             del cells[ref]
     elif plant.startswith("count_"):
         _, scope, kind = plant.split("_")
-        delta = D("-4" if kind == "negative" else "0.5")
+        delta = (
+            D("-4")
+            if kind == "negative"
+            else D("-0.5" if scope in {"female", "activity21"} else "0.5")
+        )
+        # Fractional transfers must not also make a count negative. The first
+        # two female activities have no Non-Profit counts; balance in Household.
+        balancing_column = "I" if (scope, kind) == ("activity42", "fraction") else "D"
 
         def transfer(number, amount):
-            for column, change in (("C", amount), ("D", -amount)):
+            for column, change in (("C", amount), (balancing_column, -amount)):
                 ref = f"{column}{number}"
                 cells[ref] = str(D(cells[ref]) + change)
 
@@ -248,19 +255,40 @@ def workbook(*, both_row=8, plant=""):
     return output.getvalue()
 
 
-def zones(null_field="Private"):
+def zones(null_field="Private", *, mixed=0):
     result = []
     source = "census_zone_sector"
-    for zone, private in ((101, 10), (102, 20), (103, 15)):
+    for zone, private, mixed_count in ((101, 10, mixed), (102, 20, 0), (103, 15, 0)):
         attrs = {
             name: "INVENTED" if kinds == (str,) else 0
             for name, kinds in SCHEMAS[source].items()
         }
-        attrs.update(ZONE_NO=zone, Private=private, Government=30 - private)
+        attrs.update(
+            ZONE_NO=zone,
+            Private=private,
+            Mixed=mixed_count,
+            Government=30 - private - mixed_count,
+        )
         attrs[COUNTS[source][0]] = 30
         result.append({"attributes": attrs, "geometry": {"rings": []}})
     result[-1]["attributes"][null_field] = None
     return {"count": len(result), "features": result}
+
+
+@given(st.integers(min_value=0, max_value=20))
+def test_c8_zone_nonprivate_parameter_preserves_valid_counts(mixed):
+    baseline = zones()
+    payload = zones(mixed=mixed)
+    attrs = payload["features"][0]["attributes"]
+    original = baseline["features"][0]["attributes"]
+    fields = COUNTS["census_zone_sector"]
+    assert attrs["Mixed"] == mixed
+    assert sum(Fraction(attrs[field]) for field in fields[1:]) == attrs[fields[0]]
+    assert all(attrs[field] >= 0 for field in fields)
+    assert attrs[fields[0]] > 0
+    assert attrs["Private"] == original["Private"] <= attrs[fields[0]]
+    assert attrs[fields[0]] == original[fields[0]]
+    assert payload["features"][1:] == baseline["features"][1:]
 
 
 def write_source(cache, key, body):
@@ -292,9 +320,16 @@ def invented_cache(
         for field in ("Private", "Government", COUNTS["census_zone_sector"][0]):
             payload["features"][0]["attributes"][field] = 0
     elif plant == "zone_negative":
+        payload = zones(null_field, mixed=-1)
         attrs = payload["features"][0]["attributes"]
-        attrs["Government"] = -1
-        attrs["Private"] += 21
+        fields = COUNTS["census_zone_sector"]
+        assert sum(attrs[field] for field in fields[1:]) == attrs[fields[0]]
+        assert attrs[fields[0]] > 0
+        assert 0 <= attrs["Private"] <= attrs[fields[0]]
+        baseline = zones(null_field)["features"][0]["attributes"]
+        assert attrs["Private"] == baseline["Private"]
+        assert attrs[fields[0]] == baseline[fields[0]]
+        assert all(attrs[field] >= 0 for field in fields if field != "Mixed")
     elif plant == "zone_empty":
         payload = {"count": 0, "features": []}
     elif plant == "zone_duplicate_key":
@@ -574,6 +609,19 @@ def test_c8_counts_are_nonnegative_whole_numbers(
 ):
     plant = f"count_{scope}_{kind}"
     assert _fixture_equalities(plant) == (True, True, True)
+    sheet = read_sheet(workbook(plant=plant), "76", cached_formulas=True)
+    values = [
+        Fraction(sheet.cells[f"{column}{row}"])
+        for start in (8, 29, 50)
+        for row in range(start, start + 21)
+        for column in "CDEFGHIJ"
+    ]
+    if kind == "negative":
+        assert any(value < 0 for value in values)
+        assert all(value.denominator == 1 for value in values)
+    else:
+        assert all(value >= 0 for value in values)
+        assert any(value.denominator != 1 for value in values)
     assert_c8_closed(tmp_path, {"plant": plant}, reason)
 
 
