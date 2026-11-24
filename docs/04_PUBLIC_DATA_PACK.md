@@ -1416,9 +1416,10 @@ basis of use under [decision 0026](decisions/0026-public-sources-used-in-full-lo
 
 `investment_pages.v2` declares each agency page's language and its extraction bounds.
 The inventory lists the English pages, confirmed by the lead, and the Arabic pages at the
-site's own Arabic language path, one for each English page; the Arabic list stays unconfirmed
-(every `language_confirmation.ar` field false) until the lead's reading date, confirmed shapes
-and live comparison under decision 0064 item 32 and OI-181. No Arabic bound, shape or
+site's own Arabic language path, one for each English page. The Arabic `language_confirmation.ar` block records the
+inventory and the fixture comparison with the lead's reading date; its field coverage and live
+comparison flags stay false while a listed page has no stored row because the release check of
+decision 0029 item 5 refuses it (OI-414), under decision 0064 item 32 and OI-181. No Arabic bound, shape or
 confirmation is inferred from an English page, and a listed page whose language path segment
 differs from its declared language is refused (`page_language`). The gate requires
 separate Arabic evidence covering every page family. Offline invented bilingual fixtures
@@ -1432,7 +1433,11 @@ cache index and are never used to reconstruct a complete quotation. This acquisi
 interface supplies no screen-delivery proof and adds no release column: the
 `pub_investqa_record` release columns and DAT-143 remain unchanged until part B after
 accepted decision record 0029. Only the agency envelope uses `AGENCY_PARSER_VERSION`;
-the dashboard and milestone parser versions remain unchanged.
+the dashboard and milestone parser versions remain unchanged. Under ruling L-1856,
+extractor `investqa_page_text@2` reads a `button` inside a heading and outside any
+`form` as heading text — an ASSUMPTION that decision 0029 item 2's "form controls"
+are the controls of a form, recorded here pending the reviewer's judgment on whether
+it needs its own record.
 
 `review/fdi_crosswalks.yaml` is the committed empty review template. Invented crosswalks
 in parser tests establish mechanics only. The lead supplies real mappings from the selected

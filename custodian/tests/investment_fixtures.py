@@ -665,3 +665,25 @@ def quotation_page(language: str = "en", extra: str = "") -> bytes:
         "<form><label>Excluded form</label></form><!-- Excluded comment -->"
         f"{extra}</main></body></html>"
     ).encode()
+
+
+def furniture_div_page() -> bytes:
+    """A furniture class on a div, and on a section for contrast."""
+    return quotation_page(
+        extra='<div class="whatsHappening">Invented developments</div>'
+        '<section class="whatsHappening">Invented section furniture</section>'
+    )
+
+
+def heading_button_page() -> bytes:
+    """A button inside a heading outside any form, and two control buttons."""
+    return quotation_page(
+        extra='<h2><button class="collapse-title">Invented chapter</button></h2>'
+        "<div><button>Invented control</button></div>"
+        "<form><h2><button>Invented form control</button></h2></form>"
+    )
+
+
+def inline_point_page() -> bytes:
+    """An inline element's end directly followed by a full stop."""
+    return quotation_page(extra='<p>Invented <a href="/invented-here">here</a>.</p>')

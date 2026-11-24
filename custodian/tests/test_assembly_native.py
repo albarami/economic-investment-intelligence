@@ -288,7 +288,7 @@ def test_agency_selected_release_writes_both_languages_and_inventory(
     assert len(expected) == 10
     assert {item["page_language"] for item in expected} == {"en", "ar"}
     assert table["schema_version"] == "pub_investqa_record.v1"
-    assert all(item["extractor"] == "investqa_page_text@1" for item in expected)
+    assert all(item["extractor"] == "investqa_page_text@2" for item in expected)
     # Publish changed bytes but keep the earlier explicit reviewed selection.
     from custodian.tests import test_investment_build as fixture
     from custodian.tests.test_investment_bilingual import bilingual

@@ -3,9 +3,9 @@
 OI-181 offline part: the inventory's ``ar`` entries mirror the confirmed
 ``en`` list through the site's own language path segment, each language
 covers every page family, and the same kind rules parse and refuse the
-invented Arabic pages of the same shape. The live comparison through the
-normal seam is the lead's later run: every ``language_confirmation.ar``
-flag stands false until it.
+invented Arabic pages of the same shape. The live read of the real
+copies (2026-11-24, ruling L-1861) set the ``language_confirmation.ar``
+fields it supports; the two flags whose pages have no row stay false.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ import yaml
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.fetch.registry import read_yaml
-from eii_custodian.publicdata.gate_report import INVESTMENT_FLAGS, investment_evidence
+from eii_custodian.publicdata.gate_report import investment_evidence
 from eii_custodian.publicdata.investment_build import (
     PageSpec,
     SourceSpec,
@@ -143,16 +143,29 @@ def test_each_language_covers_every_page_family(language: str) -> None:
     assert require_page_families(kinds, _envelope(LANDING_URL)) is None
 
 
-def test_arabic_evidence_flags_stay_pending_until_the_live_read() -> None:
-    """The live comparison is the lead's later run; no flag is ticked offline."""
+def test_arabic_evidence_flags_record_the_live_read() -> None:
+    """The 2026-11-24 read supports two flags; two stay pending, each by name.
+
+    Ruling L-1861: ``inventory_recorded`` and ``fixture_comparison_recorded``
+    are set on the re-run evidence over the 27 real Arabic copies.
+    ``field_coverage_recorded`` and ``live_page_compared`` stay false because
+    ar15 and ar18 have no ``pub_investqa_page`` row — the release check of
+    decision 0029 item 5 refuses their genuine page text
+    (``page_contact_shape``) — so the gate check stays pending.
+    """
     root = repository_root(Path(__file__))
     document = read_yaml(root / "custodian" / "publicdata" / "investment_pages.yaml")
     agency = document["sources"]["investqa_pages"]
     arabic = agency["language_confirmation"]["ar"]
-    for flag in INVESTMENT_FLAGS:
-        assert arabic[flag] is False
-    assert arabic["read_on"] is None
-    assert arabic["reference"] is None
+    assert arabic["inventory_recorded"] is True
+    assert arabic["fixture_comparison_recorded"] is True
+    assert arabic["field_coverage_recorded"] is False
+    assert arabic["live_page_compared"] is False
+    assert arabic["read_on"] == "2026-11-24"
+    assert (
+        arabic["reference"]
+        == "PROGRESS.md S2-P100 Arabic page evidence (S2-T39 box 1; OI-181)"
+    )
     result = investment_evidence(document, "invented-review")
     assert result.checks["investqa_pages:arabic_evidence"] is False
 

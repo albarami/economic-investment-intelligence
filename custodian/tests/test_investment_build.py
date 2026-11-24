@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.repository_root import repository_root
+from hypothesis import given
+from hypothesis import strategies as st
 
 from check_tree import DATA_PROBES
 from eii_custodian.publicdata.fetch.cadence import Cadence
@@ -1297,7 +1299,7 @@ def test_page_text_determinism_and_bilingual_roundtrip(language):
     assert first == second
     assert json.loads(json.dumps(first, ensure_ascii=True)) == first
     assert first["page_text"].encode() == second["page_text"].encode()
-    assert first["extractor"] == "investqa_page_text@1"
+    assert first["extractor"] == "investqa_page_text@2"
     assert first["page_key"] == "en_invented_page"
     assert set(first) == {
         "page_key",
@@ -1322,6 +1324,74 @@ def test_page_text_determinism_and_bilingual_roundtrip(language):
     changed = _quotation_row(reordered, language)
     assert not isinstance(changed, InvestmentFailure)
     assert changed["page_text"] != first["page_text"]
+
+
+def test_page_text_keeps_a_furniture_class_on_a_div_not_a_section():
+    """A furniture class gates a section only, as the record reader applies it."""
+    row = _quotation_row(
+        _fixtures.furniture_div_page(), furniture=frozenset({"whatsHappening"})
+    )
+    assert not isinstance(row, InvestmentFailure), row
+    assert "Invented developments" in row["page_text"]
+    assert "Invented section furniture" not in row["page_text"]
+
+
+def test_page_text_reads_a_button_inside_a_heading_only():
+    """A button inside a heading outside any form is heading text; a control is not."""
+    row = _quotation_row(_fixtures.heading_button_page())
+    assert not isinstance(row, InvestmentFailure), row
+    assert "Invented chapter" in row["page_text"]
+    assert "Invented control" not in row["page_text"]
+    assert "Invented form control" not in row["page_text"]
+
+
+def test_page_text_adds_no_space_before_punctuation():
+    """A line's raw text collapses before trimming: no space is added or lost."""
+    row = _quotation_row(_fixtures.inline_point_page())
+    assert not isinstance(row, InvestmentFailure), row
+    assert "Invented here." in row["page_text"]
+    assert "Invented here ." not in row["page_text"]
+
+
+_SAFE_TEXT = st.text(
+    alphabet=st.characters(
+        whitelist_categories=("Ll", "Lo", "Lm", "Zs"),
+        whitelist_characters=".,;:!?'()[]،؛؟-/ ",
+    ),
+    max_size=60,
+).filter(lambda s: "canary" not in s.lower() and "syn-" not in s.lower())
+
+
+def _line_oracle(text: str) -> str:
+    import re
+    import unicodedata
+
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFC", text)).strip()
+
+
+@given(
+    paragraphs=st.lists(_SAFE_TEXT, max_size=6),
+    inline=st.lists(_SAFE_TEXT, min_size=1, max_size=6),
+)
+def test_page_text_property_keeps_every_visible_character(paragraphs, inline):
+    """Whole input domain: @2 adds, loses and reorders no visible character."""
+    import html as html_lib
+
+    parts = [f"<p>{html_lib.escape(t)}</p>" for t in paragraphs]
+    fused = "".join(
+        html_lib.escape(t) if i % 2 else f"<a href='/i{i}'>{html_lib.escape(t)}</a>"
+        for i, t in enumerate(inline)
+    )
+    parts.append(f"<p>{fused}</p>")
+    row = _quotation_row(_fixtures.quotation_page(extra="".join(parts)))
+    assert not isinstance(row, InvestmentFailure), row
+    expected = [line for line in (_line_oracle(t) for t in paragraphs) if line]
+    fused_line = _line_oracle("".join(inline))
+    if fused_line:
+        expected.append(fused_line)
+    lines = row["page_text"].split("\n")
+    if expected:
+        assert lines[-len(expected) :] == expected
 
 
 @pytest.mark.parametrize(

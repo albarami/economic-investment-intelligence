@@ -683,7 +683,7 @@ def period_is_future(period: str, retrieved_utc: str) -> bool:
 
 # Decision 0029 appendix item 2, plus the common Public source-registry key.
 # L-1157: the record schema remains v1; this is the extraction's version.
-PAGE_EXTRACTOR = "investqa_page_text@1"
+PAGE_EXTRACTOR = "investqa_page_text@2"
 PAGE_COLUMNS = frozenset(
     {
         "page_key",

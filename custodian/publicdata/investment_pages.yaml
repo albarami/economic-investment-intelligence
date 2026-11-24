@@ -82,13 +82,18 @@ sources:
   investqa_pages:
     # The Arabic page list stands below; its reading evidence is the lead's.
     language_confirmation:
+      # Live read of the 27 real copies on 2026-11-24 under ruling L-1861:
+      # inventory and fixture comparison are supported; field coverage and the
+      # live-page comparison stay false because ar15 and ar18 have no
+      # pub_investqa_page row — the release check of decision 0029 item 5
+      # refuses their genuine page text (page_contact_shape).
       ar:
-        inventory_recorded: false
+        inventory_recorded: true
         field_coverage_recorded: false
-        fixture_comparison_recorded: false
+        fixture_comparison_recorded: true
         live_page_compared: false
-        read_on: null
-        reference: null
+        read_on: "2026-11-24"
+        reference: "PROGRESS.md S2-P100 Arabic page evidence (S2-T39 box 1; OI-181)"
     confirmed: true
     snapshot_identity: aggregate_manifest
     row_count_min: 20
