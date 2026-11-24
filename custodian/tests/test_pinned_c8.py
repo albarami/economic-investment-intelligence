@@ -347,13 +347,10 @@ def _c8_wrong_value(original, slot):
 def plant_c8(methods_module, cache, config):
     """Build an invented cache and plant exactly one named C8 failure."""
     kind = config.get("kind", "pass")
-    if kind in {"source_invalid", "spine_refused", "receipt_hash_mismatch"}:
+    if kind in {"source_invalid", "spine_refused"}:
         error = {
             "source_invalid": KeyError(str(SENTINEL)),
             "spine_refused": SpineError(f"INVENTED {SENTINEL}"),
-            "receipt_hash_mismatch": ValueError(
-                "receipt_hash_mismatch:census_2020_workbook"
-            ),
         }[kind]
         methods_module._cache.pinned_body = _c8_raiser(error)
         return
@@ -395,7 +392,7 @@ def plant_c8(methods_module, cache, config):
                 "share_range",
                 lambda values: (min(values), D(SENTINEL)),
             )
-    elif kind in {"pin", "bytes", "receipt"}:
+    elif kind in {"pin", "bytes", "receipt", "snapshot", "index", "path"}:
         key = config["key"]
         digest = pins[key]
         if kind == "pin":
@@ -404,11 +401,22 @@ def plant_c8(methods_module, cache, config):
         elif kind == "bytes":
             extension = "xlsx" if key == "census_2020_workbook" else "json"
             (cache / key / f"{digest}.{extension}").write_bytes(b"INVENTED wrong bytes")
-        else:
+        elif kind == "receipt":
             path = cache / key / f"{digest}.meta.json"
             receipt = json.loads(path.read_text())
             receipt["source_id"] = "est_census"
             path.write_text(json.dumps(receipt))
+        else:
+            index_path = cache / key / "index" / f"{digest}.json"
+            if kind == "index":
+                index_path.unlink()
+            elif kind == "path":
+                index = json.loads(index_path.read_text())
+                index["path"] = "INVENTED invalid path"
+                index_path.write_text(json.dumps(index))
+            else:
+                index = json.loads(index_path.read_text())
+                (cache / key / index["path"]).unlink()
 
 
 def assert_c8_closed(tmp_path, config, reason):
@@ -691,9 +699,18 @@ def test_c8_planted_wrong_calculated_value_fails(tmp_path, slot):
 
 
 @pytest.mark.parametrize("key", ["census_zone_sector", "census_2020_workbook"])
-@pytest.mark.parametrize("plant", ["pin", "bytes", "receipt"])
+@pytest.mark.parametrize(
+    "plant", ["pin", "bytes", "receipt", "snapshot", "index", "path"]
+)
 def test_c8_each_pin_and_receipt_is_required(tmp_path, key, plant):
-    reason = "public_cache_missing" if plant == "pin" else "source_invalid"
+    reason = {
+        "pin": "public_cache_missing",
+        "bytes": "receipt_hash_mismatch",
+        "receipt": "receipt_hash_mismatch",
+        "snapshot": "public_cache_missing",
+        "index": "public_cache_missing",
+        "path": "public_cache_missing",
+    }.get(plant, "source_invalid")
     assert_c8_closed(tmp_path, {"kind": plant, "key": key}, reason)
 
 
@@ -707,7 +724,6 @@ def test_c8_case_passes_on_invented_child_setup(tmp_path):
     [
         ("source_invalid", "source_invalid"),
         ("spine_refused", "spine_refused"),
-        ("receipt_hash_mismatch", "receipt_hash_mismatch"),
     ],
 )
 def test_c8_unexpected_and_cache_errors_are_closed(tmp_path, kind, reason):
@@ -715,10 +731,13 @@ def test_c8_unexpected_and_cache_errors_are_closed(tmp_path, kind, reason):
 
 
 @given(
-    st.text(),
+    st.data(),
     st.sampled_from([ValueError, KeyError, TypeError, SpineError, AssertionError]),
 )
-def test_c8_reason_map_is_closed(message, kind):
+def test_c8_reason_map_is_closed(data, kind):
+    message = data.draw(
+        st.one_of(st.sampled_from(sorted(methods.C8_REASONS)), st.text())
+    )
     reason = methods.closed_reason(kind(message), methods.C8_REASONS)
     admitted = methods.C8_REASONS.get(message)
     if kind is SpineError:

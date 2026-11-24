@@ -7,7 +7,15 @@ from types import SimpleNamespace
 
 import pytest
 from custodian.data_tests import test_pinned_methods as methods
-from custodian.tests.test_pinned_wilson import CHILD, SENTINEL, summary
+from custodian.tests.test_pinned_wilson import (
+    CHILD,
+    ONE_MATCH,
+    SENTINEL,
+    SHAMAL,
+    active_rows,
+    cancelled_rows,
+    summary,
+)
 from custodian.tests.test_restricted_expectation_guards import child_run
 from hypothesis import given
 from hypothesis import strategies as st
@@ -38,6 +46,14 @@ C3_OCC_EXPECTED = {
     "fixed_composition_percent": "1.0",
 }
 C3_ACT_EXPECTED = {"change": "673", "mix": "572"}
+C5_HEADINGS = (
+    ("1902", "Italy", "8.69"),
+    ("1902", "Saudi Arabia", "11.45"),
+    ("0406", "Italy", "40.61"),
+    ("0406", "Denmark", "26.06"),
+    ("1509", "Italy", "30.60"),
+    ("1509", "Lebanon", "19.26"),
+)
 CASE_SOURCES = {
     "C1": "lic_active",
     "C3": "wage_occ",
@@ -89,11 +105,63 @@ CASE_REASONS = {
         "geography_mismatch",
     ),
 }
+SPLIT_PLANTS = {
+    ("C9", "momentum_mismatch"): (
+        "momentum_national",
+        "momentum_zone69",
+        "momentum_ranked",
+    ),
+    ("C9", "zero_zone_mismatch"): (
+        "zero_zone_ratio",
+        "zero_zone_ranked_ratio",
+        "zero_zone_relative",
+        "zero_zone_ratio_unrounded",
+        "zero_zone_ranked_unrounded",
+        "zero_zone_order",
+    ),
+    ("C2-NATIONAL", "totals_mismatch"): (
+        "totals_dated",
+        "totals_undated",
+        "totals_result_undated",
+    ),
+    ("C2-NATIONAL", "bulk_month_mismatch"): tuple(
+        f"bulk_month_{part}_{month.replace('-', '_')}"
+        for month in ("2020-07", "2022-06", "2024-09")
+        for part in ("missing", "count")
+    ),
+    ("C2-NATIONAL", "bulk_share_mismatch"): (
+        "bulk_share_named",
+        "bulk_share_result",
+    ),
+    ("C2-MUNICIPAL", "stock_mismatch"): (
+        "stock_return",
+        "stock_active_count",
+    ),
+    ("C2-MUNICIPAL", "excluding_mismatch"): (
+        "excluding_exact",
+        "excluding_value",
+    ),
+    ("C2-MUNICIPAL", "geography_mismatch"): (
+        "geography_local",
+        "geography_national",
+    ),
+}
 NEGATIVE_CASES = [
     (case, kind, reason)
     for case, kinds in CASE_REASONS.items()
     for kind in kinds
     for reason in (kind,)
+    if (case, kind) not in SPLIT_PLANTS
+    and (case, kind) != ("C5", "unit_value_mismatch")
+]
+NEGATIVE_CASES += [
+    (case, plant, reason)
+    for (case, reason), plants in SPLIT_PLANTS.items()
+    for plant in plants
+]
+NEGATIVE_CASES += [
+    ("C5", f"unit_value_mismatch:{heading}:{origin}", "unit_value_mismatch")
+    for heading, origin, _ in C5_HEADINGS
 ]
 NEGATIVE_CASES += [
     (case, kind, kind)
@@ -300,16 +368,9 @@ def plant_c4(methods_module, kind):
 
 def plant_c5(methods_module, kind):
     methods_module.pinned = lambda _source: ([], CHAIN)
-    calls = iter(
-        (
-            "total",
-            ("1902", "Italy", "8.69"),
-            ("1902", "Saudi Arabia", "11.45"),
-            ("0406", "Italy", "40.61"),
-            ("0406", "Denmark", "26.06"),
-            ("1509", "Italy", "30.60"),
-            ("1509", "Lebanon", "19.26"),
-        )
+    calls = iter(("total", *C5_HEADINGS))
+    planted = (
+        tuple(kind.split(":", 2)[1:]) if kind.startswith("unit_value_mismatch:") else ()
     )
 
     def metrics(*_args, **_kwargs):
@@ -317,12 +378,8 @@ def plant_c5(methods_module, kind):
         if selected == "total":
             exact = D(SENTINEL) if kind == "total_mismatch" else D("138530000000")
             return {"total_value": SimpleNamespace(exact_unrounded=exact)}
-        _, origin, expected = selected
-        value = (
-            SENTINEL
-            if kind == "unit_value_mismatch" and origin == "Italy"
-            else expected
-        )
+        heading, origin, expected = selected
+        value = SENTINEL if planted == (heading, origin) else expected
         return {"origins": {origin: {"unit_value": fact(value)}}}
 
     methods_module.supplier_metrics = metrics
@@ -345,13 +402,28 @@ def c9_result(kind):
         "ratio_unrounded": None,
         "ranked_unrounded": False,
     }
-    if kind == "zero_zone_mismatch":
-        zones["0"]["ratio"] = fact(SENTINEL)
+    if kind == "momentum_zone69":
+        zones["69"]["ratio"] = fact(SENTINEL)
+    if kind == "momentum_ranked":
+        zones["72"]["ranked_ratio"] = fact(SENTINEL)
+    zero_slot = {
+        "zero_zone_ratio": "ratio",
+        "zero_zone_ranked_ratio": "ranked_ratio",
+        "zero_zone_relative": "relative",
+    }.get(kind)
+    if zero_slot is not None:
+        zones["0"][zero_slot] = fact(SENTINEL)
+    if kind == "zero_zone_ratio_unrounded":
+        zones["0"]["ratio_unrounded"] = D(SENTINEL)
+    if kind == "zero_zone_ranked_unrounded":
+        zones["0"]["ranked_unrounded"] = True
     order = ("2", "72", "29", "69")
     if kind == "order_mismatch":
         order = (str(SENTINEL), "72", "29", "69")
+    if kind == "zero_zone_order":
+        order = (*order, "0")
     return {
-        "national_ratio": fact(SENTINEL if kind == "momentum_mismatch" else "1.34"),
+        "national_ratio": fact(SENTINEL if kind == "momentum_national" else "1.34"),
         "zones": zones,
         "order_unrounded": order,
     }
@@ -373,21 +445,28 @@ def plant_c9(methods_module, kind):
 def plant_c2_national(methods_module, kind):
     methods_module.pinned = lambda _source: ([], CHAIN)
     counts = {"2020-07": D(40791), "2022-06": D(14212), "2024-09": D(11232)}
-    dated = D(SENTINEL) if kind == "totals_mismatch" else D(153669)
-    methods_module.c2_national_totals = lambda *_args: (counts, dated, D(7386), {})
+    dated = D(SENTINEL) if kind == "totals_dated" else D(153669)
+    undated = D(SENTINEL) if kind == "totals_undated" else D(7386)
+    methods_module.c2_national_totals = lambda *_args: (counts, dated, undated, {})
     if kind == "month_outside_calendar":
         methods_module.licence_churn = raiser(ValueError("month outside calendar"))
         return
     bulk = list(methods.EXPECTED_C2_BULK_MONTHS)
-    if kind == "bulk_month_mismatch":
-        bulk.remove("2020-07")
+    if kind.startswith("bulk_month_"):
+        part, year, month = kind.removeprefix("bulk_month_").rsplit("_", 2)
+        period = f"{year}-{month}"
+        if part == "missing":
+            bulk.remove(period)
+        else:
+            counts[period] = D(SENTINEL)
     if kind == "bulk_order_mismatch":
         bulk.reverse()
+    if kind == "bulk_share_named":
+        methods_module.rounded = lambda *_args: str(SENTINEL)
+    result_undated = SENTINEL if kind == "totals_result_undated" else 7386
     methods_module.licence_churn = lambda *_args: {
-        "undated_count": fact(7386),
-        "bulk_share_percent": fact(
-            SENTINEL if kind == "bulk_share_mismatch" else "54.3"
-        ),
+        "undated_count": fact(result_undated),
+        "bulk_share_percent": fact(SENTINEL if kind == "bulk_share_result" else "54.3"),
         "bulk_months_unrounded": tuple(bulk),
     }
 
@@ -401,40 +480,63 @@ def c2_municipal_result(kind):
     def local(value, exact=None):
         return fact(
             value,
-            "national" if kind == "geography_mismatch" else geography,
-            "national" if kind == "geography_mismatch" else "public",
+            "national" if kind == "geography_local" else geography,
+            "national" if kind == "geography_local" else "public",
             exact,
         )
 
+    national_geography = geography if kind == "geography_national" else "national"
+    national_kind = "public" if kind == "geography_national" else "national"
+    excluding_exact = (
+        Fraction(SENTINEL)
+        if kind == "excluding_exact"
+        else Fraction(excluded * 100, active)
+    )
     return {
-        "active_count": local(active),
+        "active_count": local(SENTINEL if kind == "stock_active_count" else active),
         "including_ratio": local("0"),
         "including_percent": local(
             SENTINEL if kind == "including_mismatch" else including
         ),
         "excluding_percent": local(
-            SENTINEL if kind == "excluding_mismatch" else excluding,
-            Fraction(excluded * 100, active),
+            SENTINEL if kind == "excluding_value" else excluding,
+            excluding_exact,
         ),
         "including_interval": (),
         "excluding_interval": (),
-        "undated_count": fact(0),
-        "bulk_share_percent": fact(0),
+        "undated_count": fact(0, national_geography, national_kind),
+        "bulk_share_percent": fact(0, national_geography, national_kind),
     }
 
 
 def plant_c2_municipal(methods_module, kind):
     methods_module.pinned = lambda _source: ([], CHAIN)
     if kind.startswith("missing_"):
-        methods_module.c2_municipal_churn = raiser(
-            ValueError(f"{kind}:lic_active:doha:{SENTINEL}")
-        )
+        active = active_rows()
+        cancelled = cancelled_rows(ONE_MATCH)
+        target = methods.C2_MUNICIPAL_EXAMPLES[0][0]
+        for row in (*active, *cancelled):
+            if row["lbldy"] == SHAMAL:
+                row["lbldy"] = target
+        if kind == "missing_active_municipality":
+            active = [row for row in active if row["lbldy"] != target]
+        elif kind == "missing_cancelled_municipality":
+            cancelled = [row for row in cancelled if row["lbldy"] != target]
+        else:
+            for row in active:
+                if row["lbldy"] == target:
+                    row["rmz_lnsht_ltjry"] = "5630112"
+        by_source = {
+            "lic_active": (active, CHAIN),
+            "lic_cancelled": (cancelled, CHAIN),
+        }
+        methods_module.pinned = by_source.__getitem__
         return
     if kind == "month_outside_calendar":
         methods_module.c2_municipal_churn = raiser(ValueError("month outside calendar"))
         return
     _, _, active, cancelled, _, _, _ = methods.C2_MUNICIPAL_EXAMPLES[0]
-    stock = SENTINEL if kind == "stock_mismatch" else active
+    stock = SENTINEL if kind == "stock_return" else active
     total = SENTINEL if kind == "cancelled_mismatch" else cancelled
     methods_module.c2_municipal_churn = lambda *_args: (
         D(stock),
@@ -497,11 +599,12 @@ def test_pinned_case_prints_only_case_and_closed_reason(tmp_path, case, kind, re
     ),
 )
 @given(
-    st.text(),
+    st.data(),
     st.sampled_from([ValueError, KeyError, TypeError, SpineError, AssertionError]),
 )
-def test_each_new_reason_map_is_closed(map_name, message, kind):
+def test_each_new_reason_map_is_closed(map_name, data, kind):
     reasons = getattr(methods, map_name)
+    message = data.draw(st.one_of(st.sampled_from(sorted(reasons)), st.text()))
     reason = methods.closed_reason(kind(message), reasons)
     admitted = reasons.get(message)
     if kind is SpineError:

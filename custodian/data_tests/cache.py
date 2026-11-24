@@ -9,12 +9,27 @@ from eii_core.calc.facts import SourceChain
 from eii_core.calc.public_series import C2_METHOD_VERSION
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.build import read_cached
+from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.mapping import POP_FIELDS, fields
 from eii_custodian.publicdata.review.activity import SpineError
 from eii_custodian.publicdata.series.parse import confirmed_rows, selected_source
 
 ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / "data/public_cache"
+CACHE_MISSING_ERRORS = {
+    "snapshot_missing",
+    "snapshot_index_invalid",
+    "snapshot_path_invalid",
+}
+
+
+def _cache_refusal_reason(error: ValueError) -> str | None:
+    message = str(error)
+    if "hash_mismatch" in message or "hash mismatch" in message:
+        return "receipt_hash_mismatch"
+    if message.rsplit(": ", 1)[-1] in CACHE_MISSING_ERRORS:
+        return "public_cache_missing"
+    return None
 
 
 def closed_reason(error: Exception, reasons: dict[str, str]) -> str:
@@ -40,14 +55,9 @@ def cached(cache: Path, source: str, digest: str):
     try:
         rows, receipt = selected_source(cache, entry, digest)
     except ValueError as error:
-        if "hash_mismatch" in str(error) or "hash mismatch" in str(error):
-            raise ValueError("receipt_hash_mismatch:" + source) from error
-        if str(error) in {
-            "snapshot_missing",
-            "snapshot_index_invalid",
-            "snapshot_path_invalid",
-        }:
-            raise ValueError("public_cache_missing:" + source) from None
+        reason = _cache_refusal_reason(error)
+        if reason is not None:
+            raise ValueError(reason + ":" + source) from error
         raise
     if source == "pop_muni":
         # The frame owns this source's confirmed shape, not the series adapter.
@@ -90,7 +100,15 @@ def pinned_body(source: str):
     """Reuse the frame's receipt reader for binary workbooks and layer envelopes."""
     entry = next(row for row in load_registry() if row.key == source)
     digest = _pin(source)
-    body, receipt = read_cached(CACHE, entry, digest=digest, decode=lambda body: body)
+    try:
+        body, receipt = read_cached(
+            CACHE, entry, digest=digest, decode=lambda body: body
+        )
+    except FrameError as error:
+        reason = _cache_refusal_reason(error)
+        if reason is not None:
+            raise ValueError(reason + ":" + source) from error
+        raise
     chain = SourceChain(
         source,
         entry.release_tables[0],

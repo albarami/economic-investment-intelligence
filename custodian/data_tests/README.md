@@ -52,7 +52,8 @@ both Male and Female blocks are required. Each block ends at the next sex
 label (or sheet end), and its activity rows have nonempty ISIC codes in column
 A; trailing code whitespace and text mirror columns K and L are preserved.
 The sheet reader explicitly accepts stored formula caches; formulas are never
-evaluated, and a formula without a cached value still fails with `schema_missing`.
+evaluated, and a formula without a cached value still fails, and the case prints
+`C8:source_invalid`.
 Independent plain `Fraction` arithmetic checks each block row against the sum
 of its activity rows in every column C through J, Both Sexes against Male plus
 Female in each of those columns, and the Both Sexes Total against its seven

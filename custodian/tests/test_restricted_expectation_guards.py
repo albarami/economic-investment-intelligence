@@ -835,9 +835,10 @@ def test_restricted_summary_accounting(plant):
         "FAILED invented.py::test_one",
         "FAILED invented.py::test_one - C12-MTH-46:awaiting_routine",
         "FAILED invented.py::test_one - Failed: unknown:awaiting_routine",
+        "FAILED invented.py::test_one - Failed: C12-MTH-46:invented_unlisted",
         "ERROR invented.py::test_one - Failed: C12-MTH-46:awaiting_routine",
     ],
-    ids=["truncated", "missing_prefix", "unknown_case", "error"],
+    ids=["truncated", "missing_prefix", "unknown_case", "unlisted_reason", "error"],
 )
 def test_restricted_summary_unparsed(line):
     local, _ = modules()
@@ -875,13 +876,16 @@ def test_restricted_every_exception_is_closed(tmp_path, error_name, reason):
 
 
 @given(
-    st.text(),
+    st.data(),
     st.sampled_from([ValueError, KeyError, TypeError, SpineError, AssertionError]),
 )
-def test_restricted_reason_map_is_closed(message, kind):
+def test_restricted_reason_map_is_closed(data, kind):
     from custodian.data_tests.cache import closed_reason
 
     local, _ = modules()
+    message = data.draw(
+        st.one_of(st.sampled_from(sorted(local.RESTRICTED_REASONS)), st.text())
+    )
     reason = closed_reason(kind(message), local.RESTRICTED_REASONS)
     admitted = local.RESTRICTED_REASONS.get(message)
     if kind is SpineError:

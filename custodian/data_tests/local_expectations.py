@@ -401,19 +401,7 @@ def summary_reasons(text, exit_code):
             case_by_id(case_id)
         except ValueError:
             raise ValueError("summary_unparsed") from None
-        if reason not in {
-            "awaiting_routine",
-            "awaiting_expectation",
-            "expectation_mismatch",
-            "missing_record",
-            "record_invalid",
-            "record_checksum_mismatch",
-            "source_pin_mismatch",
-            "path_refused",
-            "source_invalid",
-            "zone_missing",
-            "spine_refused",
-        }:
+        if reason not in RESTRICTED_LOCAL_REASONS | {"spine_refused"}:
             raise ValueError("summary_unparsed") from None
         reasons.add(case_id + ":" + reason)
     final = text.strip().splitlines()[-1] if text.strip() else ""
