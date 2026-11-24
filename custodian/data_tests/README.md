@@ -83,6 +83,33 @@ confirmation OI-172). There is no skipped or prefix-based C2 class replay.
 The new pinned C1 test was not run by P05; helper tests use invented temporary
 snapshots only. No task or slice gate is closed by those helper tests.
 
+## Wilson example: stock and pre-registered period (S2-P83)
+
+`test_pinned_c2_wilson_stock` (case `C2-WILSON-STOCK`) reuses
+`c2_municipal_churn` on the pinned `lic_active` and `lic_cancelled` and
+asserts that the May 2025 stock of activity 5610101 in Al Shamal equals
+document 07 section 3's n. The stock does not depend on the period.
+`test_pinned_c2_wilson_period` (case `C2-WILSON-PERIOD`) checks the same stock
+first. It then counts cancellations, flagged months included, over the fixed
+grid `WILSON_PERIOD_GRID`: calendar years 2015 to 2024 and `2025-partial`
+(January to May 2025, because the C2 calendar ends at 2025-05 and any later
+month is refused as `month_outside_calendar`). The grid was written before any
+run (lead ruling L-1717, L5c section 1 option B). It asserts that exactly one
+cell gives section 3's k. On a pass, one `WilsonPeriodIdentified` warning in
+pytest's default warnings summary names the cell's label and nothing else.
+No match fails `C2-WILSON-PERIOD:wilson_period_no_match` and several matches
+fail `C2-WILSON-PERIOD:wilson_period_ambiguous`. Every failure is
+`<CASE>:<reason>`, and no case prints a count. The grid is never widened to find
+a match (MTH-04): `custodian/tests/test_pinned_wilson.py` pins its exact
+set, and its invented-cache tests cover one, none and two matches, a stock
+other than n, a month after the calendar, and grid mutations. A unique match
+identifies the period. The research did not record it, so the k assertion is
+not independent evidence. This task writes no configuration pin. Lead shell:
+
+```sh
+uv run --locked python -m pytest custodian/data_tests/test_pinned_methods.py -k "wilson" -vv -p no:cacheprovider
+```
+
 ## Inventory and preparation
 
 `restricted_cases.CASES` is the metadata-only inventory, version `S2-T35-v1`.

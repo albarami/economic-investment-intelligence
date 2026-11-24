@@ -3,6 +3,7 @@
 import importlib.util
 import json
 import sys
+import warnings
 from decimal import Decimal as D
 from fractions import Fraction
 from pathlib import Path
@@ -629,6 +630,77 @@ def test_pinned_c2_municipal_restaurants(
         assert (fact.geography, fact.geography_kind) == (geography, "public")
     for fact in (result["undated_count"], result["bulk_share_percent"]):
         assert (fact.geography, fact.geography_kind) == ("national", "national")
+
+
+WILSON_MUNICIPALITY = ("بلدية الشمال", "al_shamal")
+WILSON_STOCK = D(28)
+WILSON_CANCELLATIONS = D(6)
+# Pre-registered before any run (L-1717; L5c section 1 option B): label -> year.
+# Cancellations include flagged months. The 2025 cell is partial: the C2
+# calendar ends at 2025-05 and licence_churn refuses any later month.
+# custodian/tests/test_pinned_wilson.py pins this exact set; never widen it.
+WILSON_PERIOD_GRID = (
+    ("2015", "2015"),
+    ("2016", "2016"),
+    ("2017", "2017"),
+    ("2018", "2018"),
+    ("2019", "2019"),
+    ("2020", "2020"),
+    ("2021", "2021"),
+    ("2022", "2022"),
+    ("2023", "2023"),
+    ("2024", "2024"),
+    ("2025-partial", "2025"),
+)
+
+
+class WilsonPeriodIdentified(UserWarning):
+    """Names the one matching grid label; never a count."""
+
+
+def wilson_stock_check(active_rows, active_chain, cancelled_rows, cancelled_chain):
+    """n is the May 2025 stock, so the year argument does not change it."""
+    stock, _, _ = c2_municipal_churn(
+        active_rows, active_chain, cancelled_rows, cancelled_chain, *WILSON_MUNICIPALITY
+    )
+    if stock != WILSON_STOCK:
+        raise ValueError("wilson_stock_mismatch")
+
+
+def wilson_period_label(active_rows, active_chain, cancelled_rows, cancelled_chain):
+    rows = (active_rows, active_chain, cancelled_rows, cancelled_chain)
+    wilson_stock_check(*rows)
+    matches = [
+        label
+        for label, year in WILSON_PERIOD_GRID
+        if c2_municipal_churn(*rows, *WILSON_MUNICIPALITY, year=year)[1]
+        == WILSON_CANCELLATIONS
+    ]
+    if not matches:
+        raise ValueError("wilson_period_no_match")
+    if len(matches) > 1:
+        raise ValueError("wilson_period_ambiguous")
+    return matches[0]
+
+
+def _wilson_case(case, check):
+    """Safe failure: the case ID and a fixed reason, never a count."""
+    try:
+        active_rows, active_chain = pinned("lic_active")
+        cancelled_rows, cancelled_chain = pinned("lic_cancelled")
+        return check(active_rows, active_chain, cancelled_rows, cancelled_chain)
+    except ValueError as error:
+        reason = str(error).split(":", 1)[0].replace(" ", "_")
+    pytest.fail(f"{case}:{reason}", pytrace=False)
+
+
+def test_pinned_c2_wilson_stock():
+    _wilson_case("C2-WILSON-STOCK", wilson_stock_check)
+
+
+def test_pinned_c2_wilson_period():
+    label = _wilson_case("C2-WILSON-PERIOD", wilson_period_label)
+    warnings.warn(f"C2-WILSON-PERIOD:{label}", WilsonPeriodIdentified, stacklevel=1)
 
 
 def c2_class_members(isic_class: str) -> tuple[str, ...]:
