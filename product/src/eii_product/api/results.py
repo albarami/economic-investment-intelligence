@@ -10,6 +10,7 @@ from fastapi.encoders import jsonable_encoder
 from starlette.responses import JSONResponse
 
 from eii_core.facts import Fact
+from eii_core.reasons import closed_code, reason
 from eii_product.api.playbooks import refusal
 from eii_product.ledger.local import LocalLedger, tool_entry
 from eii_product.store.protocol import EngineName, StoreRefusal
@@ -41,15 +42,19 @@ def wire_fact(fact: Fact) -> dict[str, Any]:
     return projected
 
 
-def error_response(error: Exception) -> JSONResponse:
+def error_response(
+    error: Exception, *, answer_id: str | None = None, release_id: str | None = None
+) -> JSONResponse:
     """Never interpolate an exception, query, coordinate or path."""
+    diagnostic = reason(error)
+    context = {"answer_id": answer_id, "release_id": release_id}
     if isinstance(error, (ArgumentError, AreaIdError)):
-        return refusal(422, "INVALID_ARGUMENT")
-    if isinstance(error, StoreRefusal) and str(error) == "STORE_UNAVAILABLE":
-        return refusal(503, "STORE_UNAVAILABLE")
+        return refusal(422, "INVALID_ARGUMENT", message_key=diagnostic, **context)
+    if isinstance(error, StoreRefusal) and diagnostic == "STORE_UNAVAILABLE":
+        return refusal(503, "STORE_UNAVAILABLE", message_key=diagnostic, **context)
     if isinstance(error, TimeoutError):
-        return refusal(504, "QUERY_TIMEOUT")
-    return refusal(500, "INTERNAL")
+        return refusal(504, "QUERY_TIMEOUT", message_key=diagnostic, **context)
+    return refusal(500, "INTERNAL", message_key=diagnostic, **context)
 
 
 def respond(
@@ -64,7 +69,13 @@ def respond(
     try:
         result = run()
         if result.status == "INVALID_ARGUMENT":
-            return refusal(422, "INVALID_ARGUMENT")
+            return refusal(
+                422,
+                "INVALID_ARGUMENT",
+                message_key=closed_code(result.reason, "INVALID_ARGUMENT")
+                if result.reason is not None
+                else None,
+            )
         if result.status not in GOVERNED:
             return refusal(500, "INTERNAL")
         admit = (

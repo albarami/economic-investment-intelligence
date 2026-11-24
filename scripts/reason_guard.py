@@ -1,4 +1,4 @@
-"""Reject Part-A outer handlers that discard an inner closed reason."""
+"""Reject outer handlers that discard an inner closed reason."""
 
 from __future__ import annotations
 
@@ -7,6 +7,26 @@ from pathlib import Path
 from typing import TypeGuard
 
 MODULES = (
+    "product/src/eii_product/imagery_provider/address.py",
+    "product/src/eii_product/api/tools.py",
+    "product/src/eii_product/api/results.py",
+    "product/src/eii_product/api/layers.py",
+    "product/src/eii_product/api/public_layers.py",
+    "product/src/eii_product/api/release.py",
+    "product/src/eii_product/api/map_modes.py",
+    "product/src/eii_product/api/frontend.py",
+    "product/src/eii_product/api/gis_imagery.py",
+    "product/src/eii_product/api/playbooks.py",
+    "product/src/eii_product/api/area_context.py",
+    "product/src/eii_product/tools/public_context_tools.py",
+    "product/src/eii_product/tools/make_area.py",
+    "product/src/eii_product/tools/routing.py",
+    "product/src/eii_product/tools/resolve.py",
+    "product/src/eii_product/tools/sector_facts.py",
+    "product/src/eii_product/register_file.py",
+    "product/src/eii_product/assistant/catalogue/load.py",
+    "product/src/eii_product/photoreal_tiles/proxy.py",
+    "product/src/eii_product/photoreal_tiles/limit.py",
     "scripts/operations/build.py",
     "scripts/operations/deploy.py",
     "scripts/operations/serve.py",
@@ -28,6 +48,8 @@ MODULES = (
 )
 GENERIC = frozenset(
     {
+        "INTERNAL",
+        "PLAYBOOK_FAILED",
         "assembly_build_refused",
         "assembly_input_refused",
         "producer_schema_refused",
@@ -123,7 +145,7 @@ def _leaks(sink: ast.AST, name: str | None) -> bool:
         if (
             isinstance(parent, ast.Call)
             and isinstance(parent.func, ast.Name)
-            and parent.func.id == "reason"
+            and parent.func.id in {"reason", "closed_reason", "error_response"}
             and parent.args
             and parent.args[0] is node
         ):
@@ -160,19 +182,37 @@ def _sink(node: ast.AST) -> TypeGuard[ast.Raise | ast.Return | ast.Call]:
     )
 
 
+def _projects(
+    node: ast.AST,
+    name: str | None,
+    bindings: dict[str, ast.expr],
+    seen: frozenset[str] = frozenset(),
+) -> bool:
+    for child in ast.walk(node):
+        if (
+            isinstance(child, ast.Call)
+            and isinstance(child.func, ast.Name)
+            and child.func.id in {"reason", "closed_reason", "error_response"}
+            and child.args
+            and isinstance(child.args[0], ast.Name)
+            and child.args[0].id == name
+        ):
+            return True
+        if (
+            isinstance(child, ast.Name)
+            and child.id in bindings
+            and child.id not in seen
+        ):
+            if _projects(bindings[child.id], name, bindings, seen | {child.id}):
+                return True
+    return False
+
+
 def _masks(
     sink: ast.AST, name: str | None, carries_reason: bool, bindings: dict[str, ast.expr]
 ) -> bool:
     nodes = list(ast.walk(sink))
-    projects = any(
-        isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id == "reason"
-        and node.args
-        and isinstance(node.args[0], ast.Name)
-        and node.args[0].id == name
-        for node in nodes
-    )
+    projects = _projects(sink, name, bindings)
     generic = any(
         value in GENERIC or value.rpartition(": ")[2] in GENERIC
         for node in nodes
@@ -294,6 +334,20 @@ def violations(source: str, *, functions: tuple[str, ...] = ()) -> list[int]:
             )
         ):
             failed.append(handler.lineno)
+    # D18 is a projection function rather than an except block. Its literal
+    # HTTP classes are safe only when each response carries the diagnostic.
+    for root in roots:
+        for function in ast.walk(root):
+            if (
+                not isinstance(function, ast.FunctionDef)
+                or function.name != "error_response"
+            ):
+                continue
+            for node in ast.walk(function):
+                if isinstance(node, ast.Return) and _masks(
+                    node, "error", True, _bindings(node, parents)
+                ):
+                    failed.append(node.lineno)
     return failed
 
 

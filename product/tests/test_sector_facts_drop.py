@@ -79,8 +79,24 @@ def test_whole_response_drops_invalid_fact_and_keeps_siblings(monkeypatch, plant
     assert result["facts"] == kept
     assert result["status"] == "OK"
     assert result["blocks"] == [
-        dict(block="market_context", status="OK", fact_ids=[kept[0].fact_id]),
-        dict(block="SYN-invalid-only", status="NO_DATA", fact_ids=[]),
+        dict(
+            block="market_context",
+            status="OK",
+            fact_ids=[kept[0].fact_id],
+            reason_key={
+                "unresolved": "source_missing",
+                "hash": "source_hash_missing",
+            }.get(plant, "fact_invalid"),
+        ),
+        dict(
+            block="SYN-invalid-only",
+            status="NO_DATA",
+            fact_ids=[],
+            reason_key={
+                "unresolved": "source_missing",
+                "hash": "source_hash_missing",
+            }.get(plant, "fact_invalid"),
+        ),
     ]
     assert all(fact_id not in repr(result) for fact_id in rejected)
 

@@ -95,10 +95,10 @@ def test_transport_error_has_closed_result(satellite):
         )
 
     if satellite:
-        assert fetch() == (503, b"", {})
+        assert fetch() == (503, b"", {"x-eii-error-code": "operation_os_error"})
     else:
         # An unknown billable outcome must leave the journal pending.
-        with pytest.raises(proxy.AddressFailure, match=r"^NOT_FOUND$"):
+        with pytest.raises(proxy.AddressFailure, match=r"^operation_os_error$"):
             fetch()
 
 

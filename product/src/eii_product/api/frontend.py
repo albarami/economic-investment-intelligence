@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi import APIRouter
 from starlette.responses import FileResponse, Response
 
+from eii_core.reasons import reason
 from eii_product.api.playbooks import refusal
 
 ASSET_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\.(js|css|woff2|svg|png|json)\Z")
@@ -26,24 +27,26 @@ def _inside(base: Path, name: str) -> Path | None:
     try:
         resolved = (base / name).resolve()
         resolved.relative_to(base.resolve())
-        return resolved if resolved.is_file() else None
-    except (OSError, ValueError, RuntimeError):
-        return None
+        if not resolved.is_file():
+            raise ValueError("asset_missing")
+        return resolved
+    except (OSError, ValueError, RuntimeError) as error:
+        raise ValueError(reason(error, "asset_path_refused")) from None
 
 
 def _font_path(font_dir: Path, stack: str, span: str) -> Path | None:
     if stack not in FONT_STACKS:
-        return None
+        raise ValueError("font_stack_refused")
     match = FONT_SPAN.fullmatch(span)
     if match is None:
-        return None
+        raise ValueError("font_span_refused")
     start, end = int(match[1]), int(match[2])
     if start % 256 or end != start + 255 or start > 0xFF00:
-        return None
+        raise ValueError("font_range_refused")
     expected = font_dir.resolve() / stack
     base = (font_dir / stack).resolve()
     if base != expected:
-        return None
+        raise ValueError("asset_path_refused")
     return _inside(base, span)
 
 
@@ -52,7 +55,10 @@ def build_router(web_dir: Path | None, font_dir: Path | None = None) -> APIRoute
 
     @router.get("/", response_model=None)
     async def index() -> Response:
-        path = None if web_dir is None else _inside(web_dir, "index.html")
+        try:
+            path = None if web_dir is None else _inside(web_dir, "index.html")
+        except ValueError as error:
+            return refusal(404, "NOT_FOUND", message_key=reason(error))
         if path is None:
             return refusal(404, "NOT_FOUND")
         return FileResponse(
@@ -63,7 +69,10 @@ def build_router(web_dir: Path | None, font_dir: Path | None = None) -> APIRoute
     async def asset(name: str) -> Response:
         if web_dir is None or ASSET_NAME.fullmatch(name) is None:
             return refusal(404, "NOT_FOUND")
-        path = _inside(web_dir / "assets", name)
+        try:
+            path = _inside(web_dir / "assets", name)
+        except ValueError as error:
+            return refusal(404, "NOT_FOUND", message_key=reason(error))
         if path is None:
             return refusal(404, "NOT_FOUND")
         return FileResponse(
@@ -74,7 +83,10 @@ def build_router(web_dir: Path | None, font_dir: Path | None = None) -> APIRoute
 
     @router.get("/fonts/{stack}/{span}", response_model=None)
     async def glyph(stack: str, span: str) -> Response:
-        path = None if font_dir is None else _font_path(font_dir, stack, span)
+        try:
+            path = None if font_dir is None else _font_path(font_dir, stack, span)
+        except (OSError, ValueError, RuntimeError) as error:
+            return refusal(404, "NOT_FOUND", message_key=reason(error))
         if path is None:
             return refusal(404, "NOT_FOUND")
         return FileResponse(

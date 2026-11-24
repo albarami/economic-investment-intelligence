@@ -18,6 +18,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
 
+from eii_core.reasons import reason
 from eii_product.config import read_fc_register_file
 
 COLUMN_REGISTRATION_KEY = "registration_key"
@@ -113,7 +114,7 @@ def read_fc_register_rows(
     """
     configured = read_fc_register_file()
     if setting is not None and (type(setting) is not str or setting == ""):
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_setting_invalid")
     if setting != configured:
         raise RegisterRefusal("path_refused")
     if asked_path is not None and asked_path != configured:
@@ -175,10 +176,10 @@ def _read_path(path: str, listed_sha256: str) -> RegisterBundle:
         raise RegisterRefusal("hash_mismatch")
     try:
         parsed = json.loads(body.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError):
-        raise RegisterRefusal("row_shape") from None
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise RegisterRefusal(reason(error, "register_json_invalid")) from None
     if type(parsed) is not dict:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_document_invalid")
     rows = _rows(parsed.get("rows"))
     return RegisterBundle(
         rows=rows,
@@ -193,13 +194,13 @@ def _read_path(path: str, listed_sha256: str) -> RegisterBundle:
 
 def _rows(value: object) -> tuple[RegisterRow, ...]:
     if type(value) is not list or not value:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_rows_invalid")
     seen: set[str] = set()
     built: list[RegisterRow] = []
     for item in value:
         row = _row(item)
         if row.registration_key in seen or row.row_id in seen:
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_row_duplicate")
         seen.add(row.registration_key)
         seen.add(row.row_id)
         built.append(row)
@@ -208,27 +209,27 @@ def _rows(value: object) -> tuple[RegisterRow, ...]:
 
 def _row(value: object) -> RegisterRow:
     if type(value) is not dict:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_row_invalid")
     if any(key not in ROW_COLUMNS for key in value):
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_column_unknown")
     registration = _token(value.get(COLUMN_REGISTRATION_KEY))
     row_id = value.get(COLUMN_ROW_ID)
     if type(row_id) is not str or _ROW_ID.fullmatch(row_id) is None:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_row_id_invalid")
     tower = _optional(value.get(COLUMN_TOWER))
     lon = _optional(value.get(COLUMN_POSITION_LON))
     lat = _optional(value.get(COLUMN_POSITION_LAT))
     if (lon is None) != (lat is None):
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_position_incomplete")
     position = None
     if lon is not None and lat is not None:
         if _COORDINATE.fullmatch(lon) is None or _COORDINATE.fullmatch(lat) is None:
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_position_invalid")
         position = (lon, lat)
     district = _optional(value.get(COLUMN_DISTRICT))
     free = value.get(COLUMN_DISTRICT_FREE_ZONE)
     if type(free) is not bool:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_district_flag_invalid")
     return RegisterRow(
         registration_key=registration,
         row_id=row_id,
@@ -242,32 +243,32 @@ def _row(value: object) -> RegisterRow:
 
 def _card(value: object) -> tuple[tuple[str, str], ...]:
     if type(value) is not dict or set(value) != set(CARD_FIELDS):
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_card_invalid")
     pairs: list[tuple[str, str]] = []
     for key in CARD_FIELDS:
         text = value[key]
         if type(text) is not str or text.strip() == "" or text != text.strip():
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_card_text_invalid")
         pairs.append((key, text))
     return tuple(pairs)
 
 
 def _gazetteer(value: object) -> Mapping[str, GazetteerPlace]:
     if type(value) is not list:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_gazetteer_invalid")
     found: dict[str, GazetteerPlace] = {}
     place_codes: set[str] = set()
     for item in value:
         if type(item) is not dict:
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_gazetteer_row_invalid")
         tower = _token(item.get("tower_or_building"))
         code = item.get("place_code")
         if type(code) is not str or _PLACE.fullmatch(code) is None:
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_place_code_invalid")
         # DAT-93 identifies the count by geography, not by the tower's name.
         # Distinct tower groups must never emit different counts for one code.
         if tower in found or code in place_codes:
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_place_duplicate")
         place_codes.add(code)
         found[tower] = GazetteerPlace(tower_or_building=tower, place_code=code)
     return found
@@ -275,27 +276,27 @@ def _gazetteer(value: object) -> Mapping[str, GazetteerPlace]:
 
 def _districts(value: object) -> Mapping[str, DistrictGeometry]:
     if type(value) is not list:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_districts_invalid")
     found: dict[str, DistrictGeometry] = {}
     for item in value:
         if type(item) is not dict:
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_district_invalid")
         key = _token(item.get("district_key"))
         name = _token(item.get("name"))
         ring = _ring(item.get("ring"))
         if key in found:
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_district_duplicate")
         found[key] = DistrictGeometry(district_key=key, name=name, ring=ring)
     return found
 
 
 def _ring(value: object) -> tuple[tuple[str, str], ...]:
     if type(value) is not list or len(value) < 4:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_ring_invalid")
     points: list[tuple[str, str]] = []
     for item in value:
         if type(item) is not list or len(item) != 2:
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_ring_point_invalid")
         lon, lat = item
         if (
             type(lon) is not str
@@ -303,22 +304,24 @@ def _ring(value: object) -> tuple[tuple[str, str], ...]:
             or _COORDINATE.fullmatch(lon) is None
             or _COORDINATE.fullmatch(lat) is None
         ):
-            raise RegisterRefusal("row_shape")
+            raise RegisterRefusal("register_ring_coordinate_invalid")
         points.append((lon, lat))
     return tuple(points)
 
 
 def _source(value: object) -> Mapping[str, object]:
     if type(value) is not dict:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_source_invalid")
     retrieved = value.get("retrieved_on")
     if type(retrieved) is not str or _DATE.fullmatch(retrieved) is None:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_retrieved_invalid")
     year_text, month_text, day_text = retrieved.split("-")
     try:
         parsed = date(int(year_text), int(month_text), int(day_text))
-    except ValueError:
-        raise RegisterRefusal("row_shape") from None
+    except ValueError as error:
+        raise RegisterRefusal(
+            reason(error, "register_retrieved_date_invalid")
+        ) from None
     return {
         "source_id": _token(value.get("source_id")),
         "publisher": _token(value.get("publisher")),
@@ -332,7 +335,7 @@ def _source(value: object) -> Mapping[str, object]:
 
 def _lineage(value: object) -> Mapping[str, object]:
     if type(value) is not dict:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_lineage_invalid")
     return {
         "lineage_id": _token(value.get("lineage_id")),
         "table_name": _token(value.get("table_name")),
@@ -344,7 +347,7 @@ def _lineage(value: object) -> Mapping[str, object]:
 
 def _token(value: object) -> str:
     if type(value) is not str or value.strip() == "" or value != value.strip():
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_token_invalid")
     return value
 
 
@@ -356,11 +359,11 @@ def _optional(value: object) -> str | None:
 
 def _hash_text(value: object) -> str:
     if type(value) is not str or _HASH.fullmatch(value) is None:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_hash_invalid")
     return value
 
 
 def _year(value: object) -> str:
     if type(value) is not str or re.fullmatch(r"[0-9]{4}", value) is None:
-        raise RegisterRefusal("row_shape")
+        raise RegisterRefusal("register_year_invalid")
     return value

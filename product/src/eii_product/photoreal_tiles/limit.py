@@ -16,6 +16,8 @@ from pathlib import Path
 from threading import RLock
 from typing import TextIO, TypedDict, TypeVar
 
+from eii_core.reasons import closed_code, reason
+
 T = TypeVar("T")
 LOCK = RLock()
 COUNT_PATH = Path(__file__).resolve().parents[4] / "data" / "photoreal-count.log"
@@ -71,8 +73,8 @@ def meter_for_count(count: int, limit: int, price: Decimal) -> SpendMeter:
 class BillableFailure(Exception):
     """A known successful provider status whose response could not be consumed."""
 
-    def __init__(self) -> None:
-        super().__init__("response_unavailable")
+    def __init__(self, diagnostic: str = "response_unavailable") -> None:
+        super().__init__(closed_code(diagnostic, "response_unavailable"))
 
 
 def encode_spend_meter(meter: SpendMeter) -> str:
@@ -134,8 +136,8 @@ class Budget:
                 with self.path.open("r+", encoding="ascii") as stream:
                     fcntl.flock(stream, fcntl.LOCK_EX)
                     return self._read(stream)
-            except (OSError, UnicodeError, ValueError):
-                raise BudgetFailure("count_unavailable") from None
+            except (OSError, UnicodeError, ValueError) as error:
+                raise BudgetFailure(reason(error, "count_unavailable")) from None
 
     def available(self, limit: int) -> None:
         if self.count() >= limit:
@@ -162,9 +164,11 @@ class Budget:
                     self._append(stream, f"pending:{count}\n")
                     try:
                         result = send()
-                    except BillableFailure:
+                    except BillableFailure as error:
                         self._append(stream, f"ready:{count + 1}\n")
-                        raise BudgetFailure("response_unavailable") from None
+                        raise BudgetFailure(
+                            reason(error, "response_unavailable")
+                        ) from None
                     appended = count + int(billable(result))
                     self._append(stream, f"ready:{appended}\n")
                     if step is not None:
@@ -172,6 +176,6 @@ class Budget:
                     return result
             except BudgetFailure:
                 raise
-            except Exception:
+            except Exception as error:
                 self._broken = True
-                raise BudgetFailure("count_unavailable") from None
+                raise BudgetFailure(reason(error, "count_unavailable")) from None

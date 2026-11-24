@@ -9,6 +9,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
+from eii_core.reasons import reason
 from eii_product.imagery_provider.address import AddressFailure, exchange_metadata
 from eii_product.photoreal_tiles.limit import BillableFailure
 from eii_product.photoreal_tiles.native import Target
@@ -94,13 +95,13 @@ def fetch_tile(
         return error.code, b"", {}
     except Exception as error:
         if satellite:
-            return 503, b"", {}
+            return 503, b"", {"x-eii-error-code": reason(error)}
         if status is not None and 200 <= status < 300:
-            raise BillableFailure from None
+            raise BillableFailure(reason(error)) from None
         if isinstance(error, RedirectRefused):
-            return 503, b"", {}
+            return 503, b"", {"x-eii-error-code": reason(error)}
         # No trustworthy billable result: leave Budget.request's pending entry unresolved.
-        raise AddressFailure from None
+        raise AddressFailure(reason(error)) from None
 
 
 def safe_response(raw: bytes, headers: dict[str, str], key: str) -> bool:
@@ -133,5 +134,5 @@ def satellite_credit(opener: Callable[..., object], base: str, key: str) -> str:
         if not isinstance(credit, str):
             return ""
         return credit
-    except Exception:
-        return ""
+    except Exception as error:
+        raise AddressFailure(reason(error)) from None

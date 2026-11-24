@@ -19,6 +19,7 @@ from pydantic import BaseModel, ConfigDict
 from starlette.responses import JSONResponse
 
 from eii_core.facts import METRIC_KEYS, Fact, validate_chain
+from eii_core.reasons import reason
 from eii_product.api.area_context import trusted_seat, trusted_shapes
 from eii_product.api.building_heights import heights_from_release
 from eii_product.api.playbooks import PlaybookRoute, refusal
@@ -181,8 +182,8 @@ class MountedRelease:
             ):
                 raise ValueError("mount_unverified")
             self.summary()
-        except Exception:
-            raise ValueError("mount_unverified") from None
+        except Exception as error:
+            raise ValueError(reason(error, "mount_unverified")) from None
         # The heights the checked release pins (S3-T16), refused by their own
         # closed reason, or none.
         self.heights = heights_from_release(

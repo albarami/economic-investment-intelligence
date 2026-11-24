@@ -17,6 +17,7 @@ from urllib.request import Request
 import pytest
 from hypothesis import example, given
 from hypothesis import strategies as st
+from product.tests.reason_contract import assert_error
 from product.tests.test_map_modes import Response, invoke, seed_journal, view_query
 from product.tests.test_map_modes import provider as provider
 
@@ -117,7 +118,7 @@ def test_billed_body_failure_counts_once_and_the_retry_counts_again(tmp_path, pr
     app = create_app(tmp_path, opener=opener, count_path=count)
     failed = invoke(app, "/api/photoreal/3dtiles/root.json", query=view_query(app))
     assert failed[0] == 404
-    assert failed[1] == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(failed[1], "NOT_FOUND", "operation_os_error")
     assert count.read_text() == "ready:0\npending:0\nready:1\n"
     assert len(calls) == 1
     mode["billed_failure"] = False
@@ -135,7 +136,7 @@ def test_unbilled_http_error_is_forwarded_and_not_counted(tmp_path, provider):
         app, "/api/photoreal/3dtiles/root.json", query=view_query(app)
     )
     assert status == 404
-    assert raw == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(raw, "NOT_FOUND", "response_unavailable")
     assert len(calls) == 1
     assert count.read_text() == "ready:0\npending:0\nready:0\n"
 
@@ -167,7 +168,7 @@ def test_request_past_the_ceiling_never_reaches_the_stand_in(
     app = create_app(tmp_path, opener=opener, count_path=count)
     status, raw, _headers = invoke(app, "/api/photoreal/views", "POST")
     assert status == 429
-    assert raw == b'{"error":{"code":"PROVIDER_CAP_REACHED"}}'
+    assert_error(raw, "PROVIDER_CAP_REACHED", "cap_reached")
     modes = json.loads(invoke(app, "/api/map-modes")[1])
     assert modes["open"] == {"available": True, "reason": None}
     assert modes["photoreal"]["available"] is False
@@ -257,7 +258,7 @@ def test_unbilled_tile_has_no_spend_header(tmp_path, provider):
         app, "/api/photoreal/3dtiles/root.json", query=view_query(app)
     )
     assert status == 404
-    assert raw == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(raw, "NOT_FOUND", "response_unavailable")
     assert b"x-spend-meter" not in headers
     assert b"x-spend-order" not in headers
     assert len(calls) == 1

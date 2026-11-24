@@ -11,6 +11,7 @@ from eii_core.calc.layer_classes import equal_count_classes
 from eii_core.calc.public_methods import AnnualEnergy, reliability, zone_momentum
 from eii_core.calc.source_geometry import validate_source_geometry
 from eii_core.facts import Fact, fact_id, validate_chain
+from eii_core.reasons import closed_code, reason
 from eii_product.api.results import wire_fact
 from eii_product.store.protocol import ReleaseStore
 from eii_product.tools.make_area import PublicPoint
@@ -54,6 +55,12 @@ def public_point_snapshot(store: ReleaseStore) -> Mapping[str, tuple[PublicPoint
     result = {}
     for key in PUBLIC_POINT_LAYER_KEYS:
         body = read_layer(store, key)
+        if body["payload"].get("withheld"):
+            raise ValueError(
+                closed_code(
+                    body["payload"]["withheld"][0]["reason_key"], "chain_refused"
+                )
+            )
         features = body["payload"]["layers"][0]["features"]
         result[key] = tuple(
             (
@@ -234,24 +241,33 @@ class LayerRead:
     def __init__(self, store: ReleaseStore, key: str):
         self.store = store
         self.key = key
+        self.withheld: list[dict[str, str]] = []
         self.facts: dict[str, Fact] = {}
         self.sources: dict[str, dict[str, Any]] = {}
+
+    def checked(
+        self, table: str, source_id: str | None
+    ) -> tuple[SourceChain, list[dict[str, Any]]] | str:
+        """The table's complete chain, holding the named source; else its reason."""
+        try:
+            source, lines, sources = chain(self.store, table)
+        except ValueError as error:
+            return reason(error)
+        broken = validate_chain(source.lineage_ref, lines, sources)
+        if broken is not None:
+            return closed_code(broken, "chain_refused")
+        if source_id is not None and source_id not in {
+            line["source_id"] for line in lines if line["table_name"] == table
+        }:
+            return "source_missing"
+        return source, sources
 
     def verified(
         self, table: str, source_id: str | None
     ) -> tuple[SourceChain, list[dict[str, Any]]] | None:
         """The table's complete chain, holding the named source; else None."""
-        try:
-            source, lines, sources = chain(self.store, table)
-        except ValueError:
-            return None
-        if validate_chain(source.lineage_ref, lines, sources) is not None:
-            return None
-        if source_id is not None and source_id not in {
-            line["source_id"] for line in lines if line["table_name"] == table
-        }:
-            return None
-        return source, sources
+        checked = self.checked(table, source_id)
+        return None if isinstance(checked, str) else checked
 
     def fact(
         self,
@@ -267,10 +283,11 @@ class LayerRead:
         evidence_status: str = "observed",
         labels: tuple[str, str] = ("Published layer value", "قيمة الطبقة المنشورة"),
     ) -> Fact | None:
-        verified = self.verified(table, source_id)
-        if verified is None:
+        checked = self.checked(table, source_id)
+        if isinstance(checked, str):
+            self.withheld.append({"reason_key": checked})
             return None
-        source, sources = verified
+        source, sources = checked
         geography = {"kind": "public", "public_code": code}
         identifier = fact_id(
             release_id=self.store.release_id,
@@ -348,6 +365,8 @@ class LayerRead:
             "sources": list(self.sources.values()),
             "gazetteer_points": [],
         }
+        if self.withheld:
+            payload["withheld"] = self.withheld
         return {
             "status": "ok" if features else "NO_DATA",
             "facts": [wire_fact(f) for f in self.facts.values()],
@@ -1016,7 +1035,8 @@ def company_points(ctx: LayerRead) -> dict[str, Any]:
     cards: list[dict[str, Any]] = []
     try:
         source, _, _ = chain(ctx.store, "pub_register_company")
-    except ValueError:
+    except ValueError as error:
+        ctx.withheld.append({"reason_key": reason(error)})
         # A broken source chain draws no point (rule 7).
         rows: list[dict[str, Any]] = []
     else:
@@ -1107,7 +1127,7 @@ def seal_company_points(body: dict[str, Any], store: ReleaseStore) -> dict[str, 
             try:
                 _lon, _lat = position
             except (ValueError, TypeError) as exc:
-                raise CompanyPointRefusal("detail_on_point") from exc
+                raise CompanyPointRefusal(reason(exc, "detail_on_point")) from None
             if (
                 feature["provenance"] != "public"
                 or feature["metric_key"] != "register_company_point"

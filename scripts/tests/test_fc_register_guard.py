@@ -523,7 +523,9 @@ def test_unconfigured_paths_never_reach_open(supplied: str) -> None:
         patch.setattr(Path, "read_text", forbidden)
         with pytest.raises(
             RegisterRefusal,
-            match=r"^row_shape$" if supplied == "" else r"^path_refused$",
+            match=r"^register_setting_invalid$"
+            if supplied == ""
+            else r"^path_refused$",
         ):
             read_fc_register_rows(supplied, listed_sha256="0" * 64)
 

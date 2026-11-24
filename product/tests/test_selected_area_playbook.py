@@ -349,7 +349,7 @@ def test_selected_failure_rolls_back_every_tool(capture, monkeypatch):
     refused(
         client.post("/api/playbooks/site_check", json={**BASE, **selected}),
         500,
-        "PLAYBOOK_FAILED",
+        "INTERNAL",
     )
     assert ledger.rows() == before
 
@@ -465,7 +465,7 @@ def test_selected_refusal_logs_never_echo_coordinates(capture, monkeypatch, caps
 
     monkeypatch.setattr("eii_product.tools.public_context_tools.run_card", fail)
     response = client.post("/api/playbooks/site_check", json={**BASE, **selected})
-    refused(response, 500, "PLAYBOOK_FAILED")
+    refused(response, 500, "INTERNAL")
     logs = capsys.readouterr()
     assert "INVENTED-coordinate-sentinel" not in logs.out + logs.err + response.text
     assert "latitude" not in logs.out + logs.err + response.text
@@ -551,6 +551,6 @@ def test_playbook_card_dispatch_reuses_closed_tool_models(
     refused(
         client.post("/api/playbooks/site_check", json={**BASE, **selected}),
         500,
-        "PLAYBOOK_FAILED",
+        "INTERNAL",
     )
     assert ledger.rows() == before

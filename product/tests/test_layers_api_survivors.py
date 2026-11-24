@@ -82,9 +82,10 @@ def test_reader_refusal_contract(reason: str) -> None:
             {"status": "NO_DATA", "reason": "read_refused", "facts": []},
         )
     else:
-        with pytest.raises(RegisterRefusal) as caught:
-            _get(app, "/api/layers/fc_firms_per_tower")
-        _message(caught.value, reason)
+        status, body = _get(app, "/api/layers/fc_firms_per_tower")
+        assert status == 500
+        assert body["error"]["code"] == "INTERNAL"
+        assert body["error"]["message_key"] == reason
 
 
 @pytest.mark.parametrize("kind", ["unset", "absent", "broken"])

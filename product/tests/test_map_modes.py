@@ -512,7 +512,7 @@ def test_meter_never_invents_a_total_for_unavailable_count(tmp_path, provider, j
     state = json.loads(invoke(app, "/api/map-modes")[1])["photoreal"]
     assert state == {
         "available": False,
-        "reason": "count_unavailable",
+        "reason": "operation_os_error" if journal is None else "count_unavailable",
         "meter": None,
     }
     assert invoke(app, "/api/photoreal/views", "POST")[0] == 404
@@ -687,12 +687,18 @@ def test_counter_io_failure_refuses_without_forgetting(
         monkeypatch.setattr(
             budget, "_append", lambda *args: (_ for _ in ()).throw(OSError())
         )
-    with pytest.raises(BudgetFailure, match="count_unavailable"):
+    with pytest.raises(
+        BudgetFailure,
+        match="count_unavailable" if failure == "crash" else "operation_os_error",
+    ):
         budget.request(3, send, bool)
     monkeypatch.undo()
     if failure == "crash":
         assert calls == [True]
-        with pytest.raises(BudgetFailure, match="count_unavailable"):
+        with pytest.raises(
+            BudgetFailure,
+            match="count_unavailable" if failure == "crash" else "operation_os_error",
+        ):
             Budget(count).available(3)
     else:
         assert calls == []

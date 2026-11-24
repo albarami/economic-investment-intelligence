@@ -171,7 +171,7 @@ def test_a_broken_document_refuses_without_a_chained_parser_error(
 ) -> None:
     dest = tmp_path / "stand_in_register.json"
     dest.write_text("{", encoding="utf-8")
-    with pytest.raises(RegisterRefusal, match="row_shape") as caught:
+    with pytest.raises(RegisterRefusal, match="register_json_invalid") as caught:
         read_fc_register_rows(str(dest), listed_sha256=listed(str(dest)))
     assert caught.value.__cause__ is None
 
@@ -190,7 +190,7 @@ def test_two_distinct_towers_cannot_share_a_place_code(tmp_path: Path) -> None:
     second["place_code"] = first["place_code"]
     dest = tmp_path / "stand_in_register.json"
     dest.write_text(json.dumps(parsed), encoding="utf-8")
-    with pytest.raises(RegisterRefusal, match=r"^row_shape$"):
+    with pytest.raises(RegisterRefusal, match=r"^register_place_duplicate$"):
         read_fc_register_rows(str(dest), listed_sha256=listed(str(dest)))
 
 
@@ -225,7 +225,11 @@ def test_one_broken_register_field_is_refused(tmp_path: Path, plant: str) -> Non
     _plant_reader(parsed, plant)
     dest = tmp_path / "stand_in_register.json"
     dest.write_text(json.dumps(parsed), encoding="utf-8")
-    with pytest.raises(RegisterRefusal, match="row_shape"):
+    from product.tests.test_fc_register_survivors import PLANT_REASONS
+
+    with pytest.raises(
+        RegisterRefusal, match="^register_" + PLANT_REASONS[plant] + "$"
+    ):
         read_fc_register_rows(str(dest), listed_sha256=listed(str(dest)))
 
 

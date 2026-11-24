@@ -11,6 +11,9 @@ from typing import TypedDict
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, Response
 
+from eii_core.reasons import closed_code
+from eii_core.reasons import reason as closed_reason
+from eii_product.api.playbooks import refusal
 from eii_product.config import map_setting, read_maptile_api_key
 from eii_product.photoreal_tiles.limit import (
     LOCK,
@@ -51,8 +54,8 @@ def build_router(
             configured = map_setting("EII_PHOTOREAL_LIMIT")
             limit = min(maximum, max(0, int(configured))) if configured else maximum
             return price, limit
-        except (ValueError, InvalidOperation):
-            raise BudgetFailure("count_unavailable") from None
+        except (ValueError, InvalidOperation) as error:
+            raise BudgetFailure(closed_reason(error, "count_unavailable")) from None
 
     def limit() -> int:
         return pricing()[1]
@@ -72,7 +75,7 @@ def build_router(
             try:
                 budget.available(limit())
             except BudgetFailure as error:
-                return str(error)
+                return closed_reason(error, "count_unavailable")
         return None
 
     @router.get("/api/map-modes")
@@ -91,16 +94,17 @@ def build_router(
                     why = (
                         "cap_reached" if meter["billable_requests"] >= maximum else None
                     )
-            except BudgetFailure:
+            except BudgetFailure as error:
                 if why is None or why == "cap_reached":
-                    why = "count_unavailable"
+                    why = closed_reason(error, "count_unavailable")
             modes[mode] = {"available": why is None, "reason": why, "meter": meter}
         return JSONResponse(modes, headers=NO_STORE)
 
     @router.get("/api/imagery/tiles/{z}/{x}/{y}")
     def imagery(z: str, x: str, y: str) -> Response:
-        if reason(True) is not None:
-            return refuse()
+        why = reason(True)
+        if why is not None:
+            return refuse(why)
         if not all(
             value.isascii() and value.isdecimal() and len(value) <= 2 for value in (z,)
         ):
@@ -116,16 +120,22 @@ def build_router(
         key = key_reader()
         if not key:
             return refuse()
-        credit = satellite_credit(opener, map_setting("EII_IMAGERY_TILE_BASE"), key)
+        try:
+            credit = satellite_credit(opener, map_setting("EII_IMAGERY_TILE_BASE"), key)
+        except Exception as error:
+            return refuse(closed_reason(error))
         if not credit:
             return refuse()
-        result = fetch_tile(
-            opener,
-            map_setting("EII_IMAGERY_TILE_BASE"),
-            f"tile/{z}/{y}/{x}",
-            key,
-            satellite=True,
-        )
+        try:
+            result = fetch_tile(
+                opener,
+                map_setting("EII_IMAGERY_TILE_BASE"),
+                f"tile/{z}/{y}/{x}",
+                key,
+                satellite=True,
+            )
+        except Exception as error:
+            return refuse(closed_reason(error))
         status, raw, headers = result
         if not safe_response(raw, headers, key):
             return refuse()
@@ -171,8 +181,8 @@ def build_router(
                 target = native.target(
                     view, path, map_setting("EII_PHOTOREAL_TILE_BASE")
                 )
-            except NativeFailure:
-                return refuse()
+            except NativeFailure as error:
+                return refuse(closed_reason(error))
             step = JournalStep()
             try:
                 result = budget.request(
@@ -189,12 +199,14 @@ def build_router(
                     step,
                 )
             except BudgetFailure as error:
-                return refuse(str(error))
+                return refuse(closed_reason(error))
             issued = meter_header(pricing, step.count)
             status, raw, headers = result
             if not 200 <= status < 300 or not safe_response(raw, headers, key):
                 native.dispose(view)
-                return refuse()
+                return refuse(
+                    closed_code(headers.get("x-eii-error-code"), "response_unavailable")
+                )
             try:
                 if target.path.endswith(".json"):
                     raw = native.rewrite(
@@ -202,9 +214,9 @@ def build_router(
                     )
                     headers["content-type"] = "application/json"
                 native.refuse_session_echo(view, raw)
-            except NativeFailure:
+            except NativeFailure as error:
                 native.dispose(view)
-                return refuse()
+                return refuse(closed_reason(error))
             return deliver(
                 (status, raw, headers),
                 key,
@@ -218,11 +230,13 @@ def build_router(
 
 def refuse(reason: str = "no_key") -> JSONResponse:
     capped = reason == "cap_reached"
-    return JSONResponse(
-        {"error": {"code": "PROVIDER_CAP_REACHED" if capped else "NOT_FOUND"}},
-        status_code=429 if capped else 404,
-        headers=NO_STORE,
+    response = refusal(
+        429 if capped else 404,
+        "PROVIDER_CAP_REACHED" if capped else "NOT_FOUND",
+        message_key=closed_code(reason, "operation_failed"),
     )
+    response.headers.update(NO_STORE)
+    return response
 
 
 class IssuedSpend(TypedDict):
@@ -260,7 +274,9 @@ def deliver(
 ) -> Response:
     status, raw, headers = result
     if not 200 <= status < 300 or not safe_response(raw, headers, key):
-        return refuse()
+        return refuse(
+            closed_code(headers.get("x-eii-error-code"), "response_unavailable")
+        )
     outgoing = dict(NO_STORE)
     credit = headers.get("x-attribution", "")
     if (require_credit and not credit) or (

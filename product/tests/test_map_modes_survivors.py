@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import pytest
 from fastapi import FastAPI
+from product.tests.reason_contract import assert_error
 from product.tests.test_map_modes import invoke, view_query
 from product.tests.test_map_modes import provider as provider
 
@@ -29,14 +30,14 @@ def expected_meter(*, limit=None, warning=False):
     }
 
 
-def assert_refusal(response, *, capped=False):
+def assert_refusal(response, *, capped=False, reason="no_key"):
     status, raw, headers = response
     if capped:
         assert status == 429
-        assert raw == b'{"error":{"code":"PROVIDER_CAP_REACHED"}}'
+        assert_error(raw, "PROVIDER_CAP_REACHED", "cap_reached")
     else:
         assert status == 404
-        assert raw == b'{"error":{"code":"NOT_FOUND"}}'
+        assert_error(raw, "NOT_FOUND", reason)
     assert headers[b"cache-control"] == b"no-store"
     assert headers[b"content-type"] == b"application/json"
 
@@ -73,7 +74,9 @@ def test_invalid_configuration_reason(tmp_path, provider, monkeypatch, setting, 
         "reason": "count_unavailable",
         "meter": None,
     }
-    assert_refusal(invoke(app, "/api/photoreal/views", "POST"))
+    assert_refusal(
+        invoke(app, "/api/photoreal/views", "POST"), reason="count_unavailable"
+    )
     assert calls == []
 
 
@@ -124,7 +127,10 @@ def test_damaged_counter_reason_and_body(tmp_path, provider):
     app = create_app(tmp_path, opener=opener, count_path=count)
     query = view_query(app)
     count.write_text("ready:0\npending:0\n")
-    assert_refusal(invoke(app, "/api/photoreal/3dtiles/root.json", query=query))
+    assert_refusal(
+        invoke(app, "/api/photoreal/3dtiles/root.json", query=query),
+        reason="count_unavailable",
+    )
     assert json.loads(invoke(app, "/api/map-modes")[1])["photoreal"] == {
         "available": False,
         "reason": "count_unavailable",
@@ -174,7 +180,7 @@ def test_schema_refusal_exact_body(provider):
         require_credit=False,
     )
     assert result.status_code == 404
-    assert result.body == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(result.body, "NOT_FOUND", "no_key")
     assert result.headers["cache-control"] == "no-store"
 
 

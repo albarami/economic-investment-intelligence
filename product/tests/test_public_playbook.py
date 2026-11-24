@@ -523,7 +523,16 @@ def test_loaded_http_route_and_ledger(loaded_playbook, monkeypatch, plant, capsy
         if messages[0]["status"] != 202 and method == "POST":
             from product.tests.test_playbook_http import assert_http_error
 
-            assert_http_error(messages, messages[0]["status"], capsys)
+            assert_http_error(
+                messages,
+                messages[0]["status"],
+                capsys,
+                message_key="ledger_cardinality"
+                if plant in {"zero", "duplicate"}
+                else "NOT_FOUND"
+                if plant == "unknown"
+                else None,
+            )
         return messages[0]["status"], b"".join(m.get("body", b"") for m in messages)
 
     async def run():

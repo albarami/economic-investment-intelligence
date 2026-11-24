@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, Request
 from pydantic import ValidationError
 from starlette.responses import JSONResponse
 
+from eii_core.reasons import closed_code
 from eii_product.api.area_context import AreaContextFactory
 from eii_product.api.playbooks import PlaybookRoute, refusal
 from eii_product.api.results import PublicResult, error_response, respond
@@ -45,8 +46,16 @@ def _resolved(
         if not result.payload["candidates"]:
             raise ValueError("resolve_result_invalid")
     elif result.status not in {"NO_DATA", "OUT_OF_SCOPE"} or result.payload is not None:
-        raise ValueError("resolve_result_invalid")
-    return PublicResult(result.tool, result.status, result.release_id, result.payload)
+        raise ValueError(closed_code(result.reason, "resolve_result_invalid"))
+    return PublicResult(
+        result.tool,
+        result.status,
+        result.release_id,
+        result.payload,
+        reason=closed_code(result.reason, "operation_failed")
+        if result.reason is not None
+        else None,
+    )
 
 
 def build_tools_router(

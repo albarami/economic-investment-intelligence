@@ -19,7 +19,12 @@ def test_closed_inputs(change):
         def fetch(self, *args):
             raise AssertionError("input read before validation")
 
-    with pytest.raises(ValueError, match="INVALID_ARGUMENT"):
+    with pytest.raises(
+        ValueError,
+        match="^"
+        + ("INVALID_ARGUMENT" if "year" in change else next(iter(change)))
+        + "$",
+    ):
         sector_facts(
             Unread(),
             {
@@ -396,7 +401,11 @@ def test_mixed_geography_cannot_bypass_assembly():
     assert list(ctx.facts.values()) == [fact]
     ctx2 = Context(object(), ctx.inputs)
     ctx2.block("SYN-empty", [forged])
-    assert ctx2.blocks == [dict(block="SYN-empty", status="NO_DATA", fact_ids=[])]
+    assert ctx2.blocks == [
+        dict(
+            block="SYN-empty", status="NO_DATA", fact_ids=[], reason_key="fact_invalid"
+        )
+    ]
 
 
 def test_stored_bulk_flag_agrees_with_the_calculator():

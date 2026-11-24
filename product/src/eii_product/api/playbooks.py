@@ -15,6 +15,8 @@ from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 
+from eii_core.reasons import closed_code, reason
+
 if TYPE_CHECKING:
     from eii_product.api.area_context import AreaContextFactory
     from eii_product.api.release import MountedRelease
@@ -35,9 +37,15 @@ def refusal(
     status: int,
     code: str,
     *,
+    message_key: str | None = None,
     answer_id: str | None = None,
     release_id: str | None = None,
 ) -> JSONResponse:
+    diagnostic = (
+        closed_code(message_key, code.lower())
+        if message_key is not None
+        else code.lower()
+    )
     error_id = str(uuid4())
     print(
         json.dumps(
@@ -52,7 +60,7 @@ def refusal(
                 release_id=release_id,
                 status=status,
                 duration_ms=None,
-                error_code=code,
+                error_code=code if message_key is None else diagnostic,
                 error_id=error_id,
             ),
             sort_keys=True,
@@ -64,7 +72,7 @@ def refusal(
         content={
             "error": {
                 "code": code,
-                "message_key": code.lower(),
+                "message_key": diagnostic,
                 "error_id": error_id,
             }
         },
@@ -130,8 +138,8 @@ def build_router(
     ) -> dict[str, str] | Response:
         try:
             definition = load_playbook(playbook, catalogue)
-        except ValueError:
-            return refusal(404, "NOT_FOUND")
+        except (ValueError, OSError) as error:
+            return refusal(404, "NOT_FOUND", message_key=reason(error))
         try:
             inputs = Inputs.model_validate(raw)
         except ValueError:
@@ -158,13 +166,15 @@ def build_router(
                 if session is not None:
                     request.app.state.sessions.release(session)
                 raise
-        except ArgumentError:
-            return refusal(422, "INVALID_ARGUMENT")
+        except ArgumentError as error:
+            return refusal(422, "INVALID_ARGUMENT", message_key=reason(error))
         except SessionsFull:
             return refusal(429, "RATE_LIMITED")
-        except Exception:
-            return refusal(
-                500, "PLAYBOOK_FAILED", answer_id=answer_id, release_id=store.release_id
+        except Exception as error:
+            from eii_product.api.results import error_response
+
+            return error_response(
+                error, answer_id=answer_id, release_id=store.release_id
             )
         if admit is not None and session is not None:
             admit(session.key)

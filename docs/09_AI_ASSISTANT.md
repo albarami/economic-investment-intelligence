@@ -706,3 +706,19 @@ S8-T01's named catalogue-retrieval sub-step starts in process and must lower rou
 Under [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) items 4 and 5 (S2-T51), `POST /api/address-search/structured` accepts exactly string fields `zone`, `street`, `building`, with no text, language, limit, URL, utility account, PIN or person field. It reads only `pub_address_point` and returns bounded, feature-key-ordered candidates with published subtype/point and release/source lineage, and found, ambiguous, not-found or missing-source status. Duplicate triples remain ambiguous; nothing guesses a point. The request and result never enter a log, ledger, model payload or persisted query/result store. The fixed read `structured-address-v1` and composite index apply in both stores. The model has no callable tool for this route. Every displayed address numeral uses the Fact chip family.
 
 `GET /api/gis-imagery/{date}/{level}/{row}/{column}` serves only explicitly selected verified released pictures, with credits from `/api/gis-imagery/credit`; the page shows the selected date's publisher, service, retrieval date and terms/basis while imagery is visible (PUB-110). A missing snapshot remains missing coverage. No product reader imports custodian code, contacts the centre, reads the external root or infers a number from a tile. Level 11 and free text are refused by name before any send, with keys present/absent and offline control set/unset. This supplement leaves BE-135, BE-136, AI-130, FE-142, TST-248, TST-249, OPS-73 and the keyed provider unchanged.
+
+### Part-B closed answer-path diagnostics
+
+S3-T11 early round S3-P02 Part B retains the inner closed `message_key` through
+playbook definition, execution, layer/card preparation and ledger refusals
+(document 08, **Closed API reasons (S3-T11 early round, Part B)**). Store faults
+use `STORE_UNAVAILABLE`, timeouts `QUERY_TIMEOUT`, and other execution faults
+`INTERNAL`. Error text never becomes catalogue text or model input. Catalogue
+YAML syntax errors use `yaml_invalid`; a successfully parsed non-mapping still
+uses `NOT_MAPPING`. The catalogue remains closed and no new rendered wording is
+added. Tool `NO_DATA` outcomes retain their closed reason and emit no withheld
+fact. Part C and S3-T11 closure remain pending.
+
+Field diagnostics name only declared tool-input fields. An unknown property,
+even one spelled like another closed diagnostic, remains `INVALID_ARGUMENT`;
+a visitor cannot select a diagnostic category through an extra property name.

@@ -12,6 +12,30 @@ from product.tests.test_fc_register_read import (
 
 from eii_product.register_file import RegisterRefusal, read_fc_register_rows
 
+PLANT_REASONS = {
+    "duplicate_registration_key": "row_duplicate",
+    "duplicate_row_id": "row_duplicate",
+    "lon_without_lat": "position_incomplete",
+    "lat_without_lon": "position_incomplete",
+    "lon_syntax": "position_invalid",
+    "lat_syntax": "position_invalid",
+    "card_not_object": "card_invalid",
+    "card_missing_field": "card_invalid",
+    "card_extra_field": "card_invalid",
+    "card_blank": "card_text_invalid",
+    "card_untrimmed": "card_text_invalid",
+    "card_not_text": "card_text_invalid",
+    "release_hash_not_text": "hash_invalid",
+    "release_hash_syntax": "hash_invalid",
+    "source_hash_not_text": "hash_invalid",
+    "source_hash_syntax": "hash_invalid",
+    "year_not_text": "year_invalid",
+    "year_syntax": "year_invalid",
+    "date_not_text": "retrieved_invalid",
+    "date_syntax": "retrieved_invalid",
+    "date_impossible": "retrieved_date_invalid",
+}
+
 
 def _unchecked(value: object) -> Any:
     return value
@@ -27,7 +51,7 @@ def _refusal(caught: pytest.ExceptionInfo[RegisterRefusal], reason: str) -> None
 def test_setting_refusal(setting: object) -> None:
     with pytest.raises(RegisterRefusal) as caught:
         read_fc_register_rows(_unchecked(setting), listed_sha256="0" * 64)
-    _refusal(caught, "row_shape")
+    _refusal(caught, "register_setting_invalid")
 
 
 def test_path_refusal(tmp_path: Path) -> None:
@@ -45,7 +69,9 @@ def test_document_refusal(tmp_path: Path, raw: str) -> None:
     path.write_text(raw, encoding="utf-8")
     with pytest.raises(RegisterRefusal) as caught:
         read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
-    _refusal(caught, "row_shape")
+    _refusal(
+        caught, "register_json_invalid" if raw == "{" else "register_document_invalid"
+    )
 
 
 @pytest.mark.parametrize(
@@ -81,7 +107,7 @@ def test_existing_plants_have_exact_refusals(tmp_path: Path, plant: str) -> None
     path.write_text(json.dumps(parsed), encoding="utf-8")
     with pytest.raises(RegisterRefusal) as caught:
         read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
-    _refusal(caught, "row_shape")
+    _refusal(caught, "register_" + PLANT_REASONS[plant])
 
 
 @pytest.mark.parametrize(
@@ -130,7 +156,7 @@ def test_field_refusals(
     path.write_text(json.dumps(parsed), encoding="utf-8")
     with pytest.raises(RegisterRefusal) as caught:
         read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
-    _refusal(caught, "row_shape")
+    _refusal(caught, field_reason(route, value))
 
 
 def test_duplicate_district_refusal(tmp_path: Path) -> None:
@@ -140,7 +166,7 @@ def test_duplicate_district_refusal(tmp_path: Path) -> None:
     path.write_text(json.dumps(parsed), encoding="utf-8")
     with pytest.raises(RegisterRefusal) as caught:
         read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
-    _refusal(caught, "row_shape")
+    _refusal(caught, "register_district_duplicate")
 
 
 def test_gazetteer_fields_and_explicit_same_path(tmp_path: Path) -> None:
@@ -183,4 +209,46 @@ def test_reader_decodes_utf8_after_the_hash(tmp_path: Path) -> None:
     path.write_bytes(json.dumps(parsed, ensure_ascii=False).encode("utf-16"))
     with pytest.raises(RegisterRefusal) as caught:
         read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
-    _refusal(caught, "row_shape")
+    _refusal(caught, "register_json_invalid")
+
+
+def field_reason(route, value):
+    """Independent oracle over the register's named fields and containers."""
+    if route[0] == "rows":
+        if len(route) == 1:
+            suffix = "rows_invalid"
+        elif len(route) == 2:
+            suffix = "row_invalid"
+        else:
+            suffix = {
+                "unknown": "column_unknown",
+                "row_id": "row_id_invalid",
+                "district_free_zone": "district_flag_invalid",
+                "registration_key": "token_invalid",
+                "card": "card_text_invalid",
+            }[route[2]]
+    elif route[0] == "gazetteer":
+        suffix = (
+            "gazetteer_invalid"
+            if len(route) == 1
+            else "gazetteer_row_invalid"
+            if len(route) == 2
+            else "place_code_invalid"
+            if route[2] == "place_code"
+            else "place_duplicate"
+        )
+    elif route[0] == "districts":
+        suffix = (
+            "districts_invalid"
+            if len(route) == 1
+            else "district_invalid"
+            if len(route) == 2
+            else "ring_invalid"
+            if len(route) == 3
+            else "ring_point_invalid"
+            if len(route) == 4
+            else "ring_coordinate_invalid"
+        )
+    else:
+        suffix = {"source": "source_invalid", "lineage": "lineage_invalid"}[route[0]]
+    return "register_" + suffix

@@ -263,7 +263,7 @@ def test_config_write_failure_is_closed_and_cleans_storage(extract, monkeypatch)
 
     monkeypatch.setattr("eii_product.api.area_context.TemporaryDirectory", storage)
     monkeypatch.setattr(Path, "write_text", failed)
-    with pytest.raises(ConfigError, match=r"^routing_tiles$") as caught:
+    with pytest.raises(ConfigError, match=r"^operation_os_error$") as caught:
         RoutingSource.from_tiles(extract[0] / TILES, extract[0])
     assert caught.value.__context__ is None
     assert all(not Path(s.name).exists() for s in storages)

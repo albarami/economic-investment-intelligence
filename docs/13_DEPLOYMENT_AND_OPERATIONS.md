@@ -936,3 +936,26 @@ budget alert or cap in the provider account as a backstop; none is configured by
 this task. Release restoration excludes this journal. The real provider adapters
 and frontend integration remain incomplete; this work does not authorize live
 use or claim all of OPS-74 is satisfied.
+
+### Closed API and tool reasons (S3-T11 early round, Part B)
+
+The Part-A diagnostic helper is also the API/tool boundary. API responses retain
+the BE-91 envelope and place the whole inner closed reason in `message_key`;
+refusal logs put it in `error_code`. See document 08, **Closed API reasons
+(S3-T11 early round, Part B)**. No documented CLI command or named printed outcome changes in this round;
+rule 44 is unchanged. Its existing promise to preserve a closed inner reason
+also applies to the extended diagnostic vocabulary.
+
+`make_area` separates bad user arguments from release geometry, grid and routing
+configuration failures. `resolve` preserves a refused candidate's reason;
+malformed release keys, codes or geometry withhold the result with a closed
+reason rather than silently dropping the row. Sector blocks retain chain,
+validation and ambiguous employee-total reasons while withholding the same
+facts. Public context cards retain their calculator's `NoData` reason. Provider
+transport diagnostics contain no URL or response text; the existing journal
+still distinguishes billable success, known unbillable redirect and an unknown
+outcome that must stay pending. Catalogue syntax diagnostics use `yaml_invalid`.
+
+The shared static reason guard includes the Part-B modules. Its D18 regression
+plant, behavioural table and guard-deletion evidence are part of this local
+candidate; independent maker acceptance remains the lead's review step.

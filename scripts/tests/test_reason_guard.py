@@ -364,3 +364,23 @@ def test_exception_output_invariant(name: str, form: str, sink: str) -> None:
         + "\n"
     )
     assert violations(safe) == []
+
+
+class PartBGuard(unittest.TestCase):
+    def test_d18_reverted(self) -> None:
+        source = 'try:\n    read_layer()\nexcept Exception:\n    return refusal(500, "INTERNAL")\n'
+        self.assertEqual(violations(source), [3])
+
+    def test_part_b_inventory_cannot_disappear(self) -> None:
+        from reason_guard import MODULES
+
+        self.assertIn("product/src/eii_product/api/results.py", MODULES)
+        with patch("reason_guard.violations", return_value=[1]):
+            self.assertTrue(check(ROOT))
+
+
+def test_actual_d18_projection_reverted() -> None:
+    source = 'def error_response(error):\n    return refusal(500, "INTERNAL")\n'
+    assert violations(source) == [2]
+    safe = 'def error_response(error):\n    diagnostic = reason(error)\n    return refusal(500, "INTERNAL", message_key=diagnostic)\n'
+    assert violations(safe) == []

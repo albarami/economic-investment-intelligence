@@ -1109,6 +1109,31 @@ Model unavailability is not an error: it is reported as a `status` event with `w
 | BE-94 | Logs are JSON lines on standard output with `ts`, `level`, `event`, `answer_id`, `seat_key`, `tool`, `engine`, `release_id`, `status`, `duration_ms`, `error_code`, `error_id`. |
 | BE-95 | Logs never contain the API key, the traffic provider key, the imagery provider key or `MAPTILE_API_KEY`, request headers, a provider request URL, anything of a provider response, model payloads (only `egress_id`), question text, the text or any result of an address search (BE-136; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 7), scenario-input values, a drawn shape's coordinates, or a case sample file or any value computed from it. |
 
+### Closed API reasons (S3-T11 early round, Part B)
+
+The BE-91 `code` selects the HTTP error class above. `message_key` preserves the
+inner closed diagnostic, without lowercasing or rewording it; the matching BE-94
+log uses that diagnostic as `error_code`. Calls with no inner diagnostic retain
+their existing default message key and log code. The sole vocabulary is
+`eii_core.reason_codes.CODES`, projected by `eii_core.reasons.reason` and
+`closed_code`. No exception excerpt, YAML text, path, SQL, coordinate or provider
+response is admitted. Unstructured faults use the Part-A key/type/attribute,
+timeout and operating-system classes, otherwise `operation_failed`.
+
+| HTTP class | Closed inner diagnostic families |
+|---|---|
+| `INTERNAL` | layer/card binding, source-chain and citation failures (`metric_unbound`, `chain_refused`, `row_citation_missing`, `source_*`, `lineage_*`); register `register_*` shape faults and `path_refused`; mounted-release checks; make-area release geometry, grid and routing configuration faults |
+| `STORE_UNAVAILABLE`, `QUERY_TIMEOUT` | playbook execution retains the same store/timeout classification as direct tool requests, with its closed diagnostic |
+| `NOT_FOUND` | playbook-definition diagnostics; asset/font path, stack, span, range or missing-file diagnostics; optional provider availability (`no_key`, `offline`, `no_address`, `count_unavailable`, `response_unavailable`) and closed transport diagnostics |
+| `PROVIDER_CAP_REACHED` | `cap_reached`, with the existing refusal and request-count behaviour |
+| `INVALID_ARGUMENT` | the closed reason of an actual argument refusal; data/configuration failures in make-area instead use `INTERNAL` |
+
+This early round covers D18–D31, D37–D47 and D53 only. A withheld value remains
+withheld: layer payloads carry `withheld` entries with `reason_key`; card entries
+and sector blocks retain their `reason_key`. A broken point snapshot refuses
+instead of supplying an incomplete snapshot to an area answer. The browser's
+Part-C refusal state is a later round; no new display prose is introduced here.
+
 ## 13. Performance budgets
 
 All values are targets, to be measured on the build machine and recorded; none is a promise.

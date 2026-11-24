@@ -12,6 +12,9 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Response
 
+from eii_core.reasons import reason
+from eii_product.api.playbooks import refusal
+
 _HASH = re.compile(r"[a-f0-9]{64}")
 _DATE = re.compile(r"[0-9]{4}-[0-9]{2}")
 
@@ -38,8 +41,8 @@ class ReleasedImagery:
             self.sources: tuple[dict[str, Any], ...] = tuple(data["sources"])
             self.credit = self.sources[0]
             self.coverage: dict[str, Any] = data["coverage"]
-        except (OSError, KeyError, TypeError, json.JSONDecodeError):
-            raise ValueError("imagery_manifest_integrity") from None
+        except (OSError, KeyError, TypeError, json.JSONDecodeError) as error:
+            raise ValueError(reason(error, "imagery_manifest_integrity")) from None
 
     def _path(self, relative: str) -> Path:
         candidate = self.directory / relative
@@ -114,8 +117,8 @@ class ReleasedImagery:
             ):
                 raise ValueError("imagery_integrity")
             return body
-        except (OSError, KeyError, TypeError):
-            raise ValueError("imagery_integrity") from None
+        except (OSError, KeyError, TypeError) as error:
+            raise ValueError(reason(error, "imagery_integrity")) from None
 
 
 def imagery_router(imagery: ReleasedImagery | None) -> APIRouter:
@@ -128,7 +131,7 @@ def imagery_router(imagery: ReleasedImagery | None) -> APIRouter:
         try:
             body = imagery.tile(date, level, row, column)
         except ValueError as error:
-            raise HTTPException(status_code=422, detail=str(error)) from None
+            return refusal(422, "INVALID_ARGUMENT", message_key=reason(error))
         if body is None:
             raise HTTPException(status_code=404, detail="missing-coverage")
         return Response(

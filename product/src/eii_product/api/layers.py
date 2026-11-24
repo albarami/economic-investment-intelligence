@@ -143,7 +143,9 @@ def build_layer_router(
         except RegisterRefusal as exc:
             if exc.reason == "read_refused":
                 return _no_data("read_refused")
-            raise
+            from eii_product.api.results import error_response
+
+            return error_response(exc)
         if bundle is None or _chain_broken(bundle):
             return _no_data("missing_input")
         body = _serve(bundle)

@@ -3,6 +3,7 @@
 import json
 
 import pytest
+from product.tests.reason_contract import assert_error
 
 from eii_product.photoreal_tiles.native import NativeFailure, NativeViews, Target
 
@@ -139,7 +140,7 @@ def test_route_alias_overflow_disposes_view_after_counting_billable_fetch(
     alias = json.loads(raw)["root"]["children"][0]["content"]["uri"]
     status, raw, headers = invoke(app, alias, query=query)
     assert status == 404 and headers[b"cache-control"] == b"no-store"
-    assert raw == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(raw, "NOT_FOUND", "native-view-unavailable")
     assert not native.contains(view)
     assert count.read_text() == "ready:0\npending:0\nready:1\npending:1\nready:2\n"
     assert invoke(app, alias, query=query)[0] == 404
@@ -411,7 +412,9 @@ def test_route_counts_success_when_body_read_is_interrupted(
     status, raw, headers = invoke(app, path, query=query)
     assert status == 404
     assert headers[b"cache-control"] == b"no-store"
-    assert raw == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(
+        raw, "NOT_FOUND", "NOT_FOUND" if address_failure else "operation_os_error"
+    )
     assert closed == [True]
     assert count.read_text() == before + f"pending:{initial}\nready:{initial + 1}\n"
     assert len(exchange_errors) == 1
@@ -449,7 +452,7 @@ def test_route_indeterminate_exchange_stays_pending_after_restart(
     status, raw, headers = invoke(app, path, query=query)
     assert status == 404
     assert headers[b"cache-control"] == b"no-store"
-    assert raw == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(raw, "NOT_FOUND", "operation_timeout")
     assert count.read_text() == before + f"pending:{initial}\n"
     assert len(exchange_errors) == 1
     for marker in ("SYN-invented-key", "SYN-header-value", BASE):
@@ -547,7 +550,7 @@ def test_route_redirect_resolves_unbillable_and_later_view_sends(
     status, raw, headers = invoke(app, path, query=query)
     assert status == 404
     assert headers[b"cache-control"] == b"no-store"
-    assert raw == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(raw, "NOT_FOUND", "NOT_FOUND")
     refused_journal = before + f"pending:{initial}\nready:{initial}\n"
     assert count.read_text() == refused_journal
     assert len(calls) == initial + 1
@@ -614,7 +617,7 @@ def test_route_unreadable_status_stays_pending_and_sends_nothing_further(
     status, raw, headers = invoke(app, path, query=query)
     assert status == 404
     assert headers[b"cache-control"] == b"no-store"
-    assert raw == b'{"error":{"code":"NOT_FOUND"}}'
+    assert_error(raw, "NOT_FOUND", "NOT_FOUND")
     assert count.read_text() == before + f"pending:{initial}\n"
     for application in (app, create_app(tmp_path, opener=opener, count_path=count)):
         assert json.loads(invoke(application, "/api/map-modes")[1])["photoreal"] == {

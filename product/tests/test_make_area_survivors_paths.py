@@ -169,9 +169,9 @@ def test_a_missing_tile_folder_is_refused() -> None:
     context = MakeAreaContext(
         "abcdef0123456789", "public_only", None, object(), object()
     )
-    with pytest.raises(ArgumentError) as caught:
+    with pytest.raises(ValueError) as caught:
         _routing(context, "walk", 5, Decimal("1"), Decimal("2"))
-    full_message(caught.value, INVALID_ARGUMENT)
+    full_message(caught.value, "routing_tiles")
 
 
 class _Name:
@@ -222,9 +222,9 @@ def test_a_grid_row_must_be_two_integers() -> None:
         def fetch(self, query: object, params: object) -> QueryResult:
             return QueryResult(("cell", "resolution"), ((1, "8"),))
 
-    with pytest.raises(ArgumentError) as caught:
+    with pytest.raises(ValueError) as caught:
         _frame(Store(), _Inventory())
-    full_message(caught.value, INVALID_ARGUMENT)
+    full_message(caught.value, "grid_row_invalid")
 
 
 def test_a_pin_without_a_latitude_is_refused() -> None:

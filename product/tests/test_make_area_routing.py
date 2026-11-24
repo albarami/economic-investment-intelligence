@@ -96,7 +96,7 @@ def test_unreadable_configuration_names_no_path() -> None:
     config.chmod(0)
     try:
         with pytest.raises(
-            RoutingTilesUnavailable, match="routing tiles unavailable"
+            RoutingTilesUnavailable, match="operation_os_error"
         ) as caught:
             outline(folder, "walk", 5, 0.0, 0.0)
         _names_no_path(caught.value, folder)

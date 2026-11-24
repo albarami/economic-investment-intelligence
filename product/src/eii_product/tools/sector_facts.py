@@ -13,7 +13,7 @@ from decimal import Decimal
 from typing import Any, Literal, cast
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from eii_core import calc
 from eii_core.calc.facts import (
@@ -27,6 +27,8 @@ from eii_core.calc.public_methods import AnnualEnergy
 from eii_core.calc.public_series import C2_CALENDAR, bulk_months, complete_years
 from eii_core.calc.sector_economics import Component
 from eii_core.facts import SIZE_BAND, Fact, validate_chain
+from eii_core.reasons import closed_code
+from eii_core.reasons import reason as closed_reason
 from eii_product.store import ReleaseStore
 from eii_product.store.protocol import Param
 from eii_product.store.registry import PACKAGED
@@ -163,10 +165,13 @@ class Context:
                 try:
                     # Revalidate at assembly; model_construct/model_copy cannot bypass DAT-90.
                     checked = Fact.model_validate(fact.model_dump())
-                except ValueError:
+                except ValueError as error:
+                    reason = closed_reason(error, "fact_invalid")
                     continue
                 lines, sources = self.chains.get(checked.lineage_ref, ([], []))
-                if validate_chain(checked.lineage_ref, lines, sources) is not None:
+                broken = validate_chain(checked.lineage_ref, lines, sources)
+                if broken is not None:
+                    reason = closed_code(broken, "chain_refused")
                     continue
                 self.facts[checked.fact_id] = checked
                 valid.append(checked.fact_id)
@@ -175,7 +180,7 @@ class Context:
             status="OK" if valid else status,
             fact_ids=list(dict.fromkeys(valid)),
         )
-        if reason is not None and (valid or not values):
+        if reason is not None:
             block["reason_key"] = reason
         self.blocks.append(block)
 
@@ -247,6 +252,7 @@ def _licences(ctx: Context) -> None:
             ],
         )
     density: Fact | None = None
+    density_reason = None
     # PUB-72 explicitly fixes this snapshot to the residents year; no inferred year selection.
     if (
         len(residents) == 1
@@ -268,9 +274,9 @@ def _licences(ctx: Context) -> None:
                 count=local[0]["active_count"],
                 caveats=("licence_activity_not_firm", "snapshot_may_2025"),
             )
-        except ValueError:
-            pass
-    ctx.block("density", [density])
+        except ValueError as error:
+            density_reason = closed_reason(error)
+    ctx.block("density", [density], reason=density_reason)
 
 
 def _churn(ctx: Context) -> None:
@@ -626,7 +632,11 @@ def _norms(ctx: Context) -> None:
             if row["period"] == period and row["unit"] == "count"
         ]
         if len(totals) != 1:
-            ctx.block("unit_economics", [])
+            ctx.block(
+                "unit_economics",
+                [],
+                reason="employee_total_ambiguous" if totals else "missing_input",
+            )
             continue
 
         def measure(row: Mapping[str, Any], unit: str) -> Measure:
@@ -659,8 +669,8 @@ def _norms(ctx: Context) -> None:
                 services_percent=measure(cells["services_share"], "percent"),
                 components=components,
             )
-        except (ValueError, KeyError):
-            ctx.block("unit_economics", [])
+        except (ValueError, KeyError) as error:
+            ctx.block("unit_economics", [], reason=closed_reason(error))
             continue
         ctx.block(
             "unit_economics",
@@ -688,8 +698,14 @@ def sector_facts(store: ReleaseStore, raw: Mapping[str, object]) -> dict[str, An
             raise ValueError("geography")
         if args.scenario_inputs is not None and args.topic != "unit_economics":
             raise ValueError("scenario")
-    except ValueError:
-        raise ValueError("INVALID_ARGUMENT") from None
+    except ValidationError as error:
+        faults = error.errors(include_input=False, include_url=False)
+        field = faults[0]["loc"][0] if faults and faults[0]["loc"] else None
+        if field not in Inputs.model_fields:
+            field = None
+        raise ValueError(closed_code(field, "INVALID_ARGUMENT")) from None
+    except ValueError as error:
+        raise ValueError(closed_reason(error, "INVALID_ARGUMENT")) from None
     ctx = Context(store, args)
     if args.topic == "licences":
         _licences(ctx)

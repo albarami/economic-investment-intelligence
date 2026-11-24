@@ -246,7 +246,7 @@ def test_foreign_release_answer_admits_nothing_and_rolls_back(fresh):
     rows = ledger.rows()
     with patch("eii_product.api.playbooks.execute", side_effect=planted):
         started = client.post("/api/playbooks/site_check", json={**START, **AREA})
-    assert code(started) == (500, "PLAYBOOK_FAILED")
+    assert code(started) == (500, "INTERNAL")
     assert mount.answered == {}
     assert ledger.rows() == rows
     assert (client.cookies, client.app.state.sessions.count) == ({}, 0)
@@ -324,7 +324,7 @@ def test_failed_commit_admits_nothing(fresh):
     ):
         started = client.post("/api/playbooks/site_check", json={**START, **AREA})
         again = held.post("/api/playbooks/site_check", json={**START, **AREA})
-    assert code(started) == code(again) == (500, "PLAYBOOK_FAILED")
+    assert code(started) == code(again) == (500, "INTERNAL")
     assert len(prepared) == 2 and all(bundle.facts for bundle in prepared)
     assert set(mount.answered) == {kept}
     assert set(mount.answered[kept]) == {f["fact_id"] for f in earlier}

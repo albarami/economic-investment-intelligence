@@ -16,10 +16,13 @@ from urllib.error import URLError
 from urllib.parse import urlencode
 from urllib.request import Request
 
+from eii_core.reasons import closed_code
+
 FIND_ADDRESS_CANDIDATES = (
     "https://geocode-api.arcgis.com/arcgis/rest/services/"
     "World/GeocodeServer/findAddressCandidates"
 )
+
 MAX_LOCATIONS = 5
 REQUEST_TIMEOUT_S = 5
 _LON_LIMIT = 180
@@ -29,8 +32,8 @@ _LAT_LIMIT = 90
 class AddressFailure(Exception):
     """The provider did not yield a usable result. The message is fixed."""
 
-    def __init__(self) -> None:
-        super().__init__("NOT_FOUND")
+    def __init__(self, diagnostic: str = "NOT_FOUND") -> None:
+        super().__init__(closed_code(diagnostic, "NOT_FOUND"))
 
 
 @dataclass(frozen=True)

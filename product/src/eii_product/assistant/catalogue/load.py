@@ -10,6 +10,7 @@ from importlib.resources.abc import Traversable
 
 import yaml
 
+from eii_core.reasons import reason
 from eii_product.assistant.catalogue.directives import _directives
 from eii_product.assistant.catalogue.entries import (
     _claims,
@@ -103,16 +104,16 @@ def _read(path: Traversable, file_name: str) -> dict[str, object] | Refusal:
         return duplicate
     try:
         loaded: object = yaml.safe_load(text)
-    except yaml.YAMLError:
-        return Refusal("NOT_MAPPING", file_name)
+    except yaml.YAMLError as error:
+        return Refusal(reason(error, "yaml_invalid"), file_name)
     return _string_key_mapping(loaded, file_name)
 
 
 def _duplicate_key(text: str, file_name: str) -> Refusal | None:
     try:
         node: object = yaml.compose(text, Loader=yaml.SafeLoader)
-    except yaml.YAMLError:
-        return Refusal("NOT_MAPPING", file_name)
+    except yaml.YAMLError as error:
+        return Refusal(reason(error, "yaml_invalid"), file_name)
     if node is None:
         return None
     return _walk(node, file_name, set())

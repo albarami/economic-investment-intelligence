@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from eii_core.calc.facts import NoData, SourceChain
 from eii_core.facts import Fact, validate_chain
 from eii_core.grid import cell_centre
+from eii_core.reasons import closed_code
 from eii_product.api.results import PublicResult
 from eii_product.store.protocol import Param, ReleaseStore
 from eii_product.store.registry import PACKAGED
@@ -67,15 +68,16 @@ def chain(
     lines = read(store, "public_lineage_for_table", table_name=table)
     refs = {r["lineage_id"] for r in lines}
     if len(refs) != 1:
-        raise ValueError("missing_input")
+        raise ValueError("lineage_ambiguous" if refs else "missing_input")
     ref = next(iter(refs))
     sources = read(
         store,
         "sector_facts_sources",
         sources=list(dict.fromkeys(r["source_id"] for r in lines)),
     )
-    if validate_chain(ref, lines, sources) is not None:
-        raise ValueError("missing_input")
+    broken = validate_chain(ref, lines, sources)
+    if broken is not None:
+        raise ValueError(closed_code(broken, "chain_refused"))
     line = next(r for r in lines if r["table_name"] == table)
     src = next(r for r in sources if r["source_id"] == line["source_id"])
     method, version = line["transform"].rsplit("@", 1)
@@ -134,6 +136,13 @@ def run_card(
         )
         if isinstance(fact, Fact):
             facts.append(fact)
+        else:
+            entries.append(
+                {
+                    "status": "NO_DATA",
+                    "reason_key": closed_code(fact.reason, "missing_input"),
+                }
+            )
     else:
         rows = read(store, "population_age_sex_rows")
         bands = read(store, "population_age_sex_bands")
@@ -158,12 +167,23 @@ def run_card(
                             "sex": sex or "none",
                         }
                     )
+                else:
+                    entries.append(
+                        {
+                            "status": "NO_DATA",
+                            "reason_key": closed_code(bound.reason, "missing_input"),
+                        }
+                    )
     return PublicResult(
         tool,
         "OK" if facts else "NO_DATA",
         store.release_id,
         payload={"entries": entries},
         facts=tuple(facts),
+        reason=next(
+            (str(entry["reason_key"]) for entry in entries if "reason_key" in entry),
+            None,
+        ),
     )
 
 

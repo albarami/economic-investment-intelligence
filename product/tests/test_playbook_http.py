@@ -140,20 +140,21 @@ def test_http_unknown_answer_and_bad_cursor(capsys, path, cursor, status):
     asyncio.run(run())
 
 
-def assert_http_error(messages, status, capsys):
+def assert_http_error(messages, status, capsys, message_key=None):
     import json
     from uuid import UUID
 
     body = json.loads(b"".join(m.get("body", b"") for m in messages))
-    code = {404: "NOT_FOUND", 422: "INVALID_ARGUMENT", 500: "PLAYBOOK_FAILED"}[status]
+    code = {404: "NOT_FOUND", 422: "INVALID_ARGUMENT", 500: "INTERNAL"}[status]
+    diagnostic = message_key or ("operation_failed" if status == 500 else code.lower())
     error_id = body["error"]["error_id"]
     assert str(UUID(error_id)) == error_id
     assert body == {
-        "error": {"code": code, "message_key": code.lower(), "error_id": error_id}
+        "error": {"code": code, "message_key": diagnostic, "error_id": error_id}
     }
     logs = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
     row = next(row for row in logs if row.get("error_id") == error_id)
-    assert row["error_code"] == code
+    assert row["error_code"] == (diagnostic if message_key or status == 500 else code)
     assert set(row) == {
         "ts",
         "level",

@@ -11,6 +11,7 @@ from tempfile import TemporaryDirectory
 
 from fastapi import Depends, Request
 
+from eii_core.reasons import reason
 from eii_product.api.session_store import SessionShapes, SessionStore
 from eii_product.assistant.playbooks.engine import UnregisteredShapes
 from eii_product.config import ConfigError
@@ -53,6 +54,7 @@ class RoutingSource:
         from valhalla import get_config
 
         storage = None
+        diagnostic = "routing_tiles"
         try:
             if (
                 not isinstance(extract, Path)
@@ -77,10 +79,11 @@ class RoutingSource:
             config["additional_data"] = {}
             (folder / "config.json").write_text(json.dumps(config), encoding="utf-8")
             return cls(tile_folder=folder, _storage=storage)
-        except (OSError, ValueError, RuntimeError, tarfile.TarError):
+        except (OSError, ValueError, RuntimeError, tarfile.TarError) as error:
+            diagnostic = reason(error, "routing_tiles")
             if storage is not None:
                 storage.cleanup()
-        raise ConfigError("routing_tiles")
+        raise ConfigError(diagnostic)
 
     @classmethod
     def from_call(cls, call: RoutingCall) -> RoutingSource:

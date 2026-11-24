@@ -96,7 +96,8 @@ def test_failed_lock_stays_broken(provider, monkeypatch):
     with monkeypatch.context() as patch:
         patch.setattr(limit.fcntl, "flock", fail_lock)
         assert_failure(
-            lambda: budget.request(2, lambda: calls.append("SYN-send"), bool)
+            lambda: budget.request(2, lambda: calls.append("SYN-send"), bool),
+            "operation_os_error",
         )
     # The journal is still valid; the same Budget must nevertheless stay closed.
     assert count.read_text() == "ready:0\n"
@@ -123,7 +124,7 @@ def test_unicode_journal_is_not_decoded_with_default_encoding(provider, operatio
 def test_missing_counter_is_exact_refusal(provider):
     count, _, _, _ = provider
     count.unlink()
-    assert_failure(lambda: limit.Budget(count).available(3))
+    assert_failure(lambda: limit.Budget(count).available(3), "operation_os_error")
     assert not count.exists()
 
 
@@ -131,7 +132,7 @@ def test_read_only_journal_refuses_availability(provider):
     count, _, _, _ = provider
     count.chmod(0o400)
     try:
-        assert_failure(lambda: limit.Budget(count).available(3))
+        assert_failure(lambda: limit.Budget(count).available(3), "operation_os_error")
     finally:
         count.chmod(0o600)
 

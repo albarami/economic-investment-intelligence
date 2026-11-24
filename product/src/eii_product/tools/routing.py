@@ -8,6 +8,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, cast
 
+from eii_core.reasons import reason
 from eii_core.shapes import Ring, canonical_ring, ring_is_simple
 
 ROUTING_TILES_UNAVAILABLE = "routing tiles unavailable"
@@ -38,15 +39,16 @@ def accepted_ring(value: object) -> Ring:
     after the handler, so the message, the cause and the context carry no path
     and no engine text. A boolean is not a number.
     """
+    diagnostic = ROUTING_TILES_UNAVAILABLE
     ring: Ring | None = None
     try:
         candidate = canonical_ring(_coordinate_pairs(value))
         if ring_is_simple(candidate):
             ring = candidate
-    except (AttributeError, IndexError, KeyError, TypeError, ValueError):
-        ring = None
+    except (AttributeError, IndexError, KeyError, TypeError, ValueError) as error:
+        diagnostic = reason(error, ROUTING_TILES_UNAVAILABLE)
     if ring is None:
-        raise RoutingTilesUnavailable(ROUTING_TILES_UNAVAILABLE)
+        raise RoutingTilesUnavailable(diagnostic)
     return ring
 
 
@@ -68,14 +70,15 @@ def _isochrone(
         "polygons": True,
         "costing_options": {costing: {"speed_types": []}},
     }
+    diagnostic = ROUTING_TILES_UNAVAILABLE
     answer = None
     try:
         actor = valhalla.Actor(str(tile_folder / "config.json"))
         answer = actor.isochrone(request)
-    except (OSError, RuntimeError, ValueError, TypeError, KeyError):
-        answer = None
+    except (OSError, RuntimeError, ValueError, TypeError, KeyError) as error:
+        diagnostic = reason(error, ROUTING_TILES_UNAVAILABLE)
     if answer is None:
-        raise RoutingTilesUnavailable(ROUTING_TILES_UNAVAILABLE)
+        raise RoutingTilesUnavailable(diagnostic)
     return answer
 
 
@@ -103,6 +106,7 @@ def network_distance(
         "units": "kilometers",
         "verbose": True,
     }
+    diagnostic = ROUTING_TILES_UNAVAILABLE
     result = None
     try:
         actor = valhalla.Actor(str(tile_folder / "config.json"))
@@ -112,10 +116,17 @@ def network_distance(
             if value is not None:
                 _engine_number(value)
             result = (value, "kilometers")
-    except (OSError, RuntimeError, ValueError, TypeError, KeyError, IndexError):
-        result = None
+    except (
+        OSError,
+        RuntimeError,
+        ValueError,
+        TypeError,
+        KeyError,
+        IndexError,
+    ) as error:
+        diagnostic = reason(error, ROUTING_TILES_UNAVAILABLE)
     if result is None:
-        raise RoutingTilesUnavailable(ROUTING_TILES_UNAVAILABLE)
+        raise RoutingTilesUnavailable(diagnostic)
     return result
 
 

@@ -14,8 +14,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Protocol, cast
 
+from eii_core.reasons import reason
 from eii_core.shapes import (
-    GEOMETRY_REFUSED,
     GeometryTextError,
     Polygon,
     decode_geometry,
@@ -74,6 +74,10 @@ class ArgumentError(ValueError):
 
 class PayloadError(ValueError):
     """The payload is outside the closed model."""
+
+
+class DataRefusal(PayloadError):
+    """A malformed released row withholds an outcome; it is not a user fault."""
 
 
 class _Fetcher(Protocol):
@@ -174,11 +178,18 @@ def resolve(
         parsed = parse_request(request)
     except ArgumentError:
         return _status(release_id, INVALID_ARGUMENT, None)
-    index = context.index_for(store)
+    try:
+        index = context.index_for(store)
+    except PayloadError as error:
+        return ResolveResult(TOOL_KEY, "NO_DATA", reason(error), release_id, None)
     try:
         return _matched(release_id, parsed, index)
-    except PayloadError:
-        return _status(release_id, INVALID_ARGUMENT, None)
+    except DataRefusal as error:
+        return ResolveResult(TOOL_KEY, "NO_DATA", reason(error), release_id, None)
+    except PayloadError as error:
+        return ResolveResult(
+            TOOL_KEY, INVALID_ARGUMENT, reason(error), release_id, None
+        )
 
 
 def parse_request(request: Mapping[str, object]) -> _Parsed:
@@ -226,7 +237,7 @@ def require_candidate(candidate: Mapping[str, object]) -> None:
     identifiers = _IDENTIFIER_FIELDS[kind]
     for name, value in candidate.items():
         if name not in identifiers and type(value) is str and _has_numeral(value):
-            raise PayloadError(INVALID_ARGUMENT)
+            raise PayloadError("candidate_numeral")
 
 
 def _has_numeral(value: str) -> bool:
@@ -263,7 +274,13 @@ def _matched(release_id: str, parsed: _Parsed, index: ResolveIndex) -> ResolveRe
         inside.append(candidate)
     if not inside:
         status = "OUT_OF_SCOPE" if outside else "NO_DATA"
-        return _status(release_id, status, None)
+        return ResolveResult(
+            TOOL_KEY,
+            status,
+            "outside_land" if outside else "coordinate_missing",
+            release_id,
+            None,
+        )
     ordered = sorted(inside, key=_rank)
     payload: dict[str, object] = {"candidates": ordered[:_CANDIDATE_CAP]}
     require_payload(payload)
@@ -343,8 +360,8 @@ def _located(place: _Place, land: tuple[Polygon, ...]) -> bool | None:
         return None
     try:
         point = exact_point(place.latitude, place.longitude)
-    except (TypeError, ValueError):
-        return None
+    except (TypeError, ValueError) as error:
+        raise DataRefusal(reason(error, "coordinate_range")) from None
     return point_in_land(point, land)
 
 
@@ -353,7 +370,7 @@ def _places(result: QueryResult) -> tuple[_Place, ...]:
     for record in _records(result):
         key = _cell_text(record.get("place_key"))
         if key is None:
-            continue
+            raise DataRefusal("candidate_key_missing")
         longitude = _coordinate(record.get("lon"))
         latitude = _coordinate(record.get("lat"))
         cell = record.get("cell")
@@ -399,7 +416,7 @@ def _activities(
         key = _cell_text(node.get("node_id"))
         code = _cell_text(node.get("code"))
         if key is None or code is None:
-            continue
+            raise DataRefusal("candidate_code_missing")
         class_node = by_id.get(classified.get(key, ""))
         class_code = (
             "" if class_node is None else (_cell_text(class_node.get("code")) or "")
@@ -443,13 +460,11 @@ def _land(result: QueryResult) -> tuple[Polygon, ...]:
     for record in _records(result):
         text = record.get("geometry")
         if type(text) is not str:
-            continue
+            raise DataRefusal("geometry_refused")
         try:
             polygons.extend(decode_geometry(text))
         except GeometryTextError as error:
-            if str(error) != GEOMETRY_REFUSED:
-                raise
-            continue
+            raise DataRefusal(reason(error, "geometry_refused")) from None
     return tuple(polygons)
 
 
@@ -473,6 +488,8 @@ def _aliases(value: NormalValue) -> tuple[str, ...]:
 def _coordinate(value: NormalValue) -> Decimal | int | None:
     if type(value) is int or type(value) is Decimal:
         return value
+    if value is not None:
+        raise DataRefusal("coordinate_invalid")
     return None
 
 

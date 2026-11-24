@@ -100,7 +100,7 @@ def test_block_drops_fact_without_cached_chain():
             module.Inputs(activity="SYN-a", topic="licences", geography="national"),
         )
         ctx.block("SYN-block", [fact])
-    assert ctx.blocks == [empty("SYN-block")]
+    assert ctx.blocks == [{**empty("SYN-block"), "reason_key": "lineage_missing"}]
     assert ctx.facts == {}
 
 
@@ -194,7 +194,10 @@ def test_full_invalid_argument_refusal(change):
     with release_store({}) as store:
         args = dict(activity="SYN-a", topic="licences", geography="national")
         args.update(change)
-        refusal(lambda: module.sector_facts(store, args), "INVALID_ARGUMENT")
+        refusal(
+            lambda: module.sector_facts(store, args),
+            "scenario" if "scenario_inputs" in change else next(iter(change)),
+        )
 
 
 def test_repository_search_fails_loudly(tmp_path):
@@ -388,7 +391,10 @@ def test_norm_failure_continues_to_later_years(plant):
             if r["period"] == "2018" and r["indicator"] == "compensation"
         )["unit"] = "count"
     result = run("unit_economics", data)
-    assert result["blocks"][0] == empty("unit_economics")
+    assert result["blocks"][0] == {
+        **empty("unit_economics"),
+        "reason_key": "missing_input" if plant == "employees" else "unit mismatch",
+    }
     assert [b["block"] for b in result["blocks"]] == ["unit_economics"] * 5 + [
         "scenario"
     ]
@@ -539,5 +545,5 @@ def test_validation_exception_context(change, message):
         args.update(change)
         with pytest.raises(ValueError) as caught:
             module.sector_facts(store, args)
-        assert str(caught.value) == "INVALID_ARGUMENT"
+        assert str(caught.value) == message
         assert str(caught.value.__context__) == message

@@ -21,6 +21,7 @@ from eii_core.grid import (
     cells_in_circle,
     cells_in_polygon,
 )
+from eii_core.reasons import reason
 from eii_core.shapes import (
     GEOMETRY_REFUSED,
     GeometryTextError,
@@ -252,7 +253,9 @@ def make_area(
         return decode_area(store, parsed.area_id, context)
     try:
         return _checked(store, parsed, context)
-    except (ArgumentError, AreaIdError, GeometryTextError):
+    except GeometryTextError as error:
+        raise ValueError(reason(error)) from None
+    except (ArgumentError, AreaIdError):
         return _invalid(context)
 
 
@@ -442,7 +445,7 @@ def _routing(
     if context.routing is not None:
         return context.routing(mode, minutes, latitude, longitude)
     if context.tile_folder is None:
-        raise ArgumentError(INVALID_ARGUMENT)
+        raise ValueError("routing_tiles")
     return outline(
         context.tile_folder, mode, minutes, float(latitude), float(longitude)
     )
@@ -476,7 +479,7 @@ def _frame(store: object, inventory: Inventory) -> tuple[tuple[int, int], ...]:
     rows: list[tuple[int, int]] = []
     for cell, resolution in result.rows:
         if type(cell) is not int or type(resolution) is not int:
-            raise ArgumentError(INVALID_ARGUMENT)
+            raise ValueError("grid_row_invalid")
         rows.append((cell, resolution))
     return tuple(rows)
 
