@@ -6846,6 +6846,7 @@ introduced.
 - EVIDENCE: the review's targeted pass; the hosted failure of OI-408 shows the exposure on shared runners.
 - NEEDED: a sweep that re-enumerates every `@given` body in the repository and removes the exposure in the same way, with no assertion, strategy or example count changed.
 - NEEDED BY: before the S2 gate record.
+- RESOLVED 2026-11-24 (S2-P80, built by Anthropic Claude on base `d9b8862474`, uncommitted pending review): all 106 `@given` properties under `core/tests`, `custodian/tests`, `product/tests`, `scripts/tests` and `evals/` were re-enumerated. 23 do file or folder work in every example, confirmed by a static read and by an audit-hook run of every property. 12 already set `deadline=None`; 11 now do: the nine named above, plus `scripts/tests/test_spine_refusal_persistence.py` (the nested `check`) and `scripts/tests/test_stac_item_pins.py::test_snapshot_cardinality_property`. The four `test_register_tables.py` properties use `@settings(_REUSE, deadline=None)`, which keeps their health-check suppression. No assertion, strategy, example count, profile or seed changed. Guard: `scripts/tests/test_test_bootstrap.py::test_file_backed_properties_carry_no_deadline`, with its planted violations. The hosted-run evidence that OI-408 still needs is unchanged.
 
 ## OI-410 — Module count of decision 0081 out of date after S2-P78
 

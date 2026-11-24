@@ -4,7 +4,7 @@ import json
 from typing import Any
 
 import pytest
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 from test_spine_refusals import case as case
 from test_spine_refusals import commit_refusals, refuse_audit, unit_refusal
@@ -92,6 +92,7 @@ def test_appended_refusal_cannot_be_committed_by_changing_bytes(case: Any) -> No
     archive = case.review.with_name("activity_spine_refusals.json")
     appended = archive.read_bytes()
 
+    @settings(deadline=None)
     @given(st.binary())
     @example(b"")
     @example(b"\n")

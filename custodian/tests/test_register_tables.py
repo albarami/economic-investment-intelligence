@@ -1364,7 +1364,7 @@ def _replace_manifest(tmp_path: Path, manifest) -> None:
 _REUSE = settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
 
 
-@_REUSE
+@settings(_REUSE, deadline=None)
 @given(value=_JSON_VALUE)
 def test_release_kind_accepts_only_legal_strings(
     staged_text, tmp_path: Path, frame, value
@@ -1380,7 +1380,7 @@ def test_release_kind_accepts_only_legal_strings(
         assert value in ("public_only", "protected")
 
 
-@_REUSE
+@settings(_REUSE, deadline=None)
 @given(value=_JSON_VALUE)
 def test_receipt_use_accepts_only_current(
     staged_text, tmp_path: Path, frame, value
@@ -1396,7 +1396,7 @@ def test_receipt_use_accepts_only_current(
         assert value == "current"
 
 
-@_REUSE
+@settings(_REUSE, deadline=None)
 @given(value=_JSON_VALUE)
 def test_coverage_months_accepts_only_the_kept_set(
     staged_text, tmp_path: Path, frame, value
@@ -1412,7 +1412,7 @@ def test_coverage_months_accepts_only_the_kept_set(
         assert value == ["2026-11"]
 
 
-@_REUSE
+@settings(_REUSE, deadline=None)
 @given(value=_JSON_VALUE)
 def test_table_name_accepts_only_the_declared_name(
     staged_text, tmp_path: Path, frame, value
