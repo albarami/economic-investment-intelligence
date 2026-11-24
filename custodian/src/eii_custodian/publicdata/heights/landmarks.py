@@ -162,6 +162,10 @@ def verify_landmark_receipts(
 
     for row in landmarks:
         entry = _registry_entry(row)
+        if entry.skip_reason:
+            # A skipped row (decision 0107) cites no page, even when a valid
+            # snapshot of it remains from an earlier build.
+            raise _refuse_citation("registry_skipped")
         citation = row.citation
         try:
             snapshot = read_snapshot(

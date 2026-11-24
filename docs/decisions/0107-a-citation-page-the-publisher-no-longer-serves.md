@@ -53,9 +53,10 @@ No landmark height row of the reviewed cache record cites this page.
 
 The probe evidence is the lead's probe record of 2026-11-24, held outside the
 pack. The offline implementation evidence is the S2-P81 row of PROGRESS.md.
-While the word stands, the snapshot of this page is absent from a new build;
-a landmark height citing this page would have no receipt and would refuse
-through the existing receipt check. No other landmark source's coverage changes.
+While the word stands, the snapshot of this page is absent from a new build,
+and a landmark height citing this page refuses with the closed detail
+`registry_skipped` before any snapshot is read, so a valid snapshot kept from
+an earlier build cannot carry it either. No other landmark source's coverage changes.
 
 ## What would change this decision
 

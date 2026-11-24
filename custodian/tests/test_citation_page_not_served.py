@@ -203,3 +203,23 @@ def test_committed_row_is_reported_skip_without_a_request(tmp_path):
     )
     assert outcome.failure is None
     assert outcome.lines == (f"SKIP {ROW} {WORD}",)
+
+
+def test_retained_snapshot_of_a_skipped_page_refuses_its_height(tmp_path, monkeypatch):
+    """S2-P81.rv1 finding 1: a valid snapshot kept from an earlier build cannot
+    carry a height once the cited page's registry row is skipped."""
+    from custodian.tests.test_publicdata_heights import _cited_page
+
+    from eii_custodian.publicdata.heights import landmarks
+    from eii_custodian.publicdata.heights.model import HeightError
+
+    cache, row, _digest, rows, verify = _cited_page(tmp_path, monkeypatch)
+    verify()  # positive control: the unskipped row and its snapshot verify
+    skipped = replace(row, skip_reason=WORD)
+    monkeypatch.setattr(landmarks, "_registry_by_url", lambda: {row.url: skipped})
+    with pytest.raises(HeightError) as error:
+        landmarks.verify_landmark_receipts(cache, rows)
+    assert (error.value.name, error.value.detail) == (
+        "landmark_heights_citation",
+        "registry_skipped",
+    )
