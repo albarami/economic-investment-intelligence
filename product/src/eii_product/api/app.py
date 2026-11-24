@@ -151,6 +151,9 @@ def create_app(
             store.release_id,
             routing,
             point_snapshot=lambda: public_point_snapshot(store),
+            hosting_off=frozenset()
+            if startup_policy is None
+            else startup_policy.hosting_off(),
         )
         if store is not None and hasattr(store, "release_id")
         else None
@@ -177,6 +180,7 @@ def create_app(
                 gate=gate,
                 area_contexts=app.state.area_contexts,
                 mount=mount,
+                writer=None if startup_policy is None else startup_policy.candidate,
             )
         )
         if app.state.area_contexts is not None and ledger is not None:

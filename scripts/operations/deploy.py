@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from eii_core.reasons import reason
-from operations import process
+from operations import process, remote
 from operations.activation import activate, active_route, operation_lock
 from operations.common import Refusal, atomic_json, read_json
 from operations.config import (
@@ -126,7 +126,8 @@ def load(root: Path, environ: Mapping[str, str], *, connect: Any = None) -> int:
 def get(port: int, path: str, timeout: float = 4.0) -> tuple[int, bytes]:
     connection = http.client.HTTPConnection("127.0.0.1", port, timeout=timeout)
     try:
-        connection.request("GET", path)
+        # The entry admits the local name only, never a numeric Host.
+        connection.request("GET", path, headers={"Host": "localhost:" + str(port)})
         response = connection.getresponse()
         return response.status, response.read()
     finally:
@@ -236,9 +237,32 @@ def staging_probe(env: Environment, report: Mapping[str, Any]) -> None:
         raise Refusal("promotion_evidence_staging") from None
 
 
-def public_handover() -> Any:
-    """S3-T20 owns supplying this entry; setup never opens a public route."""
-    return None
+def entry_probe(port: int, timeout: float) -> str | None:
+    """The entry's own closed reason, or an empty answer when it relays."""
+    try:
+        status, body = get(port, "/health", timeout)
+    except (OSError, http.client.HTTPException):
+        return None
+    return remote.entry_reason(status, body) or ""
+
+
+def public_handover(env: Environment, request: Mapping[str, Any], raw_host: str) -> Any:
+    """Validate the host before anything is appended; retire the entry after."""
+    if request["exposure"] != "public_entry":
+        return None
+    remote.remote_host(raw_host)
+
+    def retire_entry() -> None:
+        # Inside activate's lock, after the route switch: no second entry runs.
+        path = process.process_record(env.state, 8088)
+        if not path.exists():
+            return
+        record = read_json(path, "process_identity_mismatch")
+        if record.get("stopped") is not True:
+            process.terminate(record, env.name)
+            atomic_json(path, dict(record, stopped=True))
+
+    return retire_entry
 
 
 def require_retained(env: Environment, target: Mapping[str, Any] | None) -> None:
@@ -259,11 +283,12 @@ def require_retained(env: Environment, target: Mapping[str, Any] | None) -> None
 
 
 def up(environ: Mapping[str, str], *, handover: Any = None) -> dict[str, Any]:
+    environ, raw_host = remote.take_host(environ)
     env = read_environment(environ)
     verify_peers(env)
     raw = request_for(env, environ)
     if handover is None:
-        handover = public_handover()
+        handover = public_handover(env, raw, raw_host)
     application, manifest = installed(env, raw)
     check_stores(env, environ)
     child_env = runtime_environment(environ)
@@ -375,7 +400,7 @@ def up(environ: Mapping[str, str], *, handover: Any = None) -> dict[str, Any]:
                     application,
                     path,
                     argv,
-                    child_env,
+                    remote.entry_environment(child_env, route["exposure"], raw_host),
                     environment=env.name,
                     nonce=nonce,
                     port=8088,
@@ -386,7 +411,13 @@ def up(environ: Mapping[str, str], *, handover: Any = None) -> dict[str, Any]:
             # The fixed entry can retain its process while its upstream changes.
             expected = dict(entry_record, release_id=raw["release_id"])
             try:
-                process.wait_ready(expected, env.name, health_probe)
+                closed = remote.expected_answer(
+                    route["exposure"], remote.bound(env.state)
+                )
+                if closed is None:
+                    process.wait_ready(expected, env.name, health_probe)
+                else:
+                    process.wait_closed(expected, env.name, entry_probe, closed)
             except BaseException:
                 if spawned_entry:
                     process.terminate(entry_record, env.name)
@@ -395,7 +426,8 @@ def up(environ: Mapping[str, str], *, handover: Any = None) -> dict[str, Any]:
     return route
 
 
-def down(environ: Mapping[str, str]) -> None:
-    env = read_environment(environ)
+def down(environ: Mapping[str, str], *, previous_boot: bool = False) -> None:
+    # Stopping never needs the host and is never refused for holding it.
+    env = read_environment(remote.take_host(environ)[0])
     with operation_lock(env.state):
-        process.down(env.state, env.name)
+        process.down(env.state, env.name, previous_boot=previous_boot)

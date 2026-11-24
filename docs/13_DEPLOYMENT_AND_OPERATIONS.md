@@ -238,6 +238,7 @@ All commands run from the repository root inside Ubuntu. Names are pinned in [02
 | `./eii up` | Serves from the store preflight found (section 5), invokes `./eii load-release` only when the configured release schema is absent, replays the local ledger, starts the API serving the front end, tiles and fonts, prints the links for the two company seats and the presenter console (OPS-03), the store, `release_id` and model mode, for live/staging, returns zero only after its owned detached process is ready; the foreground contract for other environments remains unchanged (decision 0072) | No | All |
 | `./eii up --embedded` | Same, with store `embedded`; skips PostgreSQL and Docker | No | All except PostgreSQL |
 | `./eii down` | Stops the API cleanly; never starts or stops the database (that is `./eii db-up` and `./eii db-down`); never removes volumes | No | None |
+| `./eii down --previous-boot` | Marks the process records a previous boot left behind as stopped and signals nothing; this boot's owned processes keep running and keep their records; a record of this boot that is not owned refuses `process_identity_mismatch` with exit 4 after the other records were handled; any other argument is a usage error; the first step of the boot script (S3-T20 start on boot, below) | No | None |
 | `./eii test` | Runs the suites defined in [12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md), including parity on both engines | No | Tools, PostgreSQL |
 | `./eii build-public` | Runs the public fetchers, against the allow-listed hosts only (OPS-65), into `data/public_cache/` with hash, licence (for every source, the publisher's terms in its own words with the date read and the basis of use) and retrieval date; reads the FDI dashboard page on every run; fetches the self-serve sources of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) (OPS-72) | Yes | Tools, disk |
 | `./eii build-public --tenders-only [--resume]` | Lead-shell background tender acquisition or one-time verified handoff from a completed tender entry; exactly one registry key, `tenders_pub`, with a separate cache journal, log, page/terms receipts and archive; it does not run whole-pack completeness | Tender list and its terms on a fresh fetch only | Tools, disk |
@@ -251,6 +252,7 @@ All commands run from the repository root inside Ubuntu. Names are pinned in [02
 | `./eii load-release` | Live/staging first install the verified application and an exact release copy from `EII_SOURCE_RELEASE_DIR`, then use the existing owner-only loader and full two-store verification. Application archive identity is separate from release identity; accepts only manifest tables | No | Tools, PostgreSQL, release |
 | `./eii freeze` | Accepts `protected` releases only and takes no mode flag. It is run twice (section 7): the first run writes the data bundle, checksum list and pending `freeze.json` and appends the register line; the second run, from the containing base-branch commit, builds and verifies the application archive, writes its checksum beside the bundle and marks `freeze.json` complete. A `public_only` release is never frozen or registered | No | All |
 | `./eii question-lab run --n N --seed S` | Runs distinct invented S3 scenarios in both languages through the loaded fixture; records coverage, empty cells, per-question results and the gallery packet; missing native, sealed, pixel or human evidence fails qualification | No | Local evaluation prerequisites only |
+| `./eii remote-check` | Lead's own shell only, never a worker, test, gate or CI (decision 0041 item 5). Takes no argument. Reads the owner's own host name from `EII_REMOTE_HOST`, never prints it, and prints PASS or FAIL for each item with its HTTP status or the words that no HTTP status was received. Exit 0 when every item passes, 1 when any item fails, 2 for an argument or for a host refused before any request | Yes, through the owner's own tunnel only | None |
 
 "Network" in the table means that the command itself needs the network. The running API may in addition reach the traffic provider under the three conditions of OPS-70, the imagery provider under those of OPS-73 and the photorealistic 3D tiles under those of OPS-74.
 
@@ -436,7 +438,7 @@ Use `<deployment>/<environment>/releases/<full-release-id>`, `applications/<arch
 4. **First live activation.** Install with the same source export and archive into live’s separate roots and database. Run `load-release`, `preflight`, then `up` using `initial_live_activation`, loopback exposure and a null predecessor. Every promotion item is required; only pristine empty history permits this operation. Retain the initial installation itself. Expect entry 8088 to serve the full identity through upstream 18088. No S3 gate approval is required for this loopback setup.
 5. **Promote.** Build the next export once, install/check/start its staging copy, then install and preflight live. `./eii up` with `promote` names the active predecessor and the other private upstream. Offline evidence files bind full commit, release and archive: merged-main ancestry and each of the six hosted checks; a different-maker APPROVED review; actual whole-test exit/count/seed report; staging identity plus actual smoke/health probes; retained predecessor; reviewed completed surfaces and existing gates. Hash references and structured reports are required; a boolean is insufficient. Authorisation is appended and synced before candidate service, readiness precedes atomic route replacement, and only then is the retiring owned upstream stopped.
 6. **Rollback.** Keep both application archives, installed copies, schemas and loader outputs. Recheck the retained target in staging, then `./eii up` with `rollback` names the current predecessor and restores the retained release **and its backend port**. No rebuild or schema overwrite occurs. First-release rollback refuses `no_previous_release_for_rollback`; down is the explicit stop operation.
-7. **Public handover.** After recorded S3 gate approval, the lead uses an `expose_public` request for the current identity. Approval must match the exact commit, release and archive. The shared callback is reserved for S3-T20; while that entry is unavailable the command refuses `public_entry_requires_s3_t20`. This task opens no tunnel and records no public address.
+7. **Public handover.** After recorded S3 gate approval, the lead uses an `expose_public` request for the current identity, with `EII_REMOTE_HOST` set in that one command's environment. Approval must match the exact commit, release and archive. `up` validates the host before anything is appended (`remote_host_missing`, `remote_host_invalid`), appends the authorisation, switches the route and, inside the same lock, retires the owned entry; its entry step then starts the one entry that holds the host and waits for it. A request that reaches the activation without that handover still refuses `public_entry_requires_s3_t20`. The command starts no tunnel and records no public address; the order around the tunnel is the lead's, in "S3-T20 entry at the owner's address" below.
 8. **Stop.** `./eii down` for each environment verifies PID/start ticks/command hash/nonce/environment, signals only owned processes through pidfds and waits within its fixed bound. New process records include the kernel boot identity. Records from a previous boot are marked stopped without signalling; a same-boot identity refusal is reported after the other records have been processed. A same-boot record with different live start ticks or a PID now owned by another user is also marked stopped without signalling, while still reporting the mismatch; matching ticks with a different nonce or command do not retire the record. A failed ownership probe keeps refusing and does not retire the record. It retains releases, databases, route/history, question journal, count journal and archives. It issues no database-control command.
 
 A request has exactly the fields of `operations.evidence.FIELDS`; reports use local relative hash references. Promotion logs form a hash chain; the route binds its authorisation sequence/hash, release, archive and backend. Serving also requires a durable switched outcome for the entire route, including its predecessor; the outcome is written ahead of the route, so an interrupted switch leaves the previous route serving. Missing/truncated history, a mismatched route, concurrent operation, removed retention or a failed readiness check refuses. A file edit that does not match a durable authorisation and switched outcome never promotes; the unkeyed hash chain detects accidental corruption, not a writer with access to the state folder. Recovery is an explicit reviewed operation; there is no automatic rollback or store fallback.
@@ -716,6 +718,134 @@ the custodian tests separately run the actual sandbox, including command dispatc
 returning success followed by independent export verification. These are not real-cache
 or real PostgreSQL observations. See TASKS.md **S3-T28** and OPEN_ITEMS.md
 **S3-T28 Part C — real-cache assembly and independent review**.
+
+### S3-T20 entry at the owner's address
+
+Authority: [decision 0041](decisions/0041-remote-mode-through-the-owners-own-host.md) items 1 to 5 and 8. This section describes code and the lead's ordered steps; it claims no tunnel, no public address, no gate approval and no recorded run (AGENTS.md rule 47). The tests named here use invented `.invalid` hosts and invented process, store and upstream fixtures.
+
+**One entry.** The owner's tunnel points at the loopback entry on port 8088 and at nothing else. The entry relays to the private upstream the durable route names; promotion and rollback keep switching that upstream behind the fixed entry. No second listener is added. The host name is read from `EII_REMOTE_HOST` in the environment of the lead's command and is never committed, printed or logged. Its value is one lower-case DNS name of at least two labels, with no scheme, port, path, address literal, trailing dot or localhost form (`remote_host_invalid`). `up` and `down` take the name out of the settings before the closed list of S3-T28 is checked, so that list is unchanged and still refuses the name, and the API child never receives it. The entry child receives it only when it is started under a route whose exposure is `public_entry`.
+
+**Admission.** For each request the entry reads the verified route and requires live, entry port 8088 and a known exposure, else it answers `entry_route_unavailable`. It then decides, before it reads the Host, the Origin or the target and before any upstream connection, from three things no caller can set: the exposure of the route; whether this live state is bound, meaning its verified promotion log holds at least one authorised `public_entry` request; and whether this entry process was started with a validated host.
+
+| Route exposure | Bound state or host-holding entry | Every request on the socket |
+|---|---|---|
+| `public_entry` | entry holds the host | Goes on to the request rules below; `localhost:8088` and the remote name are both served |
+| `public_entry` | entry holds no host | `remote_host_missing` |
+| `loopback` | either | `remote_exposure_required`, for every Host, Origin, method and path |
+| `loopback` | neither | The S3-T28 loopback entry: `localhost:8088` is served and any other Host is `host_refused` |
+
+The Host is read only after this table and can only refuse. The environment value alone enables nothing. The log is append-only, so inside one state folder a bound state never becomes unbound.
+
+**First exposure and the tunnel: the lead's ordered steps.** The product cannot observe whether a tunnel process is running, and nothing here detects a tunnel that was started independently. Before the first authorised exposure of a live state folder, port 8088 is the unbound loopback entry and relays `localhost:8088`; a tunnel running then would reach the product without any approval. The order is therefore the lead's, and the lead records each step in the gate record as one row holding the step, the 64-character label the lead gives that state folder, and the command's exit code:
+
+1. `tunnel_stopped`: the tunnel is stopped, and the placeholder has left port 8088, before the unbound entry is used.
+2. `live_start`: `./eii up` with a loopback request (step 4 of the operator sequence above, or a later loopback `restart`), exit 0.
+3. `handover`: `./eii up` with the `expose_public` request and `EII_REMOTE_HOST` (step 7 above), exit 0. Readiness is part of that exit code.
+4. Only then is the tunnel started.
+
+`operations.runbook.require_tunnel_start` checks that record before step 4, in the way `verify_transcript` checks the operator sequence: it checks the record and observes no tunnel. For the named state folder it refuses `tunnel_stop_missing` when the record does not begin with the stopped tunnel, `tunnel_start_before_exposure` when it holds no handover, `tunnel_start_after_failed_exposure` when the latest handover did not exit 0, `runbook_step_missing` when no successful loopback start precedes that handover, and `runbook_result_invalid` for a row of another shape. A new live state folder starts unbound: an earlier folder's rows do not count for it, and its own record begins again with the tunnel stopped. The tests of this order (`scripts/tests/test_s3_t20_handover.py`, class `FirstExposure`) run the two `up` commands through the real dispatcher on invented fixtures and use a counter in place of a tunnel; no test starts one.
+
+**After the first exposure.** On a public route the entry relays. On a loopback route a bound state is a closed door at 8088, whichever entry process is running: the earlier host-holding one, a new one after `down` and `up`, or the boot script's after a restart of the computer. A tunnel left running through a promotion, rollback, restart, `down`, `up` or reboot therefore reaches only `remote_exposure_required` until the lead exposes again with an approval bound to the new identity. An exposure that fails after its authorisation was appended also leaves the state bound, and the tunnel is not started after it (`tunnel_start_after_failed_exposure`). Stopping exposure is any authorised loopback operation, or `./eii down`; neither needs the tunnel stopped first. To replace the tunnel or its name the lead changes `EII_REMOTE_HOST` and exposes again; the handover replaces the entry and the old name is `host_refused` from then on.
+
+**Entry readiness.** The entry step of `up` waits for what the table says the owned entry must answer: relayed health with the route's identity where the table relays, and the entry's closed body with exactly `remote_exposure_required` on a loopback route of a bound state. Any other answer, relayed health on a closed door included, is `startup_not_ready`, and a newly started entry is stopped. If readiness fails during a handover the route is public with no listener; repeating the `expose_public` command recovers.
+
+**Local use of a bound state.** Once a state is bound, a loopback route closes 8088 to every caller, the local one included: Host, Origin, forwarded headers and the peer address are all set by the caller or by the tunnel process, so none of them tells one ingress from another. Local viewing, local checks and the presenter console use the route's private upstream port on the loopback (18088 or 18089), which serves the bundle and the API under one origin and at which the tunnel is never pointed.
+
+**Request rules.** A refusal is the entry's one closed JSON body, `{"error_code": <reason>, "status": "entry_refused"}`, sent before any upstream connection with `Cache-Control: no-store`; a HEAD refusal has no body. Every answer closes its connection, so one connection carries one request. Nothing of the request is echoed or logged.
+
+| Rule | Closed reason (HTTP status) |
+|---|---|
+| The request line and headers parse, in HTTP/1.0 or HTTP/1.1, within the line limit | `request_malformed` (400) |
+| Method is GET, HEAD, OPTIONS or POST | `method_refused` (405) |
+| Each read of the request line, headers and body completes within 10 seconds, a judgement for the lead to confirm and not a measurement | `request_read_timeout` (408) |
+| Header names are tokens; no folded or control-bearing value | `header_syntax_refused` (400) |
+| Exactly one Host | `host_header_invalid` (400) |
+| Host is `localhost:8088` or, in an entry that holds it, the remote name with or without the HTTPS port; address literals, upper case, a trailing dot and other ports are refused | `host_refused` (403) |
+| At most one Origin | `origin_header_invalid` (400) |
+| Origin is absent only on a safe method, otherwise equal to the origin of the presented Host | `origin_refused` (403) |
+| Target is in origin form | `target_form_refused` (400) |
+| The path decodes once; no encoded slash, backslash, dot or percent, no control or non-UTF-8 byte, no fragment, no empty or dot segment. Decisions use the canonical path and the entry forwards its own re-encoding of it with the query | `target_path_refused` (400) |
+| No presenter path and no presenter token header, whatever the Host: the presenter console stays local (ARC-36) | `presenter_remote_refused` (403) |
+| No Transfer-Encoding | `transfer_encoding_refused` (400) |
+| At most one Content-Length, decimal digits only, required on POST | `content_length_invalid` (400) |
+| No body on another method | `request_body_refused` (400) |
+| Body at most 65,536 bytes, the API's largest accepted body; a test fails if the two diverge | `request_body_too_large` (413) |
+| The whole declared body arrives | `request_body_incomplete` (400) |
+| The upstream answers | `entry_upstream_unavailable` (503) |
+| On a public route every relayed cookie carries a real SameSite value | `cookie_policy_refused` (502) |
+
+The entry forwards only the rebuilt request. It drops the fixed hop-by-hop headers, every header the client's Connection names, `Forwarded` and every `X-Forwarded-` header; the API server is started with its proxy-header interpretation explicitly off, so it never reads one either. A line ending of a bare line feed is accepted by the standard parser and is normalised by the rebuild; this is an accepted limit. While the route is `public_entry` the entry adds Secure to every cookie it relays; in loopback exposure cookies are relayed unchanged (S3-T08 A15). Each Set-Cookie field is relayed separately.
+
+**Compression and streaming.** The entry compresses with gzip only when the client accepts it and the response is a complete 200 of a listed text type with a known length of at most 4,194,304 bytes, no encoding of its own and no range; it then sets `Vary: Accept-Encoding` and the new length. Everything else, an event stream included, is relayed chunk by chunk as it arrives.
+
+**Hosting-off sources and the assistant.** The served API child receives `EII_BUSYNESS_SOURCE` and `EII_WEATHER_SOURCE` beside the three existing fixed modes. Each has one admitted value, `off`, and both are forced by `serve` and not read from the operator's settings, so they stay outside the settings table of section 2 and outside `.env.example`. The serving policy the application requires at start-up mirrors them (`busyness_mode_refused`, `weather_mode_refused`, `traffic_mode_refused`), and a capability that would need such a source answers as out of scope with `hosting_off_source`. Weather and the live traffic provider have no reader in the product; no provider contract is invented. The same policy owns the only assistant key reader and provider opener; in a served environment both refuse `remote_paid_assistant_refused`, so the address serves replays and templates only. No setting turns a paid call on: a paid-call switch would be a new name outside every admitted list, which the closed-list rule refuses at start-up.
+
+Current official page read for S3-T20 on 2026-11-24: [Uvicorn settings](https://uvicorn.dev/settings/) for the proxy-header option; the standard-library `http.server`, `http.client` and `gzip` modules are used as documented for the pinned Python. No pin changed.
+
+### S3-T20 remote-check
+
+`./eii remote-check` is run from the lead's own shell only, never by a worker, a test, a gate or CI (decision 0041 item 5). It takes no argument, reads the owner's own host name from `EII_REMOTE_HOST` in the environment and never prints it. Its tests reach only invented `.invalid` names on loopback fixtures through an injected resolver, opener and browser result; no test resolves or reaches a host, and none starts a browser.
+
+**What runs.** The command resolves the host once and uses that same address for its own requests, with the certificate checked against the host name and no redirect followed. It reads the health page and, last, one streamed answer itself. Between the two it starts the pinned browser runner of `web/` once, in a closed child environment that holds no credential, with the child's own output neither printed nor kept; the runner observes both language start pages, one card with its Fact chip, the map style and one tile in one fresh browser context and writes one closed result file, which the command validates before it believes any of it. The one child launch is `scripts/remote_check_browser.py`; the command and the reader start no process themselves.
+
+**Items of remote-check.** Seven lines in this order: health, start page (en), start page (ar), card with fact chip, map style, tile, streamed answer. Each is `PASS <item>: HTTP <status>`, or `FAIL <item>: HTTP <status>: <reason>`, or `FAIL <item>: no HTTP status was received: <reason>`. A refusal before any request prints `FAIL remote-check: <reason>` and exits 2. The command exits 0 when every item passes and 1 when any item fails.
+
+**Closed refusal list of remote-check.** Before any request: `remote_host_missing`, `remote_host_invalid`, `remote_host_unresolved`, `remote_host_loopback`. Transport: `no_response`, `tls_failed`, `redirect_refused`, `response_timeout`, `response_too_large`, `status_unexpected`, or the entry's own reason from its closed body. Health: `health_malformed`, `health_not_ok`. Streamed answer: `stream_answer_unavailable`, `stream_type_invalid`, `stream_length_fixed`, `stream_encoded`, `stream_frame_malformed`, `stream_order_invalid`, `stream_error_event`, `stream_truncated`. Browser: `browser_unavailable`, `browser_timeout`, `browser_failed`, `browser_result_missing`, `browser_result_invalid`, or the reason the runner decided for that item from its own closed list. A fault outside these lists prints `FAIL remote-check: operation_failed` with no exception text, address or setting, and exits 1.
+
+**The card's fixed selection.** The card item asks one activity query and one place query, two Public labels held in the tracked closed file `web/tests/remote-check/selection.json`. The lead picks them from the live release's own pickers; as tracked, both are null, so until the lead records them the card item reports `card_selection_unresolved` and the streamed answer `stream_answer_unavailable`. Nothing substitutes for a label that stops resolving. The runner's own tests use the invented labels of the opening fixture.
+
+A result file is read by each field's own rule. A successful item with no reason is valid; an item the runner could not observe withholds only what depends on it, so a result without the path of the answer's events keeps the browser's items and withholds the streamed answer alone as `stream_answer_unavailable`.
+
+**Bounds of remote-check.** Each is one named constant of `scripts/operations/remote_check.py`, a judgement for the lead to confirm and not a measurement.
+
+| Bound | Constant | Value |
+|---|---|---|
+| Connect | `CONNECT_SECONDS` | 5 seconds |
+| Each read | `READ_SECONDS` | 10 seconds |
+| One HTTP item | `ITEM_SECONDS` | 30 seconds |
+| Health body | `HEALTH_BYTES` | 65,536 bytes |
+| Streamed answer | `STREAM_BYTES` | 1,048,576 bytes |
+| Browser child | `BROWSER_SECONDS` | 180 seconds |
+| Each browser step | `BROWSER_STEP_SECONDS` | 15 seconds |
+| Result file | `RESULT_BYTES` | 65,536 bytes |
+
+The bound of one HTTP item is applied between reads of the body; the header phase is bounded by each read alone.
+
+**Closing line of remote-check.** One of six closed sentences, the first that applies, claiming no more than the responses establish:
+
+1. `remote-check: every item passed`
+2. `remote-check: the entry answered and public exposure is not authorised`
+3. `remote-check: the entry answered and the product is not serving`
+4. `remote-check: the entry answered and refused the check's request`
+5. `remote-check: the tunnel or the product is down, and the responses cannot establish which`
+6. `remote-check: the failed items above failed on content, or the browser could not run`
+
+Sentences 2 to 4 are used only when an answer carried the entry's own closed body. The last sentence says nothing about whether the entry or the product answered: no response established it. The product-down case is planted in a test of the check logic against an invented host on loopback (`entry_upstream_unavailable`), never through the tunnel.
+
+### S3-T20 start on boot and the no-login choice
+
+Authority: [decision 0041](decisions/0041-remote-mode-through-the-owners-own-host.md) items 6 and 8. This section describes a script and a choice; it claims no boot setup, no recorded boot run and no port handover (AGENTS.md rule 47). Those are the lead's records.
+
+**The Linux-side script.** `scripts/boot/start-on-boot.sh` runs four commands from the repository root, in this order, and stops at the first one that fails with that command's exit code:
+
+1. `./eii down --previous-boot` marks the process records of a previous boot as stopped. Nothing is signalled: after a restart of the computer those processes no longer exist, and their recorded process numbers may now belong to other programs. A record of this boot that is not owned refuses `process_identity_mismatch`, and no later step runs. A record of this boot whose process has ended is such a record; the lead runs `./eii down`, which retires it, and runs the script again.
+2. `./eii db-up` starts the database service and waits for it to answer.
+3. `./eii preflight` only probes.
+4. `./eii up` starts the product behind the loopback entry. Run a second time in the same boot, it finds the owned processes and starts no second one.
+
+The script reads no settings file and never reads `.env`. The caller supplies the environment of the live installation: the settings of step 4 of the operator sequence above, with an operation record that names a loopback `restart` of the current identity. The script removes `EII_REMOTE_HOST` from its own environment before any command, so a start on boot is always a loopback start. A live state that was exposed before stays a closed door at port 8088 after a restart of the computer, until the lead exposes it again with an approval bound to the current identity. The script prints no setting, key or path.
+
+**The Windows side.** ASSUMPTION, to be settled by the lead's recorded boot run and the operating system's own documentation: the owner installs one log-on task that starts the Linux side and runs the script there. The steps are the owner's:
+
+1. Keep the live settings in a file of the owner's own, outside the repository and readable only by the owner. No committed file holds them.
+2. Create one task that runs at log-on, with the owner's own account, and that starts the Linux distribution with a command that loads those settings and runs `scripts/boot/start-on-boot.sh`.
+3. Restart the computer, log on and read the task's recorded result. Exit 0 means all four commands passed.
+
+Whether the Linux side stays alive after that task's command returns is not established here. The lead's recorded boot run shows it, together with the start and with `./eii remote-check` detecting a stopped product. A stopped product is reported by remote-check; nothing restarts it between boots.
+
+**Port handover.** When the web entry is ready to take port 8088, the advisor is told so that the placeholder can be stopped. The lead records that handover with the boot run. No handover is recorded here.
+
+**The owner's no-login choice and what it means.** The owner chose no login gate (decision 0041 item 8). Anyone who has the address can open the product while the owner's computer is on and the lead has exposed it. No account, password or session check stands between the address and the Public first map. What the address shows is the `public_only` release; the presenter console and its controls are not reachable through it. Work a public address needs beyond the seven points of the owner's note is recorded in document 17's Hardening register (DHA-133 and DHA-146 to DHA-149), each row with its origin, and is not added to S3-T20's acceptance criteria.
 
 ## 8. Offline and no-key modes
 

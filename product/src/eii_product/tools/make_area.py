@@ -192,6 +192,8 @@ class MakeAreaContext:
     # None means unavailable. This is not a request or a release schema field.
     public_points: Mapping[str, tuple[PublicPoint, ...]] | None = None
     point_snapshot: Callable[[], Mapping[str, tuple[PublicPoint, ...]]] | None = None
+    # Sources the serving policy keeps off for a hosted service (S3-T20 B5).
+    hosting_off: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True)

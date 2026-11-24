@@ -48,6 +48,10 @@ def main(argv: Sequence[str], environ: Mapping[str, str], root: Path) -> int:
         return down_cmd.run(environ, rest)
     if word == "question-lab":
         return question_lab.run(root, environ, rest)
+    if word == "remote-check":
+        import commands.remote_check as remote_check
+
+        return remote_check.run(root, environ, rest)
     if word == "freeze":
         import commands.load_release as load_release
 

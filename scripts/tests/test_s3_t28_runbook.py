@@ -323,10 +323,6 @@ class Runbook(WorkspaceCase):
                     lambda record, env: events.append(("stop", env, record["port"])),
                 ),
                 ("operations.deploy.get", get),
-                (
-                    "operations.deploy.public_handover",
-                    lambda: lambda: events.append(("handover", "live", 8088)),
-                ),
             ):
                 stack.enter_context(patch(target, side_effect=replacement))
             run("build", "build-release", "custodian", {}, IDENTITY)
@@ -374,7 +370,9 @@ class Runbook(WorkspaceCase):
             self.assertEqual(active["backend_port"], 18088)
             live = settings("live", IDENTITY, "expose_public", IDENTITY, 18088)
             run("handover_probe", "preflight", "live", live, IDENTITY)
-            run("handover", "up", "live", live, IDENTITY)
+            # S3-T20: the real handover runs on the patched process seams.
+            exposed = dict(live, EII_REMOTE_HOST="entry.s3-t20.invalid")
+            run("handover", "up", "live", exposed, IDENTITY)
             preserved = {
                 environment: file_inventory(self.root / environment / "releases")
                 for environment in ("staging", "live")
@@ -387,7 +385,16 @@ class Runbook(WorkspaceCase):
                 )
         verify_transcript(transcript)
         self.assertEqual(builds, [IDENTITY, candidate])
-        self.assertEqual(
-            events.count(("start", "live", 8088)), 1, "second exposed entry admitted"
-        )
-        self.assertEqual(events.count(("handover", "live", 8088)), 1)
+        entry_events = [
+            kind
+            for kind, environment, port in events
+            if (environment, port) == ("live", 8088) and kind in {"start", "stop"}
+        ]
+        unstopped = [
+            entry_events[: index + 1].count("start")
+            - entry_events[: index + 1].count("stop")
+            for index in range(len(entry_events))
+        ]
+        self.assertLessEqual(max(unstopped), 1, "second exposed entry admitted")
+        # Initial start; the handover's stop and start; the final down.
+        self.assertEqual(entry_events, ["start", "stop", "start", "stop"])

@@ -24,6 +24,8 @@ API_NAMES = frozenset(
         "EII_OPERATION_RECORD",
         "EII_LANG_DEFAULT",
         "EII_TRAFFIC_PROVIDER",
+        "EII_BUSYNESS_SOURCE",
+        "EII_WEATHER_SOURCE",
         "EII_PRESENTER",
         "EII_DECISION_PROVIDER",
     }
@@ -84,6 +86,8 @@ def runtime_environment(
         ("EII_DECISION_PROVIDER", "none", "decision_mode_refused"),
         ("EII_PRESENTER", "0", "presenter_mode_refused"),
         ("EII_TRAFFIC_PROVIDER", "simulated", "traffic_mode_refused"),
+        ("EII_BUSYNESS_SOURCE", "off", "busyness_mode_refused"),
+        ("EII_WEATHER_SOURCE", "off", "weather_mode_refused"),
     ):
         if environ.get(name, "") not in ("", expected):
             raise Refusal(reason, 1)
@@ -92,6 +96,8 @@ def runtime_environment(
         EII_DECISION_PROVIDER="none",
         EII_PRESENTER="0",
         EII_TRAFFIC_PROVIDER="simulated",
+        EII_BUSYNESS_SOURCE="off",
+        EII_WEATHER_SOURCE="off",
     )
     return result
 

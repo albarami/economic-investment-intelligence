@@ -20,6 +20,9 @@ from eii_core.reasons import closed_code, reason
 if TYPE_CHECKING:
     from eii_product.api.area_context import AreaContextFactory
     from eii_product.api.release import MountedRelease
+    from eii_product.assistant.playbooks.models import Bundle
+    from eii_product.assistant.playbooks.registry import Definition
+    from eii_product.assistant.templates.writer import Draft
 
 from eii_product.api.answers import Answer, Gate, default_gate
 from eii_product.api.session_store import CapReached, SessionKey, SessionStore
@@ -106,6 +109,7 @@ def build_router(
     gate: Gate = default_gate,
     area_contexts: AreaContextFactory | None = None,
     mount: MountedRelease | None = None,
+    writer: Callable[[Bundle, Definition, Catalogue], Draft | None] | None = None,
 ) -> APIRouter:
     """A store cannot serve playbooks without the BE-69 writer."""
     if ledger is None:
@@ -183,7 +187,10 @@ def build_router(
         if admit is not None and session is not None:
             admit(session.key)
             session.keep(response)
-        answers[answer_id] = Answer(answer_id, bundle, definition, catalogue, gate=gate)
+        draft = None if writer is None else writer(bundle, definition, catalogue)
+        answers[answer_id] = Answer(
+            answer_id, bundle, definition, catalogue, gate=gate, candidate=draft
+        )
         return {
             "answer_id": answer_id,
             "events_url": f"/api/answers/{answer_id}/events",

@@ -165,12 +165,14 @@ class AreaContextFactory:
         *,
         point_snapshot: Callable[[], Mapping[str, tuple[PublicPoint, ...]]]
         | None = None,
+        hosting_off: frozenset[str] = frozenset(),
     ) -> None:
         if routing is not None and not isinstance(routing, RoutingSource):
             raise ConfigError("routing_tiles")
         self.release_id = release_id
         self.routing = routing
         self.point_snapshot = point_snapshot
+        self.hosting_off = hosting_off
 
     def _build(self, shapes: ShapePort, name: str) -> MakeAreaContext:
         source = self.routing
@@ -183,6 +185,7 @@ class AreaContextFactory:
             tile_folder=None if source is None else source.tile_folder,
             routing=_unconfigured if source is None else source.call,
             point_snapshot=self.point_snapshot,
+            hosting_off=self.hosting_off,
         )
 
     def for_session(self, shapes: SessionShapes) -> MakeAreaContext:

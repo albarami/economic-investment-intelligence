@@ -34,6 +34,7 @@ COMMANDS: tuple[Command, ...] = (
     Command("up", "up", "Product", "real", NOT_YET),
     Command("up --embedded", "up", "Product", "real", NOT_YET),
     Command("down", "down", "Product", "real", ""),
+    Command("down --previous-boot", "down", "Product", "real", ""),
     Command(TEST_FORM, "test", "All", "real", ""),
     Command("build-public [--seed N]", "build-public", "Custodian", "real", ""),
     Command(
@@ -68,6 +69,7 @@ COMMANDS: tuple[Command, ...] = (
         "not_built (built by task S11-T01 and S11-T06)",
     ),
     Command("question-lab run --n N --seed S", "question-lab", "Product", "real", ""),
+    Command("remote-check", "remote-check", "Product", "real", ""),
 )
 
 WORDS = frozenset(row.word for row in COMMANDS)

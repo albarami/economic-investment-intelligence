@@ -46,14 +46,19 @@ def test_one_entry_forwards_changed_identity_and_backend_then_rollback(tmp_path)
 
     first, second = "ab" * 32, "cd" * 32
     left, right = start(backend(first)), start(backend(second))
-    selected = dict(backend_port=left)
+    # S3-T20: the entry requires a verified live route with a known exposure.
+    selected = dict(
+        backend_port=left, environment="live", entry_port=8088, exposure="loopback"
+    )
     with patch("operations.entry.active_route", side_effect=lambda _: selected):
         entry = start(handler(tmp_path))
 
         def read():
             connection = http.client.HTTPConnection("127.0.0.1", entry, timeout=2)
             try:
-                connection.request("GET", "/api/release")
+                connection.request(
+                    "GET", "/api/release", headers={"Host": "localhost:8088"}
+                )
                 response = connection.getresponse()
                 return response.status, response.read()
             finally:
@@ -67,7 +72,10 @@ def test_one_entry_forwards_changed_identity_and_backend_then_rollback(tmp_path)
             assert read() == (200, first.encode())
             servers[0].shutdown()
             servers[0].server_close()
-            assert read()[0] == 503
+            assert read() == (
+                503,
+                b'{"error_code":"entry_upstream_unavailable","status":"entry_refused"}',
+            )
         finally:
             for server in servers:
                 server.shutdown()

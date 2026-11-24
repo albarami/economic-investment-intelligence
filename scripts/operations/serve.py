@@ -7,6 +7,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 # This bootstrap also runs with -S, so no editable-package .pth is evaluated.
 APPLICATION_ROOT = Path(__file__).resolve().parents[2]
@@ -40,6 +41,18 @@ def verify_runtime() -> None:
     __import__("psycopg")
     __import__("uvicorn")
     __import__("shapely")
+
+
+def server_options(port: int) -> dict[str, Any]:
+    """The one set of server options: numeric loopback bind, no proxy trust."""
+    return dict(
+        host="127.0.0.1",
+        port=port,
+        access_log=False,
+        log_config=None,
+        # The entry drops forwarding headers; the server never interprets one.
+        proxy_headers=False,
+    )
 
 
 def main() -> int:
@@ -161,13 +174,7 @@ def main() -> int:
     import uvicorn
 
     try:
-        uvicorn.run(
-            app,
-            host="127.0.0.1",
-            port=int(sys.argv[sys.argv.index("--port") + 1]),
-            access_log=False,
-            log_config=None,
-        )
+        uvicorn.run(app, **server_options(int(sys.argv[sys.argv.index("--port") + 1])))
     finally:
         ledger.close()
         standby.close()

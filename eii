@@ -13,6 +13,7 @@ usage() {
     'up' \
     'up --embedded' \
     'down' \
+    'down --previous-boot' \
     'test [--seed N] [--suite NAME]' \
     'build-public [--seed N]' \
     'build-public --tenders-only [--resume]' \
@@ -25,6 +26,7 @@ usage() {
     'load-release' \
     'freeze' \
     'question-lab run --n N --seed S' \
+    'remote-check' \
     "CDSE backup boundary: possession of both CDSE values, held only by the lead's wrapper." >&2
   exit 2
 }
@@ -35,7 +37,7 @@ fi
 
 word=$1
 case "$word" in
-  preflight|db-up|db-down|up|down|build-public|build-world|build-release|load-release|freeze|test|question-lab)
+  preflight|db-up|db-down|up|down|build-public|build-world|build-release|load-release|freeze|test|question-lab|remote-check)
     ;;
   *)
     usage

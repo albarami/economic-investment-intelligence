@@ -115,3 +115,40 @@ def verify_transcript(rows: Sequence[Mapping[str, Any]]) -> None:
                 or result["backend_port"] != port
             ):
                 raise Refusal("runbook_result_invalid")
+
+
+FIRST_EXPOSURE = ("tunnel_stopped", "live_start", "handover")
+
+
+def require_tunnel_start(rows: Sequence[Mapping[str, Any]], state: str) -> None:
+    """Check the lead's recorded order before a tunnel start (document 13).
+
+    For this live state the record must begin with the tunnel stopped, hold a
+    successful loopback ``up`` and end its exposures with a successful
+    ``expose_public``. Nothing here observes a tunnel: it checks the record.
+    """
+    own = []
+    for row in rows:
+        if (
+            set(row) != {"step", "state", "exit_code"}
+            or row["step"] not in FIRST_EXPOSURE
+            or type(row["exit_code"]) is not int
+            or type(row["state"]) is not str
+            or not HEX64.fullmatch(row["state"])
+        ):
+            raise Refusal("runbook_result_invalid")
+        if row["state"] == state:
+            own.append((row["step"], row["exit_code"]))
+    if own[:1] != [("tunnel_stopped", 0)]:
+        raise Refusal("tunnel_stop_missing")
+    started, exposure, before = False, None, False
+    for step, code in own:
+        started = started or (step, code) == ("live_start", 0)
+        if step == "handover":
+            exposure, before = code, started
+    if exposure is None:
+        raise Refusal("tunnel_start_before_exposure")
+    if exposure != 0:
+        raise Refusal("tunnel_start_after_failed_exposure")
+    if not before:
+        raise Refusal("runbook_step_missing")

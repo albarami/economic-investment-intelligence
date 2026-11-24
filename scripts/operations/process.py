@@ -200,11 +200,26 @@ def wait_ready(record: Mapping[str, Any], environment: str, probe: Any) -> None:
     raise Refusal("startup_not_ready")
 
 
+def wait_closed(
+    record: Mapping[str, Any], environment: str, probe: Any, reason: str
+) -> None:
+    """Await the entry's one closed answer through the same owned, bounded poll."""
+
+    def closed(port: int, timeout: float) -> dict[str, Any] | None:
+        answer = probe(port, timeout)
+        if answer is None:
+            return None
+        identity = record["release_id"] if answer == reason else None
+        return dict(status="ok", release_id=identity, release_hash=identity)
+
+    wait_ready(record, environment, closed)
+
+
 def process_record(state: Path, port: int) -> Path:
     return state / ("process-" + str(port) + ".json")
 
 
-def down(state: Path, environment: str) -> None:
+def down(state: Path, environment: str, *, previous_boot: bool = False) -> None:
     # State, releases, databases, journals and ledger are retained.
     if state.name != "state" or state.parent.name != environment:
         raise Refusal("cross_environment_write")
@@ -220,6 +235,11 @@ def down(state: Path, environment: str) -> None:
                     type(record.get("boot_id")) is str
                     and record["boot_id"] != current_boot
                 ):
+                    if previous_boot:
+                        # This boot's owned processes keep running and keep
+                        # their records; a record that is not owned refuses.
+                        require_owned(record, environment)
+                        continue
                     try:
                         terminate(record, environment)
                     except Refusal as failure:

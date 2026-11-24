@@ -103,6 +103,10 @@ def run_card(
     store: ReleaseStore, tool: str, args: Mapping[str, Any], context: MakeAreaContext
 ) -> PublicResult | MakeAreaResult:
     if tool == "venue_busyness":
+        if "busyness" in context.hosting_off:
+            return PublicResult(
+                tool, "OUT_OF_SCOPE", store.release_id, reason="hosting_off_source"
+            )
         return venue(store, args)
     parse_area_id(args["area_id"], store.release_id)
     decoded = decode_area(store, args["area_id"], context)

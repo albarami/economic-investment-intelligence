@@ -302,6 +302,21 @@ export async function storyRings(
   return outline ? { directive, outline } : null;
 }
 
+/** The events address of the closed playbook start body, or null. */
+export function startedEventsUrl(
+  started: Record<string, unknown>,
+): string | null {
+  const id = started.answer_id;
+  if (
+    Object.keys(started).sort().join() !== 'answer_id,events_url' ||
+    typeof id !== 'string' ||
+    !/^[a-f0-9-]+$/.test(id)
+  )
+    return null;
+  const address = '/api/answers/' + id + '/events';
+  return started.events_url === address ? address : null;
+}
+
 export async function runPublicStory(
   activity: string,
   lang: Language,
@@ -323,15 +338,9 @@ export async function runPublicStory(
   const refusal = outcomeRefusal(value, response.status, 'story.unavailable');
   if (refusal) throw new ApiRefusal(refusal, 'story_refused');
   if (response.status !== 202) throw new Error('story_refused');
-  const started = value as Record<string, unknown>;
-  if (
-    Object.keys(started).sort().join() !== 'answer_id,events_url' ||
-    typeof started.answer_id !== 'string' ||
-    started.events_url !== '/api/answers/' + started.answer_id + '/events' ||
-    !/^[a-f0-9-]+$/.test(started.answer_id)
-  )
-    throw new Error('story_refused');
-  const stream = await fetch(started.events_url as string, {
+  const eventsUrl = startedEventsUrl(value as Record<string, unknown>);
+  if (eventsUrl === null) throw new Error('story_refused');
+  const stream = await fetch(eventsUrl, {
     credentials: 'same-origin',
     redirect: 'error',
   });

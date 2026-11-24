@@ -24,6 +24,11 @@ def run(root: Path, environ: Mapping[str, str], args: Sequence[str]) -> int:
         return 2
     if embedded and environ.get("EII_ENVIRONMENT") in {"live", "staging"}:
         return exits.finish(4, "up", "embedded_environment_refused")
+    from operations.remote import take_host
+
+    # Only the final activation reads the remote host; every probe, load and
+    # closed-list check before it sees the environment without that name.
+    exposing, environ = environ, take_host(environ)[0]
     report = preflight.run_preflight(
         root,
         environ,
@@ -89,7 +94,7 @@ def run(root: Path, environ: Mapping[str, str], args: Sequence[str]) -> int:
     from operations.deploy import up
 
     try:
-        up(environ)
+        up(exposing)
     except Refusal as error:
         return exits.finish(error.code, "up", error.reason)
     except Exception as error:

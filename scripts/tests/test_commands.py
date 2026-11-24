@@ -26,7 +26,7 @@ class Commands(unittest.TestCase):
     def test_usage_lists_every_command(self) -> None:
         expected = support.expected_usage(ROOT)
         rows = support.architecture_table(ROOT)
-        self.assertEqual(len(rows), 18)
+        self.assertEqual(len(rows), 20)
         for args in ((), ("bogus",)):
             with self.subTest(args=args):
                 proc = support.run_launcher(args, {"PATH": ""}, ROOT)
@@ -41,7 +41,7 @@ class Commands(unittest.TestCase):
 
         self.assertEqual(table.usage_text(), expected)
         specs = table.COMMANDS
-        self.assertEqual(len(specs), 18)
+        self.assertEqual(len(specs), 20)
         for spec, (command, plane) in zip(specs, rows, strict=True):
             self.assertEqual(spec.form, support.usage_form(command))
             self.assertEqual(spec.plane, plane)
