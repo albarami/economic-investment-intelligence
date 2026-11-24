@@ -5,9 +5,16 @@
     "name_en": "Lusail",
     "name_ar": "لوسيل",
     "aliases": null,
-    "source_id": null,
+    "source_id": "bnd_hdx.district",
     "record_ref": null,
-    "arabic_review": "pending native review"
+    "arabic_review": "pending native review",
+    "members": [
+      "QAT001069812",
+      "QAT001070813",
+      "QAT003096699",
+      "QAT001070121"
+    ],
+    "member_reason": "The Lusail city extent spans the four boundary districts named Lusail 69, Lusail 70, Lusail West and Wadi Lusail."
   },
   {
     "place_key": "landmark:1",
@@ -15,9 +22,14 @@
     "name_en": "West Bay",
     "name_ar": "الخليج الغربي",
     "aliases": null,
-    "source_id": null,
+    "source_id": "bnd_hdx.district",
     "record_ref": null,
-    "arabic_review": "pending native review"
+    "arabic_review": "pending native review",
+    "members": [
+      "QAT006061806",
+      "QAT006061810"
+    ],
+    "member_reason": "The West Bay waterfront district is the two boundary districts the source names Al Dafna 61 and Al Gassar 61."
   },
   {
     "place_key": "landmark:2",
@@ -25,9 +37,15 @@
     "name_en": "Msheireb",
     "name_ar": "مشيرب",
     "aliases": null,
-    "source_id": null,
+    "source_id": "bnd_hdx.district",
     "record_ref": null,
-    "arabic_review": "pending native review"
+    "arabic_review": "pending native review",
+    "members": [
+      "QAT006003776",
+      "QAT006004777",
+      "QAT006013778"
+    ],
+    "member_reason": "The Msheireb downtown quarter spans the three boundary districts named Mushaireb 3, Mushaireb 4 and Mushaireb 13."
   },
   {
     "place_key": "landmark:3",
@@ -35,8 +53,12 @@
     "name_en": "The Pearl",
     "name_ar": "اللؤلؤة",
     "aliases": null,
-    "source_id": null,
+    "source_id": "bnd_hdx.district",
     "record_ref": null,
-    "arabic_review": "pending native review"
+    "arabic_review": "pending native review",
+    "members": [
+      "QAT006066765"
+    ],
+    "member_reason": "The Pearl island is exactly the one boundary district the source names The Pearl."
   }
 ]

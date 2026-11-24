@@ -96,6 +96,7 @@ from eii_custodian.publicdata.places.read import (
     require_receipt,
 )
 from eii_custodian.publicdata.places.review import (
+    DISTRICT_SOURCE,
     load_attribution,
     load_flagship_candidates,
     load_showcase_gazetteer,
@@ -598,6 +599,16 @@ def check(review: Path, inputs: Inputs) -> tuple[list[str], bool]:
     for name, source_id, loader in FILES:
         for row in review_rows(review / name, loader):
             if row.get("record_key") is None:
+                continue
+            if row.get("source_id") == DISTRICT_SOURCE:
+                members = row.get("members")
+                same = isinstance(members, list) and row.get("record_key") == "|".join(
+                    sorted(members)
+                )
+                agrees = agrees and same
+                lines.append(
+                    f"{row['place_key']} check={_flag(same)} kept={_flag(same)}"
+                )
                 continue
             item = propose(row, source_id, inputs)
             same = (

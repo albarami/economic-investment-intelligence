@@ -106,6 +106,7 @@ def build_live_frame(
         grid,
         {item.key: item.geometry for item in zones},
         build_date=build_date,
+        districts=districts,
     )
     points = _place_points(cache)
     resolved: list[dict[str, Any]] = []

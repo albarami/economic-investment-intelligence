@@ -867,6 +867,22 @@ otherwise each `place_key` is unique (`showcase_area_duplicate`), its `source_id
 `places_ovt` (`showcase_area_source`), and, when supplied, its gazetteer must hold the
 same `(place_key, source_id, record_ref)` (`showcase_area_gazetteer_mismatch`). Both the
 stage and area-request producer supply `showcase_gazetteer.yaml` for that check.
+A `showcase_gazetteer.yaml` row of kind `landmark` may resolve as a reviewed
+boundary-district area ([decision 0115](decisions/0115-showcase-landmarks-are-reviewed-district-areas.md)):
+its `source_id` is then `bnd_hdx.district`, its `record_ref` stays null, and it
+carries a non-empty `members` list of distinct district keys of the licensed
+boundary archive with a `member_reason` sentence; the internal record key is
+the sorted members joined by `|`, and the row's gazetteer point is the point
+on surface of the member polygons' union. The loader refuses an empty,
+non-list or duplicated member list (`landmark_members_empty`,
+`landmark_member_duplicate`), a missing or blank reason
+(`landmark_reason_missing`), a non-null `record_ref` (`landmark_record_ref`),
+any `members` or `member_reason` on a row of another source, and a `landmark`
+row on a source other than `places_ovt` or `bnd_hdx.district`
+(`landmark_source_refused`). At the stage, a member that names no archive
+district (`landmark_member_unknown`), one whose polygon is not inside the
+frame boundary (`landmark_member_outside`) and a repeated archive district key
+(`landmark_member_duplicate`) each refuse the build.
 For `pub_place_verification` (PUB-52), the required population is the sorted unique
 kept food-service ids (`restaurant` or `italian_restaurant`) inside any showcase walk
 polygon, plus the explicitly supplied prepared-story ids (empty pending OI-397).

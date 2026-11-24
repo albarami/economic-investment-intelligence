@@ -43,6 +43,7 @@ REFUSED_SOURCES = frozenset(
     {"review_site", "delivery_platform", "booking_platform", "map_search"}
 )
 CATEGORY_CLASSES = frozenset({"restaurant", "italian_restaurant", "other"})
+DISTRICT_SOURCE = "bnd_hdx.district"
 _CHECK_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -319,10 +320,48 @@ def review_file_spec(row: Mapping[str, object]) -> dict[str, object]:
     """Translate a file row without changing the other fields' treatment."""
     if "record_key" in row:
         raise PlacesError("missing_key")
-    return {
+    spec = {
         ("record_key" if name == "record_ref" else name): value
         for name, value in row.items()
     }
+    _district_members(spec)
+    return spec
+
+
+def _district_members(spec: dict[str, object]) -> None:
+    """Validate the reviewed district-members route and derive its key.
+
+    A ``bnd_hdx.district`` row is the only one allowed ``members`` and
+    ``member_reason``; it must be a landmark, hold a null ``record_ref`` and
+    name a non-empty list of distinct district keys, from which the canonical
+    record key is derived. Every refusal is closed.
+    """
+    if "kind" not in spec:
+        return
+    source, kind = spec.get("source_id"), spec.get("kind")
+    if source != DISTRICT_SOURCE:
+        if spec.get("members") is not None or spec.get("member_reason") is not None:
+            raise PlacesError("landmark_source_refused")
+        if kind == "landmark" and source not in (None, "places_ovt"):
+            raise PlacesError("landmark_source_refused")
+        return
+    if kind != "landmark":
+        raise PlacesError("landmark_source_refused")
+    if spec.get("record_key") is not None:
+        raise PlacesError("landmark_record_ref")
+    members = spec.get("members")
+    if (
+        not isinstance(members, list)
+        or not members
+        or any(not isinstance(member, str) or member == "" for member in members)
+    ):
+        raise PlacesError("landmark_members_empty")
+    if len(set(members)) != len(members):
+        raise PlacesError("landmark_member_duplicate")
+    reason = spec.get("member_reason")
+    if not isinstance(reason, str) or not reason.strip():
+        raise PlacesError("landmark_reason_missing")
+    spec["record_key"] = "|".join(sorted(members))
 
 
 def review_file_row(row: Mapping[str, object]) -> dict[str, object]:
@@ -330,7 +369,11 @@ def review_file_row(row: Mapping[str, object]) -> dict[str, object]:
     if "record_key" not in row:
         raise KeyError("record_key")
     return {
-        ("record_ref" if name == "record_key" else name): value
+        ("record_ref" if name == "record_key" else name): (
+            None
+            if name == "record_key" and row.get("source_id") == DISTRICT_SOURCE
+            else value
+        )
         for name, value in row.items()
     }
 

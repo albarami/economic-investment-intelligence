@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
@@ -17,10 +18,13 @@ from custodian.tests.fixtures.places.invented import (
     write_places,
 )
 from custodian.tests.repository_root import repository_root
+from hypothesis import given
+from hypothesis import strategies as st
 from shapely.geometry import Polygon, box
 
 import h3
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
+from eii_custodian.publicdata.frame.geometry import Boundary
 from eii_custodian.publicdata.places import PlacesError, stage
 from eii_custodian.publicdata.places.area_files import (
     AreaRequest,
@@ -349,7 +353,7 @@ def test_a_filled_key_without_its_record_is_refused() -> None:
 
 
 def test_committed_keys_match_l4_redo_and_require_their_source_records() -> None:
-    """S2-L4 redo filled six building references; every other entry stays pending."""
+    """S2-LMK2 district rows join the six L4 building references; one stays pending."""
     review = repository_root(Path(__file__)) / "custodian/publicdata/review"
     specs = load_showcase_gazetteer(review / "showcase_gazetteer.yaml", None)[1]
     candidates = load_flagship_candidates(review / "flagship_candidates.yaml", None)[1]
@@ -360,6 +364,10 @@ def test_committed_keys_match_l4_redo_and_require_their_source_records() -> None
         if spec["record_key"] is not None or spec["source_id"] is not None
     ]
     assert filled == [
+        "landmark:0",
+        "landmark:1",
+        "landmark:2",
+        "landmark:3",
         "building:0",
         "building:1",
         "building:2",
@@ -368,12 +376,19 @@ def test_committed_keys_match_l4_redo_and_require_their_source_records() -> None
         "building:6",
     ]
     points = {("places_ovt", "SYN-LAND"): _POINT}
-    # The review loaders translate record_ref to the internal record_key.
-    # Resolve each entry so a missing filled record cannot hide pending entries.
+    # The review loaders translate record_ref to the internal record_key, and a
+    # district row derives its key from its sorted members. Resolve each entry
+    # so a missing filled record cannot hide pending entries.
     report = []
     for spec in everything:
         if spec["place_key"] in filled:
-            assert spec["source_id"] == "bldg_ovt"
+            if spec["place_key"].startswith("landmark:"):
+                assert spec["source_id"] == "bnd_hdx.district"
+                members = spec["members"]
+                assert isinstance(members, list) and members
+                assert spec["record_key"] == "|".join(sorted(members))
+            else:
+                assert spec["source_id"] == "bldg_ovt"
             assert isinstance(spec["record_key"], str) and spec["record_key"]
             with pytest.raises(PlacesError, match=r"^record_missing$") as caught:
                 resolve_review((spec,), points, _POINT_GRID)
@@ -385,10 +400,10 @@ def test_committed_keys_match_l4_redo_and_require_their_source_records() -> None
             assert resolved == []
             report.extend(pending)
     assert tuple(report) == (
-        "gazetteer: source point pending S2-T06: landmark:0",
-        "gazetteer: source point pending S2-T06: landmark:1",
-        "gazetteer: source point pending S2-T06: landmark:2",
-        "gazetteer: source point pending S2-T06: landmark:3",
+        "landmark:0: record_missing",
+        "landmark:1: record_missing",
+        "landmark:2: record_missing",
+        "landmark:3: record_missing",
         "building:0: record_missing",
         "building:1: record_missing",
         "building:2: record_missing",
@@ -525,7 +540,12 @@ def test_stage_call_sits_after_the_fetch_and_before_gazetteer_resolution(
 
 
 def _config(
-    tmp: Path, review: Path, places: Path, arabic_tag: str = "ar", fsq: bool = False
+    tmp: Path,
+    review: Path,
+    places: Path,
+    arabic_tag: str = "ar",
+    fsq: bool = False,
+    districts: Sequence[Boundary] = (),
 ) -> StageConfig:
     buildings = tmp / "buildings.parquet"
     paths = (buildings,) if buildings.is_file() else ()
@@ -549,7 +569,49 @@ def _config(
         fsq_licence="SYN-FSQ-LICENCE" if fsq else "",
         buildings_paths=paths,
         buildings_receipts=receipts,
+        districts=districts,
     )
+
+
+def _district(
+    key: str, west: float, south: float, east: float, north: float
+) -> Boundary:
+    return Boundary(
+        key, "Invented " + key, "اسم تجريبي", "SYN-M", box(west, south, east, north)
+    )
+
+
+# Adjacent invented districts whose union is a rectangle centred on a grid
+# cell of _grid(): the union's point on surface is its centre (51.501, 25.301).
+def _district_pair() -> tuple[Boundary, Boundary]:
+    return (
+        _district("SYN-D", 51.498, 25.298, 51.501, 25.304),
+        _district("SYN-E", 51.501, 25.298, 51.504, 25.304),
+    )
+
+
+def _district_row(members: Sequence[str] = ("SYN-D", "SYN-E")) -> dict[str, object]:
+    return {
+        "place_key": "SYN-AREA",
+        "kind": "landmark",
+        "name_en": "SYN Area",
+        "name_ar": "منطقة تجريبية",
+        "aliases": None,
+        "source_id": "bnd_hdx.district",
+        "record_ref": None,
+        "arabic_review": "pending native review",
+        "members": list(members),
+        "member_reason": "invented district union for the invented area",
+    }
+
+
+def _district_setup(tmp: Path, members: Sequence[str] = ("SYN-D", "SYN-E")):
+    review = _review(tmp, "", candidates=False, areas=False)
+    (review / "showcase_gazetteer.yaml").write_text(
+        json.dumps([_district_row(members)]), encoding="utf-8"
+    )
+    places = _places(tmp, _food())
+    return review, places
 
 
 def _review(
@@ -819,3 +881,131 @@ def _ring() -> tuple[tuple[float, float], ...]:
 
 def _json(payload: dict[str, str]) -> str:
     return json.dumps(payload) + "\n"
+
+
+def test_a_district_member_landmark_resolves_on_its_union_point(
+    tmp_path: Path,
+) -> None:
+    """The member polygons' union gives the point on surface, on a grid cell."""
+    from shapely import unary_union
+    from shapely.geometry import Point
+
+    review, places = _district_setup(tmp_path)
+    outcome = run_places_stage(
+        _config(tmp_path, review, places, districts=_district_pair())
+    )
+    rows = json.loads((outcome.directory / "place_points.json").read_text())
+    row = next(item for item in rows if item["source_id"] == "bnd_hdx.district")
+    assert row["record_key"] == "SYN-D|SYN-E"
+    union = unary_union([item.geometry for item in _district_pair()])
+    assert union.covers(Point(float(row["lon"]), float(row["lat"])))
+    report = json.loads((outcome.directory / "build_report.json").read_text())
+    assert "SYN-AREA" in report["resolved"]
+
+
+def test_member_order_never_changes_the_resolved_point(tmp_path: Path) -> None:
+    """Reversed members derive the same key and the same union point."""
+    review, places = _district_setup(tmp_path, members=("SYN-E", "SYN-D"))
+    outcome = run_places_stage(
+        _config(tmp_path, review, places, districts=_district_pair())
+    )
+    rows = json.loads((outcome.directory / "place_points.json").read_text())
+    row = next(item for item in rows if item["source_id"] == "bnd_hdx.district")
+    assert row["record_key"] == "SYN-D|SYN-E"
+    assert row["lon"] == "51.501000"
+    assert row["lat"] == "25.301000"
+
+
+def test_an_unknown_district_member_is_refused(tmp_path: Path) -> None:
+    """One member not in the archive districts refuses the whole stage."""
+    review, places = _district_setup(tmp_path, members=("SYN-D", "SYN-X"))
+    with pytest.raises(PlacesError, match=r"^landmark_member_unknown$"):
+        run_places_stage(_config(tmp_path, review, places, districts=_district_pair()))
+
+
+def test_a_member_outside_the_frame_boundary_is_refused(tmp_path: Path) -> None:
+    """One member polygon not inside the boundary refuses the whole stage."""
+    review, places = _district_setup(tmp_path, members=("SYN-OUT",))
+    outside = (_district("SYN-OUT", 51.8, 25.6, 51.9, 25.7),)
+    with pytest.raises(PlacesError, match=r"^landmark_member_outside$"):
+        run_places_stage(_config(tmp_path, review, places, districts=outside))
+
+
+def test_a_repeated_archive_district_key_is_refused(tmp_path: Path) -> None:
+    """Two archive districts with one key refuse, never silently collapse."""
+    review, places = _district_setup(tmp_path, members=("SYN-D",))
+    district = _district("SYN-D", 51.498, 25.298, 51.504, 25.304)
+    with pytest.raises(PlacesError, match=r"^landmark_member_duplicate$"):
+        run_places_stage(
+            _config(tmp_path, review, places, districts=(district, district))
+        )
+
+
+def test_a_member_named_without_any_districts_is_refused(tmp_path: Path) -> None:
+    """With no archive districts handed over, every member is unknown."""
+    review, places = _district_setup(tmp_path, members=("SYN-D",))
+    with pytest.raises(PlacesError, match=r"^landmark_member_unknown$"):
+        run_places_stage(_config(tmp_path, review, places))
+
+
+def test_the_live_frame_resolves_a_district_member_landmark(
+    tmp_path: Path,
+) -> None:
+    """build_frame hands archive districts to the stage; no refusal remains."""
+    from datetime import date
+
+    from shapely.geometry import Point
+
+    from eii_custodian.publicdata.frame.build import build_frame
+    from eii_custodian.publicdata.places.review import VERIFIED_COLUMNS
+
+    cache, review, output, entries = _frame_stage_fixture(tmp_path)
+    (review / "verified_places.csv").write_text(",".join(VERIFIED_COLUMNS) + "\n")
+    spec = _district_row(members=("SYN042042042",))
+    (review / "showcase_gazetteer.yaml").write_text(
+        json.dumps([spec]), encoding="utf-8"
+    )
+    result = build_frame(
+        cache, tuple(entries), review, output, build_date=date(2026, 11, 17)
+    )
+    row = next(
+        item
+        for item in result.tables["gazetteer"]
+        if item.get("place_key") == "SYN-AREA"
+    )
+    assert row["source_id"] == "bnd_hdx.district"
+    point = Point(float(row["lon"]), float(row["lat"]))
+    assert box(0, 0, 0.04, 0.04).covers(point)
+    assert row["cell"] in {item["cell"] for item in result.tables["grid_cell"]}
+
+
+@given(perm=st.permutations(["SYN-D", "SYN-E", "SYN-F"]))
+def test_member_permutations_give_identical_points(
+    perm: tuple[str, ...],
+) -> None:
+    """Every permutation of one member set gives one key and one point.
+
+    Edge classes covered: single member, pairs, triples and every ordering of
+    them; the canonical key and union point are order-free, and the point
+    always stays inside the union.
+    """
+    from shapely import unary_union
+    from shapely.geometry import Point
+
+    from eii_custodian.publicdata.places.review import review_file_spec
+    from eii_custodian.publicdata.places.stage import _district_points
+
+    districts = (
+        _district("SYN-D", 51.498, 25.298, 51.501, 25.304),
+        _district("SYN-E", 51.501, 25.298, 51.504, 25.304),
+        _district("SYN-F", 51.499, 25.304, 51.503, 25.308),
+    )
+    boundary = box(51.2, 25.0, 51.7, 25.5)
+    spec = review_file_spec(_district_row(list(perm)))
+    canonical_spec = review_file_spec(_district_row(sorted(perm)))
+    assert spec["record_key"] == canonical_spec["record_key"]
+    rows = _district_points([spec], districts, boundary)
+    assert rows == _district_points([canonical_spec], districts, boundary)
+    (row,) = rows
+    union = unary_union([item.geometry for item in districts])
+    assert union.covers(Point(float(row["lon"]), float(row["lat"])))

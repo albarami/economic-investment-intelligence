@@ -2178,5 +2178,48 @@ class BuildingNameProperty(unittest.TestCase):
         self.assertEqual((result.key, result.reason, result.basis), expected)
 
 
+class DistrictRows(World):
+    """A reviewed district-member row is never re-derived or overwritten."""
+
+    def _district_world(self) -> None:
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
+        self.cache_buildings(0, [])
+        self.review_files(
+            gazetteer=[
+                spec(
+                    "landmark:0",
+                    "Syn Area",
+                    source_id="bnd_hdx.district",
+                    members=["SYN-D", "SYN-E"],
+                    member_reason="invented district union",
+                )
+            ]
+        )
+
+    def test_check_agrees_and_fill_never_overwrites_the_row(self) -> None:
+        self._district_world()
+        self.assertEqual(
+            self.run_tool("--check"),
+            (0, "landmark:0 check=true kept=true\n"),
+        )
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertEqual(out, "")
+        row = self.rows("showcase_gazetteer.yaml")[0]
+        self.assertEqual(row["source_id"], "bnd_hdx.district")
+        self.assertIsNone(row["record_ref"])
+        self.assertEqual(row["members"], ["SYN-D", "SYN-E"])
+
+    def test_check_agrees_on_a_single_member_row(self) -> None:
+        self._district_world()
+        row = self.rows("showcase_gazetteer.yaml")[0]
+        row["members"] = ["SYN-E"]
+        self.review_files(gazetteer=[row])
+        self.assertEqual(
+            self.run_tool("--check"),
+            (0, "landmark:0 check=true kept=true\n"),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

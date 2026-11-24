@@ -10,10 +10,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import yaml
+from shapely import point_on_surface
 from shapely.geometry.base import BaseGeometry
+from shapely.ops import unary_union
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
 from eii_custodian.publicdata.frame.checks import FrameError
+from eii_custodian.publicdata.frame.geometry import Boundary
 from eii_custodian.publicdata.frame.live import resolve_reviewed_specs
 from eii_custodian.publicdata.places import PlacesError
 from eii_custodian.publicdata.places.area_files import FileAreaProvider
@@ -32,6 +35,7 @@ from eii_custodian.publicdata.places.read import (
     read_place_file,
 )
 from eii_custodian.publicdata.places.review import (
+    DISTRICT_SOURCE,
     STATUSES,
     Verification,
     load_attribution,
@@ -77,6 +81,57 @@ _PLACES_SOURCE = "places_ovt"
 _BUILDINGS_SOURCE = "bldg_ovt"
 
 
+def _district_points(
+    specs: Sequence[Mapping[str, object]],
+    districts: Sequence[Boundary],
+    boundary: BaseGeometry,
+) -> list[dict[str, object]]:
+    """Point rows for reviewed district-member landmarks.
+
+    Each member must name one archive district inside the frame boundary; the
+    landmark's point is the point on surface of the member polygons' union.
+    """
+    wanted = [item for item in specs if item.get("source_id") == DISTRICT_SOURCE]
+    if not wanted:
+        return []
+    geoms: dict[str, BaseGeometry] = {}
+    for district in districts:
+        if district.key in geoms:
+            raise PlacesError("landmark_member_duplicate")
+        geoms[district.key] = district.geometry
+    rows: list[dict[str, object]] = []
+    for item in wanted:
+        members = item.get("members")
+        if not isinstance(members, list):
+            raise PlacesError("landmark_members_empty")
+        union = unary_union(
+            [_district_member(geoms, member, boundary) for member in sorted(members)]
+        )
+        point = point_on_surface(union)
+        rows.append(
+            {
+                "caveat_key": CAVEAT_KEY,
+                "lat": f"{point.y:.6f}",
+                "lon": f"{point.x:.6f}",
+                "record_key": item["record_key"],
+                "source_id": DISTRICT_SOURCE,
+            }
+        )
+    return rows
+
+
+def _district_member(
+    geoms: Mapping[str, BaseGeometry], member: object, boundary: BaseGeometry
+) -> BaseGeometry:
+    """One archive district polygon, inside the frame boundary, or a refusal."""
+    geometry = geoms.get(member) if isinstance(member, str) else None
+    if geometry is None:
+        raise PlacesError("landmark_member_unknown")
+    if not boundary.covers(geometry):
+        raise PlacesError("landmark_member_outside")
+    return geometry
+
+
 @dataclass(frozen=True)
 class StageConfig:
     """Inputs the stage does not invent. The Arabic tag is required."""
@@ -96,6 +151,7 @@ class StageConfig:
     fsq_licence: str = ""
     buildings_paths: tuple[Path, ...] = ()
     buildings_receipts: tuple[FileReceipt, ...] = ()
+    districts: Sequence[Boundary] = ()
 
 
 @dataclass(frozen=True)
@@ -150,16 +206,17 @@ def run_places_stage(config: StageConfig) -> StageOutcome:
     known_later.update(place.place_id for place in result.places)
     verifications = result.verifications
     points = _points(result.places, _buildings(config))
+    specs = (
+        *gazetteer,
+        *load_flagship_candidates(config.review / "flagship_candidates.yaml", None)[1],
+    )
+    district_points = _district_points(specs, config.districts, config.boundary)
     resolved, notes = resolve_review(
-        (
-            *gazetteer,
-            *load_flagship_candidates(config.review / "flagship_candidates.yaml", None)[
-                1
-            ],
-        ),
-        _point_index(points),
+        specs,
+        _point_index([*points, *district_points]),
         config.grid,
     )
+    points.extend(district_points)
     report = (*result.report, *notes)
     check_text = _check_text(result.flagship, _manifest_sha(config.cache))
     decision = _decision_against_file(config.review, check_text)
