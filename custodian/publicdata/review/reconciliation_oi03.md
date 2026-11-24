@@ -118,3 +118,11 @@ lines, each included bilingual pair after trimming its ends, all source siblings
 under every included eight-digit parent, and no repeated code within an activity.
 Closure still needs the delegated note bound to the final decision hash and the
 complete source set, then the lead's registry and OI-03 updates.
+
+
+## PO-S2-R8D-02 — winning dated closure pointer and superseding correction (2026-11-24, records only)
+
+The stored **Handoffs** and earlier "OI-03 remains open" lines above are history.
+The OI-03 Closure entry in `OPEN_ITEMS.md` **OI-03 — Conflicting restaurant and wage figures** (CLOSED entry) records the winning dated closure pointer of `2026-11-20, under PUB-77`: [decision 0025](../../../docs/decisions/0025-reconciliation-of-restaurant-and-wage-figures.md) is Accepted and signed off by the owner-delegated advisor under the owner's delegation of `2026-11-20` ("1: you make sign"). The signature binds the record's SHA-256 `9e90ef5499` (the `Status` line set to Accepted; it supersedes the first signature of the same day at `1e71c00107`, whose record differed only in that line) and the six sources `sec_hr_ind`, `sec_hr_goods`, `sec_hr_serv`, `sec_hr_size`, `wage_occ` and `wage_act`. R1 stays "closed: not published" (no production value is derived or shown); R2 stays "reconciled: tables differ, occupation table used", with the activity-table mean in the source chain. The six registry rows read `reconciliation: resolved:0025-reconciliation-of-restaurant-and-wage-figures`; the binding file (`review/oi03_signoff.json`, the advisor's signature record) is written by the lead's shell into the uncommitted public cache before the next live run, never committed; the gate still refuses an absent or unbound sign-off (`series/reconcile.py` `Resolution.approved`, `gate_report.oi03_line`). OI-171 is a separate hotel-basket item and stays open.
+
+Above lines retain their force as written evidence. This pointer does not re-author the earlier missing-field, sign-off, handoff, registry or build-stage text; it is the dated superseding correction that closes the records-only follow-up `PO-S2-R8D-02` of S2-R8D round 3. No earlier row of this file is rewritten; the pointer is appended.
