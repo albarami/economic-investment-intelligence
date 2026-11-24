@@ -26,12 +26,12 @@ ROW = (
     "landmark_skyscraperpage_com/"
     "page-a4474c164d99fd530665e2e45c1419e2e7872e9ba8cefe248e372243c595d794"
 )
-# SHA-256 of the canonical JSON of (key, skip_reason, basis_note) for every
-# committed registry row, computed at base 1dba941bcf; this row's two changed
-# fields are restored before hashing. Missing optional notes are empty strings.
-BASE_PROJECTION_SHA256 = (
-    "d17073ec9da4f03806d6222f18ccd9e54fcff3e9d1bcb595315b94c3497d1e30"
-)
+# SHA-256 of the canonical JSON of every committed registry row at base
+# 1dba941bcf; this row's two changed fields are restored before hashing, and
+# only the reviewed per-row byte ceiling added later by S2-P84
+# (`stream_max_bytes`, absent at that base) is left out of every row.
+BASE_ROWS_SHA256 = "771b96a4afb3ffca7e914ab783663cfd2fca4542ce0b478aaab48b1627e69593"
+LATER_REVIEWED_FIELDS = frozenset({"stream_max_bytes"})
 BASE_ROW_COUNT = 891
 BASE_BASIS_NOTE = (
     "Document 04 S2-P53 landmark hand-list placement and citation snapshots; "
@@ -169,20 +169,18 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     assert "2026-11-24" in row["basis_note"]
     assert "0107" in row["basis_note"]
     restored = [
-        dict(item, skip_reason="", basis_note=BASE_BASIS_NOTE)
-        if item["key"] == ROW
-        else item
+        {
+            field: value
+            for field, value in (
+                dict(item, skip_reason="", basis_note=BASE_BASIS_NOTE)
+                if item["key"] == ROW
+                else item
+            ).items()
+            if field not in LATER_REVIEWED_FIELDS
+        }
         for item in rows
     ]
-    projection = [
-        {
-            "key": item["key"],
-            "skip_reason": item.get("skip_reason", ""),
-            "basis_note": item.get("basis_note", ""),
-        }
-        for item in restored
-    ]
-    assert _canonical_rows(projection) == BASE_PROJECTION_SHA256
+    assert _canonical_rows(restored) == BASE_ROWS_SHA256
     entries = registry.load_registry()
     assert len(entries) == BASE_ROW_COUNT
     landmark = [e for e in entries if e.source_id.startswith("landmark_")]
