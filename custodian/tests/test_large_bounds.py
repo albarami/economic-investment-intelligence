@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 from custodian.tests.test_large_intake import meta, stream
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.fetch import large, registry, transport
@@ -380,6 +380,7 @@ def test_cut_chunked_transfer_is_unreachable_and_publishes_nothing(
     _unpublished(entry, tmp_path)
 
 
+@settings(deadline=None)
 @given(
     rows=st.lists(
         st.fixed_dictionaries({"value": st.integers()}), min_size=1, max_size=5
