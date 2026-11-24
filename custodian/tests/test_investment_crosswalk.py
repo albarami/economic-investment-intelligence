@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -59,9 +60,55 @@ def cached_specimen(tmp_path: Path, monkeypatch):
     (committed / "fdi_crosswalks.yaml").write_text(
         json.dumps({"schema_version": "fdi_crosswalks.v1", "mappings": []})
     )
+    (review / "invented-countries.yaml").rename(committed / "invented-countries.yaml")
     monkeypatch.setattr(values[0], "_REVIEW", committed)
     monkeypatch.setattr(values[0], "_CACHE", cache)
     return (*values, cache)
+
+
+@pytest.mark.parametrize("location", ["committed", "cache"])
+def test_cache_crosswalk_country_target_location(tmp_path: Path, monkeypatch, location):
+    c, page, row, document, path, _good, cache = cached_specimen(tmp_path, monkeypatch)
+    target = b"iso3\nINV\n"
+    directory = c._REVIEW if location == "committed" else path.parent
+    (directory / "invented-countries.csv").write_bytes(target)
+    row.update(
+        target_resource="invented-countries.csv", target_sha256=sha256_hex(target)
+    )
+    path.write_text(json.dumps(document))
+    loaded = c.load_crosswalk(cache)
+    if location == "cache":
+        assert isinstance(loaded, InvestmentFailure), loaded
+        assert loaded.check == "crosswalk_target"
+        return
+    assert not isinstance(loaded, InvestmentFailure), loaded
+    result = c.mapped_columns(
+        loaded,
+        row["project_id"],
+        row["project_key"],
+        replace(b._envelope(), page_sha256=sha256_hex(page.body)),
+    )
+    assert not isinstance(result, InvestmentFailure), result
+    assert result["source_country_iso3"] == "INV"
+    assert result["mapping_coverage"]["source_country_iso3"] == "reviewed"
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root ignores directory permissions")
+def test_unreadable_cache_review_refuses_instead_of_falling_back(
+    tmp_path: Path, monkeypatch
+):
+    c, _page, _row, _document, path, _good, cache = cached_specimen(
+        tmp_path, monkeypatch
+    )
+    assert not isinstance(c.load_crosswalk(cache), InvestmentFailure)
+    mode = path.parent.stat().st_mode
+    path.parent.chmod(0)
+    try:
+        loaded = c.load_crosswalk(cache)
+    finally:
+        path.parent.chmod(mode)
+    assert isinstance(loaded, InvestmentFailure), loaded
+    assert loaded.check == "crosswalk_hash"
 
 
 def test_cache_crosswalk_fills_all_slots(tmp_path: Path, monkeypatch):
@@ -72,7 +119,7 @@ def test_cache_crosswalk_fills_all_slots(tmp_path: Path, monkeypatch):
         "place_key": "SYN-place-AA-0001",
     }
     body = json.dumps([{"iso3": "INV", **targets}]).encode()
-    (path.parent / "invented-target.yaml").write_bytes(body)
+    (c._REVIEW / "invented-target.yaml").write_bytes(body)
     document["mappings"] = [
         {
             **row,
@@ -176,7 +223,7 @@ def test_cache_crosswalk_exhaustive_hostile_leaves(
         document["mappings"] = []
     elif kind == "two":
         body = b'[{"iso3":"INV","place_key":"INV"}]'
-        (path.parent / row["target_resource"]).write_bytes(body)
+        (c._REVIEW / row["target_resource"]).write_bytes(body)
         row["target_sha256"] = sha256_hex(body)
         document["mappings"].append({**row, "column": "place_key"})
     path.write_text(json.dumps(document))
@@ -239,6 +286,13 @@ def test_committed_row_refusal_is_independent_of_column_order(columns):
             assert not isinstance(loaded, InvestmentFailure), loaded
             assert loaded.mappings == ()
             assert loaded.origin == "committed"
+        cache = root / "cache"
+        (cache / "review").mkdir(parents=True)
+        (cache / "review" / path.name).write_bytes(path.read_bytes())
+        loaded = c.load_crosswalk(cache)
+        assert not isinstance(loaded, InvestmentFailure), loaded
+        assert tuple(row.column for row in loaded.mappings) == tuple(columns)
+        assert loaded.origin == "cache"
 
 
 @pytest.mark.parametrize("missing_key_field", [False, True])
@@ -585,11 +639,12 @@ def test_all_target_columns_and_publication_path(
     cache = root / "data/public_cache"
     review = cache / "review"
     review.mkdir(parents=True)
-    _c, page, row, document, path, _good = specimen(review)
+    c, page, row, document, path, _good = specimen(tmp_path)
+    monkeypatch.setattr(c, "_REVIEW", tmp_path)
     target = json.dumps(
         [{field: key, "arabic_review": "pending native review"}]
     ).encode()
-    (review / "invented-target.yaml").write_bytes(target)
+    (tmp_path / "invented-target.yaml").write_bytes(target)
     document["mappings"].append(
         {
             **row,
@@ -599,7 +654,7 @@ def test_all_target_columns_and_publication_path(
             "target_sha256": sha256_hex(target),
         }
     )
-    path.write_text(json.dumps(document), encoding="utf-8")
+    (review / path.name).write_text(json.dumps(document), encoding="utf-8")
     assert b._run(root, monkeypatch, b._fdi_entry(), {b.DASHBOARD_URL: page.body}) == 0
     _, _, table = b._batch(root, "fdi_projects")
     assert table["rows"][0][column] == key

@@ -78,12 +78,17 @@ def _failure(check: str) -> InvestmentFailure:
 
 
 def read_crosswalk(
-    path: Path, *, expected_sha256: str, cache: Path | None = None
+    path: Path,
+    *,
+    expected_sha256: str,
+    cache: Path | None = None,
+    targets: Path | None = None,
 ) -> ReviewedCrosswalk | InvestmentFailure:
     """Check a crosswalk against the caller's hash and validate its Public targets.
 
     Municipality codes live only in the supplied cache/review directory.
-    Other targets are direct files beside the crosswalk, pinned per mapping.
+    Other targets are direct files in targets (default: beside the crosswalk),
+    pinned per mapping.
     Only target keys are read, never a name-matching map or target review flags.
     The caller supplies the expected hash; this reader does not establish its
     approval or bind it to a separate trusted manifest.
@@ -117,7 +122,7 @@ def read_crosswalk(
                 and (snapshot, identifier, column) in seen
             ):
                 return _failure("crosswalk_duplicate")
-        checked = _mapping(item, path.parent, cache)
+        checked = _mapping(item, targets if targets is not None else path.parent, cache)
         if isinstance(checked, InvestmentFailure):
             return checked
         key = (checked.snapshot_sha256, checked.project_id, checked.column)
@@ -146,14 +151,18 @@ def load_crosswalk(cache: Path | None = None) -> ReviewedCrosswalk | InvestmentF
     if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
         return _failure("crosswalk_hash")
     origin: Literal["cache", "committed"] = "cache"
-    if not path.exists():
+    try:
+        path.lstat()
+    except FileNotFoundError:
         path = _REVIEW / "fdi_crosswalks.yaml"
         origin = "committed"
+    except OSError:
+        return _failure("crosswalk_hash")
     try:
         digest = sha256_hex(path.read_bytes())
     except OSError:
         return _failure("crosswalk_hash")
-    checked = read_crosswalk(path, expected_sha256=digest, cache=cache)
+    checked = read_crosswalk(path, expected_sha256=digest, cache=cache, targets=_REVIEW)
     if isinstance(checked, InvestmentFailure):
         return checked
     if origin == "committed" and checked.mappings:
