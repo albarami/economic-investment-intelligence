@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted, 2026-11-24, by the owner's relayed decision of 18:58 after another maker's review approved the draft |
 | Date | 2026-11-24 |
 | Owner | The owner |
-| Amends | Nothing until accepted by the owner; then, for the pilot only, rule 35 of AGENTS.md and CLAUDE.md and the L-30 wording "no approved-with-comments" |
+| Amends | For the pilot only, rule 35 of AGENTS.md and CLAUDE.md and the L-30 wording "no approved-with-comments" |
 | Purpose | Remove a second review round only for exactly specified small fixes, with every finding fixed before merge and all merge checks preserved |
 | Read first | [CLAUDE.md](../../CLAUDE.md) rules 35 and 46; [decision 0032](0032-approved-tasks-of-one-slice-may-merge-as-a-train.md) items 1 to 3 |
 
@@ -111,8 +111,11 @@ under rule 46.
 
 ## Open questions and assumptions
 
-Owner acceptance of this proposed record remains pending. No other choice is
-delegated to the builder by this draft.
+The owner accepted this record by his relayed decision of 2026-11-24 at 18:58,
+"Do those recommendations if you thing they speed up without loosing quality",
+which named this record, after a review by another maker approved the draft.
+The pilot starts only with briefs and a closure script that enforce items 2
+to 4. No other choice is delegated to the builder.
 
 ## Sources
 
