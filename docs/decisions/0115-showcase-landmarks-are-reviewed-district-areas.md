@@ -80,12 +80,17 @@ source's zone grouping — the three districts of the Al Dafna zones, Al Dafna
    may carry a reviewed choice: `source_id: bldg_ovt`, a non-null
    `record_ref` and a non-empty `choice_reason` recording why that footprint
    is the building. `review_place_keys.py --check` accepts such a row as
-   `check=yes basis=reviewed_choice` only when the helper cannot re-derive
-   the key, the chosen footprint is in the row's own exact-or-folded
-   name-candidate set and it is inside the boundary set; it refuses
-   `reviewed_choice_kind` (a `choice_reason` on any other row),
+   `check=yes basis=reviewed_choice` only when its stored `kind` is
+   `building` and its stored `source_id` is `bldg_ovt`, the helper cannot
+   re-derive the key, the chosen `record_ref` is text naming a footprint in
+   the row's own exact-or-folded name-candidate set, and that footprint is
+   inside the boundary set; both the fill run and `--check` refuse
+   `reviewed_choice_kind` (a `choice_reason` on a row of
+   `showcase_gazetteer.yaml`, or on a row whose stored `kind` is not
+   `building` or whose stored `source_id` is not `bldg_ovt`, null included),
    `reviewed_choice_reason_missing`, `reviewed_choice_unneeded` (the helper
-   re-derives the key uniquely), `reviewed_choice_not_candidate` and
+   re-derives the key uniquely), `reviewed_choice_not_candidate` (a
+   `record_ref` that is not text or is outside the candidate set) and
    `reviewed_choice_outside`. The fill run never writes or overwrites such
    a row. `building:3` is filled on this route.
 
