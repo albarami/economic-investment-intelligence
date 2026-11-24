@@ -119,7 +119,7 @@ test('decoder manifest rejects a missing wasm and changed bytes', () => {
       verifyAssets(() => {
         throw new Error('invented-missing');
       }),
-    /invented-missing/,
+    /unqualified-asset/,
   );
 });
 

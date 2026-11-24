@@ -46,16 +46,15 @@ it.each([null, '/tiles/basemap.pmtiles'])(
   },
 );
 
-it('keeps an absent or refused mount empty', async () => {
+it('refuses a failed release lookup without mounting the plain style', async () => {
   api.basemap.mockRejectedValue(new Error('chain_refused'));
   api.layer.mockRejectedValue(new Error('layer_refused'));
   const view = render(
     <MountedPublicShell extractUrl="/tiles/basemap.pmtiles" />,
   );
   await act(async () => undefined);
-  expect(
-    view.container
-      .querySelector('[data-extract]')
-      ?.getAttribute('data-extract'),
-  ).toBe('absent');
+  expect(view.container.querySelector('[data-extract]')).toBeNull();
+  expect(view.getByRole('alert').getAttribute('data-message-key')).toBe(
+    'chain_refused',
+  );
 });

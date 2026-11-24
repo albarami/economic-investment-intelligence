@@ -158,31 +158,35 @@ def ensure_schema(environ: Mapping[str, str]) -> bool:
 
 
 def health_probe(port: int, timeout: float) -> dict[str, Any] | None:
-    from eii_product.api.health import Health
+    from eii_product.api.health import Health, asset_reason
 
     try:
         status, body = get(port, "/health", timeout)
         document = json.loads(body)
         if not isinstance(document, dict):
             raise Refusal("startup_not_ready")
-        if status != 200:
-            raise Refusal("startup_not_ready")
         health = Health.model_validate(document)
-        if (
-            health.status != "ok"
-            or health.parity != "identical"
-            or health.traffic != "simulated"
-            or health.model == "live"
-            or (health.tiles, health.fonts, health.replays) != ("ok", "ok", "ok")
-            or (health.store == "postgres" and health.postgres != "up")
-            or (health.store == "embedded" and health.postgres != "not_used")
+        if (health.tiles, health.fonts, health.replays) != ("ok", "ok", "ok"):
+            raise Refusal(asset_reason((health.tiles, health.fonts, health.replays)))
+        if health.parity != "identical":
+            raise Refusal("startup_parity_failed")
+        if health.traffic != "simulated":
+            raise Refusal("traffic_mode_refused")
+        if health.model == "live":
+            raise Refusal("startup_model_live")
+        if (health.store == "postgres" and health.postgres != "up") or (
+            health.store == "embedded" and health.postgres != "not_used"
         ):
+            raise Refusal("startup_store_status")
+        if health.status != "ok":
+            raise Refusal("startup_status_degraded")
+        if status != 200:
             raise Refusal("startup_not_ready")
         return health.model_dump()
     except (OSError, http.client.HTTPException):
         return None
-    except ValueError:
-        raise Refusal("startup_not_ready") from None
+    except ValueError as error:
+        raise Refusal(reason(error, "startup_not_ready")) from None
 
 
 def staging_probe(env: Environment, report: Mapping[str, Any]) -> None:

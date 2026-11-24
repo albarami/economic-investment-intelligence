@@ -25,6 +25,12 @@ import {
   postShape,
   type AreaOutline,
 } from './areas';
+import {
+  ApiRefusal,
+  outcomeRefusal,
+  readApiBody,
+  type RefusalState,
+} from './refusal';
 import { loadRegistryInput } from './release';
 
 export type SelectedArea = PinBody | PlaceBody | ShapeIdBody;
@@ -305,8 +311,15 @@ export async function runPublicStory(
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ activity, lang, ...selection }),
   });
+  const value = await readApiBody(
+    response,
+    'story.unavailable',
+    'story_refused',
+  );
+  const refusal = outcomeRefusal(value, response.status, 'story.unavailable');
+  if (refusal) throw new ApiRefusal(refusal, 'story_refused');
   if (response.status !== 202) throw new Error('story_refused');
-  const started = (await response.json()) as Record<string, unknown>;
+  const started = value as Record<string, unknown>;
   if (
     Object.keys(started).sort().join() !== 'answer_id,events_url' ||
     typeof started.answer_id !== 'string' ||
@@ -318,7 +331,8 @@ export async function runPublicStory(
     credentials: 'same-origin',
     redirect: 'error',
   });
-  if (!stream.ok) throw new Error('story_refused');
+  if (!stream.ok)
+    await readApiBody(stream, 'story.unavailable', 'story_refused');
   const frames = readStoryFrames(await stream.text());
   const chosenArea = storyArea(frames);
   const inputs: RegistryInput[] = [];
@@ -357,8 +371,14 @@ export async function runPublicStory(
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(args),
     });
-    if (!response.ok) throw new Error('story_refused');
-    const body = (await response.json()) as {
+    const value = await readApiBody(
+      response,
+      'story.unavailable',
+      'story_refused',
+    );
+    const refusal = outcomeRefusal(value, response.status, 'story.unavailable');
+    if (refusal) throw new ApiRefusal(refusal, 'story_refused');
+    const body = value as {
       tool: string;
       status: string;
       facts: Fact[];
@@ -400,9 +420,11 @@ export async function runPublicStory(
 }
 
 /** Card C37 is selected by returned place keys; never joined to a people estimate. */
-export async function loadBusyness(
-  placeKey: string,
-): Promise<{ input: RegistryInput; cards: ContextPayload[] }> {
+export async function loadBusyness(placeKey: string): Promise<{
+  input: RegistryInput;
+  cards: ContextPayload[];
+  refusal?: RefusalState;
+}> {
   const response = await fetch('/api/tools/venue_busyness', {
     method: 'POST',
     credentials: 'same-origin',
@@ -410,8 +432,15 @@ export async function loadBusyness(
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ place_keys: [placeKey] }),
   });
-  if (!response.ok) throw new Error('card_refused');
-  const body = (await response.json()) as {
+  const value = await readApiBody(
+    response,
+    'story.unavailable',
+    'card_refused',
+  );
+  const refusal = outcomeRefusal(value, response.status, 'story.unavailable');
+  if (refusal?.code === 'SUPPRESSED')
+    throw new ApiRefusal(refusal, 'card_refused');
+  const body = value as {
     tool: string;
     status: string;
     facts: Fact[];
@@ -423,7 +452,10 @@ export async function loadBusyness(
     !Array.isArray(body.facts)
   )
     throw new Error('card_refused');
-  const input = await loadRegistryInput(body.facts);
+  const input =
+    body.status === 'NO_DATA' && !body.facts.length
+      ? mergeInputs([])
+      : await loadRegistryInput(body.facts);
   const registry = createRegistry(input);
   const cards: ContextPayload[] = [];
   for (const entry of body.payload?.entries ?? []) {
@@ -446,7 +478,7 @@ export async function loadBusyness(
       state: 'no_data',
       reason: 'missing_input',
     });
-  return { input, cards };
+  return { input, cards, ...(refusal ? { refusal } : {}) };
 }
 
 /** The named layer's Fact uses the documented `place:` public-code namespace.

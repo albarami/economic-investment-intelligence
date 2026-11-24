@@ -7786,3 +7786,9 @@ Source: `.overnight/IN/rv1-open-items.md`, S3-P02B.rv1. These are records for th
 - **D24 (`public_point_snapshot`).** Any withheld entry in any of the five point layers now makes `make_area` and the area cards return 500. Confirm that release checks guarantee no such entry.
 - **D38.** An `AreaIdError` inside playbook execution now maps to 422 instead of 500 `PLAYBOOK_FAILED`. Whether it can be reached is unverified.
 - **D31.** A data integrity fault on the imagery tile route now carries the class `INVALID_ARGUMENT` (status 422, unchanged). Raise it for Part C or doc 08.
+
+
+### PO-S3-P02C-1 — Withheld story cards and independent acceptance
+
+- D36 still refuses the whole story when a fetched card is NO_DATA or SUPPRESSED. This Part-C transport round retains its closed reason without relaxing the refusal; S3-T10 owns the existing criterion that a withheld fixture shows its own reason. Existing no-data busyness cards remain no-data cards. Source: `.overnight/BRIEF.md`, **Subject**, and doc 08 **Closed web reasons (S3-T11 early round, Part C)**.
+- Different-maker review and the lead's fresh-seed whole `./eii test`, hosted checks and gate evidence remain pending. This uncommitted worker candidate claims no independent approval or S3 gate closure.

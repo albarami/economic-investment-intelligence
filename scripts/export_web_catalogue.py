@@ -1,7 +1,9 @@
 """Write the web catalogue from the closed assistant catalogues.
 
-The command writes web/src/brief/catalogue.generated.json. With --check it
-compares that file to a fresh export and writes nothing. A refusal from the
+The default command writes web/src/brief/catalogue.generated.json and the shared
+web/src/api/reason-codes.generated.json vocabulary. With --check it compares both
+files to fresh exports and writes nothing. The --path test override writes only
+the specified assistant catalogue. A refusal from the
 loader exits non-zero and writes nothing.
 """
 
@@ -17,6 +19,7 @@ from dataclasses import asdict, is_dataclass
 from importlib.resources.abc import Traversable
 from pathlib import Path
 
+from eii_core.reason_codes import CODES
 from eii_core.reasons import closed_code
 from eii_product.assistant.catalogue.load import catalogue_directory, load_catalogue
 from eii_product.assistant.catalogue.schema import Refusal
@@ -153,7 +156,18 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     root = repo_root()
     target = args.path if args.path is not None else default_target(root)
-    return run(catalogue_directory(), target, args.check)
+    result = run(catalogue_directory(), target, args.check)
+    if result != 0 or args.path is not None:
+        return result
+    reasons = root / "web/src/api/reason-codes.generated.json"
+    text = _prettier(json.dumps(sorted(CODES), ensure_ascii=False), root)
+    if args.check:
+        if not reasons.is_file() or reasons.read_text(encoding="utf-8") != text:
+            print("reason_catalogue_stale", file=sys.stderr)
+            return 1
+    else:
+        reasons.write_text(text, encoding="utf-8")
+    return 0
 
 
 if __name__ == "__main__":

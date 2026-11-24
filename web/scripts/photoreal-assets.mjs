@@ -67,8 +67,19 @@ export const assets = [
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 export function verifyAssets(read) {
   for (const row of assets) {
-    if (digest(read(row.path)) !== row.sha256)
-      throw new Error('unqualified-asset');
+    const messageKey = 'unqualified-asset:' + path.basename(row.path);
+    const refused = () =>
+      Object.assign(new Error(messageKey), {
+        code: 'unqualified-asset',
+        message_key: messageKey,
+      });
+    let bytes;
+    try {
+      bytes = read(row.path);
+    } catch {
+      throw refused();
+    }
+    if (digest(bytes) !== row.sha256) throw refused();
   }
 }
 export function assertQualifiedImport(code, id, webRoot = process.cwd()) {

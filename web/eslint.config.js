@@ -3,6 +3,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import refusalReasons from './eslint-rules/refusal-reasons.mjs';
 import numeralsOnlyInFactChip, {
   FACT_CHIP_FILES,
 } from './eslint-rules/numerals-only-in-fact-chip.mjs';
@@ -23,6 +24,11 @@ const apiOnly = {
 };
 
 export default defineConfig([
+  {
+    files: ['src/api/*.{ts,mjs}', 'src/app/MountedPublicShell.tsx'],
+    plugins: { refusal: { rules: { 'closed-reason': refusalReasons } } },
+    rules: { 'refusal/closed-reason': 'error' },
+  },
   globalIgnores([
     'dist/',
     'node_modules/',

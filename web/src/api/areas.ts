@@ -4,6 +4,7 @@
  * make_area: docs/08_BACKEND.md section "make_area" and the tool route row.
  * The shapes route is called against a stand-in. This module builds no route.
  */
+import { ApiRefusal } from './refusal';
 import type { PlaceBody } from '../controls/area-request';
 import { plainHoldsDigit } from '../stage/layers/checks';
 import { isRecord } from '../guards';
@@ -282,7 +283,8 @@ export async function decodeAreaOutline(
     const payload = answer.envelope.payload;
     if (payload?.area_id !== areaId) return null;
     return readableOutline(payload.outline) ? payload.outline : null;
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiRefusal) throw error;
     return null;
   }
 }

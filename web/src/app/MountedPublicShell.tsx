@@ -5,6 +5,8 @@ import {
   type PublicLayerKey,
   type PublicLayerResult,
 } from '../api/public-layer';
+import { bodyRefusal, refusalState, type RefusalState } from '../api/refusal';
+import { RefusalNotice } from './RefusalNotice';
 import { loadBasemapUrl } from '../api/release';
 import {
   loadBusyness,
@@ -63,7 +65,8 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
   const theme = requestParam('theme') === 'light' ? 'light' : 'dark';
   const [scene, setScene] = useState<'opening' | 'area'>('opening');
   const [layer, setLayer] = useState<LayerKey>('zone_electricity_growth');
-  const [layerFailed, setLayerFailed] = useState(false);
+  const [layerFailed, setLayerFailed] = useState<RefusalState | null>(null);
+  const [basemapFailed, setBasemapFailed] = useState<RefusalState | null>(null);
   const [story, setStory] = useState<
     | (StoryEvidence & { selection: ReturnType<typeof selectedAreaRequest> })
     | null
@@ -71,9 +74,10 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
   const [busyness, setBusyness] = useState<{
     input: RegistryInput;
     cards: ContextPayload[];
+    refusal?: RefusalState;
   } | null>(null);
   const [pending, setPending] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<RefusalState | null>(null);
   const generation = useRef(0);
   const layerGeneration = useRef(0);
   const area = useArea();
@@ -81,10 +85,17 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
     let active = true;
     void loadBasemapUrl()
       .then((url) => {
-        if (active) setMountedExtract(url === extractUrl ? url : null);
+        if (!active) return;
+        if (url !== null && url !== extractUrl)
+          throw bodyRefusal('chain_refused', 200, 'stage.error');
+        setMountedExtract(url);
+        setBasemapFailed(null);
       })
-      .catch(() => {
-        if (active) setMountedExtract(null);
+      .catch((error: unknown) => {
+        if (active) {
+          setMountedExtract(null);
+          setBasemapFailed(refusalState(error, 'stage.error'));
+        }
       });
     return () => {
       active = false;
@@ -101,12 +112,12 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
       .then((result) => {
         if (token !== layerGeneration.current) return;
         setMounted(result);
-        setLayerFailed(false);
+        setLayerFailed(null);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (token !== layerGeneration.current) return;
         setMounted(null);
-        setLayerFailed(true);
+        setLayerFailed(refusalState(error, 'layers.unavailable'));
       });
     return () => {
       layerGeneration.current += 1;
@@ -134,7 +145,7 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
     setStory(null);
     setBusyness(null);
     setPending(false);
-    setFailed(false);
+    setFailed(null);
     setScene('opening');
     setLayer('zone_electricity_growth');
   }
@@ -143,18 +154,25 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
     if (!selection) return;
     const token = ++generation.current;
     setPending(true);
-    setFailed(false);
+    setFailed(null);
     setStory(null);
     try {
       const answer = await runPublicStory(activity, language, selection);
       if (token === generation.current && selection === selectedAreaRequest())
         setStory({ ...answer, selection });
-    } catch {
-      if (token === generation.current) setFailed(true);
+    } catch (error) {
+      if (token === generation.current)
+        setFailed(refusalState(error, 'story.unavailable'));
     } finally {
       if (token === generation.current) setPending(false);
     }
   }
+  if (basemapFailed)
+    return (
+      <div lang={language} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <RefusalNotice language={language} refusal={basemapFailed} />
+      </div>
+    );
   return (
     <div className="opening-app" data-opening-scene={scene}>
       <AnswerShell
@@ -208,7 +226,7 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
                     ...(busyness?.cards ?? []),
                   ]}
                   pending={pending}
-                  failed={failed}
+                  failed={false}
                   onRun={(activity) => {
                     void run(activity);
                   }}
@@ -218,6 +236,15 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
                     reset();
                   }}
                 />
+                {failed ? (
+                  <RefusalNotice language={language} refusal={failed} />
+                ) : null}
+                {busyness?.refusal ? (
+                  <RefusalNotice
+                    language={language}
+                    refusal={busyness.refusal}
+                  />
+                ) : null}
                 <label className="layer-chooser">
                   {text(language, 'layers.select')}
                   <select
@@ -225,7 +252,7 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
                     onChange={(event) => {
                       setMounted(null);
                       setLayer(event.target.value as LayerKey);
-                      setLayerFailed(false);
+                      setLayerFailed(null);
                     }}
                   >
                     {PUBLIC_LAYERS.map((key) => (
@@ -236,7 +263,7 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
                   </select>
                 </label>
                 {layerFailed ? (
-                  <p role="alert">{text(language, 'layers.unavailable')}</p>
+                  <RefusalNotice language={language} refusal={layerFailed} />
                 ) : null}
                 {mounted?.payload.layers.flatMap((row) =>
                   row.key === 'public_places'
@@ -258,9 +285,11 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
                                   if (token === generation.current)
                                     setBusyness(result);
                                 })
-                                .catch(() => {
+                                .catch((error: unknown) => {
                                   if (token === generation.current)
-                                    setFailed(true);
+                                    setFailed(
+                                      refusalState(error, 'story.unavailable'),
+                                    );
                                 });
                             }}
                           >

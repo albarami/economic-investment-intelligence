@@ -1134,8 +1134,43 @@ timeout and operating-system classes, otherwise `operation_failed`.
 This early round covers D18–D31, D37–D47 and D53 only. A withheld value remains
 withheld: layer payloads carry `withheld` entries with `reason_key`; card entries
 and sector blocks retain their `reason_key`. A broken point snapshot refuses
-instead of supplying an incomplete snapshot to an area answer. The browser's
-Part-C refusal state is a later round; no new display prose is introduced here.
+instead of supplying an incomplete snapshot to an area answer. The browser's Part-C refusal state is described below; Part B adds no display prose.
+
+### Closed web reasons (S3-T11 early round, Part C)
+
+The mounted Public browser retains `{http_status, code, message_key}` in a typed
+refusal state, with `catalogue_key` selecting an existing bilingual string. The
+shared browser helper admits only the closed BE-91 class and the exported
+`eii_core.reason_codes.CODES` vocabulary (plus the existing `errors.*` defaults).
+`uv run --locked python scripts/export_web_catalogue.py` also
+exports `web/src/api/reason-codes.generated.json`; `--check` refuses a stale or
+missing vocabulary as `reason_catalogue_stale`. The `--path` test override keeps
+its single catalogue target. Neither exception prose, error identifiers, URLs
+nor provider response prose become visible words. Unknown faults carry
+`operation_failed`; an absent response has a null `http_status`.
+
+This round covers D32–D36. Operations health keeps its exit and refusal but
+identifies failed asset slots through the existing `asset_reason` helper, and
+separately identifies parity, traffic, model, store/status and degraded-health
+failures. Photoreal asset qualification still refuses changed or unreadable
+bytes, naming only the closed decoder basename in its diagnostic. These two
+build/operations boundaries have no browser catalogue or HTTP refusal state.
+
+The financial-centre layer's `{status, reason, facts}` `NO_DATA` body is a governed
+refusal before the ready-layer four-key check. Non-success HTTP responses and
+`NO_DATA`/`SUPPRESSED` bodies preserve their closed diagnostics. A release lookup
+failure or a mismatch with the requested basemap shows a refusal and mounts no
+map. The explicit verified null `basemap_url` still selects the plain style as
+documented in document 03 **Mounted Public transport (S3-T24)**;
+it is not an error fallback. No HTTP status or server behavior changes.
+
+A withheld story card still refuses the whole story; S3-T10 owns rendering that
+card in place and remains open. An existing no-data busyness card remains a
+no-data card with its refusal diagnostic retained. Catch handlers in
+`web/src/api/*` and `MountedPublicShell.tsx` must project the caught diagnostic or
+rethrow it; the normal web lint runs the static catch guard, and the web check verifies
+bilingual catalogue parity, with discarded-catch and English-only key plants. The optional wider-outline reader retains its
+documented unresolved/null behavior and rethrows typed refusals.
 
 ## 13. Performance budgets
 

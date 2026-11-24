@@ -10,6 +10,12 @@ import {
   type LayerPayload,
 } from '../stage/layers/payload';
 import { mergeInputs, unique } from './public-opening';
+import {
+  ApiRefusal,
+  bodyRefusal,
+  outcomeRefusal,
+  readApiBody,
+} from './refusal';
 import { loadRegistryInput } from './release';
 
 export type PublicLayerKey =
@@ -71,23 +77,31 @@ export async function loadPublicLayer(
     credentials: 'same-origin',
     redirect: 'error',
   });
-  if (!response.ok) throw new Error('layer_refused');
-  const body = (await response.json()) as unknown;
-  if (typeof body !== 'object' || body === null)
-    throw new Error('layer_refused');
-  const fields = body as Record<string, unknown>;
+  const value = await readApiBody(
+    response,
+    'layers.unavailable',
+    'layer_refused',
+  );
+  const fields = value as Record<string, unknown>;
   const status = fields.status;
-  if (!Array.isArray(fields.facts) || (status !== 'ok' && status !== 'NO_DATA'))
-    throw new Error('layer_refused');
-  const reason = envelopeReason(fields);
-  if (reason === undefined) throw new Error('layer_refused');
+  const reason =
+    Array.isArray(fields.facts) && (status === 'ok' || status === 'NO_DATA')
+      ? envelopeReason(fields)
+      : undefined;
+  // A closed layer NO_DATA reason is a result; any other NO_DATA stays refused.
+  const refusal = reason
+    ? null
+    : outcomeRefusal(value, response.status, 'layers.unavailable');
+  if (refusal) throw new ApiRefusal(refusal, 'layer_refused');
+  if (reason === undefined)
+    throw bodyRefusal('layer_refused', response.status, 'layers.unavailable');
   const input = await loadRegistryInput(fields.facts as Fact[]);
   const registry = createRegistry(input);
   return {
     payload: fields.payload as LayerPayload,
     registry,
     input,
-    status,
+    status: status as PublicLayerResult['status'],
     reason,
   };
 }

@@ -1,4 +1,5 @@
 /** Document 03 mounted Public projections. No ID decoding or provenance defaults. */
+import { bodyRefusal, readApiBody } from './refusal';
 import { createRegistry } from '../facts/registry';
 import type {
   Fact,
@@ -14,22 +15,23 @@ export function closed(
   keys: readonly string[],
 ): Record<string, unknown> {
   if (value === null || typeof value !== 'object' || Array.isArray(value))
-    throw new Error('chain_refused');
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   const row = value as Record<string, unknown>;
   if (
     Object.keys(row).length !== keys.length ||
     keys.some((key) => !Object.hasOwn(row, key))
   )
-    throw new Error('chain_refused');
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   return row;
 }
 export function text(value: unknown): string {
   if (typeof value !== 'string' || value.trim() === '')
-    throw new Error('chain_refused');
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   return value;
 }
 function list(value: unknown): unknown[] {
-  if (!Array.isArray(value)) throw new Error('chain_refused');
+  if (!Array.isArray(value))
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   return value;
 }
 function appendConsistent<T>(
@@ -39,7 +41,7 @@ function appendConsistent<T>(
 ): void {
   const existing = rows.find((item) => identity(item) === identity(row));
   if (existing && JSON.stringify(existing) !== JSON.stringify(row))
-    throw new Error('chain_refused');
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   if (!existing) rows.push(row);
 }
 
@@ -80,7 +82,7 @@ export function sourceRow(value: unknown): SourceRow {
     ) ||
     source.inputClass !== 'public'
   )
-    throw new Error('chain_refused');
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   return {
     sourceId: text(source.sourceId),
     kind: source.kind as SourceRow['kind'],
@@ -99,8 +101,7 @@ async function get(path: string): Promise<unknown> {
     credentials: 'same-origin',
     redirect: 'error',
   });
-  if (!response.ok) throw new Error('chain_refused');
-  return response.json();
+  return readApiBody(response, 'layers.refused.registry', 'chain_refused');
 }
 
 async function readRelease() {
@@ -115,20 +116,22 @@ async function readRelease() {
     'basemap_url',
   ]);
   const releaseId = text(release.release_id);
-  if (release.release_kind !== 'public_only') throw new Error('chain_refused');
+  if (release.release_kind !== 'public_only')
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   text(release.rules_version_id);
   for (const key of ['hour_keys', 'day_keys', 'month_keys'])
     list(release[key]).forEach(text);
   const tables: ReleaseTable[] = list(release.tables).map((value) => {
     const row = closed(value, ['releaseId', 'tableName']);
-    if (row.releaseId !== releaseId) throw new Error('chain_refused');
+    if (row.releaseId !== releaseId)
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     return { releaseId, tableName: text(row.tableName) };
   });
   if (
     release.basemap_url !== null &&
     release.basemap_url !== '/tiles/basemap.pmtiles'
   )
-    throw new Error('chain_refused');
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   return { releaseId, tables, basemapUrl: release.basemap_url };
 }
 
@@ -152,7 +155,7 @@ export async function loadRegistryInput(
       fact.input_classes.length !== 1 ||
       fact.input_classes[0] !== 'public'
     )
-      throw new Error('chain_refused');
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     const chain = closed(await get('/api/facts/' + fact.fact_id + '/lineage'), [
       'fact_id',
       'release_id',
@@ -161,7 +164,7 @@ export async function loadRegistryInput(
       'binding',
     ]);
     if (chain.fact_id !== fact.fact_id || chain.release_id !== releaseId)
-      throw new Error('chain_refused');
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     const citation =
       typeof chain.lineage === 'object' &&
       chain.lineage !== null &&
@@ -181,7 +184,7 @@ export async function loadRegistryInput(
       row.releaseId !== releaseId ||
       JSON.stringify(row.inputClasses) !== JSON.stringify(['public'])
     )
-      throw new Error('chain_refused');
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     const lineage: LineageRow = {
       factId: fact.fact_id,
       lineageId: text(row.lineageId),
@@ -202,7 +205,7 @@ export async function loadRegistryInput(
         : {}),
     };
     if (!tables.some((table) => table.tableName === lineage.tableName))
-      throw new Error('chain_refused');
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     const base = (row: LineageRow) => ({
       lineageId: row.lineageId,
       releaseId: row.releaseId,
@@ -219,7 +222,7 @@ export async function loadRegistryInput(
           JSON.stringify(base(row)) !== JSON.stringify(base(lineage)),
       )
     )
-      throw new Error('chain_refused');
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     appendConsistent(
       lineages,
       lineage,
@@ -234,14 +237,15 @@ export async function loadRegistryInput(
       'presentation',
       'qualifiers',
     ]);
-    if (companion.presentation !== 'ordinary') throw new Error('chain_refused');
+    if (companion.presentation !== 'ordinary')
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     const qualifiers = companion.qualifiers;
     if (
       qualifiers === null ||
       typeof qualifiers !== 'object' ||
       Array.isArray(qualifiers)
     )
-      throw new Error('chain_refused');
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     if (
       Object.entries(qualifiers).some(
         ([key, value]) =>
@@ -249,7 +253,7 @@ export async function loadRegistryInput(
           typeof value !== 'string',
       )
     )
-      throw new Error('chain_refused');
+      throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
     bindings.push({
       fact,
       metricKey: text(companion.metricKey),
@@ -266,6 +270,6 @@ export async function loadRegistryInput(
   };
   const registry = createRegistry(input);
   if (facts.some((fact) => registry.resolve(fact.fact_id).status !== 'ready'))
-    throw new Error('chain_refused');
+    throw bodyRefusal('chain_refused', 200, 'layers.refused.registry');
   return input;
 }

@@ -4,6 +4,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { catalogueParity } from './refusal-catalogue.mjs';
 
 const OFF_SCREEN = [
   'best',
@@ -383,8 +384,19 @@ function licenceProblems(web) {
   return problems;
 }
 
+function refusalCatalogueProblems(web) {
+  const files = ['en', 'ar'].map((language) =>
+    path.join(web, 'src/i18n', language + '.json'),
+  );
+  if (files.some((file) => !fs.existsSync(file)))
+    return ['refusal-catalogue-missing'];
+  const [en, ar] = files.map((file) => readJson(file).strings ?? {});
+  return catalogueParity(en, ar).map((key) => 'refusal-catalogue:' + key);
+}
+
 export function inspectAnswer({ root, web }) {
   const problems = [
+    ...refusalCatalogueProblems(web),
     ...catalogueProblems(
       path.join(web, 'src', 'brief', 'catalogue.generated.json'),
     ),

@@ -171,7 +171,7 @@ for (const [link, [registryCalls, plant]] of Object.entries(MISSING_LINK)) {
       plant(chain);
       const { view } = await openFirms(chain, language);
       expect(view.getByRole('alert').textContent).toBe(
-        text(language, 'layers.unavailable'),
+        text(language, 'layers.refused.registry'),
       );
       expect(
         view.container.querySelector('[data-part="fc-firms-legend"]'),
