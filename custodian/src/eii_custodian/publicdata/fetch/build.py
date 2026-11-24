@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
@@ -75,6 +75,7 @@ from eii_custodian.publicdata.fetch.resume import (
 from eii_custodian.publicdata.fetch.terms_text import FINGERPRINT_VISIBLE_TEXT
 from eii_custodian.publicdata.fetch.transport import (
     Opener,
+    Response,
     SlotReader,
     StreamTransport,
     Transport,
@@ -180,6 +181,63 @@ class _Fetched:
     # Ruling L-1016 (applying L-1001): the portal stated no licence at all on a
     # dataset-basis row; the licence is recorded pending, never a gate.
     licence_unstated: bool = False
+
+
+@dataclass
+class _RetryTransport:
+    """Observe request fault kinds without changing the stream callback."""
+
+    transport: Transport
+    only_unreachable: bool = True
+
+    def __call__(self, url: str) -> Response:
+        try:
+            return self.transport(url)
+        except TransportFault as exc:
+            self.only_unreachable &= exc.kind == "unreachable"
+            raise
+
+
+def _fetch_passes(
+    entries: tuple[Entry, ...],
+    retries: dict[str, tuple[Entry, FetchFailure]],
+    sleep: Sleeper,
+) -> Iterator[tuple[Entry, int]]:
+    """Visit the registry, then one fixed retry list after a pause in seconds."""
+    for entry in entries:
+        yield entry, 1
+    if retries:
+        sleep(60)
+        for entry, _failure in tuple(retries.values()):
+            yield entry, 2
+
+
+def _report_fetch_attempt(
+    entry: Entry,
+    result: FetchFailure | None,
+    pass_number: int,
+    observed: _RetryTransport,
+    retries: dict[str, tuple[Entry, FetchFailure]],
+    lines: list[str],
+) -> bool:
+    """Report an attempt and return whether its unreachable failure is deferred."""
+    if pass_number == 2:
+        lines.append(
+            f"RETRY {entry.key} pass=2 result={result.check if result else 'ok'}"
+        )
+    if result is None:
+        retries.pop(entry.key, None)
+        return False
+    unreachable = result.code == 6 and result.check == "unreachable"
+    if pass_number == 2 and unreachable:
+        return True
+    lines.append(
+        fail_line(entry.key, result.url, result.check, result.expected, result.observed)
+    )
+    if unreachable and observed.only_unreachable:
+        retries[entry.key] = (entry, result)
+        return True
+    return False
 
 
 def _digest_pages(directory: Path) -> str:
@@ -759,7 +817,9 @@ def run_build(
     fetched_entries: list[Entry] = []
     investment_attempts: list[FetchAttempt] = []
     told_absent = False
-    for entry in entries:
+    retries: dict[str, tuple[Entry, FetchFailure]] = {}
+    for entry, pass_number in _fetch_passes(entries, retries, sleep):
+        observed = _RetryTransport(transport)
         if is_tender_entry(entry) and not _own_run and entry.skip_reason:
             failure = FetchFailure(
                 1, entry.source_id, "", "own_run_row_changed", "", entry.skip_reason
@@ -1125,18 +1185,9 @@ def run_build(
                     break
             continue
         if is_release_entry(entry):
-            released, refused = fetch_release(entry, transport, cache, clock, sleep)
-            if refused is not None:
-                lines.append(
-                    fail_line(
-                        entry.key,
-                        refused.url,
-                        refused.check,
-                        refused.expected,
-                        refused.observed,
-                    )
-                )
-                failure = FetchFailure(
+            released, refused = fetch_release(entry, observed, cache, clock, sleep)
+            result = (
+                FetchFailure(
                     refused.code,
                     entry.source_id,
                     refused.url,
@@ -1144,6 +1195,16 @@ def run_build(
                     refused.expected,
                     refused.observed,
                 )
+                if refused is not None
+                else None
+            )
+            deferred = _report_fetch_attempt(
+                entry, result, pass_number, observed, retries, lines
+            )
+            if result is not None:
+                if deferred:
+                    continue
+                failure = result
                 break
             assert released is not None
             if _run is not None:
@@ -1159,19 +1220,10 @@ def run_build(
             continue
         if is_place_file(entry):
             placed, place_failure = fetch_place_file(
-                entry, transport, cache, clock, sleep, **_stream_options(large_stream)
+                entry, observed, cache, clock, sleep, **_stream_options(large_stream)
             )
-            if place_failure is not None:
-                lines.append(
-                    fail_line(
-                        entry.key,
-                        place_failure.url,
-                        place_failure.check,
-                        place_failure.expected,
-                        place_failure.observed,
-                    )
-                )
-                failure = FetchFailure(
+            result = (
+                FetchFailure(
                     place_failure.code,
                     entry.source_id,
                     place_failure.url,
@@ -1179,6 +1231,16 @@ def run_build(
                     place_failure.expected,
                     place_failure.observed,
                 )
+                if place_failure is not None
+                else None
+            )
+            deferred = _report_fetch_attempt(
+                entry, result, pass_number, observed, retries, lines
+            )
+            if result is not None:
+                if deferred:
+                    continue
+                failure = result
                 break
             assert placed is not None
             if _run is not None:
@@ -1192,11 +1254,11 @@ def run_build(
                     break
             lines.append(pass_line(entry.key, placed.digest, placed.host))
             continue
-        row_transport = transport
+        row_transport: Transport = observed
         if entry.key == "accident":
             try:
                 row_transport = bounded_partition_reader(
-                    transport, load_partition_spans(), sleep
+                    observed, load_partition_spans(), sleep
                 )
             except PartitionError as exc:
                 failure = FetchFailure(
@@ -1223,6 +1285,7 @@ def run_build(
         if reused is not None:
             fetched, result = _Fetched(**reused), None
             reused_times[entry.key] = fetched.retrieved_utc
+            deferred = False
         else:
             fetched, result = _fetch_row(
                 entry,
@@ -1234,6 +1297,9 @@ def run_build(
                 registry_entries=tuple(entries),
                 **_stream_options(large_stream),
             )
+            deferred = _report_fetch_attempt(
+                entry, result, pass_number, observed, retries, lines
+            )
             if _run is not None and fetched is not None and result is None:
                 try:
                     _run.fetched(entry, asdict(fetched))
@@ -1244,21 +1310,16 @@ def run_build(
                     lines.append(fail_line(entry.key, "", failure.check, "", ""))
                     break
         if result is not None:
+            if deferred and pass_number == 1:
+                continue
             if entry.source_id in INVESTMENT_SOURCES:
                 investment_attempts.append(
                     FetchAttempt(
                         entry.source_id, entry.key, "failed", None, "fetch_failed"
                     )
                 )
-            lines.append(
-                fail_line(
-                    entry.key,
-                    result.url,
-                    result.check,
-                    result.expected,
-                    result.observed,
-                )
-            )
+            if deferred:
+                continue
             failure = result
             break
         assert fetched is not None
@@ -1338,6 +1399,8 @@ def run_build(
         counted = cache / entry.source_id / "empty_coordinates.txt"
         if counted.is_file():
             lines.append(counted.read_text(encoding="utf-8").strip())
+    if failure is None and retries:
+        failure = next(iter(retries.values()))[1]
     if _fetch_only:
         from eii_custodian.publicdata.busyness.security import assert_clean
 
