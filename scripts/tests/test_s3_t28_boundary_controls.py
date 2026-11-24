@@ -426,7 +426,9 @@ class BoundaryControls(WorkspaceCase):
         env = self.env()
         env.state.mkdir(parents=True)
         budget = Budget(env.count_path)
-        self.sensitive(Budget.count, (budget,), "count_unavailable", kind=BudgetFailure)
+        self.sensitive(
+            Budget.count, (budget,), "operation_os_error", kind=BudgetFailure
+        )
         self.assertFalse(env.count_path.exists())
         env.count_path.write_text("ready:0\npending:0\nready:1\n")
         self.assertEqual(budget.count(), 1)
