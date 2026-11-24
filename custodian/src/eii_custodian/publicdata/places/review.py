@@ -319,17 +319,20 @@ def review_file_spec(row: Mapping[str, object]) -> dict[str, object]:
     """Translate a file row without changing the other fields' treatment."""
     if "record_key" in row:
         raise PlacesError("missing_key")
-    result = dict(row)
-    if "record_ref" in result:
-        result["record_key"] = result.pop("record_ref")
-    return result
+    return {
+        ("record_key" if name == "record_ref" else name): value
+        for name, value in row.items()
+    }
 
 
 def review_file_row(row: Mapping[str, object]) -> dict[str, object]:
-    """Translate an internal review row to its on-disk field names."""
-    result = dict(row)
-    result["record_ref"] = result.pop("record_key")
-    return result
+    """Translate an internal review row to its on-disk field names, in order."""
+    if "record_key" not in row:
+        raise KeyError("record_key")
+    return {
+        ("record_ref" if name == "record_key" else name): value
+        for name, value in row.items()
+    }
 
 
 def _area(item: object) -> Mapping[str, object]:

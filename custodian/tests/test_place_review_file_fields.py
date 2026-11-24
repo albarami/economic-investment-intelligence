@@ -24,7 +24,11 @@ _FILES = tuple(
     for folder, names in (
         (
             "custodian/publicdata/review",
-            ("flagship_candidates.yaml", "showcase_gazetteer.yaml"),
+            (
+                "flagship_candidates.yaml",
+                "showcase_areas.yaml",
+                "showcase_gazetteer.yaml",
+            ),
         ),
         (
             "custodian/tests/fixtures/places/syn_review",
@@ -82,15 +86,26 @@ def _rows(path: Path) -> list[Mapping[str, object]]:
 def test_review_file_fields_avoid_scanner_keywords(path: Path) -> None:
     rows = _rows(path)
     _assert_no_scanner_keyword_fields(rows)
-    planted = [dict(rows[0])]
-    planted[0]["record_ref"] = planted[0].pop("record_key", None)
+    planted = [dict(rows[0]) if rows else {"record_ref": None}]
     planted[0]["record_key"] = planted[0].pop("record_ref")
     with pytest.raises(AssertionError, match="record_key"):
         _assert_no_scanner_keyword_fields(planted)
 
 
 @given(
-    word=st.sampled_from(_KEYWORDS),
+    word=st.sampled_from(
+        (
+            "key",
+            "token",
+            "secret",
+            "passw",
+            "auth",
+            "api",
+            "credential",
+            "creds",
+            "access",
+        )
+    ),
     prefix=st.sampled_from(("x", "x_", "x-")),
     suffix=st.sampled_from(("x", "_x", "-x")),
     upper=st.booleans(),
@@ -126,7 +141,6 @@ def test_old_record_key_is_refused_with_missing_key(
 ) -> None:
     source = _rows(_ROOT / "custodian/tests/fixtures/places/syn_review" / filename)[0]
     row = dict(source)
-    row["record_ref"] = row.pop("record_key", None)
     row["record_key"] = row["record_ref"]
     if not keep_new:
         del row["record_ref"]

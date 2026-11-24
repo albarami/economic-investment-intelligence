@@ -717,6 +717,14 @@ class RowBinding(World):
         stored = self.rows("showcase_gazetteer.yaml")
         self.assertEqual([row["record_ref"] for row in stored], [None, "SYN-P-1"])
 
+    def test_fill_keeps_the_field_order_of_every_row(self) -> None:
+        self.two_rows("landmark:1")
+        before = [list(row) for row in self.rows("showcase_gazetteer.yaml")]
+        self.assertEqual(self.run_tool()[0], 0)
+        stored = self.rows("showcase_gazetteer.yaml")
+        self.assertEqual([row["record_ref"] for row in stored], [None, "SYN-P-1"])
+        self.assertEqual([list(row) for row in stored], before)
+
     def test_repeated_place_key_is_refused_before_writing(self) -> None:
         self.two_rows("landmark:0")
         before = (self.review / "showcase_gazetteer.yaml").read_bytes()
