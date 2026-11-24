@@ -683,11 +683,8 @@ def wilson_period_label(active_rows, active_chain, cancelled_rows, cancelled_cha
     return matches[0]
 
 
-# The only ValueError messages admitted as failure reasons, matched exactly.
-WILSON_REASONS = {
-    "wilson_stock_mismatch": "wilson_stock_mismatch",
-    "wilson_period_no_match": "wilson_period_no_match",
-    "wilson_period_ambiguous": "wilson_period_ambiguous",
+# The only ValueError messages a pinned licence case admits, matched exactly.
+LICENCE_REASONS = {
     "month outside calendar": "month_outside_calendar",
     **{
         f"{reason}:{source}": reason
@@ -695,32 +692,51 @@ WILSON_REASONS = {
         for source in ("lic_active", "lic_cancelled")
     },
 }
+WILSON_REASONS = {
+    "wilson_stock_mismatch": "wilson_stock_mismatch",
+    "wilson_period_no_match": "wilson_period_no_match",
+    "wilson_period_ambiguous": "wilson_period_ambiguous",
+    **LICENCE_REASONS,
+}
+ISIC_REASONS = {
+    "spine_pins_differ": "spine_pins_differ",
+    "isic_stock_mismatch": "isic_stock_mismatch",
+    "isic_ratio_mismatch": "isic_ratio_mismatch",
+    "isic_lineage": "isic_lineage",
+    **LICENCE_REASONS,
+}
 
 
-def wilson_reason(error: Exception) -> str:
-    """Map an error to a closed reason; any other error is `source_invalid`."""
+def closed_reason(error: Exception, reasons: dict[str, str]) -> str:
+    """Map an error to a closed reason; never its own text."""
+    if type(error) is SpineError:
+        return "spine_refused"
     if type(error) is ValueError:
-        return WILSON_REASONS.get(str(error), "source_invalid")
+        return reasons.get(str(error), "source_invalid")
     return "source_invalid"
 
 
-def _wilson_case(case, check):
+def wilson_reason(error: Exception) -> str:
+    return closed_reason(error, WILSON_REASONS)
+
+
+def _licence_case(case, check, reasons):
     """Safe failure: the case ID and a fixed reason, never a count."""
     try:
         active_rows, active_chain = pinned("lic_active")
         cancelled_rows, cancelled_chain = pinned("lic_cancelled")
         return check(active_rows, active_chain, cancelled_rows, cancelled_chain)
     except Exception as error:
-        reason = wilson_reason(error)
+        reason = closed_reason(error, reasons)
     pytest.fail(f"{case}:{reason}", pytrace=False)
 
 
 def test_pinned_c2_wilson_stock():
-    _wilson_case("C2-WILSON-STOCK", wilson_stock_check)
+    _licence_case("C2-WILSON-STOCK", wilson_stock_check, WILSON_REASONS)
 
 
 def test_pinned_c2_wilson_period():
-    label = _wilson_case("C2-WILSON-PERIOD", wilson_period_label)
+    label = _licence_case("C2-WILSON-PERIOD", wilson_period_label, WILSON_REASONS)
     warnings.warn(f"C2-WILSON-PERIOD:{label}", WilsonPeriodIdentified, stacklevel=1)
 
 
@@ -733,19 +749,12 @@ def c2_class_members(isic_class: str) -> tuple[str, ...]:
     selected = reviewed_selections(_cache.CACHE)
     for key in ("lic_active", "lic_cancelled"):
         if selected.get(key) != _cache._pin(key):
-            pytest.fail(
-                "C2 ISIC 5610 spine and method pins name different snapshots: " + key
-            )
+            raise ValueError("spine_pins_differ")
     return committed_class_members(_cache.CACHE, isic_class, selections=selected)
 
 
-def test_pinned_c2_isic_5610():
-    cancelled_rows, cancelled_chain = pinned("lic_cancelled")
-    active_rows, active_chain = pinned("lic_active")
-    try:
-        members = set(c2_class_members("5610"))
-    except SpineError as error:
-        pytest.fail("C2 ISIC 5610 membership refused: " + error.detail)
+def isic_5610_check(active_rows, active_chain, cancelled_rows, cancelled_chain):
+    members = set(c2_class_members("5610"))
     class_cancelled = [
         row for row in cancelled_rows if row["rmz_lnsht_ltjry"] in members
     ]
@@ -777,12 +786,19 @@ def test_pinned_c2_isic_5610():
         reading(dated + undated, "count", "2025-05", cancelled_chain),
         reading(dated, "count", "2025-05", cancelled_chain),
     )
-    assert result["active_count"].value == D(7878)
-    assert result["including_ratio"].exact_unrounded * 7878 == 2510
-    assert result["including_ratio"].value == D("0.32")
-    assert {"lic_active", "lic_cancelled"} <= {
-        chain.lineage_ref for chain in result["including_ratio"].sources
-    }
+    if result["active_count"].value != D(7878):
+        raise ValueError("isic_stock_mismatch")
+    ratio = result["including_ratio"]
+    if ratio.exact_unrounded * 7878 != 2510 or ratio.value != D("0.32"):
+        raise ValueError("isic_ratio_mismatch")
+    if not {"lic_active", "lic_cancelled"} <= {
+        chain.lineage_ref for chain in ratio.sources
+    }:
+        raise ValueError("isic_lineage")
+
+
+def test_pinned_c2_isic_5610():
+    _licence_case("C2-ISIC-5610", isic_5610_check, ISIC_REASONS)
 
 
 def test_pinned_c5_heading_checks_only():

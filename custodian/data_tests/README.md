@@ -110,6 +110,14 @@ not independent evidence. This task writes no configuration pin. Lead shell:
 uv run --locked python -m pytest custodian/data_tests/test_pinned_methods.py -k "wilson" -vv -p no:cacheprovider
 ```
 
+`test_pinned_c2_isic_5610` (case `C2-ISIC-5610`) runs through the same
+safe-failure wrapper. Its failure prints only `C2-ISIC-5610:<reason>`. The
+reason is `spine_refused` for any activity-spine refusal, whatever its detail,
+`spine_pins_differ`, `isic_stock_mismatch`, `isic_ratio_mismatch` or
+`isic_lineage`, a closed cache reason, or `source_invalid`. The spine
+refusal's own text is never printed. Its invented child runs are in
+`custodian/tests/test_pinned_isic.py`.
+
 ## Inventory and preparation
 
 `restricted_cases.CASES` is the metadata-only inventory, version `S2-T35-v1`.
