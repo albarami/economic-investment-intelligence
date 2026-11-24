@@ -46,7 +46,9 @@ MACHINERY_SEEDS: tuple[str, ...] = (
 # build.py function scopes excluded from the machinery closure. Each runs
 # only after the fetch loop or only for note-only rows (whose completion
 # never carries a fingerprint), except _seeded_assembly, which runs before
-# the loop and is bound through the loaded-module hash instead. Each name is
+# the loop and is bound through the loaded-module hash instead: that holds
+# only for modules it loads before RunRecord.begin, so it preloads what the
+# assembly imports before calling the fetcher. Each name is
 # asserted to exist as a top-level function of build.py; the scope set may not
 # overlap any computed closure's inputs.
 EXCLUDED_SCOPES: frozenset[str] = frozenset(

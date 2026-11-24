@@ -6,6 +6,7 @@ import contextlib
 import importlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -1233,6 +1234,145 @@ def test_production_shape_loads_no_checkout_module_outside_the_bound_set() -> No
     )
     assert done.returncode == 0, done.stderr[-400:]
     assert done.stdout.strip() == "[]", done.stdout
+
+
+# Drives the real seeded run_build (`python -I`, `import commands.main`, the
+# real registry and roots) up to the fetch loop. The stubbed loop applies the
+# action of argv[3], prints the paths unexpected_loaded() would flag, the
+# guard results and _fingerprint's refusal for the first https_file entry,
+# then returns a failure without fetching.
+_SEEDED_LOOP_PROBE = textwrap.dedent(
+    """
+    import json, sys
+    from pathlib import Path
+    root, cache, action = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
+    sys.path[:0] = [str(root / d) for d in (
+        "scripts", "custodian/src", "core/src", "product/src", "gateway/src")]
+    import commands.main
+    import eii_custodian
+    from eii_custodian.publicdata.fetch import build, resume
+    from eii_custodian.publicdata.fetch import fingerprint as fp
+    from eii_custodian.publicdata.fetch.registry import load_registry
+    from eii_custodian.publicdata.fetch.transport import TransportFault
+    from eii_custodian.publicdata.method_pin_config import load_generation_config
+    assert Path(eii_custodian.__file__).resolve().is_relative_to(root)
+    runs = []
+    begin = resume.RunRecord.begin.__func__
+    def capture(cls, *a, **k):
+        runs.append(begin(cls, *a, **k))
+        return runs[-1]
+    resume.RunRecord.begin = classmethod(capture)
+    entries = tuple(e for e in load_registry()
+                    if e.kind not in {"cdse_backup", "company_web"})
+    first = next(e for e in entries if e.kind == "https_file" and not e.skip_reason)
+    seeded = build.run_build
+    def loop(*a, **k):
+        if not k.get("_fetch_only"):
+            return seeded(*a, **k)
+        if action.startswith("tamper:"):
+            with (root / action[7:]).open("a") as handle:
+                handle.write("# changed after begin\\n")
+        elif action == "plant":
+            import syn_late_probe
+        scan = runs[0].scan
+        flagged = sorted(p.relative_to(root).as_posix()
+                         for p in fp._qualifying_modules(scan.roots)
+                         if p not in scan.baseline and p not in scan.union)
+        print(json.dumps({"flagged": flagged,
+                          "intact": scan.closure_intact(),
+                          "unexpected": scan.unexpected_loaded(),
+                          "refusal": runs[0]._fingerprint(first)[1]}))
+        failure = build.FetchFailure(1, "build-public", "", "probe_stop", "", "")
+        return build.BuildOutcome((), failure)
+    build.run_build = loop
+    def unreachable(url, *a, **k):
+        raise TransportFault("unreachable", url)
+    outcome = build.run_build(entries, unreachable, cache, build.utc_now, lambda s: None,
+                    large_stream=unreachable, seed=7,
+                    pin_generation_config=load_generation_config(root),
+                    pin_auto_supply=True, environ={})
+    print(outcome.failure and outcome.failure.check, file=sys.stderr)
+    """
+)
+_NEWLY_BOUND = (
+    "custodian/src/eii_custodian/publicdata/assembly_method_pins.py",
+    "custodian/src/eii_custodian/publicdata/assembly_refusals.py",
+)
+
+
+def _seeded_loop_probe(root: Path, tmp_path: Path, action: str) -> dict[str, Any]:
+    cache = tmp_path / "run" / "data" / "public_cache"
+    cache.mkdir(parents=True)
+    done = subprocess.run(
+        [sys.executable, "-I", "-c", _SEEDED_LOOP_PROBE, str(root), str(cache), action],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    lines = done.stdout.strip().splitlines()
+    assert done.returncode == 0 and lines, done.stderr[-1200:]
+    result: dict[str, Any] = json.loads(lines[-1])
+    return result
+
+
+def _tracked_copy(tmp_path: Path) -> Path:
+    """The checkout's tracked files, as on disk now, in a fresh git tree."""
+    source = default_roots().code_root
+    listed = subprocess.run(
+        ["git", "-C", str(source), "ls-files", "-z"],
+        capture_output=True,
+        check=True,
+    )
+    copy = tmp_path / "copy"
+    for name in filter(None, listed.stdout.decode("utf-8").split("\0")):
+        origin = source / name
+        if origin.is_file():
+            (copy / name).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(origin, copy / name)
+    commit = ["-c", "user.name=syn", "-c", "user.email=", "-c", "commit.gpgsign=false"]
+    commit += ["-c", "core.hooksPath=/dev/null", "commit", "-q", "-m", "copy"]
+    for args in (["init", "-q"], ["add", "-A"], commit):
+        subprocess.run(["git", "-C", str(copy), *args], capture_output=True, check=True)
+    return copy
+
+
+def test_seeded_run_loads_no_unbound_module_before_the_fetch_loop(
+    tmp_path: Path,
+) -> None:
+    """At fetch-loop entry of the real seeded run, nothing loaded after
+    begin() sits outside the bound set, so an ordinary entry gets a record:
+    _seeded_assembly binds the modules Production.run imports pre-fetch."""
+    result = _seeded_loop_probe(default_roots().code_root, tmp_path, "none")
+    assert result["flagged"] == []
+    assert result["unexpected"] is False
+    assert result["intact"] is True
+    assert result["refusal"] is None
+
+
+def test_seeded_run_module_loaded_late_is_flagged(tmp_path: Path) -> None:
+    """Planted twin: an out-of-closure module first imported inside the loop
+    is flagged and withholds the record, so the probe above is not vacuous."""
+    copy = _tracked_copy(tmp_path)
+    (copy / "custodian/src/syn_late_probe.py").write_text("X = 1\n")
+    result = _seeded_loop_probe(copy, tmp_path, "plant")
+    assert result["flagged"] == ["custodian/src/syn_late_probe.py"]
+    assert result["unexpected"] is True
+    assert result["intact"] is True
+    assert result["refusal"] == "resume_fingerprint_unproven"
+
+
+@pytest.mark.parametrize("name", _NEWLY_BOUND)
+def test_seeded_run_newly_bound_file_edit_mid_run_is_unproven(
+    tmp_path: Path, name: str
+) -> None:
+    """The preloaded assembly modules are bound, not exempted: an edit after
+    begin() breaks closure_intact() and withholds the record."""
+    copy = _tracked_copy(tmp_path)
+    result = _seeded_loop_probe(copy, tmp_path, f"tamper:{name}")
+    assert result["flagged"] == []
+    assert result["unexpected"] is False
+    assert result["intact"] is False
+    assert result["refusal"] == "resume_fingerprint_unproven"
 
 
 MISSED_FORMS = {
