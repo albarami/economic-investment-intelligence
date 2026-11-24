@@ -4,7 +4,7 @@
 |---|---|
 | Status | Proposed by the lead, 2026-11-24 (task S2-LMK2); different-maker review and acceptance remain pending |
 | Date | 2026-11-24 |
-| Scope | `custodian/publicdata/review/showcase_gazetteer.yaml` rows `landmark:0` to `landmark:3`; the review loader `custodian/src/eii_custodian/publicdata/places/review.py`; the places stage `custodian/src/eii_custodian/publicdata/places/stage.py`; the hand-over `places/integrate.py` and `frame/live.py`; the review tool `scripts/review_place_keys.py`; [document 03](../03_DATA_CONTRACTS.md) |
+| Scope | `custodian/publicdata/review/showcase_gazetteer.yaml` rows `landmark:0` to `landmark:3`; `custodian/publicdata/review/flagship_candidates.yaml` row `building:3`; the review loader `custodian/src/eii_custodian/publicdata/places/review.py`; the places stage `custodian/src/eii_custodian/publicdata/places/stage.py`; the hand-over `places/integrate.py` and `frame/live.py`; the review tool `scripts/review_place_keys.py`; [document 03](../03_DATA_CONTRACTS.md) |
 | Amends | Nothing until accepted |
 | Purpose | Let the four reviewed landmark rows of the showcase gazetteer resolve as boundary-district areas of the licensed boundary archive, so that the live build no longer refuses `gazetteer_missing_source_point` on them |
 | Read first | AGENTS.md rules 5, 7, 8, 19, 36 and 46; [decision 0030](0030-frame-grid-by-index-ownership-and-two-nullable-keys.md); [decision 0093](0093-landmark-hand-list-in-one-reviewed-cache-record.md); document 03 |
@@ -76,6 +76,18 @@ source's zone grouping — the three districts of the Al Dafna zones, Al Dafna
    groups it in zone 66, the zone of The Pearl (`landmark:3`), not the
    Al Dafna zones. A reviewer finding a different extent changes `members`
    and `member_reason` only.
+7. A `flagship_candidates.yaml` building row the name route leaves ambiguous
+   may carry a reviewed choice: `source_id: bldg_ovt`, a non-null
+   `record_ref` and a non-empty `choice_reason` recording why that footprint
+   is the building. `review_place_keys.py --check` accepts such a row as
+   `check=yes basis=reviewed_choice` only when the helper cannot re-derive
+   the key, the chosen footprint is in the row's own exact-or-folded
+   name-candidate set and it is inside the boundary set; it refuses
+   `reviewed_choice_kind` (a `choice_reason` on any other row),
+   `reviewed_choice_reason_missing`, `reviewed_choice_unneeded` (the helper
+   re-derives the key uniquely), `reviewed_choice_not_candidate` and
+   `reviewed_choice_outside`. The fill run never writes or overwrites such
+   a row. `building:3` is filled on this route.
 
 ## Evidence and consequences
 

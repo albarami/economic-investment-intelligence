@@ -353,7 +353,7 @@ def test_a_filled_key_without_its_record_is_refused() -> None:
 
 
 def test_committed_keys_match_l4_redo_and_require_their_source_records() -> None:
-    """S2-LMK2 district rows join the six L4 building references; one stays pending."""
+    """S2-LMK2 district rows join the seven L4 building references; none stays pending."""
     review = repository_root(Path(__file__)) / "custodian/publicdata/review"
     specs = load_showcase_gazetteer(review / "showcase_gazetteer.yaml", None)[1]
     candidates = load_flagship_candidates(review / "flagship_candidates.yaml", None)[1]
@@ -371,6 +371,7 @@ def test_committed_keys_match_l4_redo_and_require_their_source_records() -> None
         "building:0",
         "building:1",
         "building:2",
+        "building:3",
         "building:4",
         "building:5",
         "building:6",
@@ -407,7 +408,7 @@ def test_committed_keys_match_l4_redo_and_require_their_source_records() -> None
         "building:0: record_missing",
         "building:1: record_missing",
         "building:2: record_missing",
-        "gazetteer: source point pending S2-T06: building:3",
+        "building:3: record_missing",
         "building:4: record_missing",
         "building:5: record_missing",
         "building:6: record_missing",

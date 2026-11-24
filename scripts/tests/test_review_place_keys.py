@@ -2221,5 +2221,119 @@ class DistrictRows(World):
         )
 
 
+class ReviewedChoice(World):
+    """A reviewed choice fills the row the name route leaves ambiguous.
+
+    The valid world: SYN-B-1 carries the row's name exactly, SYN-B-2 and the
+    outside SYN-B-3 carry it once accents are folded, and SYN-B-9 is unnamed.
+    Each negative test changes ONE input of it.
+    """
+
+    REASON = "invented reason: the exact-name trace of the invented building"
+
+    def world(self) -> None:
+        self.cache_places([UNRELATED])
+        self.cache_buildings(
+            0,
+            [
+                building("SYN-B-1", 51.1, 25.1, names=names_of("Syn Spîre")),
+                building("SYN-B-2", 51.3, 25.3, names=names_of("Syn Spire")),
+                building("SYN-B-3", 51.59, 25.1, 0.04, names=names_of("Syn Spire")),
+                building("SYN-B-9", 51.4, 25.4),
+            ],
+        )
+
+    def choice_row(self, **extra: object) -> dict[str, object]:
+        row = spec(
+            "building:0",
+            "Syn Spîre",
+            source_id="bldg_ovt",
+            record_ref="SYN-B-1",
+            choice_reason=self.REASON,
+        )
+        row.update(extra)
+        return row
+
+    def test_check_accepts_a_reviewed_choice_inside_the_candidate_set(self) -> None:
+        self.world()
+        self.review_files(flagship=[self.choice_row()])
+        self.assertEqual(
+            self.run_tool("--check"),
+            (0, "building:0 check=yes basis=reviewed_choice\n"),
+        )
+        self.assertEqual(self.rows(FLAGSHIP)[0]["record_ref"], "SYN-B-1")
+
+    def test_the_fill_run_never_writes_a_reviewed_choice(self) -> None:
+        self.world()
+        self.review_files(flagship=[self.choice_row()])
+        before = (self.review / FLAGSHIP).read_bytes()
+        self.assertEqual(self.run_tool(), (0, ""))
+        self.assertEqual((self.review / FLAGSHIP).read_bytes(), before)
+
+    def test_a_choice_outside_the_candidate_set_is_refused(self) -> None:
+        self.world()
+        self.review_files(flagship=[self.choice_row(record_ref="SYN-B-9")])
+        self.assertEqual(
+            self.run_tool("--check"), (2, "REFUSED reviewed_choice_not_candidate\n")
+        )
+
+    def test_a_choice_outside_the_boundary_set_is_refused(self) -> None:
+        self.world()
+        self.review_files(flagship=[self.choice_row(record_ref="SYN-B-3")])
+        self.assertEqual(
+            self.run_tool("--check"), (2, "REFUSED reviewed_choice_outside\n")
+        )
+
+    def test_a_missing_or_blank_choice_reason_is_refused(self) -> None:
+        for reason in (None, "", "   ", 7, ["syn"]):
+            with self.subTest(reason=reason):
+                self.setUp()
+                self.world()
+                self.review_files(flagship=[self.choice_row(choice_reason=reason)])
+                self.assertEqual(
+                    self.run_tool("--check"),
+                    (2, "REFUSED reviewed_choice_reason_missing\n"),
+                )
+
+    def test_a_choice_reason_the_helper_does_not_need_is_refused(self) -> None:
+        self.cache_places([UNRELATED])
+        self.cache_buildings(
+            0, [building("SYN-B-1", 51.1, 25.1, names=names_of("Syn Spire"))]
+        )
+        self.review_files(
+            flagship=[
+                spec(
+                    "building:0",
+                    "Syn Spire",
+                    source_id="bldg_ovt",
+                    record_ref="SYN-B-1",
+                    choice_reason=self.REASON,
+                )
+            ]
+        )
+        self.assertEqual(
+            self.run_tool("--check"), (2, "REFUSED reviewed_choice_unneeded\n")
+        )
+
+    def test_a_choice_reason_on_a_gazetteer_row_is_refused(self) -> None:
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
+        self.review_files(
+            gazetteer=[
+                spec(
+                    "landmark:0",
+                    "Syn Souq",
+                    source_id="places_ovt",
+                    record_ref="SYN-P-1",
+                    choice_reason=self.REASON,
+                )
+            ]
+        )
+        for argv in ((), ("--check",)):
+            with self.subTest(argv=argv):
+                self.assertEqual(
+                    self.run_tool(*argv), (2, "REFUSED reviewed_choice_kind\n")
+                )
+
+
 if __name__ == "__main__":
     unittest.main()
