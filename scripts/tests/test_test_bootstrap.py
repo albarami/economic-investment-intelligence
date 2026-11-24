@@ -22,10 +22,11 @@ ROOT = support.ROOT
 
 # OI-409: a property whose body does file or folder work per example sets
 # deadline=None; the closed call lists below mark that work. A name bound by
-# `from M import N [as A]` counts when N is in FILE_NAMES or M.N is in
-# FILE_QUALIFIED; `import M as A` makes A.N count as M.N. Names that are file
-# work only on one module (walk, call, system, link) are qualified only, so
-# ast.walk, mock.call and platform.system stay outside.
+# `from M import N [as A]` counts when N is in FILE_NAMES or FILE_METHODS or
+# M.N is in FILE_QUALIFIED; `from M import *` binds every FILE_METHODS name and
+# each N of an M.N in FILE_QUALIFIED; `import M as A` makes A.N count as M.N.
+# Names that are file work only on one module (walk, call, system, link) are
+# qualified only, so ast.walk, mock.call and platform.system stay outside.
 # Still not seen: calls into imported production code; `os.path.*` and other
 # calls through a dotted module (`os.path.exists`, `xml.etree...`); a file
 # call reached through a variable or getattr (`f = open; f(...)`); helpers in
@@ -153,11 +154,27 @@ def _bindings(tree: ast.Module) -> _Bindings:
         if isinstance(node, ast.Import):
             modules |= {a.asname: a.name for a in node.names if a.asname}
         elif isinstance(node, ast.ImportFrom) and node.module:
-            for a in node.names:
-                qualified = f"{node.module}.{a.name}"
-                if a.name in FILE_NAMES or qualified in FILE_QUALIFIED:
-                    names.add(a.asname or a.name)
+            names |= _from_names(node.module, node.names)
     return _Bindings(frozenset(names), modules)
+
+
+def _from_names(module: str, aliases: list[ast.alias]) -> set[str]:
+    """Names that `from module import ...` binds to closed-list calls."""
+    names = set()
+    for a in aliases:
+        if a.name == "*":
+            names |= set(FILE_METHODS)
+            names |= {
+                q.rpartition(".")[2]
+                for q in FILE_QUALIFIED
+                if q.startswith(module + ".")
+            }
+        elif (
+            a.name in FILE_NAMES + FILE_METHODS
+            or f"{module}.{a.name}" in FILE_QUALIFIED
+        ):
+            names.add(a.asname or a.name)
+    return names
 
 
 def _is_file_call(call: ast.Call, bindings: _Bindings) -> bool:
@@ -369,12 +386,48 @@ _ROUTES_R2 |= {
     )
     for pair in _FROM_R2
 }
+# S2-P80.cf1 F3: every closed-list name under each from-import form, bare,
+# aliased and star; an unqualified name is shown on an invented module.
+_FROM_FAMILY = {
+    *(("anymodule", name) for name in FILE_NAMES + FILE_METHODS),
+    *(tuple(pair.split(".")) for pair in FILE_QUALIFIED),
+}
+_ROUTES_R3 = {
+    f"{form} {module}.{name}": (f"from {module} import {bound}\n", f"    {call}()\n")
+    for module, name in sorted(_FROM_FAMILY)
+    for form, bound, call in (
+        ("bare", name, name),
+        ("as", f"{name} as bound", "bound"),
+        ("star", "*", name),
+    )
+}
+_ROUTES_R3["helper copytree"] = (
+    "from shutil import copytree\n",
+    "    released()\n    if False:\n        pass\n"
+    "def released():\n    copytree('x', 'y')\n",
+)
 # Same-named calls that are not file work stay outside the guard.
 _NOT_FILE_WORK = {
     "ast.walk": "    ast.walk(text)\n",
     "mock.call": "    mock.call(text)\n",
     "platform.system": "    platform.system()\n",
 }
+_NOT_FILE_WORK_R3 = {
+    "from ast import walk": ("from ast import walk\n", "    walk(text)\n"),
+    "from ast import *": ("from ast import *\n", "    walk(text)\n"),
+    "from unittest.mock import call": (
+        "from unittest.mock import call\n",
+        "    call(text)\n",
+    ),
+    "from platform import *": ("from platform import *\n", "    system()\n"),
+}
+
+
+def _route(imports: str, line: str) -> str:
+    """The plant with `imports` above it and `line` opening its body."""
+    return imports + _PLANT.format(decorator="").replace(
+        _BODY, line + "    if False:\n"
+    )
 
 
 class TestBootstrap(unittest.TestCase):
@@ -553,19 +606,22 @@ class TestBootstrap(unittest.TestCase):
         self.assertEqual(deadline_violations(marker), ["test_plant:7"])
 
     def test_deadline_guard_routes_round_two(self) -> None:
-        for name, (imports, line) in _ROUTES_R2.items():
-            with self.subTest(route=name):
-                red = imports + _PLANT.format(decorator="").replace(
-                    _BODY, line + "    if False:\n"
-                )
-                expected = f"test_plant:{6 + imports.count(chr(10))}"
-                self.assertEqual(deadline_violations(red), [expected])
+        self._assert_routes(_ROUTES_R2)
         for name, line in _NOT_FILE_WORK.items():
             with self.subTest(pure=name):
-                pure = _PLANT.format(decorator="").replace(
-                    _BODY, line + "    if False:\n"
-                )
-                self.assertEqual(deadline_violations(pure), [])
+                self.assertEqual(deadline_violations(_route("", line)), [])
+
+    def test_deadline_guard_from_import_family(self) -> None:
+        self._assert_routes(_ROUTES_R3)
+        for name, (imports, line) in _NOT_FILE_WORK_R3.items():
+            with self.subTest(pure=name):
+                self.assertEqual(deadline_violations(_route(imports, line)), [])
+
+    def _assert_routes(self, routes: dict[str, tuple[str, str]]) -> None:
+        for name, (imports, line) in routes.items():
+            with self.subTest(route=name):
+                expected = f"test_plant:{6 + imports.count(chr(10))}"
+                self.assertEqual(deadline_violations(_route(imports, line)), [expected])
 
     def test_deadline_guard_given_alias(self) -> None:
         alias = _PLANT.replace("given, settings", "given as g, settings")
