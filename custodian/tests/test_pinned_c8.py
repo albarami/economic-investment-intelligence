@@ -291,6 +291,12 @@ def invented_cache(
     elif plant == "zone_zero":
         for field in ("Private", "Government", COUNTS["census_zone_sector"][0]):
             payload["features"][0]["attributes"][field] = 0
+    elif plant == "zone_negative":
+        attrs = payload["features"][0]["attributes"]
+        attrs["Government"] = -1
+        attrs["Private"] += 21
+    elif plant == "zone_empty":
+        payload = {"count": 0, "features": []}
     elif plant == "zone_duplicate_key":
         payload["features"][1]["attributes"]["ZONE_NO"] = payload["features"][0][
             "attributes"
@@ -679,6 +685,8 @@ def test_c8_null_zone_must_never_return_a_share(tmp_path):
         ("national_total_infinite", "national_denominator"),
         ("national_total_nan", "national_denominator"),
         ("zone_zero", "zone_denominator"),
+        ("zone_negative", "zone_denominator"),
+        ("zone_empty", "zone_keys"),
         ("zone_duplicate_key", "zone_keys"),
         ("no_complete_zones", "no_complete_zones"),
     ],
@@ -710,7 +718,7 @@ def test_c8_each_pin_and_receipt_is_required(tmp_path, key, plant):
         "snapshot": "public_cache_missing",
         "index": "public_cache_missing",
         "path": "public_cache_missing",
-    }.get(plant, "source_invalid")
+    }[plant]
     assert_c8_closed(tmp_path, {"kind": plant, "key": key}, reason)
 
 

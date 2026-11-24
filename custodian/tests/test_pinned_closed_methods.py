@@ -131,7 +131,13 @@ SPLIT_PLANTS = {
     ),
     ("C2-NATIONAL", "bulk_share_mismatch"): (
         "bulk_share_named",
+        "bulk_share_named_near",
         "bulk_share_result",
+        "bulk_share_result_near",
+    ),
+    ("C2-MUNICIPAL", "including_mismatch"): (
+        "including_mismatch",
+        "including_near",
     ),
     ("C2-MUNICIPAL", "stock_mismatch"): (
         "stock_return",
@@ -461,12 +467,17 @@ def plant_c2_national(methods_module, kind):
             counts[period] = D(SENTINEL)
     if kind == "bulk_order_mismatch":
         bulk.reverse()
-    if kind == "bulk_share_named":
-        methods_module.rounded = lambda *_args: str(SENTINEL)
+    if kind in ("bulk_share_named", "bulk_share_named_near"):
+        named_share = "43.2" if kind == "bulk_share_named_near" else SENTINEL
+        methods_module.rounded = lambda *_args: str(named_share)
     result_undated = SENTINEL if kind == "totals_result_undated" else 7386
+    bulk_share = {
+        "bulk_share_result": SENTINEL,
+        "bulk_share_result_near": "54.35",
+    }.get(kind, "54.3")
     methods_module.licence_churn = lambda *_args: {
         "undated_count": fact(result_undated),
-        "bulk_share_percent": fact(SENTINEL if kind == "bulk_share_result" else "54.3"),
+        "bulk_share_percent": fact(bulk_share),
         "bulk_months_unrounded": tuple(bulk),
     }
 
@@ -496,7 +507,11 @@ def c2_municipal_result(kind):
         "active_count": local(SENTINEL if kind == "stock_active_count" else active),
         "including_ratio": local("0"),
         "including_percent": local(
-            SENTINEL if kind == "including_mismatch" else including
+            D(including) + D("0.05")
+            if kind == "including_near"
+            else SENTINEL
+            if kind == "including_mismatch"
+            else including
         ),
         "excluding_percent": local(
             SENTINEL if kind == "excluding_value" else excluding,
