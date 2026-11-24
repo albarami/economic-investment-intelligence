@@ -22,10 +22,28 @@ def entries():
     "key", [key for key in large.REQUIRED_KEYS if "ovt/" not in key]
 )
 def test_unconfirmed_bound_refuses_before_stream(entries, key):
-    entry = entries[key]
-    assert entry.stream_max_bytes is None
+    entry = replace(entries[key], stream_max_bytes=None)
     with pytest.raises(large.IntakeError, match=r"^bound_unconfirmed$"):
         large.receive(entry, lambda _url: pytest.fail("stream opened"), io.BytesIO())
+
+
+GIB = 1024**3
+# Ruling L-1723: the smallest whole number of GiB at or above four times each
+# key's receipted bytes; reviewed by the lead, never derived from a header.
+REVIEWED_CEILINGS = {
+    "cus_imp_2019": 2 * GIB,
+    "trade_ext/qatar-imports-2014-2018": 2 * GIB,
+    "bldg_wsf3d": 8 * GIB,
+    "bldg_gba/e050_n25_e055_n20": 1 * GIB,
+    "bldg_gba/e050_n30_e055_n25": 1 * GIB,
+}
+
+
+def test_reviewed_ceilings_are_pinned(entries):
+    keys = {key for key in large.REQUIRED_KEYS if "ovt/" not in key}
+    assert set(REVIEWED_CEILINGS) == keys
+    for key, ceiling in REVIEWED_CEILINGS.items():
+        assert entries[key].stream_max_bytes == ceiling
 
 
 def test_undeclared_short_body_refuses_before_read(entries):

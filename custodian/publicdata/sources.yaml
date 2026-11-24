@@ -174,7 +174,7 @@ sources:
     skip_reason: ""
     extension: "json"
   - key: "cus_imp_2019"
-    stream_max_bytes: null
+    stream_max_bytes: 2147483648
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "cus_imp_2019"
     slug: "qatar-imports-2019-2024-copy"
@@ -28065,7 +28065,7 @@ sources:
     period_field: "sit=row;form=year_text;field=year"
     basis_note: "Period rule year_text: every exported year value is four-digit text (S2-T08 part B source review, mismatch 2; custodian/publicdata/review/s2_t08_source_review.yaml)."
   - key: trade_ext/qatar-imports-2014-2018
-    stream_max_bytes: null
+    stream_max_bytes: 2147483648
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: trade_ext
     slug: qatar-imports-2014-2018
@@ -28393,7 +28393,7 @@ sources:
     skip_reason: ""
     extension: "zip"
   - key: "bldg_wsf3d"
-    stream_max_bytes: null
+    stream_max_bytes: 8589934592
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_wsf3d"
     slug: ""
@@ -28421,7 +28421,7 @@ sources:
     skip_reason: ""
     extension: "tif"
   - key: "bldg_gba/e050_n25_e055_n20"
-    stream_max_bytes: null
+    stream_max_bytes: 1073741824
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_gba"
     slug: ""
@@ -28451,7 +28451,7 @@ sources:
     basis_note: "Hosted GeoParquet conversion; original dataset https://github.com/zhu-xlab/GlobalBuildingAtlas/ and DOI 10.14459/2025mp1782307; hosted conversion https://source.coop/tge-labs/globalbuildingatlas-lod1. Supplied footer research dated 2026-11-22; ODbL component notice quoted in terms_words from the original repository's License Notice, read 2026-11-22; publisher meaning of declared nodata remains pending. Calibration only, no published building class."
 
   - key: "bldg_gba/e050_n30_e055_n25"
-    stream_max_bytes: null
+    stream_max_bytes: 1073741824
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "bldg_gba"
     slug: ""
