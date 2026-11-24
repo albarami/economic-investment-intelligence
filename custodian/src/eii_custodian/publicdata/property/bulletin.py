@@ -84,8 +84,8 @@ SALES_EXPORT_FIELDS = (
     "share_value",
     "property_value",
 )
-# Their meaning (a part of a property, or of its value) is not confirmed: a
-# value in any of them refuses the export by name. None is read as a whole deal.
+# Their meaning remains unconfirmed. L-1724 admits only the exact whole-row
+# patterns below; these fields never supply a deal's price or floor area.
 SALES_SHARE_FIELDS = ("share_area", "number_of_shares_2400", "share_value")
 # Published fields the deal rule does not read: the Arabic twin of the usage
 # field (the reviewed use map reads ``usage``) and the source's own price per
@@ -121,6 +121,14 @@ class BulletinDeals:
     identifiers: frozenset[str]
 
 
+@dataclass(frozen=True)
+class SalesExport:
+    """Whole-property rows and counted per-row share exclusions (L-1724)."""
+
+    rows: list[dict[str, object]]
+    blocked: tuple[Coverage, ...]
+
+
 def quarter_of(value: object) -> str:
     """Return the calendar quarter ``YYYY-Qn`` of a row date, or fail."""
     text = parse_period_value(value, "date")
@@ -134,18 +142,20 @@ def refuse_release_identifiers(
     _refuse_identifier_text(repr(list(rows)), identifiers)
 
 
-def sales_export_rows(rows: object) -> list[dict[str, object]]:
+def sales_export_rows(rows: object) -> SalesExport:
     """Return the ``prop_sales`` export rows in the bulletin's own field names.
 
     Every row must hold exactly the observed fields. ``usage`` becomes the
     bulletin's usage field, the published square metres stay the floor area,
     square feet stay absent, and no share field or unread field is passed on.
-    A share field that holds any value refuses the export by name.
+    Only all-null or exactly whole share triples survive; other rows enter
+    closed coverage counts. No whole rows refuses the source by name.
     """
     if not isinstance(rows, list):
         raise AdditionError("bulletin_rows")
     expected = frozenset(SALES_EXPORT_FIELDS)
     adapted: list[dict[str, object]] = []
+    counts: dict[str, int] = defaultdict(int)
     for row in rows:
         if not isinstance(row, dict):
             raise AdditionError("bulletin_row")
@@ -153,8 +163,10 @@ def sales_export_rows(rows: object) -> list[dict[str, object]]:
             raise AdditionError("unknown_source_field")
         if expected - set(row):
             raise AdditionError("source_field_missing")
-        if any(row[field] is not None for field in SALES_SHARE_FIELDS):
-            raise AdditionError("share_semantics_unconfirmed")
+        reason = _sales_share_reason(row)
+        if reason is not None:
+            counts[reason] += 1
+            continue
         kept = {
             name: row[name]
             for name in SALES_EXPORT_FIELDS
@@ -164,7 +176,39 @@ def sales_export_rows(rows: object) -> list[dict[str, object]]:
         }
         kept["property_usage"] = row["usage"]
         adapted.append(kept)
-    return adapted
+    if not adapted:
+        raise AdditionError("no_whole_property_deals")
+    return SalesExport(
+        adapted,
+        tuple(Coverage(reason, count) for reason, count in sorted(counts.items())),
+    )
+
+
+def _sales_share_reason(row: Mapping[str, object]) -> str | None:
+    """Classify shares exactly, without interpreting their unconfirmed meaning."""
+    if all(row[field] is None for field in SALES_SHARE_FIELDS):
+        return None
+    # Compare like dimensions only: area {m2}, share count {1}, value {qar}.
+    whole_values = (row["area_square_meters"], 2400, row["property_value"])
+    pairs = []
+    try:
+        for field, whole in zip(SALES_SHARE_FIELDS, whole_values, strict=True):
+            share = read_measure(
+                row[field], missing_forms=frozenset(), integral=False
+            ).number
+            total = read_measure(
+                whole, missing_forms=frozenset(), integral=False
+            ).number
+            if share is None or total is None:
+                return "share_fields_inconsistent"
+            pairs.append((share, total))
+    except AdditionError:
+        return "share_fields_inconsistent"
+    if all(share == whole for share, whole in pairs):
+        return None
+    if all(0 < share < whole for share, whole in pairs):
+        return "partial_share_deal"
+    return "share_fields_inconsistent"
 
 
 def parse_bulletin(

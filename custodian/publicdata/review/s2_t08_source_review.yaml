@@ -996,7 +996,7 @@ rows:
         types_not_evidenced: [lstkhdm, share_area, price_per_square_foot, number_of_shares_2400, share_value]
       basis_note: added
       adapter: property/bulletin.py sales_export_rows (exact observed fields; usage read as the usage field; published square metres; square feet absent)
-    disposition: corrected; any value in a share field refuses by name (share_semantics_unconfirmed) until the lead confirms what the share fields mean; the declared types of the five fields above await the live run, where a wrong type refuses
+    disposition: corrected under ruling L-1724 item 1; whole-property deals only (all three share fields null, or share_value exactly property_value, share_area exactly area_square_meters and number_of_shares_2400 exactly 2400); partial_share_deal and share_fields_inconsistent rows are excluded and counted per row in the assembly phase record, never priced; share-field meaning remains unconfirmed and partial deals require a later decision; declared field types still await the live run
   - key: bnd_muni_2025
     mismatch: 4
     shape: JSON array of 8 records; keys geo_point, geo_shape, name; geo_shape is a GeoJSON Feature object (type, geometry, properties) whose geometry is a MultiPolygon

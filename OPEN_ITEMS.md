@@ -6942,3 +6942,13 @@ run remain pending.
 - CONCERNS: `basis` of the property district crosswalk rows is enforced on the committed file's contents but is not checked against a closed set when the file is loaded, so a later regeneration with a wrong basis value would not be refused.
 - NEEDED: a closed-set check on `basis` at load, with a planted violation, when the file is next regenerated.
 - NEEDED BY: the next regeneration of the district crosswalk.
+
+## OI-412 — Share-field meaning remains unconfirmed
+
+- ID: OI-412
+- TYPE: OPEN (source semantics)
+- RAISED BY: S2-P86, 2026-11-24
+- CONCERNS: S2-T19, document 07 cards C14 and C41, ruling L-1724 item 1.
+- EVIDENCE: the task brief admits exact whole-property patterns only; invented-input tests establish exclusion accounting, not publisher meaning or real-cache counts.
+- NEEDED: share-field meaning unconfirmed; partial deals are re-admitted only by a later decision. The lead compares the real-cache counts with its trace after independent review.
+- NEEDED BY: any later admission of partial deals.

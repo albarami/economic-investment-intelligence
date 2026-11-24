@@ -864,7 +864,7 @@ sources:
         type: "number"
       - name: "property_value"
         type: "integer"
-    basis_note: "Columns are the observed export fields (S2-T08 part B source review, mismatch 3; custodian/publicdata/review/s2_t08_source_review.yaml). The shape pack shows names only: the types of lstkhdm and of the four numeric fields first declared there await the lead's live run. Share fields refuse by name until their meaning is confirmed."
+    basis_note: "Columns are the observed export fields (S2-T08 part B source review, mismatch 3; custodian/publicdata/review/s2_t08_source_review.yaml). The shape pack shows names only: the types of lstkhdm and of the four numeric fields first declared there await the lead's live run. Ruling L-1724 item 1 keeps whole-property deals only; partial_share_deal and share_fields_inconsistent rows are excluded and counted per row, never priced; share-field meaning remains unconfirmed."
     row_count_min: 26719
     row_count_max: 26719
     reconciliation: "none"
