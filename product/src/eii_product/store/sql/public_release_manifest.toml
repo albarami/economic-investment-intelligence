@@ -72,3 +72,8 @@ nullable = false
 name = "engine_versions"
 type = "string"
 nullable = false
+
+[[tables.columns]]
+name = "fc_register_sha256"
+type = "string"
+nullable = true

@@ -372,7 +372,7 @@ def exchange_errors(monkeypatch):
     errors = []
     original = Budget.request
 
-    def capture_request(self, limit, send, billable):
+    def capture_request(self, limit, send, billable, step=None):
         def observed_send():
             try:
                 return send()
@@ -380,7 +380,7 @@ def exchange_errors(monkeypatch):
                 errors.append("".join(traceback.format_exception(error)))
                 raise
 
-        return original(self, limit, observed_send, billable)
+        return original(self, limit, observed_send, billable, step)
 
     monkeypatch.setattr(Budget, "request", capture_request)
     return errors

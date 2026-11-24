@@ -20,6 +20,7 @@ from starlette.responses import JSONResponse
 
 from eii_core.facts import METRIC_KEYS, Fact, validate_chain
 from eii_product.api.area_context import trusted_seat, trusted_shapes
+from eii_product.api.building_heights import heights_from_release
 from eii_product.api.playbooks import PlaybookRoute, refusal
 from eii_product.api.results import PublicResult, error_response
 from eii_product.assistant.playbooks.models import Bundle
@@ -182,6 +183,11 @@ class MountedRelease:
             self.summary()
         except Exception:
             raise ValueError("mount_unverified") from None
+        # The heights the checked release pins (S3-T16), refused by their own
+        # closed reason, or none.
+        self.heights = heights_from_release(
+            checked.folder, checked.document["artefacts"]
+        )
 
     def summary(self) -> dict[str, Any]:
         rows = read(self.store, "public_release_manifest")
@@ -329,6 +335,7 @@ class MountedRelease:
                     ("jobs_fact_id", "fdi_jobs"),
                     ("lon_fact_id", "fdi_location"),
                     ("lat_fact_id", "fdi_location"),
+                    ("source_zone_fact_id", "accident_source_zone"),
                 ):
                     if feature.get(slot):
                         companions[feature[slot]] = metric

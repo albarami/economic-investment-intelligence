@@ -2,16 +2,23 @@
 
 The file stays outside the repository. This module opens the path the
 setting names, read-only, and prints nothing about the path or the rows.
+The file's bytes must hash to the sha256 the loaded release lists (L-1509).
+Every read of the file, here and in the release build, goes through
+``read_register_bytes``: a regular file, opened without following a symlink.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import re
+import stat
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
-from pathlib import Path
+
+from eii_product.config import read_fc_register_file
 
 COLUMN_REGISTRATION_KEY = "registration_key"
 COLUMN_ROW_ID = "row_id"
@@ -38,6 +45,7 @@ _ROW_ID = re.compile(r"row-[a-z]+(?:-[a-z]+)*")
 _PLACE = re.compile(r"place:.+")
 _DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 _HASH = re.compile(r"[0-9a-f]{64}")
+_OPEN_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC
 
 
 class RegisterRefusal(Exception):
@@ -94,30 +102,80 @@ class RegisterBundle:
 def read_fc_register_rows(
     setting: str | None,
     *,
+    listed_sha256: str | None,
     asked_path: str | None = None,
 ) -> RegisterBundle | None:
-    """Return the rows of the file ``setting`` names, or nothing when unset.
+    """Read only the freshly configured path; refuse caller substitutions.
 
-    ``asked_path`` other than that setting is refused. No other path is opened.
+    ``listed_sha256`` is the hash the loaded release lists for the file: none
+    refuses with ``hash_unlisted`` before the file is opened, and other bytes
+    refuse with ``hash_mismatch`` before any row is parsed.
     """
-    if setting is None:
-        return None
-    if type(setting) is not str or setting == "":
+    configured = read_fc_register_file()
+    if setting is not None and (type(setting) is not str or setting == ""):
         raise RegisterRefusal("row_shape")
-    target = setting if asked_path is None else asked_path
-    if target != setting:
+    if setting != configured:
         raise RegisterRefusal("path_refused")
-    return _read_path(target)
+    if asked_path is not None and asked_path != configured:
+        raise RegisterRefusal("path_refused")
+    if configured is None:
+        return None
+    if listed_sha256 is None:
+        raise RegisterRefusal("hash_unlisted")
+    return _read_path(configured, listed_sha256)
 
 
-def _read_path(path: str) -> RegisterBundle:
+def _signature(info: os.stat_result) -> tuple[int, ...]:
+    return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+
+def read_register_bytes(path: str) -> bytes:
+    """Return the bytes of the regular file at ``path``, read from one descriptor.
+
+    A symlink as the last component, a FIFO, a device, a directory, a missing
+    file, or a file changed or replaced at ``path`` during the read refuses
+    with ``read_refused``; the reason carries no path. The descriptor is owned
+    from the moment ``os.open`` returns and is closed on every exit.
+    """
     try:
-        raw = Path(path).read_text(encoding="utf-8")
-    except OSError:
+        descriptor = os.open(path, _OPEN_FLAGS)
+    except (OSError, ValueError):
         raise RegisterRefusal("read_refused") from None
     try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError:
+        return _regular_file_bytes(descriptor, path)
+    finally:
+        os.close(descriptor)
+
+
+def _regular_file_bytes(descriptor: int, path: str) -> bytes:
+    """Read ``descriptor`` when it is a regular file that is still ``path``.
+
+    The caller owns ``descriptor`` and closes it. The wrapper does not.
+    """
+    try:
+        before = os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode):
+            raise RegisterRefusal("read_refused")
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
+            body = handle.read()
+        after = os.fstat(descriptor)
+        current = os.stat(path, follow_symlinks=False)
+    except OSError:
+        raise RegisterRefusal("read_refused") from None
+    if _signature(before) != _signature(after) or _signature(after) != (
+        _signature(current)
+    ):
+        raise RegisterRefusal("read_refused")
+    return body
+
+
+def _read_path(path: str, listed_sha256: str) -> RegisterBundle:
+    body = read_register_bytes(path)
+    if hashlib.sha256(body).hexdigest() != listed_sha256:
+        raise RegisterRefusal("hash_mismatch")
+    try:
+        parsed = json.loads(body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
         raise RegisterRefusal("row_shape") from None
     if type(parsed) is not dict:
         raise RegisterRefusal("row_shape")

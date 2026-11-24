@@ -458,6 +458,31 @@ class CheckTreeTests(CheckTreeCase):
             self.assertEqual(done.returncode, 1)
             self.assert_line_starting(done, "FAIL tracked-ignored: web/dist/a.js:")
 
+    def test_committed_register_shaped_file_fails(self) -> None:
+        """A committed register-shaped file is refused (never committed).
+
+        The file is the invented stand-in of the financial-centre register's
+        shape, committed under ``data/``: the data-untracked rule refuses it.
+        """
+        with tempfile.TemporaryDirectory() as folder:
+            root = make_fixture(folder)
+            (root / "data" / "fc_register").mkdir(parents=True)
+            shutil.copyfile(
+                REPO_ROOT
+                / "product"
+                / "tests"
+                / "fixtures"
+                / "fc_register"
+                / "stand_in_register.json",
+                root / "data" / "fc_register" / "stand_in_register.json",
+            )
+            git(root, "add", "-f", "data/fc_register/stand_in_register.json")
+            done = run_check(root)
+            self.assertEqual(done.returncode, 1)
+            self.assert_line_starting(
+                done, "FAIL data-untracked: data/fc_register/stand_in_register.json:"
+            )
+
     def test_not_a_git_work_tree_exits_2(self) -> None:
         with tempfile.TemporaryDirectory() as folder:
             plain = Path(folder) / "plain"

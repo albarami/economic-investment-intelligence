@@ -70,3 +70,9 @@ Drawing, both languages, behind `web/tests/visual/draw.html`. No baseline image.
 | ar | dark | 1440×900 | radius chips |
 | en | dark | 1024×768 | tools idle |
 | ar | dark | 1024×768 | tools idle |
+
+Public context cards (S3-T14), both languages, behind `?scene=context` in `web/tests/visual/context-sizes.spec.ts`. No baseline image; each run writes one frame per row under `.overnight/evidence/S3-T14/sizes/` for the owner's review (decision 0049 item 6).
+
+| Language | Theme | Viewport | Scene |
+|---|---|---|---|
+| en, ar | dark, light | the ten views of decision 0049's eight named sizes (`NAMED_SIZES`) | context, all levels open |

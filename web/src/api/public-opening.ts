@@ -75,6 +75,18 @@ export async function storySelection(
 }
 
 /** Merge chains, retaining the original fact binding shared by every view. */
+/** One row per key; the same key with different content is a conflict. */
+export function unique<T>(rows: readonly T[], key: (row: T) => string): T[] {
+  const held = new Map<string, T>();
+  for (const row of rows) {
+    const previous = held.get(key(row));
+    if (previous && JSON.stringify(previous) !== JSON.stringify(row))
+      throw new Error('chain_conflict');
+    if (!previous) held.set(key(row), row);
+  }
+  return [...held.values()];
+}
+
 export function mergeInputs(inputs: readonly RegistryInput[]): RegistryInput {
   if (
     new Set(
@@ -84,16 +96,6 @@ export function mergeInputs(inputs: readonly RegistryInput[]): RegistryInput {
     ).size > 1
   )
     throw new Error('chain_conflict');
-  function unique<T>(rows: readonly T[], key: (row: T) => string): T[] {
-    const held = new Map<string, T>();
-    for (const row of rows) {
-      const previous = held.get(key(row));
-      if (previous && JSON.stringify(previous) !== JSON.stringify(row))
-        throw new Error('chain_conflict');
-      if (!previous) held.set(key(row), row);
-    }
-    return [...held.values()];
-  }
   return {
     facts: unique(
       inputs.flatMap((i) => i.facts),

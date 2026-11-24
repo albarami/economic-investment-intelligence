@@ -15,6 +15,7 @@ from eii_core.manifest import (
     by_name,
     canonical_json,
     engine_versions_reason,
+    listed_inputs_reason,
     release_hash,
     schema_document,
     schema_hash,
@@ -25,6 +26,7 @@ from eii_core.source_chain import ChainTable, SourceChainRefusal, require_public
 _REASONS = frozenset(
     {
         "column_mismatch",
+        "duplicate_key",
         "empty_table_list",
         "forbidden_manifest_field",
         "forbidden_table_class",
@@ -76,9 +78,18 @@ def write_public_only(
     tables: Sequence[TableWrite],
     *,
     artefacts: Sequence[Mapping[str, object]] = (),
+    listed_inputs: Sequence[Mapping[str, object]] = (),
 ) -> str:
-    """Write Parquet tables and a canonical manifest. Return the release id."""
+    """Write Parquet tables and a canonical manifest. Return the release id.
+
+    ``listed_inputs`` names a file read outside the release with its hash; the
+    field is written only when an entry is listed (L-1509).
+    """
     _refuse_scalars(scalars)
+    if listed_inputs:
+        listed = listed_inputs_reason(list(listed_inputs))
+        if listed is not None:
+            raise WriterRefusal(listed)
     if len(tables) == 0:
         raise WriterRefusal("empty_table_list")
     for table in tables:
@@ -121,6 +132,8 @@ def write_public_only(
             "sources": list(sources),
             "tables": entries,
         }
+        if listed_inputs:
+            document["listed_inputs"] = list(listed_inputs)
         document["release_id"] = release_hash(document)
         manifest_path = destination / "manifest.json"
         manifest_path.write_bytes(canonical_json(document).encode("utf-8"))

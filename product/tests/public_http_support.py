@@ -88,6 +88,25 @@ class Client:
         pass
 
 
+_MANIFEST_COLUMNS = (
+    "release_id",
+    "table_name",
+    "provenance_class",
+    "file",
+    "sha256",
+    "row_count",
+    "schema_sha256",
+    "release_kind",
+    "release_contract_version",
+    "build_id",
+    "built_at",
+    "code_version",
+    "rules_version_id",
+    "engine_versions",
+    "fc_register_sha256",
+)
+
+
 class AreaStore:
     """In-memory projections of the cards fixture, through existing named reads."""
 
@@ -98,6 +117,16 @@ class AreaStore:
         from public_release_fixture import _cards_tables
 
         self.tables = {table.name: table.rows for table in _cards_tables()}
+        # The sealed table list a mounted release reads (public_release_manifest).
+        self.tables["release_manifest"] = [
+            {
+                **dict.fromkeys(_MANIFEST_COLUMNS, "INVENTED"),
+                "release_id": self.release_id,
+                "table_name": name,
+                "row_count": len(rows),
+            }
+            for name, rows in sorted(self.tables.items())
+        ]
 
     def fetch(self, query, params):
         from eii_product.store.normalise import hold_geometry

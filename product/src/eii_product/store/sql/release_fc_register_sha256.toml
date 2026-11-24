@@ -1,0 +1,14 @@
+[[tables]]
+name = "release_manifest"
+anchor = "7.3 Columns"
+key = ["table_name"]
+
+[[tables.columns]]
+name = "table_name"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "fc_register_sha256"
+type = "string"
+nullable = true

@@ -20,8 +20,10 @@ export class ClockLight extends SunLight {
   constructor(
     timestamp: number,
     private readonly report: (direction: number[]) => void,
+    shadow = false,
   ) {
-    super({ timestamp });
+    // deck.gl's shadow is experimental (LightingEffect, DirectionalLight pages).
+    super({ timestamp, _shadow: shadow });
   }
   override getProjectedLight(
     parameters: Parameters<SunLight['getProjectedLight']>[0],

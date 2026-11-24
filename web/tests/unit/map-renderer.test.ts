@@ -16,72 +16,17 @@ const state = vi.hoisted(() => ({
   protocols: new Map(),
   overlays: [] as object[],
 }));
-vi.mock('maplibre-gl', () => ({
-  Map: class {
-    dragPan = { enable: vi.fn(), disable: vi.fn() };
-    scrollZoom = { enable: vi.fn(), disable: vi.fn() };
-    boxZoom = { enable: vi.fn(), disable: vi.fn() };
-    dragRotate = { enable: vi.fn(), disable: vi.fn() };
-    doubleClickZoom = { enable: vi.fn(), disable: vi.fn() };
-    touchZoomRotate = { enable: vi.fn(), disable: vi.fn() };
-    touchPitch = { enable: vi.fn(), disable: vi.fn() };
-    keyboard = { enable: vi.fn(), disable: vi.fn() };
-    camera = { center: [0, 0], zoom: 0, bearing: 0, pitch: 0 };
-    jumpTo(camera: Partial<typeof this.camera>) {
-      this.camera = { ...this.camera, ...camera };
-    }
-    getCenter() {
-      return this.camera.center;
-    }
-    getZoom() {
-      return this.camera.zoom;
-    }
-    getBearing() {
-      return this.camera.bearing;
-    }
-    getPitch() {
-      return this.camera.pitch;
-    }
-    style: unknown;
-    constructor(options: { style: unknown }) {
-      state.events.push('map');
-      this.style = options.style;
-      state.maps.push(this);
-    }
-    setStyle(style: unknown) {
-      this.style = style;
-    }
-    on() {}
-    off() {}
-    remove() {}
-    isStyleLoaded() {
-      return true;
-    }
-  },
-  setWorkerUrl: vi.fn(),
-  setRTLTextPlugin: vi.fn(() => {
-    state.events.push('rtl');
-    return Promise.resolve();
-  }),
-  addProtocol: (name: string, fn: unknown) => state.protocols.set(name, fn),
-  removeProtocol: (name: string) => state.protocols.delete(name),
-}));
-vi.mock('@deck.gl/maplibre', () => ({
-  MapLibreOverlay: class {
-    props: unknown;
-    constructor(props: unknown) {
-      this.props = props;
-      state.overlays.push(this);
-    }
-    onAdd() {}
-    onRemove() {}
-    setProps(props: object) {
-      this.props = { ...(this.props as object), ...props };
-    }
-  },
-}));
+vi.mock('maplibre-gl', async () => {
+  const { mapLibreDouble } = await import('../fixtures/renderer-doubles');
+  return mapLibreDouble(state);
+});
+vi.mock('@deck.gl/maplibre', async () => {
+  const { overlayDouble } = await import('../fixtures/renderer-doubles');
+  return overlayDouble(state);
+});
 import * as qualified from '../../src/stage/photoreal-loader';
 import { startMap } from '../../src/stage/map-boot';
+import type { Layer } from '@deck.gl/core';
 const style = {
   version: 8,
   sources: { fixture: { type: 'vector', url: '/SYN-map' } },
@@ -290,6 +235,34 @@ it('replaces only the overlay and removes each mounted overlay exactly once', as
   handle.remove();
   expect(first.onRemove).toHaveBeenCalledTimes(1);
   expect(second.onRemove).toHaveBeenCalledTimes(1);
+});
+
+it('keeps verified buildings across overlay replacement and reads the view edges', async () => {
+  const handle = await startMap({} as HTMLElement, style);
+  const layers = [] as Layer[];
+  const first = { onAdd: vi.fn(), onRemove: vi.fn(), setBuildings: vi.fn() };
+  const second = { onAdd: vi.fn(), onRemove: vi.fn(), setBuildings: vi.fn() };
+  handle.mountOverlay(first);
+  handle.setBuildings!(layers, 3);
+  expect(first.setBuildings).toHaveBeenCalledWith(layers, 3);
+  handle.mountOverlay(second);
+  expect(second.setBuildings).toHaveBeenCalledWith(layers, 3);
+  // A refused update is never kept for the next overlay.
+  const refusing = {
+    onAdd: vi.fn(),
+    onRemove: vi.fn(),
+    setBuildings: vi.fn((_layers: Layer[], cap: number) => {
+      if (cap === 1) throw new Error('shadow_over_cap');
+    }),
+  };
+  handle.mountOverlay(refusing);
+  expect(() => handle.setBuildings!([{} as Layer], 1)).toThrow(
+    'shadow_over_cap',
+  );
+  const third = { onAdd: vi.fn(), onRemove: vi.fn(), setBuildings: vi.fn() };
+  handle.mountOverlay(third);
+  expect(third.setBuildings).toHaveBeenCalledWith(layers, 3);
+  expect(handle.viewBounds!().bounds).toEqual([51.4, 25.2, 51.6, 25.4]);
 });
 
 it('preserves every non-default camera property across open satellite open', async () => {

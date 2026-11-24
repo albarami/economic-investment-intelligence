@@ -8,6 +8,7 @@ No API creates, truncates or restores this file.
 from __future__ import annotations
 
 import fcntl
+import json
 import os
 from collections.abc import Callable
 from decimal import Decimal
@@ -37,11 +38,46 @@ class BudgetFailure(Exception):
     """Closed refusal; no provider details."""
 
 
+class JournalStep:
+    """Count of the append that is still inside the journal lock."""
+
+    def __init__(self) -> None:
+        self.count: int | None = None
+
+
+def journal_order_token(count: int) -> str:
+    """Canonical decimal of one journal step. Not a displayed spend figure."""
+    if count < 0:
+        raise BudgetFailure("count_unavailable")
+    return str(count)
+
+
+def meter_for_count(count: int, limit: int, price: Decimal) -> SpendMeter:
+    """Exact server-only money and warning for one already-read count."""
+    return {
+        "billable_requests": count,
+        "request_limit": limit,
+        "spend_usd": format(Decimal(count) * price / 1000, "f"),
+        "warning": Decimal(count) >= Decimal(limit) * WARNING_FRACTION,
+        "ceiling_usd": format(SPEND_CEILING_USD, "f"),
+        "price_per_thousand_usd": format(price, "f"),
+        "method_version": "1",
+        # Default price reading recorded in document 04, tiles3d_google.
+        # This is not a retrieval claim about an operator override.
+        "default_price_retrieved_on": "2026-11-13",
+    }
+
+
 class BillableFailure(Exception):
     """A known successful provider status whose response could not be consumed."""
 
     def __init__(self) -> None:
         super().__init__("response_unavailable")
+
+
+def encode_spend_meter(meter: SpendMeter) -> str:
+    """One-line ASCII header value of a server meter. No second calculation."""
+    return json.dumps(meter, ensure_ascii=True, separators=(",", ":"), sort_keys=True)
 
 
 def billable_limit(price: Decimal) -> int:
@@ -107,22 +143,14 @@ class Budget:
 
     def meter(self, limit: int, price: Decimal) -> SpendMeter:
         """Exact server-only money and warning; never a limit on view detail."""
-        count = self.count()
-        return {
-            "billable_requests": count,
-            "request_limit": limit,
-            "spend_usd": format(Decimal(count) * price / 1000, "f"),
-            "warning": Decimal(count) >= Decimal(limit) * WARNING_FRACTION,
-            "ceiling_usd": format(SPEND_CEILING_USD, "f"),
-            "price_per_thousand_usd": format(price, "f"),
-            "method_version": "1",
-            # Default price reading recorded in document 04, tiles3d_google.
-            # This is not a retrieval claim about an operator override.
-            "default_price_retrieved_on": "2026-11-13",
-        }
+        return meter_for_count(self.count(), limit, price)
 
     def request(
-        self, limit: int, send: Callable[[], T], billable: Callable[[T], bool]
+        self,
+        limit: int,
+        send: Callable[[], T],
+        billable: Callable[[T], bool],
+        step: JournalStep | None = None,
     ) -> T:
         with LOCK:
             try:
@@ -137,7 +165,10 @@ class Budget:
                     except BillableFailure:
                         self._append(stream, f"ready:{count + 1}\n")
                         raise BudgetFailure("response_unavailable") from None
-                    self._append(stream, f"ready:{count + int(billable(result))}\n")
+                    appended = count + int(billable(result))
+                    self._append(stream, f"ready:{appended}\n")
+                    if step is not None:
+                        step.count = appended
                     return result
             except BudgetFailure:
                 raise

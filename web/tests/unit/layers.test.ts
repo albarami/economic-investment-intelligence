@@ -11,17 +11,22 @@ import {
   layerSource,
 } from '../fixtures/layers';
 import { legendLineSamples } from '../../src/stage/layers/legend';
+import type { LayerFeature } from '../../src/stage/layers/payload';
 import {
   LAYER_ENTRIES,
   labelsDrawn,
   selectHero,
 } from '../../src/stage/layers/registry';
-import { acceptPayload, REFUSAL_CODES } from '../../src/stage/layers/refuse';
+import {
+  acceptPayload,
+  presentationProblem,
+  REFUSAL_CODES,
+} from '../../src/stage/layers/refuse';
 import {
   expandNightCells,
   guardHexResolution,
 } from '../../src/stage/layers/night';
-import { FDI_FILTERS } from '../../src/stage/layers/fdi';
+import { FDI_FILTERS, FDI_WORD_FIELDS } from '../../src/stage/layers/fdi';
 import {
   overlayFor,
   pathRows,
@@ -29,12 +34,12 @@ import {
   polygonRows,
 } from '../../src/stage/layers/overlay';
 
-import { PLANTS } from '../fixtures/layer-plants';
+import { PLANT_REGISTRIES, PLANTS } from '../fixtures/layer-plants';
 
 describe('layer refusals', () => {
   it('plants every refusal code', () => {
     for (const code of REFUSAL_CODES) {
-      const result = acceptPayload(PLANTS[code]);
+      const result = acceptPayload(PLANTS[code], PLANT_REGISTRIES[code]);
       expect(result.ok, code).toBe(false);
       if (!result.ok) expect(result.code, code).toBe(code);
     }
@@ -173,7 +178,9 @@ describe('accepted layers', () => {
         geometry_kind:
           entry.key === 'night_lights'
             ? ('hex' as const)
-            : entry.key === 'zoning' || entry.key === 'parcels'
+            : entry.key === 'zoning' ||
+                entry.key === 'parcels' ||
+                entry.key === 'accidents'
               ? ('outline' as const)
               : entry.key === 'rail_plan'
                 ? ('line' as const)
@@ -187,7 +194,14 @@ describe('accepted layers', () => {
         cell: entry.key === 'night_lights' ? NIGHT_PARENT : undefined,
         resolution: entry.key === 'night_lights' ? (8 as const) : undefined,
         class_id: 'band_low',
-        caveat_keys: entry.key === 'fdi_projects' ? ['fdi_estimates'] : [],
+        caveat_keys:
+          entry.key === 'fdi_projects'
+            ? ['fdi_estimates']
+            : entry.key === 'accidents'
+              ? ['accidents_recorded_not_risk']
+              : [],
+        label_key:
+          entry.key === 'accidents' ? 'accident_count_context' : undefined,
         place_key: entry.key === 'fdi_projects' ? 'gx_sample_aleph' : undefined,
       };
       // A register company's point carries no class, year or caveat (S3-T12).
@@ -201,7 +215,22 @@ describe('accepted layers', () => {
               geometry_kind: 'point' as const,
               fact_id: feature.fact_id,
             }
-          : feature;
+          : entry.key === 'accidents'
+            ? {
+                // RV1: exactly the reviewed accident keys, its zone bound.
+                feature_id: feature.feature_id,
+                metric_key: feature.metric_key,
+                provenance: feature.provenance,
+                subject: feature.subject,
+                geometry_kind: feature.geometry_kind,
+                fact_id: feature.fact_id,
+                year: feature.year,
+                caveat_keys: feature.caveat_keys,
+                label_key: feature.label_key,
+                source_zone: '51',
+                source_zone_fact_id: CHAIN_ID,
+              }
+            : feature;
       const result = acceptPayload(
         basePayload({
           layers: [
@@ -480,5 +509,95 @@ describe('overlay load path', () => {
       expect(typeof data).not.toBe('string');
       expect(data !== null && typeof data === 'object').toBe(true);
     }
+  });
+});
+
+/** Seeded invented keys; the same run every time. */
+function inventedKeys(count: number): string[] {
+  let seed = 7;
+  const letters = 'abcdefghijklmnopqrstuvwxyz_';
+  return Array.from({ length: count }, () => {
+    let key = '';
+    for (let i = 0; i < 3 + (seed % 9); i += 1) {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      key += letters[seed % letters.length];
+    }
+    return key;
+  });
+}
+
+/** The written presentation contract of document 03 (RV1 finding 1). */
+function contractRefuses(
+  layer: string,
+  word: string | null,
+  status: string | null,
+  address: boolean,
+): boolean {
+  const words = [
+    'name',
+    'company',
+    ...(layer === 'fdi_projects' ? FDI_WORD_FIELDS : []),
+    ...(layer === 'zoning' ? ['permitted_use'] : []),
+  ];
+  if (word !== null && !words.includes(word)) return true;
+  if (address && layer !== 'address_points') return true;
+  if (status === null) return false;
+  if (!['rail_plan', 'parcels', 'zoning', 'land_prices'].includes(layer))
+    return true;
+  return status === 'permitted_empty' && layer !== 'parcels';
+}
+
+describe('presentation fields on every layer', () => {
+  // Edge classes: inherited object keys, names of other layers' fields,
+  // unrelated prose keys and seeded invented keys, on every layer.
+  const SHARP = ['constructor', 'toString', '__proto__', 'hasOwnProperty'];
+  const WORDS = [
+    'name',
+    'company',
+    ...FDI_WORD_FIELDS,
+    'permitted_use',
+    'permitted_empty',
+    'verdict',
+    'address',
+    ...SHARP,
+    ...inventedKeys(40),
+  ];
+  const STATUSES = [
+    'planned',
+    'operating',
+    'permitted_empty',
+    'permitted_use',
+    ...SHARP,
+    ...inventedKeys(20),
+  ];
+
+  it('refuses exactly what the written contract refuses', () => {
+    let checked = 0;
+    for (const { key: layer } of LAYER_ENTRIES) {
+      for (const word of [null, ...WORDS])
+        for (const status of [null, ...STATUSES])
+          for (const address of [false, true]) {
+            const feature = {
+              feature_id: 'f',
+              metric_key: 'm',
+              provenance: 'public',
+              subject: 'place',
+              geometry_kind: 'point',
+              ...(word === null
+                ? {}
+                : { words: Object.fromEntries([[word, 'INVENTED']]) }),
+              ...(status === null ? {} : { status_key: status }),
+              ...(address
+                ? { address: { zone: 'A', street: 'B', building: 'C' } }
+                : {}),
+            } as LayerFeature;
+            expect(
+              presentationProblem(layer, feature),
+              `${layer} ${word} ${status} ${address}`,
+            ).toBe(contractRefuses(layer, word, status, address));
+            checked += 1;
+          }
+    }
+    expect(checked).toBeGreaterThan(LAYER_ENTRIES.length * 1000);
   });
 });

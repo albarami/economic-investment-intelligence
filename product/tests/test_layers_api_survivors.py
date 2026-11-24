@@ -2,12 +2,16 @@
 
 import json
 from dataclasses import replace
+from functools import partial
 from pathlib import Path
 from typing import Any
 
 import pytest
 from fastapi import FastAPI
-from product.tests.test_fc_register_read import _copy
+from product.tests.test_fc_register_read import _copy, listed
+from product.tests.test_fc_register_read import (
+    configured_register as configured_register,
+)
 from product.tests.test_layers_fc_firms import FIXTURE, _get, _ok, _served
 
 from eii_core.calc.firms_per_tower import TowerCount
@@ -24,7 +28,8 @@ def _document() -> dict[str, Any]:
 
 
 def _bundle(tmp_path: Path) -> RegisterBundle:
-    bundle = read_fc_register_rows(str(_copy(tmp_path)))
+    copy = str(_copy(tmp_path))
+    bundle = read_fc_register_rows(copy, listed_sha256=listed(copy))
     assert bundle is not None
     return bundle
 
@@ -198,9 +203,19 @@ def test_missing_lower_break_keeps_later_break(tmp_path: Path) -> None:
     ]
 
 
-def test_default_reader_and_exact_success_contract(tmp_path: Path) -> None:
+def test_default_reader_refuses_without_a_listed_hash(tmp_path: Path) -> None:
     app = FastAPI()
     app.include_router(layers.build_layer_router(str(_copy(tmp_path))))
+    with pytest.raises(RegisterRefusal) as caught:
+        _get(app, "/api/layers/fc_firms_per_tower")
+    _message(caught.value, "hash_unlisted")
+
+
+def test_listed_reader_and_exact_success_contract(tmp_path: Path) -> None:
+    copy = str(_copy(tmp_path))
+    reader = partial(read_fc_register_rows, listed_sha256=listed(copy))
+    app = FastAPI()
+    app.include_router(layers.build_layer_router(copy, reader))
     status, body = _get(app, "/api/layers/fc_firms_per_tower")
     assert status == 200
     assert set(body) == {"status", "facts", "coverage_report", "payload"}

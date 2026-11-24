@@ -7,6 +7,15 @@ import {
   plain,
 } from './layers';
 import type { LayerPayload } from '../../src/stage/layers/payload';
+import type { FactRegistry } from '../../src/facts/registry';
+import { accidentScene, boundScene } from './accident-scene';
+
+const allocation = boundScene((p) => {
+  p.accident.geography_code = 'zone:INVENTED-zone-b';
+});
+const zoneMismatch = boundScene((p) => {
+  p.accident.source_zone = '52';
+});
 
 export const PLANTS: Record<(typeof REFUSAL_CODES)[number], LayerPayload> = {
   source_geometry_invalid: basePayload({
@@ -481,6 +490,37 @@ export const PLANTS: Record<(typeof REFUSAL_CODES)[number], LayerPayload> = {
       },
     ],
   }),
+  accident_point_map: accidentScene((p) => {
+    p.accident.geometry_kind = 'point';
+  }).payload,
+  accident_geography_allocation: allocation.body.payload,
+  accident_safety_verdict: accidentScene((p) => {
+    p.accident.label_key = 'zone_safe';
+  }).payload,
+  accident_caveat_missing: accidentScene((p) => {
+    p.accident.caveat_keys = [];
+  }).payload,
+  rail_as_operating: accidentScene((p) => {
+    p.line.status_key = 'operating';
+  }).payload,
+  accident_field_unexpected: accidentScene((p) => {
+    p.accident.words = { permitted_use: 'This zone is safe' };
+  }).payload,
+  presentation_field_unexpected: accidentScene((p) => {
+    p.line.words = { permitted_use: 'Invented use' };
+  }).payload,
+  accident_zone_unbound: accidentScene((p) => {
+    delete p.accident.source_zone_fact_id;
+  }).payload,
+  accident_zone_mismatch: zoneMismatch.body.payload,
+};
+
+/** Plants whose refusal is a binding: they are checked with this registry. */
+export const PLANT_REGISTRIES: Partial<
+  Record<(typeof REFUSAL_CODES)[number], FactRegistry>
+> = {
+  accident_geography_allocation: allocation.registry,
+  accident_zone_mismatch: zoneMismatch.registry,
 };
 
 function nightPlant(

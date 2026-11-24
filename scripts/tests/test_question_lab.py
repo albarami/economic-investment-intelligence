@@ -6,17 +6,23 @@ import copy
 import hashlib
 import json
 import re
+import shlex
+import shutil
 import socket
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
 import pytest
+from hypothesis import example, given
+from hypothesis import strategies as st
 
 # Match the offline eval tests under the runner's safe-path Python.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+import hooks_support
 from evals.question_lab.cases import coverage, load_cases, select_cases
 from evals.question_lab.oracles import (
     accuracy,
@@ -582,3 +588,289 @@ def test_packet_plant_results_require_intended_failure_and_clean_control() -> No
         assert row["control_problems"] == []
         assert row["intended_diagnostic"] in row["plant_problems"]
         assert row["scope"] == "invented_oracle_fixture_not_external_evidence"
+
+
+COMMAND = "./eii question-lab run --n N --seed S"
+RULE_FILES = ("AGENTS.md", "CLAUDE.md")
+
+
+def test_rule_44_of_both_instruction_files_holds_the_command() -> None:
+    for name in RULE_FILES:
+        assert rule_44_problem((ROOT / name).read_text(encoding="utf-8")) is None, name
+
+
+@pytest.mark.parametrize("planted", RULE_FILES)
+def test_command_omitted_from_one_instruction_file_is_refused(
+    tmp_path: Path, planted: str
+) -> None:
+    for name in RULE_FILES:
+        (tmp_path / name).write_bytes((ROOT / name).read_bytes())
+    original = (tmp_path / planted).read_bytes()
+    (tmp_path / planted).write_bytes(original.replace(COMMAND.encode(), b"", 1))
+    found = {n: rule_44_problem((tmp_path / n).read_text("utf-8")) for n in RULE_FILES}
+    assert found[planted] == "rule44:command_absent"
+    assert [n for n in RULE_FILES if found[n] is None] == [
+        n for n in RULE_FILES if n != planted
+    ]
+    (tmp_path / planted).write_bytes(original)
+    assert (tmp_path / planted).read_bytes() == (ROOT / planted).read_bytes()
+    assert rule_44_problem((tmp_path / planted).read_text("utf-8")) is None
+
+
+def test_command_outside_rule_44_or_without_rule_44_is_refused() -> None:
+    text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    moved = text.replace(COMMAND, "", 1).replace("\n45. ", f"\n45. `{COMMAND}` ", 1)
+    assert rule_44_problem(moved) == "rule44:command_absent"
+    assert rule_44_problem(text.replace("\n44. ", "\n44a. ", 1)) == "rule44:missing"
+
+
+def test_rule_44_gained_the_command_in_one_change_set(tmp_path: Path) -> None:
+    env = _history_env(tmp_path)
+    reason = history_unavailable(ROOT, env)
+    if reason is not None:
+        # The hosted tests job checks out one commit; the lead's local
+        # `./eii test` on a full clone runs this check.
+        pytest.skip(reason)
+    assert change_set_problem(ROOT, env) is None
+
+
+def test_split_change_set_is_refused_and_one_commit_passes(tmp_path: Path) -> None:
+    env = _history_env(tmp_path)
+    files = {n: (ROOT / n).read_bytes() for n in RULE_FILES}
+    without = {n: data.replace(COMMAND.encode(), b"", 1) for n, data in files.items()}
+    split, joined = tmp_path / "split", tmp_path / "joined"
+    for repo in (split, joined):
+        assert (
+            hooks_support.git(repo.parent, env, "init", "-q", str(repo)).returncode == 0
+        )
+        _commit(repo, env, without, "base")
+    _commit(split, env, {"AGENTS.md": files["AGENTS.md"]}, "agents only")
+    _commit(split, env, {"CLAUDE.md": files["CLAUDE.md"]}, "claude later")
+    _commit(joined, env, files, "both together")
+    assert history_unavailable(split, env) is None
+    assert change_set_problem(split, env) == "history:split_change_set"
+    assert change_set_problem(joined, env) is None
+    for name, data in files.items():
+        assert (joined / name).read_bytes() == data
+
+
+def test_history_never_adding_the_command_and_no_repository_are_named(
+    tmp_path: Path,
+) -> None:
+    env = _history_env(tmp_path)
+    repo = tmp_path / "repo"
+    assert hooks_support.git(tmp_path, env, "init", "-q", str(repo)).returncode == 0
+    _commit(repo, env, {n: b"44. nothing\n45. end\n" for n in RULE_FILES}, "base")
+    assert change_set_problem(repo, env) == "history:never_added"
+    outside = f"44. nothing\n45. `{COMMAND}`\n".encode()
+    _commit(repo, env, {n: outside for n in RULE_FILES}, "outside rule 44")
+    assert change_set_problem(repo, env) == "history:first_added_outside_rule_44"
+    assert (
+        history_unavailable(tmp_path / "absent", env) == "history: not a git repository"
+    )
+
+
+def test_shallow_clone_skips_rather_than_passing(tmp_path: Path) -> None:
+    env = _history_env(tmp_path)
+    source = tmp_path / "source"
+    assert hooks_support.git(tmp_path, env, "init", "-q", str(source)).returncode == 0
+    _commit(source, env, {n: b"44. a\n45. b\n" for n in RULE_FILES}, "one")
+    _commit(source, env, {n: b"44. c\n45. d\n" for n in RULE_FILES}, "two")
+    shallow = tmp_path / "shallow"
+    cloned = hooks_support.git(
+        tmp_path, env, "clone", "-q", "--depth", "1", source.as_uri(), str(shallow)
+    )
+    assert cloned.returncode == 0, cloned.stderr
+    assert (
+        history_unavailable(shallow, env) == "history: shallow clone, no full history"
+    )
+
+
+_CORRUPT_HEAD_GIT_ERROR = (
+    "fatal: not a git repository (or any of the parent directories): .git\n"
+)
+
+
+def test_corrupt_repository_metadata_fails_not_skips(tmp_path: Path) -> None:
+    env = _history_env(tmp_path)
+    repo = tmp_path / "repo"
+    assert hooks_support.git(tmp_path, env, "init", "-q", str(repo)).returncode == 0
+    (repo / ".git" / "HEAD").write_text("corrupt\n", encoding="utf-8")
+    with pytest.raises(AssertionError) as caught:
+        history_unavailable(repo, env)
+    assert str(caught.value) == _CORRUPT_HEAD_GIT_ERROR
+
+
+def test_unexpected_rev_parse_output_fails_not_skips(tmp_path: Path) -> None:
+    env = _shallow_stub_env(tmp_path, "INVENTED-unexpected\n", 0)
+    repo = tmp_path / "repo"
+    assert hooks_support.git(tmp_path, env, "init", "-q", str(repo)).returncode == 0
+    with pytest.raises(AssertionError) as caught:
+        history_unavailable(repo, env)
+    assert str(caught.value) == "INVENTED-unexpected\n"
+
+
+def test_rev_parse_failure_without_stderr_uses_stdout(tmp_path: Path) -> None:
+    env = _shallow_stub_env(tmp_path, "INVENTED-stdout-only\n", 1)
+    repo = tmp_path / "repo"
+    assert hooks_support.git(tmp_path, env, "init", "-q", str(repo)).returncode == 0
+    with pytest.raises(AssertionError) as caught:
+        history_unavailable(repo, env)
+    assert str(caught.value) == "INVENTED-stdout-only\n"
+
+
+@given(st.text(max_size=200))
+@example("")
+@example("true")
+@example("false")
+@example("true\n")
+@example("false\n")
+@example("true\n\n")
+@example("TRUE\n")
+@example(" true\n")
+@example("false ")
+@example("false\nextra")
+def test_shallow_answer_accepts_only_exact_true_or_false(stdout: str) -> None:
+    answer = stdout.removesuffix("\n")
+    if answer == "true":
+        assert _shallow_history(stdout) == "history: shallow clone, no full history"
+    elif answer == "false":
+        assert _shallow_history(stdout) is None
+    else:
+        with pytest.raises(AssertionError) as caught:
+            _shallow_history(stdout)
+        assert str(caught.value) == stdout
+
+
+def _history_env(home: Path) -> dict[str, str]:
+    """Return a scrubbed environment whose PATH holds the real git."""
+    return hooks_support.clean_env(home, [hooks_support.system_bin(home)])
+
+
+def _shallow_stub_env(home: Path, stdout: str, code: int) -> dict[str, str]:
+    """Return a scrubbed env whose git stubs only ``--is-shallow-repository``."""
+    bindir = home / "bin"
+    bindir.mkdir()
+    real = shutil.which("git")
+    if real is None:
+        raise AssertionError("git is required")
+    script = "\n".join(
+        (
+            "#!/bin/sh",
+            f"real={shlex.quote(real)}",
+            'for arg in "$@"; do',
+            '  if [ "$arg" = "--is-shallow-repository" ]; then',
+            f"    printf '%s' {shlex.quote(stdout)}",
+            f"    exit {code}",
+            "  fi",
+            "done",
+            'exec "$real" "$@"',
+            "",
+        )
+    )
+    fake = bindir / "git"
+    fake.write_text(script, encoding="utf-8")
+    fake.chmod(0o755)
+    return hooks_support.clean_env(home, [bindir, hooks_support.system_bin(home)])
+
+
+def _commit(
+    repo: Path, env: Mapping[str, str], files: dict[str, bytes], message: str
+) -> None:
+    """Commit ``files`` in ``repo`` with the scrubbed environment."""
+    for name, data in files.items():
+        (repo / name).write_bytes(data)
+    added = hooks_support.git(repo, env, "add", *files)
+    assert added.returncode == 0, added.stderr
+    committed = hooks_support.git(repo, env, "commit", "-q", "-m", message)
+    assert committed.returncode == 0, committed.stderr
+
+
+def rule_44_problem(text: str) -> str | None:
+    """Name the defect of rule 44 for the question-lab command, or None."""
+    rule = re.search(r"^44\. (.*?)(?=^45\. )", text, re.MULTILINE | re.DOTALL)
+    if rule is None:
+        return "rule44:missing"
+    if f"`{COMMAND}`" not in rule.group(1):
+        return "rule44:command_absent"
+    return None
+
+
+def _git_entry_absent(repo: Path) -> bool:
+    """Return whether the worktree root has no ``.git`` directory entry."""
+    try:
+        (repo / ".git").lstat()
+    except FileNotFoundError:
+        return True
+    except OSError:
+        return False
+    return False
+
+
+def _shallow_history(stdout: str) -> str | None:
+    """Return the shallow skip, None for a full history, or raise.
+
+    Args:
+        stdout: The standard output of ``git rev-parse --is-shallow-repository``.
+
+    Returns:
+        The shallow-clone skip when the output is exactly ``true``, or None
+        when it is exactly ``false``. One trailing newline is ignored.
+
+    Raises:
+        AssertionError: The output is anything else. The message is ``stdout``.
+    """
+    answer = stdout.removesuffix("\n")
+    if answer == "true":
+        return "history: shallow clone, no full history"
+    if answer == "false":
+        return None
+    raise AssertionError(stdout)
+
+
+def history_unavailable(repo: Path, env: Mapping[str, str]) -> str | None:
+    """Give the reason the full history cannot be read, or None.
+
+    Args:
+        repo: The worktree to read.
+        env: The scrubbed child environment.
+
+    Returns:
+        ``history: not a git repository`` only when the worktree has no
+        ``.git`` entry and ``git rev-parse --git-dir`` refuses. The shallow
+        skip only when ``--is-shallow-repository`` prints exactly ``true``.
+        None when that command prints exactly ``false``.
+
+    Raises:
+        AssertionError: Git's own error text when metadata is not confirmed
+            absent and ``rev-parse`` fails, or the raw stdout when a successful
+            shallow answer is not exactly ``true`` or ``false``.
+    """
+    git_dir = hooks_support.git(repo, env, "rev-parse", "--git-dir")
+    if _git_entry_absent(repo) and git_dir.returncode != 0:
+        return "history: not a git repository"
+    shallow = hooks_support.git(repo, env, "rev-parse", "--is-shallow-repository")
+    if shallow.returncode != 0:
+        raise AssertionError(shallow.stderr or shallow.stdout)
+    return _shallow_history(shallow.stdout)
+
+
+def change_set_problem(repo: Path, env: Mapping[str, str]) -> str | None:
+    """Name a split change set of the command in rule 44, or None."""
+    first: dict[str, str] = {}
+    for name in RULE_FILES:
+        log = hooks_support.git(
+            repo, env, "log", "--reverse", "--format=%H", f"-S{COMMAND}", "--", name
+        )
+        assert log.returncode == 0, log.stderr
+        commits = log.stdout.split()
+        if not commits:
+            return "history:never_added"
+        first[name] = commits[0]
+    if len(set(first.values())) != 1:
+        return "history:split_change_set"
+    for name in RULE_FILES:
+        shown = hooks_support.git(repo, env, "show", f"{first[name]}:{name}")
+        if rule_44_problem(shown.stdout) is not None:
+            return "history:first_added_outside_rule_44"
+    return None

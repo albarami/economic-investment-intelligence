@@ -57,6 +57,45 @@ export const OUTLINE_LAYER_KEYS = new Set([
   'parcels',
   'health_centres',
   'rail_plan',
+  'accidents',
+]);
+/** The only presentation an accident outline may carry: never a verdict. */
+const ACCIDENT_LABELS = new Set(['accident_count_context']);
+const ACCIDENT_CAVEAT = 'accidents_recorded_not_risk';
+/** The reviewed keys of an accident feature, exactly as the read sends them. */
+const ACCIDENT_FEATURE_KEYS = new Set([
+  'feature_id',
+  'metric_key',
+  'provenance',
+  'fact_id',
+  'subject',
+  'geometry_kind',
+  'source_id',
+  'geography_code',
+  'source_zone',
+  'source_zone_fact_id',
+  'year',
+  'label_key',
+  'evidence_status',
+  'caveat_keys',
+  'ring',
+  'geometry',
+  'name_segments',
+]);
+/** The word and the status the screen renders, and the layer of each. */
+export const PRESENTATION_OWNER = {
+  permitted_use: 'zoning',
+  permitted_empty: 'parcels',
+} as const;
+/** The one layer whose features carry published address numbers. */
+export const ADDRESS_OWNER = 'address_points';
+/** Words any layer may name its feature with; the screen reads no others. */
+const NAME_WORDS = ['name', 'company'];
+const STATUS_LAYERS = new Set([
+  'rail_plan',
+  'parcels',
+  'zoning',
+  'land_prices',
 ]);
 const LABEL_SUBJECTS = new Set(['place', 'business']);
 
@@ -120,8 +159,22 @@ function refuse(code: RefusalCode, layerKey?: string): AcceptResult {
     : { ok: false, code, layerKey };
 }
 
-function blank(value: string | undefined): boolean {
-  return value === undefined || value.trim() === '';
+/** Not a nonempty string: the uncast HTTP body can hold any JSON value. */
+function blank(value: unknown): boolean {
+  return typeof value !== 'string' || value.trim() === '';
+}
+
+/** An optional text: absent or null reads as empty, any other non-string as null. */
+function optionalText(value: unknown): string | null {
+  const read = value ?? '';
+  return typeof read === 'string' ? read : null;
+}
+
+/** A caveat key counts only as a whole member of a real list. */
+function hasCaveat(feature: LayerFeature, key: string): boolean {
+  return (
+    Array.isArray(feature.caveat_keys) && feature.caveat_keys.includes(key)
+  );
 }
 
 export function featureProblem(
@@ -157,6 +210,12 @@ export function featureProblem(
     return 'measure_on_named_feature';
   if (Object.values(feature.field_segments ?? {}).some(digitInPlain))
     return 'numeral_in_plain_segment';
+  if (entry.key === 'accidents') {
+    const accident = accidentProblem(feature);
+    if (accident) return accident;
+  }
+  if (presentationProblem(entry.key, feature))
+    return 'presentation_field_unexpected';
   if (!entry.layerTypes.includes(geometryDeckType(feature.geometry_kind))) {
     return 'wrong_layer_type';
   }
@@ -167,7 +226,7 @@ export function featureProblem(
   }
   if (feature.display_rule === 'withheld') return 'below_display_threshold';
   if (
-    (feature.identifier ?? '').startsWith('SYN-') ||
+    (optionalText(feature.identifier)?.startsWith('SYN-') ?? true) ||
     WAGE_KEYS.has(feature.metric_key)
   ) {
     return 'wage_or_synthetic_id';
@@ -189,7 +248,7 @@ export function featureProblem(
     (ESTIMATE_METRICS.has(feature.metric_key) ||
       Boolean(feature.capex_fact_id) ||
       Boolean(feature.jobs_fact_id)) &&
-    !(feature.caveat_keys ?? []).includes('fdi_estimates')
+    !hasCaveat(feature, 'fdi_estimates')
   ) {
     return 'announced_estimate_unlabelled';
   }
@@ -199,6 +258,13 @@ export function featureProblem(
     if (feature.status_key === 'operating') return 'station_as_operating';
     if (feature.status_key !== 'planned') return 'planned_label_missing';
   }
+  if (
+    entry.key === 'rail_plan' &&
+    feature.geometry_kind === 'line' &&
+    feature.status_key !== undefined &&
+    feature.status_key !== 'planned'
+  )
+    return 'rail_as_operating';
   if (
     entry.key === 'parcels' &&
     feature.status_key &&
@@ -245,12 +311,51 @@ export function featureProblem(
     if (
       feature.geometry_kind === 'point' &&
       (feature.subject === 'statistic' ||
-        (feature.geography_code ?? '').startsWith('district:'))
+        (optionalText(feature.geography_code)?.startsWith('district:') ?? true))
     ) {
       return 'invented_point';
     }
     if (!feature.fact_id) return 'measure_on_named_feature';
   }
+  return null;
+}
+
+/** A word or status outside its layer's closed presentation (RV1 finding 1). */
+export function presentationProblem(
+  layerKey: string,
+  feature: LayerFeature,
+): boolean {
+  const words: readonly string[] = [
+    ...NAME_WORDS,
+    ...(layerKey === 'fdi_projects' ? FDI_WORD_FIELDS : []),
+    ...(layerKey === PRESENTATION_OWNER.permitted_use ? ['permitted_use'] : []),
+  ];
+  if (Object.keys(feature.words ?? {}).some((key) => !words.includes(key)))
+    return true;
+  if (feature.address !== undefined && layerKey !== ADDRESS_OWNER) return true;
+  const status = feature.status_key;
+  if (status === undefined) return false;
+  return (
+    !STATUS_LAYERS.has(layerKey) ||
+    (status === 'permitted_empty' &&
+      layerKey !== PRESENTATION_OWNER.permitted_empty)
+  );
+}
+
+/** An accident count stays on its whole source-zone outline (S3-T12). */
+function accidentProblem(feature: LayerFeature): RefusalCode | null {
+  if (Object.keys(feature).some((key) => !ACCIDENT_FEATURE_KEYS.has(key)))
+    return 'accident_field_unexpected';
+  if (feature.geometry_kind === 'fill') return 'outline_filled';
+  if (feature.geometry_kind === 'point' || feature.geometry_kind === 'hex')
+    return 'accident_point_map';
+  if (!ACCIDENT_LABELS.has(feature.label_key ?? ''))
+    return 'accident_safety_verdict';
+  if (!hasCaveat(feature, ACCIDENT_CAVEAT)) return 'accident_caveat_missing';
+  // An outline without its bound count would skip the geography binding.
+  if (!feature.fact_id) return 'legend_count_unbound';
+  if (blank(feature.source_zone) || blank(feature.source_zone_fact_id))
+    return 'accident_zone_unbound';
   return null;
 }
 

@@ -5,6 +5,9 @@ receipt and body references with hashes computed by the producer's own
 helpers, so no hash is typed by hand. It writes no scalar except
 ``release_contract_version`` and never writes the approval: the lead fills the
 scalars, reviews the draft and renames it to ``review/release_spec.json``.
+Its ``artefacts`` are the ``assembly/artefacts.json`` record's entries; a
+built heights phase is first placed there through ``place_artefact``
+(``heights_artefacts``, S3-T16; decision 0096 item 4).
 """
 
 from __future__ import annotations
@@ -14,11 +17,12 @@ from pathlib import Path
 from typing import Any
 
 from eii_core.manifest import by_name
+from eii_custodian.release.heights_artefacts import stage_heights
 from eii_custodian.release.producer import (
     PHASES,
-    _path,
     _phase,
     _read,
+    _recorded_artefacts,
     _source,
     _write,
 )
@@ -84,14 +88,13 @@ def draft(cache: Path, listing: Mapping[str, Any]) -> dict[str, Any]:
     of its receipt and body, with no hash: hashes come from the files and the
     phase records only.
     """
-    target = _path(cache, DRAFT)
-    if target.exists() or target.is_symlink():
-        raise ValueError("spec_draft_exists")
     try:
         document = _document(cache, listing)
     except (KeyError, TypeError, AttributeError):
         raise ValueError("producer_schema_refused") from None
-    _write(cache, DRAFT, document)
+    # Only pinned publication decides whether the draft already exists;
+    # it never replaces an existing leaf.
+    _write(cache, DRAFT, document, exists="spec_draft_exists")
     return document
 
 
@@ -100,9 +103,9 @@ def _document(cache: Path, listing: Mapping[str, Any]) -> dict[str, Any]:
     tables: dict[str, dict[str, Any]] = {}
     chain: dict[str, Any] = {}
     for phase in PHASES:
-        if not _path(cache, "assembly/" + phase + ".json").is_file():
-            continue
         data = _phase(cache, phase, files)
+        if data is None:
+            continue
         chain.update(data.get("source_chain", {}))
         for name, rows in data["tables"].items():
             if by_name(name) is None:
@@ -121,12 +124,21 @@ def _document(cache: Path, listing: Mapping[str, Any]) -> dict[str, Any]:
         key not in sources for table in tables.values() for key in table["source_keys"]
     ):
         raise ValueError("producer_chain_incomplete")
+    # Only after the draft's own checks: the recorded heights asset is placed
+    # by the single artefact writer, then the record is read again (S3-T16).
+    stage_heights(cache)
+    placed = _phase(cache, "artefacts", {})
     return dict(
         version=1,
         scalars=dict(release_contract_version="release.v1"),
         sources=sources,
         tables=list(tables.values()),
-        artefacts=[],
+        artefacts=[
+            dict(path=path, sha256=digest)
+            for path, digest in _recorded_artefacts(
+                {} if placed is None else {"artefacts": placed}
+            ).items()
+        ],
     )
 
 

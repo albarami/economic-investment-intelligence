@@ -1,10 +1,11 @@
 /** Built production bundle and actual API; no intercepted API, tile or lineage. */
 import { test as base, expect, request } from '@playwright/test';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { createServer } from 'node:net';
 import { assertNoProviderAttempts } from './no-provider-attempts';
+import { startServerGroup, stopServerGroup } from './opening-server.mjs';
 
 const WEB = process.cwd();
 const ROOT = path.resolve(WEB, '..');
@@ -39,7 +40,7 @@ export const test = base.extend<Record<string, never>, { mounted: Fixture }>({
           );
         });
       });
-      const proc = spawn(
+      const proc = startServerGroup(
         'uv',
         [
           'run',
@@ -96,10 +97,7 @@ export const test = base.extend<Record<string, never>, { mounted: Fixture }>({
         assertNoProviderAttempts(work);
       } finally {
         await probe.dispose();
-        if (proc.exitCode === null) {
-          proc.kill('SIGTERM');
-          await new Promise((resolve) => proc.once('exit', resolve));
-        }
+        await stopServerGroup(proc);
         rmSync(work, { recursive: true, force: true });
       }
     },

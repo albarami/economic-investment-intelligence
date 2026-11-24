@@ -3,15 +3,21 @@ import { useEffect, useState, type ReactElement } from 'react';
 import { FactChip } from '../../facts/FactChip';
 import type { FactRegistry } from '../../facts/registry';
 import { EvidenceMark, WithheldMark } from '../../facts/ProvenanceMark';
-import { direction, text, type Language } from '../../i18n';
-import { unimplementedReason } from './checks';
+import { direction, text, type Language, type StringKey } from '../../i18n';
+import { accidentZone, unimplementedReason } from './checks';
 import { ClassLegend } from './ClassLegend';
 import { FcFirmsChrome } from './FcFirmsTowerPanel';
 import { FdiBlock } from './FdiPanel';
 import { CompanyCard } from '../../views/CompanyCard';
-import type { ClassBreakGroup, LayerFeature, LayerPayload } from './payload';
+import type {
+  ClassBreakGroup,
+  LayerFeature,
+  LayerNoDataReason,
+  LayerNotice,
+  LayerPayload,
+} from './payload';
 import { rampToken } from './ramp';
-import { acceptPayload } from './refuse';
+import { acceptPayload, ADDRESS_OWNER, PRESENTATION_OWNER } from './refuse';
 import { bindSelection } from './selection';
 import {
   activeUse,
@@ -27,6 +33,14 @@ const NOT_RANKED_TEXT = {
   no_denominator: 'layers.not_ranked.no_denominator',
   missing_input: 'layers.not_ranked.missing_input',
 } as const;
+
+const NO_DATA_TEXT: Record<LayerNoDataReason, StringKey> = {
+  accident_source_missing: 'layers.accidents.no_data.accident_source_missing',
+  accident_measure_unconfirmed:
+    'layers.accidents.no_data.accident_measure_unconfirmed',
+  accident_geography_missing:
+    'layers.accidents.no_data.accident_geography_missing',
+};
 
 const NIGHT_CLASS = {
   band_low: 'layers.night.class.band_low',
@@ -44,11 +58,13 @@ const NIGHT_DIRECTION = {
 
 export function PublicLayers({
   payload,
+  notice = null,
   language,
   registry,
   onOpenChain,
 }: {
   payload: LayerPayload;
+  notice?: LayerNotice | null;
   language: Language;
   registry: FactRegistry;
   onOpenChain: (factId: string) => void;
@@ -97,6 +113,16 @@ export function PublicLayers({
   return (
     <LayerPlate language={language} labels={draw.labelsDrawn}>
       <p data-part="boundaries">{text(language, 'layers.boundaries.absent')}</p>
+      {notice?.noData ? (
+        <p data-part="layer-no-data" data-reason={notice.noData}>
+          {text(language, NO_DATA_TEXT[notice.noData])}
+        </p>
+      ) : null}
+      {notice?.accessPending ? (
+        <section data-part="access-pending">
+          <p>{text(language, 'layers.access.pending')}</p>
+        </section>
+      ) : null}
       <ul data-part="line-samples">
         {draw.lineSamples.map((sample) => (
           <li
@@ -356,7 +382,8 @@ export function PublicLayers({
               language={language}
             />
           ) : null}
-          {selectedFeature.feature.words?.permitted_use ? (
+          {selectedFeature.layer.key === PRESENTATION_OWNER.permitted_use &&
+          selectedFeature.feature.words?.permitted_use ? (
             <p data-label="permitted">
               <bdi>{selectedFeature.feature.words.permitted_use}</bdi>
             </p>
@@ -367,7 +394,8 @@ export function PublicLayers({
               {text(language, 'layers.station.planned')}
             </p>
           ) : null}
-          {selectedFeature.feature.status_key === 'permitted_empty' ? (
+          {selectedFeature.layer.key === PRESENTATION_OWNER.permitted_empty &&
+          selectedFeature.feature.status_key === 'permitted_empty' ? (
             <p data-label="plot">
               {text(language, 'layers.plot.label')}
               <span data-caveat="plot">
@@ -389,14 +417,16 @@ export function PublicLayers({
           <AddressNumbers
             language={language}
             address={
-              selectedFeature.feature.address ??
-              (selectedFeature.layer.key === 'address_points'
-                ? payload.address_numbers
-                : undefined)
+              selectedFeature.layer.key === ADDRESS_OWNER
+                ? (selectedFeature.feature.address ?? payload.address_numbers)
+                : undefined
             }
           />
           {selectedFeature.feature.fact_id &&
-          selectedFeature.feature.metric_key !== 'parcel_area' ? (
+          selectedFeature.feature.metric_key !== 'parcel_area' &&
+          // The selected FDI card already shows every field, capex and jobs
+          // with their announced-estimate label; no unlabelled repeat here.
+          selectedFeature.layer.key !== 'fdi_projects' ? (
             <FactChip
               variant="value"
               size="standard"
@@ -404,6 +434,13 @@ export function PublicLayers({
               registry={registry}
               language={language}
               onOpen={onOpenChain}
+            />
+          ) : null}
+          {selectedFeature.layer.key === 'accidents' ? (
+            <AccidentContext
+              feature={selectedFeature.feature}
+              language={language}
+              registry={registry}
             />
           ) : null}
           {selectedFeature.feature.apportioned_from ? (
@@ -680,5 +717,45 @@ function RegisterCompanyCard({
       language={language}
       employeeCount={card.employee_count}
     />
+  );
+}
+
+/** S3-T12: the source zone and the count's own year, beside its caveat. */
+function AccidentContext({
+  feature,
+  language,
+  registry,
+}: {
+  feature: LayerFeature;
+  language: Language;
+  registry: FactRegistry;
+}) {
+  const resolved = registry.resolve(feature.fact_id ?? '');
+  if (resolved.status !== 'ready') return null;
+  const period = resolved.binding.fact.period;
+  // Rendered from the zone fact of the count's own row, never the feature.
+  const zone = accidentZone(feature, resolved.binding.fact, registry) ?? '';
+  return (
+    <p data-part="accident-context" data-zone={zone} data-period={period}>
+      <span>{text(language, 'layers.accidents.zone')}</span>
+      <FactChip
+        variant="reference"
+        language={language}
+        kind="published_text"
+        value={zone}
+        recordId={feature.source_zone_fact_id ?? ''}
+      />
+      <span>{text(language, 'layers.accidents.year')}</span>
+      <FactChip
+        variant="reference"
+        language={language}
+        kind="calendar_year"
+        value={period}
+        recordId={feature.feature_id + ':year'}
+      />
+      <span data-caveat="accidents">
+        {text(language, 'layers.accidents.caveat')}
+      </span>
+    </p>
   );
 }

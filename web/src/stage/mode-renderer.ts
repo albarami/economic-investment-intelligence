@@ -8,7 +8,7 @@ import {
   type StyleSpecification,
 } from 'maplibre-gl';
 import { requestLocal } from '../api/address-search.mjs';
-import type { MapMode, ModeFailureReason } from './map-modes';
+import type { MapMode, ModeFailureReason, SpendMeter } from './map-modes';
 
 let serial = 0;
 export function modeRenderer(
@@ -16,6 +16,7 @@ export function modeRenderer(
   open: StyleSpecification,
   onFailure?: (mode: MapMode, reason: ModeFailureReason) => void,
   attach: (layer: Layer | null) => void = () => undefined,
+  onMeter: ((meter: SpendMeter) => void) | undefined = undefined,
 ) {
   const protocol = `eii-imagery-${serial++}`;
   let active: AbortController | null = null;
@@ -92,7 +93,7 @@ export function modeRenderer(
         });
         return;
       }
-      const renderer = photoreal(attach, credit, failed);
+      const renderer = photoreal(attach, credit, failed, onMeter);
       native = renderer;
       await renderer.start();
       if (!controller.signal.aborted)

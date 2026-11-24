@@ -8,6 +8,7 @@ reviewed rows that agree.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from functools import partial
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
@@ -33,6 +34,8 @@ from eii_product.register_file import (
 )
 
 FC_CLASS_KEYS = CLOSED_CLASS_KEYS
+# Without a release-listed hash the default reader refuses (L-1509).
+_UNLISTED_READER = partial(read_fc_register_rows, listed_sha256=None)
 
 LAYER_KEY = "fc_firms_per_tower"
 CLOSED_LAYER_KEYS = frozenset(
@@ -96,7 +99,7 @@ def seal_coverage(counts: Mapping[str, int]) -> dict[str, int]:
 
 def build_layer_router(
     setting: str | None,
-    rows_reader: Callable[..., RegisterBundle | None] = read_fc_register_rows,
+    rows_reader: Callable[..., RegisterBundle | None] = _UNLISTED_READER,
     *,
     public_readers: Mapping[str, Callable[[str | None], dict[str, object]]]
     | None = None,

@@ -85,6 +85,7 @@ export function FcFirmsLegend({
               {word ? <span>{text(language, CLASS_WORD[word])}</span> : null}
               <FactChip
                 variant="compact"
+                figureCell
                 factId={band.fact_id}
                 registry={registry}
                 language={language}

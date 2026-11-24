@@ -76,14 +76,14 @@ Configuration (names pinned in [02_ARCHITECTURE.md](02_ARCHITECTURE.md); values 
 | `BESTTIME_API_KEY_PUBLIC` | key or absent | Owner, the lead's shell only | The same source's second key, under the same rules (OPS-72) |
 | `EII_BESTTIME_RUN_CREDIT_LIMIT` | whole number of credits or absent | Owner, the lead's shell only | The most credits one keyed run of the relative-busyness source may spend ([decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md) item 5); a keyed run refuses to start without it; never committed |
 | `ESRI_API_KEY` | key or absent | Owner, the product's own server only | The imagery provider's key ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), within its free tier on an account with pay-as-you-go disabled: read only by the running API process for the satellite mode and the address search; never printed, logged or committed, never in a work tree, brief, worker tool or sandbox; absent means the open map and the gazetteer only; needed by no test, gate, command or story (OPS-73) |
-| `MAPTILE_API_KEY` | key or absent | Owner, the product's own server only | The key of the photorealistic 3D tiles (Google's Map Tiles API; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), the one paid service of that decision: read at run time only by the running API process, which adds it to each tile request on a same-origin route of its own; the browser never holds it; never printed, logged or committed, never in a work tree, brief, worker tool or sandbox; the owner's `SPEND_CEILING_USD` total-spend ceiling is kept by a project-wide count of billable tile requests, with a warning at `WARNING_FRACTION` and refusal at the computed request limit; there is no per-view budget; absent means no photorealistic 3D mode; needed by no test, gate, command or story (OPS-74) |
+| `MAPTILE_API_KEY` | key or absent | Owner, the product's own server only | The key of the photorealistic 3D tiles (Google's Map Tiles API; [decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), the one paid service of that decision: read at run time only by the running API process, which adds it to each tile request on a same-origin route of its own; the browser never holds it; never printed, logged or committed, never in a work tree, brief, worker tool or sandbox; the owner's `SPEND_CEILING_USD` total-spend ceiling is kept by a project-wide count of billable tile requests, with a warning at `WARNING_FRACTION` (80 percent of the ceiling; the warning stays until one showing is measured, [decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 7) and refusal at the computed request limit; there is no per-view budget and no lowered detail; absent means no photorealistic 3D mode; needed by no test, gate, command or story (OPS-74) |
 | `EII_IMAGERY_TILE_BASE` | HTTPS service base or empty | API process | Runtime imagery service address; empty disables satellite mode; S3-T16 Part A remains incomplete |
 | `EII_PHOTOREAL_TILE_BASE` | HTTPS service base or empty | API process | Runtime photorealistic base; empty disables the mode; no browser address is supplied |
 | `EII_PHOTOREAL_LIMIT` | non-negative integer or empty | API process | Optional lower request limit, bounded by the computed spend cap; empty uses that cap |
 | `EII_PHOTOREAL_PRICE_PER_THOUSAND` | positive decimal or empty | API process | Price used for the spend cap; empty uses ruling L-717 item 3; a higher price lowers the request limit |
 | `EII_DECISION_PROVIDER` | `none` or `jev`, default `none` | Build/evaluation environment | No stage or run-time use in v1 |
 | `EII_REGISTER_FILE` | path to the register file outside the repository, or absent | Owner, in the lead's own shell | The file of public records of the public business register, source `biz_register` ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1); read, read-only, by the world build and the release build run from the lead's own shell and by the running product; the path and the file's content are never printed and never put in the repository, a brief, a fixture, a log or a worker tool's or reviewer's environment; tests and continuous integration use an invented stand-in register. A snapshot of the file is kept each month from 2026-11 beside it, in the same folder outside the repository; the readers find the snapshots there through this same setting and read them under the same rules, so no further setting is added ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12). Who keeps them is open for the owner |
-| `EII_FC_REGISTER_FILE` | path to the financial centre's register file outside the repository, or absent | Owner, in the lead's own shell | The file of public company records of the financial centre's public register, source `fc_register`, a file of its own ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1); read, read-only, by the same readers as `EII_REGISTER_FILE` and under the same rules: the path and the file's content are never printed and never put in the repository, a brief, a fixture, a log or a worker tool's or reviewer's environment; tests and continuous integration use an invented stand-in of the same shape. Its monthly snapshots are kept beside it and read in the same way as those of `EII_REGISTER_FILE` ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12) |
+| `EII_FC_REGISTER_FILE` | path to the financial centre's register file outside the repository, or absent | Owner, in the lead's own shell, or the operator for the staging and live API child | The file of public company records of the financial centre's public register, source `fc_register`, a file of its own ([decision 0022](decisions/0022-real-register-companies-with-a-synthetic-world.md) item 1); read, read-only, by the same readers as `EII_REGISTER_FILE` and under the same rules: the path and the file's content are never printed and never put in the repository, a brief, a fixture, a log or a worker tool's or reviewer's environment; tests and continuous integration use an invented stand-in of the same shape. Its monthly snapshots are kept beside it and read in the same way as those of `EII_REGISTER_FILE` ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 12). Settings per environment (S3-P10, the owner's ruling of 2026-11-23): the API child environment of `staging` and `live` admits this one name beside the common API names, and the served `fc_firms_per_tower` layer reads the register through it alone; `development` keeps its stand-in and refuses the name with `unwanted_runtime_setting`, as every environment refuses every other unlisted `EII_` name and every restricted provider key. Unset, the layer answers `NO_DATA` with reason `missing_input`; a refusal or an error names the setting or a fixed reason, never the path. The file is checked against the hash that the verified release lists (lead ruling L-1509): the lead's `./eii build-release`, from the lead's own shell, hashes the bytes of the file this setting names and records the hash as the `fc_register` entry of the manifest's `listed_inputs` (document 03); an unreadable file or value refuses the build with `fc_register_unreadable`. The served app reads that entry only through the fixed read function `release_fc_register_sha256` and refuses the file with `hash_unlisted` when the loaded release lists none, before the file is opened, and with `hash_mismatch` when its bytes differ, before any row is parsed; at start either stops the start, and later the request is refused. The setting must name a regular file: the build and the served app read it only through the one product read `read_register_bytes`, which opens it read-only without following a symlink and without blocking, checks the opened descriptor is a regular file, reads and hashes the same bytes, and refuses a symlink, a FIFO, a device, a folder, a missing file, or a file changed or replaced during the read (served app `read_refused`, which stops the start naming only the setting; build `fc_register_unreadable`). No second setting carries a hash |
 | `JEV_PRO_API_KEY` | key or absent | Owner, build/evaluation only | Never required by `up`, preflight, freeze or any gate; never printed |
 
 ## 3. Prerequisites and how each is checked
@@ -303,7 +303,7 @@ Exit codes (ASSUMPTION: this scheme is set here because nothing else defines it;
 | OPS-71 | `TOMTOM_API_KEY` and `EARTHDATA_API_KEY` lie outside the keys of [decision 0018](decisions/0018-priorities-and-amendments-to-decision-0015.md) item 12, which stay unused, and may be used by the build within their free allowances ([decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) item 16). Neither is printed, logged, committed, or put into a work tree, a brief, a prompt or a sandbox (OPS-07, OPS-08). No test, gate, command or the guided story needs either. Tests and continuous integration never call a live service: their fixtures are made by hand in the documented response format, and no response of a live service is committed. Under proposed decision 0066, `CDSE_CLIENT_ID` and `CDSE_CLIENT_SECRET` are tooling-only, environment-only, never disclosed or passed to product, generators, release or sandbox; defaults, tests, gates and the guided story need neither value nor cache. Only the lead-shell `./eii build-public --cdse-backup` form selects the optional unread backup; ordinary build-public never selects it. Provider hosts, request contracts, publisher and quota remain pending verification; no unverified host is admitted. The narrow unread CDSE public-cache exception changes no other provider storage rule. |
 | OPS-72 | The self-serve sources of [decision 0019](decisions/0019-forecasts-estimates-scenarios-and-self-serve-sources.md) items 18 to 24 are fetched only by `./eii build-public`, into the uncommitted public cache, each with its hash, licence or terms and retrieval date. `places_fsq`, a further source of the places layer (Apache 2.0), is fetched from the public copy on Source Cooperative, `https://data.source.coop/fused/fsq-os-places/` (host `data.source.coop`), which is geospatially partitioned GeoParquet read without an account; each refresh selects the newest dated release through the copy's root listing and fetches only the files that cover Qatar from that release, no secret variable is added for it, and runtime registry evidence records the actual release date, which is the date the places are shown with; every earlier dated snapshot is retained. `busy_besttime`, the relative busyness by hour of named venues, is read by the project's own reader of the provider's interface for a build-time list of venues, never at run time ([decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md)). Its two keys are read from the environment in the lead's shell only; neither is ever printed, logged, committed or put in a brief, worktree or sandbox, and an address that carries a key is never written to a log, receipt, error, cache name, fixture or file. No test, gate or command of `./eii test` needs either key. The provider's terms are recorded truthfully as the licence text with the date read; the source uses `licence_basis: provider_terms` ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md) item 3, [decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md)). Its values stay in the uncommitted public cache, the releases and the freeze bundles; they never enter the repository or a test fixture; and the source is left out of the nightly live fetch, as are the two keyed sources, whose fetchers are tested on hand-made fixtures only ([12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md)). Terms that need a permission or licence before real use are listed in document 17, DHA-102; they do not switch a source off or limit its display in version 1. See OPS-66. |
 | OPS-73 | `ESRI_API_KEY` is the imagery provider's key ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7), on the free tier of an account with pay-as-you-go disabled, so no spend is possible. It is read only from the environment of the running API process, which alone contacts the provider, and only while the key is present and the presenter's offline control is not set; the browser never holds the key and still contacts only its own origin: the satellite tiles and the address-search results pass through the server's own paths. No tile is stored, and no address-search result is written to a file, the database, a ledger or egress row, a log, a backup or the freeze bundle. The key is never printed, logged or committed, and never reaches a work tree, a brief, a prompt, a worker tool or a sandbox (OPS-07, OPS-08). The provider's hosts are never on the fetcher allow-list of `./eii build-public`. Tests and continuous integration never call the provider: a planted request to the provider's hosts without the key fails a test. The open map, every test, every gate, `./eii up`, preflight, freeze and the guided story run without the key. RECEIVED (owner; ruling L-151; item 7; OI-132): the imagery provider's attribution note is received; the provider's name may appear only in the map attribution line and in the source rows of [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md). What remains is the documentation check's place-scoped exception, which task S1-T14 builds. |
-| OPS-74 | `MAPTILE_API_KEY` is the key of the photorealistic 3D mode ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7): Google's photorealistic 3D tiles through its Map Tiles API, the one paid service of that decision (item 14). It is read at run time only, from the environment of the running API process, which alone contacts the provider: it adds the key to each tile request on a same-origin route of its own, so the browser never holds the key and still contacts only its own origin ([02_ARCHITECTURE.md](02_ARCHITECTURE.md) ARC-35, ARC-36). It does so only while the key is present, the presenter's offline control is not set and the count of billable requests is under its limit. The owner caps total paid spend at `SPEND_CEILING_USD`: every billable tile request is counted project-wide, free use is ignored, and requests are refused once the count reaches 3,333 (USD 6.00 per 1,000 requests at the provider's first paid tier). The task that builds the mode reads the provider's price again, and a higher price lowers that limit so that the spend stays within `SPEND_CEILING_USD`. Because the cap is in total, no command, restart, store switch, new release or restore resets or lowers the count. There is no per-view budget. The spend meter reports the running billable count, request limit and exact server-computed money, and warns at `WARNING_FRACTION` without reducing view detail, area or duration. No tile is stored: none is written to a file, the database, a release, a ledger or egress row, a log, a backup or the freeze bundle. The mode shows the attribution its tiles carry. The key is never printed, logged or committed, and never reaches a work tree, a brief, a prompt, a worker tool or a sandbox (OPS-07, OPS-08). The provider's hosts are never on the fetcher allow-list of `./eii build-public`. Tests and continuous integration never call the provider; the refusal at the ceiling, the warning boundary and continued requests above the former per-view allowance are tested without it ([12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md)). The open map stays the default; every test, every gate, `./eii up`, preflight, freeze and the guided story run without the key. The count journal and its remaining operator-rollback limit are described in section "S3-T16 Part A settings under implementation". |
+| OPS-74 | `MAPTILE_API_KEY` is the key of the photorealistic 3D mode ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item A7): Google's photorealistic 3D tiles through its Map Tiles API, the one paid service of that decision (item 14). It is read at run time only, from the environment of the running API process, which alone contacts the provider: it adds the key to each tile request on a same-origin route of its own, so the browser never holds the key and still contacts only its own origin ([02_ARCHITECTURE.md](02_ARCHITECTURE.md) ARC-35, ARC-36). It does so only while the key is present, the presenter's offline control is not set and the count of billable requests is under its limit. The owner caps total paid spend at `SPEND_CEILING_USD`: every billable tile request is counted project-wide, free use is ignored, and requests are refused once the count reaches 3,333 (USD 6.00 per 1,000 requests at the provider's first paid tier). The task that builds the mode reads the provider's price again, and a higher price lowers that limit so that the spend stays within `SPEND_CEILING_USD`. Because the cap is in total, no command, restart, store switch, new release or restore resets or lowers the count. There is no per-view budget. The spend meter reports the running billable count, request limit and exact server-computed money, and warns at `WARNING_FRACTION` (80 percent of the ceiling; the warning stays until one showing is measured, [decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 7) without reducing view detail, area or duration. No tile is stored: none is written to a file, the database, a release, a ledger or egress row, a log, a backup or the freeze bundle. The mode shows the attribution its tiles carry. The key is never printed, logged or committed, and never reaches a work tree, a brief, a prompt, a worker tool or a sandbox (OPS-07, OPS-08). The provider's hosts are never on the fetcher allow-list of `./eii build-public`. Tests and continuous integration never call the provider; the refusal at the ceiling, the warning boundary and continued requests above the former per-view allowance are tested without it ([12_TESTING_AND_QUALITY.md](12_TESTING_AND_QUALITY.md)). The open map stays the default; every test, every gate, `./eii up`, preflight, freeze and the guided story run without the key. The count journal and its remaining operator-rollback limit are described in section "S3-T16 Part A settings under implementation". |
 
 ### 6.4 The voice environment
 
@@ -523,7 +523,7 @@ limits and the F5 root decision do not close S3-T28 or a slice gate.
 `eii_custodian.release.producer` adapts the stored table envelopes emitted by
 `publicdata.assembly_adapters.Production.record`. Its closed phases are
 `reviewed_selections`, `frame`, `spine_graph`, `gis_property_singles`, `fsq`, `series_stage`,
-`additions` and `busyness`. A release spec supplies schemas and explicit source
+`additions`, `busyness` and `artefacts`. A release spec supplies schemas and explicit source
 bindings, because these S2 envelopes contain original rows rather than the
 reader's typed column declarations. The spec is operator-supplied review
 configuration; the producer never guesses a column type, selects a latest
@@ -557,6 +557,67 @@ match the spec. Each source also matches the phase's recorded source
 chain. `artefacts` contains existing relative `artefacts/` paths and their
 digests; it supplies no artefact bytes.
 
+**Release artefacts (S3-P04, decision 0096, accepted 2026-11-23).**
+`eii_custodian.release.artefacts.place_artefact(cache, relative, source_file)`
+is the one writer of a release artefact. `relative` must be a normalised
+relative path (ARC-119) of one file under `artefacts/`: a string, unchanged by
+POSIX and NFC normalisation, with no empty, `.` or `..` part, no backslash or
+control character, no `.private` or `.env` part, at most 255 bytes a part and
+1,024 bytes in all, with no symlink at or above the destination, no folder
+at it and no file in place of a folder above it in the cache; any other path refuses as `artefact_path_refused`. The source is opened
+without following a symlink; a symlink, folder, other non-regular or missing
+source refuses as `artefact_not_regular`. The bytes are copied through a
+temporary file in the destination folder and synchronised. Both the artefact
+and its phase record go through `eii_custodian.release.pinned`: the cache and
+every folder below it are opened as directory descriptors without following a
+symlink, and every read, creation, rename and cleanup names its entry relative to
+one of them; the phase record is read through such a descriptor, opened
+without following a symlink and checked by `fstat`. The rename is conditional
+and atomic: `renameat2` with `RENAME_NOREPLACE` when the destination was
+absent, and `RENAME_EXCHANGE` when it existed, after which the displaced file
+must be the one pinned, or the exchange is undone. A root, folder, leaf or
+temporary entry substituted by name refuses as `artefact_path_refused`; a
+substitution detected after the rename withdraws the new file (or exchanges
+the earlier one back) before the refusal, and no call returns success after a
+detected substitution. After an exchange, the exchange back runs only while
+the destination still holds the new file and must leave the new file under the
+temporary name; when it cannot run, fails or leaves anything else there, the
+displaced file is never removed but kept under its temporary name for
+recovery, the new file is withdrawn only while the destination still holds it,
+and the call refuses as `publication_rollback_incomplete`. On a refusal only
+the file this call created is ever removed; the displaced file is removed only
+after a successful exchange, while its temporary name still holds it. A
+pinned entry that disappears before it is read refuses; only an entry absent
+when pinned reads as absent. Identity is device, inode and type: a file deleted
+and recreated with its inode number reused inside the pinned folder is not
+told apart, and cannot be outside it. A system without `renameat2` (missing,
+or refused with `ENOSYS` or `EINVAL`) refuses as
+`publication_rename_unsupported`, with no fallback to a plain rename.
+On success the call returns `{path, sha256}`. It records that entry, sorted by path
+and replacing an earlier entry of the same path, in the phase record
+`assembly/artefacts.json` (method `public-assembly.artefacts`, version `1`, no
+tables), the producer's ninth phase. The spec's `artefacts` list must equal that
+record: a spec hash that differs from the record refuses as
+`producer_hash_mismatch`; a recorded path absent from the spec, an unrecorded or
+repeated spec path refuses as `producer_chain_incomplete`; a malformed record
+as `producer_schema_refused`. `producer_path_refused` for a path outside
+`artefacts/` and start-up's `startup_inventory_mismatch` for an unlisted
+release file stay. No folder artefact exists. Item 2 of decision 0096, the
+routing tile extract `artefacts/routing/tiles.tar`, is still verified at S3-P05
+(decision 0096, accepted 2026-11-23); this task places no real routing file.
+
+S3-P06 adds the build-public map-asset step. It reads the configured pinned
+Qatar PMTiles source and glyph source directory and places each present file
+through `place_artefact` as `artefacts/tiles/basemap.pmtiles` or
+`artefacts/fonts/<stack>/<range>.pbf`. An absent basemap records
+`COVERAGE map_basemap basemap_missing 1`; an absent or empty glyph source
+records `COVERAGE map_fonts fonts_missing 1`, and neither case places that
+asset. Installed and embedded serving start when either asset is absent: a
+missing basemap leaves `basemap_url` null, missing glyphs select no release
+font directory, and health reports the corresponding asset `missing`. A
+duplicate manifest basemap refuses as `basemap_missing`. Real glyph ranges
+are not yet generated; the writer reads them when present.
+
 The producer derives `source_registry` and manifest citations from receipt
 publisher, title, key-free fetch URL, licence and basis, original retrieval UTC
 date and body hash. It derives `fact_lineage` from the released table, the
@@ -573,7 +634,13 @@ final-audit or graph files refuse as `producer_receipt_missing`, before a
 candidate is written.
 
 `prepare(cache)` writes deterministic `assembly/release_candidate.json` for
-review. The first `build-release` with a complete spec and no approval prepares
+review. It and `produce(cache)`'s two outputs are written through the same
+`eii_custodian.release.pinned` publication as the artefacts; a substituted root,
+folder or leaf, or another refused rename, refuses as `producer_path_refused`,
+a rollback that cannot complete as `publication_rollback_incomplete`, and a
+system without `renameat2` as `publication_rename_unsupported`. A read file
+that existed when pinned and disappears before it is opened refuses as
+`producer_path_refused`, never as missing. The first `build-release` with a complete spec and no approval prepares
 this candidate, prints `candidate_written_approval_missing` and exits eight
 without running the sandbox or publishing an
 export. A different maker must then supply `review/release_approval.json` with
@@ -605,17 +672,42 @@ values only: all booleans `bool`, all integers `int`, all strings `string`,
 with `nullable` when a value is null or absent; any other or mixed value type,
 an empty table or an all-null column refuses as `column_type_unknown`, and the
 lead supplies such types (for example a decimal) by hand. The draft carries no
-scalar but `release_contract_version: release.v1` and an empty `artefacts`
-list. The lead fills the scalars and any narrower types, reviews the draft and
+scalar but `release_contract_version: release.v1`, and its `artefacts` list
+is the `assembly/artefacts.json` record's entries (empty when no artefact was
+placed; a malformed record refuses as `producer_schema_refused`). When the
+cache holds a `built` assembly `heights` record (`assembly/heights.json`), the
+draft, only after its own checks pass, first places the four files that record
+binds through `place_artefact` (decision 0096 item 4), each only while its
+bytes match the record, under `artefacts/heights/` (the heights manifest as
+`<sha256>.json`), so they enter that record with their hashes; a record that
+is not `built`, a missing file or a changed file refuses as
+`assembly_heights_incomplete` (S3-T16, `heights_artefacts.stage_heights`;
+document 08, "Building heights read (S3-T16)"). The lead fills the scalars and any narrower types, reviews the draft and
 renames it to `review/release_spec.json`; the producer's checks then run
 unchanged. The draft never writes or reads `review/release_approval.json` and
-refuses to replace an existing draft (`spec_draft_exists`). Its other refusals
+refuses to replace an existing regular draft (`spec_draft_exists`) through
+the pinned publication itself, only after the draft's own checks pass. Any
+other existing entry that is not a regular file (a symlink or a folder)
+refuses as `producer_path_refused`. An existing draft with an incomplete
+listing therefore refuses as `producer_chain_incomplete`, without writing.
+Its other refusals
 are `producer_receipt_missing`, `producer_hash_mismatch`, `unknown_table` (a
 phase table absent from the core catalogue), `producer_chain_incomplete` (no
 phase table, a listed key absent from the recorded chains, or a table source
 absent from the listing), `producer_schema_refused` (a malformed listing entry
 or phase record) and the producer's own source refusals; each exits four with
 its reason and writes nothing.
+
+With `EII_FC_REGISTER_FILE` set in the lead's shell, `build-release` hashes the
+bytes of that file, read through the product's one register read (a regular
+file, no symlink; otherwise `fc_register_unreadable`), and passes the hash to `prepare` and `produce` as `fc_register_sha256`; the candidate, and so
+the reviewed envelope and the manifest, then carry `listed_inputs` with the one
+entry `{name: fc_register, sha256}` (lead ruling L-1509, document 03). The spec
+has no key for it, so a typed hash is refused with the spec; a changed file
+after review gives another candidate and needs another review. Unset, nothing
+is listed and the served layer refuses the file with `hash_unlisted`. A release
+loaded before this change has no `release_manifest.fc_register_sha256` column
+and is loaded again before it serves.
 
 Invented tests cover byte determinism, each required refusal, a real S2 bank
 parser output, actual sandbox/writer/verification, command dispatch and cleanup.
@@ -799,7 +891,7 @@ defined once in `product/src/eii_product/photoreal_tiles/limit.py` and used by
 is the second named constant: a lead default until a micro-pass measures a
 showing. The warning becomes true exactly when the billable count reaches
 that fraction of the effective request limit, including a lower configured
-limit, and remains true above it. It never refuses or slows a request. Only the
+limit, and remains true above it. It never refuses, slows or lowers the detail of a request, and it stays until one showing is measured ([decision 0064](decisions/0064-the-narrowing-rows-decided.md) item 7). Only the
 absolute project-wide ceiling refuses requests with `cap_reached`; journal
 failure still refuses with `count_unavailable`. There is no per-view request
 budget; registration, alias binding, native session expiry and disposal remain.

@@ -384,9 +384,11 @@ Field names follow [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md), which holds the
   "contracts": [{"name": "wages.v1", "revision": "<n>", "feed_sha256": "<hex>", "reference_period": "<period>"}],
   "tables": [{"name": "resident_pay", "file": "tables/resident_pay.parquet", "provenance_class": "protected", "sha256": "<hex>", "row_count": 0, "schema_sha256": "<hex>", "grain": "<grain>"}],
   "sources": [{"source_id": "<id>", "url": "<url>", "licence": "<licence>", "retrieved_on": "2026-11-11", "sha256": "<hex>"}],
-  "artefacts": [{"path": "artefacts/routing/", "sha256": "<hex>"}]
+  "artefacts": [{"path": "artefacts/routing/tiles.tar", "sha256": "<hex>"}]
 }
 ```
+
+Under [decision 0096](decisions/0096-release-artefacts-are-single-files-under-artefacts.md), accepted 2026-11-23: every artefact is one regular file under `artefacts/` (ARC-119) and no folder artefact exists, as shown in this example's `artefacts` line `[{"path": "artefacts/routing/tiles.tar", "sha256": "<hex>"}]`; the routing tile-extract form is still verified at S3-P05.
 
 | Field | Meaning | In the release hash |
 |---|---|---|
@@ -407,7 +409,7 @@ Field names follow [03_DATA_CONTRACTS.md](03_DATA_CONTRACTS.md), which holds the
 
 | ID | Requirement | Check |
 |---|---|---|
-| ARC-42 | `manifest.json` validates against the JSON Schema in `contracts/`. It carries three lists: `tables`, `sources` and `artefacts`, and every `file` and `path` value is a normalised relative path (ARC-119). ASSUMPTION: the `artefacts` list is added here so that the routing graph, the story catchments and the signed reports that [08_BACKEND.md](08_BACKEND.md) reads are named and hashed. | Schema test |
+| ARC-42 | `manifest.json` validates against the JSON Schema in `contracts/`. It carries three lists: `tables`, `sources` and `artefacts`, and every `file` and `path` value is a normalised relative path (ARC-119). ASSUMPTION: the `artefacts` list is added here so that the routing graph, the story catchments and the signed reports that [08_BACKEND.md](08_BACKEND.md) reads are named and hashed. Under [decision 0096](decisions/0096-release-artefacts-are-single-files-under-artefacts.md), accepted 2026-11-23: each `artefacts` entry is one regular file under `artefacts/`, placed by the custodian writer `place_artefact` with the hash it computed; the basemap `artefacts/tiles/basemap.pmtiles`, the glyph ranges `artefacts/fonts/<stack>/<range>.pbf` and the routing extract `artefacts/routing/tiles.tar` are such entries. | Schema test |
 | ARC-43 | Every artefact has a path under `artefacts/` and a SHA-256 in the manifest. For a folder the SHA-256 is taken over a UTF-8 text with one line per file, `<sha256> <relative path>`, sorted by path. The loader and preflight verify every artefact. An artefact is read as a file and never loaded into a store. No artefact or report listed in `manifest.artefacts` contains `release_id`, `build_id` or `built_at`; for a protected release each names its release by `window_key`, `protected_sha256`, `rules_version_id` and `parameter_set`, and start-up verifies those four values against the mounted manifest. `load_receipt.json` is not a manifest artefact and carries the matching `release_id` for both release kinds. | Tampered-artefact, forbidden-identity-field, signed-report and load-receipt identity fixtures for both release kinds |
 
 ### 4.3 Content addressing

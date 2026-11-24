@@ -644,6 +644,7 @@ Writers are modules of `custodian/`; readers are modules of `product/` (`store` 
 | `pub_land_price` | Public | district × use category × year | `district_key`, `use_category`, `period` | `publicdata` (from the source `gis_land_price`; decision 0023 items 3 and 8) | card C41; card C40 for a missing rent, labelled a price; D2, D5, the map |
 | `pub_bank_credit` | Public | economic activity × period | `activity_key`, `period` | `publicdata` (from the source `bank_credit_act`; decision 0023 item 8) | card C41; D1 |
 | `pub_rail_plan` | Public | rail feature: a line, a planned station or a protection zone | `feature_key` | `publicdata` (from the source `gis_rail`, inside `./eii build-public`; decision 0023 item 3) | how near a planned station or a protection zone is: D2, D5, the map |
+| `pub_accident_zone` | Public | source zone × source year | `source_zone`, `period` | `publicdata` (from the source `accident`, inside `./eii build-public`, only after the live partition, measure, zone-vintage and coverage proofs of S3-T12; decision 0047) | the recorded-accident context of a source zone beside planned rail: the map; never a risk or safety verdict |
 | `pub_health_centre` | Public | health centre or its catchment | `feature_key` | `publicdata` (from the source `gis_phcc`; decision 0023 item 3) | the site context of D2 and D5; the map |
 | `pub_zoning` | Public | zoning polygon | `feature_key` | `publicdata` (from the source `gis_zoning`; decision 0023 item 3) | site fit (the reverse of D2) and a ranking criterion; the plot label (DAT-168); the map |
 | `pub_address_point` | Public | official address point | `feature_key` | `publicdata` (from the source `gis_address`; decision 0023 item 3) | the map; the plot label (DAT-168) |
@@ -819,6 +820,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_land_price` | `district_key`; `period` (`YYYY`: the one four-digit year of the service's own name; a service name without exactly one year is refused); `use_category` (published key); `guide_price` decimal(12,2); `price_basis` (`per_ft2`, confirmed by the layer alias in S2-T19; fact unit `qar_per_ft2`); a guide price, never a deal price or a rent; `as_of` (ISO date: the UTC date of `retrieved_utc` on the receipt of the selected snapshot whose hash the row's source names; [decision 0045](decisions/0045-eiis-own-capabilities-and-the-snapshot-archive.md) item 4) |
 | `pub_bank_credit` | `activity_key` (published key, matched to a sector only through the reviewed sector crosswalk of C41); `period` (as published); `value` decimal(18,2) (outstanding credit as published); `unit`; national, no area figure |
 | `pub_rail_plan` | `feature_key` string (a key the release build assigns to each feature, never the layer's own object identifier, PUB-14; its form is the `fea-` key of the S2-T19 note of the open-questions list, the same for every table of the GIS centre below); `feature_kind` (`line`, `planned_station`, `protection_zone`); `name_en`, `name_ar` string (Y: as published); `geometry` geometry (line, point or polygon); every row is a plan, and no column says that a line or station operates |
+| `pub_accident_zone` | `source_zone` string (the source's own `zone` number as text, never reassigned); `period` (`YYYY`: the year of `accident_year` at its published precision, a longer date kept to its year and never refined); `zone_code` string (Y: null unless the lead-reviewed crosswalk names exactly one `zone.zone_code` for the source zone; two source zones on one zone are refused, never allocated); `accident_count` int (Y: the sum of the published `total` field over the rows of one source zone and year, only when the lead has confirmed that `total` counts accidents and rows are disjoint; never a row count, never zero for an absent row); `coverage_key` (`counted`, `measure_unconfirmed`, `geography_missing`); `as_of` date (the selected snapshot's receipt date); `source_id`. No street, time, person, vehicle, nationality, coordinate or severity field crosses (DAT-07, rule 10) |
 | `pub_health_centre` | `feature_key`; `feature_kind` (`centre`, `catchment`); `name_en`, `name_ar` string (Y: as published); `period` (Y: null; the layers publish no period and the coverage note `period_not_published` counts the rows); `geometry` geometry (point for a centre, polygon for a catchment) |
 | `pub_zoning` | `feature_key`; `zoning_code` string (the published zoning designation); `source_layer` string (published layer name); `permitted_uses` string (Y: canonical JSON text of the published use fields, nulls kept; null where that layer publishes none); `height_rule`, `setback_rule` string (Y: canonical JSON text of the published height and setback fields, nulls kept; null where that layer publishes none); `geometry` geometry (polygon); a row states what zoning permits, never an approval, a permit or availability |
 | `pub_address_point` | `feature_key`; `zone_number`, `street_number`, `building_number` string (as published); `building_subtype` string (Y: as published); `survey_date` date (Y); `lon`, `lat` decimal(9,6); `cell` cell; nothing else: the utility account numbers and the internal editing fields are never taken, and the parcel number is a join key inside the build only, dropped before the release (PUB-105, PUB-14) |
@@ -856,7 +858,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `graph_node`, `graph_edge` | section 10 |
 | `fact_lineage` | `lineage_id` string (`lin_` plus the table name, with a suffix when one table has several transforms); `table_name` string; `partition_id` string (Y: required for a protected-table home family, null otherwise); `measure` string (Y: `net` or `basic` where the protected table has that dimension, null otherwise); `breakdown` string (Y: required for a protected-table home family and one of `none`, `band`, `housing_class`, `occupation_group_by_band`, `home_municipality`, `side_count_type`, `activity_class_by_size_band`, `cohort` (a `month_change` component), `company_row` (a `register_company_list` row, decision 0022); null otherwise); `family_role` (`single`, `numerator`, `denominator`; Y for a protected-table home family, null otherwise); `source_id` string; `input_class` (`public`, `synthetic`, `simulated`); `transform` string (`module.function@version`); `rules_version_id` string (Y, null for Public tables) |
 | `source_registry` | `source_id` string; `kind` (`public_dataset`, `public_document`, `reviewed_config`, `synthetic_feed`, `simulation_output`); `title`; `publisher`; `url` (Y for synthetic and simulated); `licence` string; `licence_basis` string (Y: the basis of use that the registry entry records, [04_PUBLIC_DATA_PACK.md](04_PUBLIC_DATA_PACK.md) section 3.1, `dataset` for a stated open dataset licence, `portal_terms` where only portal terms exist, `provider_terms` for the provider interfaces of PUB-95 and PUB-97 and for the Comtrade keyed interface `un_comtrade` (decision 0040 item 2), and the interface of the relative-busyness source of PUB-101 ([decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md)), and `owner_decision` for every other source with no open licence covering the use, meaning the owner's decision for a personal, local project ([decision 0026](decisions/0026-public-sources-used-in-full-locally.md)); `licence` records what the publisher states, with the publisher's words and date read held in document 04; null for synthetic and simulated sources); `retrieved_on` date; `sha256` string; `commit_allowed` bool; `attribution` string; `public_splits` string (Y: semicolon-separated subset of `sex` and `nationality` that the registry entry declares in `public_splits`, DAT-141; null when it declares none). For a figure from a decision-0017 slug, this `source_id` is the registry key `<source_id>/<slug>` (PUB-85); the fetch metadata keeps the family `source_id` |
-| `release_manifest` (loader-materialised store table only) | One row per entry of verified `manifest.tables`: `release_id`; `table_name`; `provenance_class` (`frame`, `protected`, `simulated`, `public`, `graph`, `lineage`, `control`); `file`; `sha256`; `row_count` int; `schema_sha256`; plus the scalar fields of section 8 repeated on every row. It has no row for itself. |
+| `release_manifest` (loader-materialised store table only) | One row per entry of verified `manifest.tables`: `release_id`; `table_name`; `provenance_class` (`frame`, `protected`, `simulated`, `public`, `graph`, `lineage`, `control`); `file`; `sha256`; `row_count` int; `schema_sha256`; plus the scalar fields of section 8 repeated on every row; and `fc_register_sha256`, nullable, the hash of the `fc_register` entry of `manifest.listed_inputs` repeated on every row, or null when the release lists none (lead ruling L-1509). It has no row for itself. |
 | `rules_version` | `rules_version_id`; `parameter_set` (`A`, `B`, `shared`); `rule_code`; `value` string; `unit` string; `description_en` string |
 | `suppression_reason` | `code` (upper snake case, for example `BELOW_MIN_EARNERS`, `EMPLOYER_DOMINANCE`, `TOP_TWO_DOMINANCE`, `PERSON_CONCENTRATION`, `REMAINDER_FAILED`); `label_en`; `label_ar` (pending native review); `explanation_en`; `explanation_ar` |
 | `survival_report` | `parameter_set`; `table_name`; `partition_id`; `units_total`, `units_published`, `units_pooled`, `units_withheld` int; `earners_published_share` decimal(5,2) (rounded to whole percent) |
@@ -1321,6 +1323,19 @@ Its lists:
 `tables` (`{name, file, provenance_class, sha256, row_count, schema_sha256, grain}`), `sources`
 (`{source_id, url, licence, retrieved_on, sha256}`) and `artefacts` (`{path, sha256}`). The complete
 `artefacts` inventory and every artefact digest participate in the release identity.
+A manifest may also carry the closed list `listed_inputs` (`{name, sha256}`), which names a file
+that the release build read outside the release folder and gives the lowercase hexadecimal SHA-256
+of its bytes, with no path. Its only name is `fc_register`: the financial centre's register file
+named by `EII_FC_REGISTER_FILE` (lead ruling L-1509). The lead's `./eii build-release` computes the
+hash from the file's bytes in the lead's own shell and passes it to the Public assembly producer,
+whose reviewed envelope carries it; the release spec cannot supply one. The field is absent when
+nothing is listed; an empty list, a repeated or unknown name, an extra or wrongly cased key, or a
+hash that is not 64 lowercase hexadecimal characters is refused. It takes part in the release
+identity like every other field. The loader repeats the listed hash on every `release_manifest` row
+as `fc_register_sha256`, and the product reads it only through the fixed read function
+`release_fc_register_sha256`: the served register file is refused with `hash_unlisted` when the
+loaded release lists none and with `hash_mismatch` when the file's bytes differ, before any row is
+parsed (document 13, `EII_FC_REGISTER_FILE`).
 
 Each protected build evaluates A and B inside the custodian plane and writes exactly one
 `protected` release for the configured `export_parameter_set`. The unselected protected table set
@@ -1594,6 +1609,8 @@ fixture proves each refusal. The caveat keys are the fixed sentences of
 | `affordability_years` | `years` | number, 0 or more | DAT-167: years of pay of a `per_unit` median against the Public mean wage of one occupation group, the group in the `qualifiers` |
 | `credit_growth`, `sector_growth` | `percent` | number | DAT-167: the growth of a sector's bank credit, and of the same sector's Public series, over the same two periods |
 | `firms_per_tower` | `count` | integer, 1 or more | DAT-168: the companies of the financial centre's register at one tower or building, or in one district where the card gives none |
+| `accident_count` | `count` | integer, 0 or more | S3-T12: the sum of the published `total` of one source zone and year of `pub_accident_zone`, `inferred` (the measure and the zone crosswalk are reviewed, not published), with the caveat `accidents_recorded_not_risk` |
+| `accident_source_zone` | `published_text` | the source's own `zone` number as text | S3-T12: the `source_zone` of the same `pub_accident_zone` row as its `accident_count`, `observed`, with that count's period, geography and lineage; the browser shows the source zone only from this fact |
 
 | Caveat key | Carried by |
 |---|---|
@@ -1601,6 +1618,8 @@ fixture proves each refusal. The caveat keys are the fixed sentences of
 | `estimate_on_simulated_inputs` | the three cases of a site estimate while an input is Simulated or Synthetic (DAT-161); a required backend origin marker under decision 0035 item 3, with no audience label and nothing rendered by the template writer |
 | `scenario_not_forecast` | every fact of a scenario (DAT-162) |
 | `tender_fetch_own_run` | the `NO_DATA` coverage row for registered `tenders_pub` while its separate archive is not yet pinned and assembled (decision 0084 item 2); no `pub_tender` row may be emitted |
+| `accident_source_missing` | the `NO_DATA` coverage row for the registered `accident` source while no verified partition is pinned (S3-T12); no `pub_accident_zone` row may be emitted, and the accident read answers `NO_DATA` with reason `accident_source_missing` before it queries the absent table |
+| `accidents_recorded_not_risk` | every fact from `pub_accident_zone`: recorded accidents on the source's own zone and year, never a risk, safety or danger verdict |
 | `base_rate_not_your_chance` | every fact of a base rate (DAT-159) |
 | `present_by_pay_band_assumed` | the figure of people present by pay band (DAT-160) |
 | `relative_busyness_not_people` | every fact from `pub_venue_busyness` (DAT-157) |
@@ -1794,12 +1813,21 @@ empty. The available night-light month list comes from the existing
 The nullable `basemap_url` is operational asset configuration, not a Fact or a
 release-table binding. The API factory accepts the closed, trusted
 `basemap_name` selection `basemap.pmtiles` or null (the default); every other
-name refuses configuration. Only a verified mounted release can expose the
-corresponding `/tiles/basemap.pmtiles` URL. A mount without that selection
-reports null. Map assets remain outside release tables and release identity,
-as in document 02 **4.1 Folder structure**. A named asset whose file later fails
-still uses the existing tile route and fails its range/geometry proof; it is
-never replaced by another archive.
+name refuses configuration. Installed and embedded serving select that name
+only after the checked manifest lists exactly one
+`artefacts/tiles/basemap.pmtiles`. With no basemap entry the selection is null
+and health reports `tiles: missing`; a duplicate entry refuses as
+`basemap_missing`. With no glyph range, serving selects no release font
+directory and health reports `fonts: missing`. Only a verified mounted release can expose the corresponding
+`/tiles/basemap.pmtiles` URL. A direct factory mount without that selection
+reports null. Map assets are not release tables, but under
+[decision 0096](decisions/0096-release-artefacts-are-single-files-under-artefacts.md),
+accepted 2026-11-23, the basemap and glyph ranges
+`artefacts/fonts/<stack>/<range>.pbf` are release artefacts listed in
+`manifest.artefacts` and inside release identity; start-up's exact inventory is
+not relaxed. A named asset whose file later fails still uses the existing tile
+route and fails its range/geometry proof; it is never replaced by another
+archive.
 
 The browser independently reads this closed summary before requesting an
 extract. With no mount, a refused summary, or a null name, it keeps the
@@ -3150,3 +3178,49 @@ The nullable `announced` and `project_year` columns leave a year-policy gap with
 FE-116. An undated record keeps its absent year and the browser's existing
 `fdi_year_missing` refusal; no year is inferred from retrieval metadata.
 OI-265 asks for the minimal contract decision before those records can display.
+
+### Accident context read (S3-T12)
+
+The fixed read `layer_accidents` (adjacent contract bound to section
+**7.3 Columns**) projects `pub_accident_zone` in key order; the layer
+`accidents` also reads `public_release_manifest` and `layer_zone_geometry`. The
+reader `eii_product.api.public_layers.accidents` answers one closed Public-layer
+envelope. A valid answer is the ordinary four keys `status`, `facts`,
+`payload`, `coverage_report`; a `NO_DATA` answer adds a closed `reason` and
+carries `facts: []`, a `payload` whose `accidents` layer has empty `features`,
+and its `coverage_report` counts. It never reuses the three-key `_no_data` of
+the firms layer. The absence matrix:
+
+| Release state | Answer |
+|---|---|
+| `pub_accident_zone` absent from the sealed release manifest (the registered source is pending) | `NO_DATA` / `accident_source_missing`, counts `{}`; no accident or zone table is queried, on either store |
+| the latest source year has `measure_unconfirmed` rows | `NO_DATA` / `accident_measure_unconfirmed`, counts `{measure_unconfirmed: n}` |
+| no counted row of the latest year has an exact `zone` outline | `NO_DATA` / `accident_geography_missing`, counts `{counted: 0, geography_missing: n}` |
+| some counted rows have an outline | `ok`: one whole-zone `outline` per counted row; a row without an outline is withheld and counted as `geography_missing`, never drawn as zero, a centroid or another boundary |
+| an empty table, a coverage key outside the closed list, a count or zone code inconsistent with its coverage key, a negative or non-integer count, a malformed period or source zone, a duplicate key, measure-unconfirmed rows mixed with others in the table, two source zones on one zone code, or a broken lineage (checked for a present table, every row's source against the table's chain, before either `NO_DATA` outcome above) | hard failure, sanitized `INTERNAL` (`accident_table_empty`, `accident_coverage_invalid`, `accident_count_invalid`, `accident_period_invalid`, `accident_zone_invalid`, `accident_row_duplicate`, `accident_geography_allocation`, `accident_lineage_broken`) |
+
+Each feature carries `fact_id` (metric `accident_count`, unit `count`,
+`inferred`, geography `zone:<zone_code>`, caveat `accidents_recorded_not_risk`),
+`source_zone`, `source_zone_fact_id` (metric `accident_source_zone` of the
+same row), `year`, `label_key` `accident_count_context` and the zone's polygon
+members, and no other key. The browser refuses any other key of an accident
+feature `accident_field_unexpected`, a missing source zone or zone fact
+reference `accident_zone_unbound`, and a zone fact that is not the count's own
+row (another metric, table, release, lineage, period or geography, or a value
+other than the feature's `source_zone`) `accident_zone_mismatch`; the inspector
+shows the source zone from that fact. On every layer, a `words` key other than
+a name, or a status, that the layer does not own is refused
+`presentation_field_unexpected`: permitted use belongs to `zoning`, the
+permitted-and-looks-empty status to `parcels`, address numbers to
+`address_points`, and a status to the status layers only; the inspector renders
+each only on its owning layer. The browser draws only the outline: a point or hex accident
+feature is refused `accident_point_map`, a filled one `outline_filled`, a
+label outside the closed list `accident_safety_verdict`, a missing caveat
+`accident_caveat_missing`, an unbound count `legend_count_unbound`, and a count
+whose fact geography differs from the feature's `accident_geography_allocation`.
+A rail line with a status other than planned is refused `rail_as_operating`;
+a planned station is drawn at a fixed pixel size and one neutral colour.
+The mounted shell reads `accidents` beside `rail_plan` from one release and
+shows a closed, nonnumeric access-pending panel (proposed PO-S3-B8-ACCESS,
+delivering task S6-T13); no access figure, join or composite score is made.
+A drawn area never filters, clips or totals an accident outline.

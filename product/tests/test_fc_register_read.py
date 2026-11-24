@@ -1,6 +1,7 @@
 """The financial-centre register is read only through its setting."""
 
 import asyncio
+import hashlib
 import json
 import logging
 import traceback
@@ -15,19 +16,40 @@ from eii_product.register_file import RegisterRefusal, read_fc_register_rows
 FIXTURE = Path(__file__).parent / "fixtures" / "fc_register" / "stand_in_register.json"
 
 
+def listed(setting: object) -> str:
+    """The hash a release would list for the file's present bytes (L-1509).
+
+    An unreadable or invalid setting gets an invented hash, so the read is
+    attempted and the reader's own refusal is the one asserted.
+    """
+    try:
+        return hashlib.sha256(Path(str(setting)).read_bytes()).hexdigest()
+    except OSError:
+        return "0" * 64
+
+
+@pytest.fixture(autouse=True)
+def configured_register(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Direct-reader callers configure only their invented temporary stand-in."""
+    monkeypatch.setenv("EII_FC_REGISTER_FILE", str(tmp_path / "stand_in_register.json"))
+
+
 def _copy(tmp_path: Path) -> Path:
     dest = tmp_path / "stand_in_register.json"
     dest.write_bytes(FIXTURE.read_bytes())
     return dest
 
 
-def test_an_unset_reader_returns_nothing_and_opens_no_file() -> None:
-    assert read_fc_register_rows(None) is None
+def test_an_unset_reader_returns_nothing_and_opens_no_file(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("EII_FC_REGISTER_FILE", raising=False)
+    assert read_fc_register_rows(None, listed_sha256=None) is None
 
 
 def test_the_read_opens_only_the_path_the_setting_names(tmp_path: Path) -> None:
     copy = _copy(tmp_path)
-    bundle = read_fc_register_rows(str(copy))
+    bundle = read_fc_register_rows(str(copy), listed_sha256=listed(str(copy)))
     assert bundle is not None
     assert bundle.rows[0].tower_or_building == "Invented Tower Aleph"
     assert bundle.rows[0].position == ("51.5", "25.3")
@@ -39,7 +61,9 @@ def test_a_planted_read_of_another_path_is_refused(tmp_path: Path) -> None:
     other = tmp_path / "other.json"
     other.write_text("[]", encoding="utf-8")
     with pytest.raises(RegisterRefusal, match="path_refused") as caught:
-        read_fc_register_rows(str(copy), asked_path=str(other))
+        read_fc_register_rows(
+            str(copy), listed_sha256=listed(str(copy)), asked_path=str(other)
+        )
     assert str(other) not in str(caught.value)
     assert other.read_text(encoding="utf-8") == "[]"
 
@@ -65,7 +89,8 @@ def test_an_absent_setting_yields_no_data_and_no_substitute_path(
 
 
 def test_the_stand_in_has_the_shape_the_reader_accepts(tmp_path: Path) -> None:
-    bundle = read_fc_register_rows(str(_copy(tmp_path)))
+    copy = str(_copy(tmp_path))
+    bundle = read_fc_register_rows(copy, listed_sha256=listed(copy))
     assert bundle is not None
     assert len(bundle.rows) == 10
     assert bundle.year == "2024"
@@ -82,7 +107,7 @@ def test_nothing_of_the_file_or_its_path_is_printed_or_written(
 ) -> None:
     copy = _copy(tmp_path)
     before = copy.read_bytes()
-    read_fc_register_rows(str(copy))
+    read_fc_register_rows(str(copy), listed_sha256=listed(str(copy)))
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == ""
@@ -126,7 +151,7 @@ def test_a_later_read_failure_returns_a_fixed_refusal_without_the_path(
     tiles = tmp_path / "tiles"
     tiles.mkdir()
     caplog.set_level(logging.DEBUG)
-    app = create_app(tiles)
+    app = create_app(tiles, fc_listed_reader=lambda _store: listed(copy))
     copy.chmod(0)
     try:
         status, body = _get(app, "/api/layers/fc_firms_per_tower")
@@ -147,12 +172,13 @@ def test_a_broken_document_refuses_without_a_chained_parser_error(
     dest = tmp_path / "stand_in_register.json"
     dest.write_text("{", encoding="utf-8")
     with pytest.raises(RegisterRefusal, match="row_shape") as caught:
-        read_fc_register_rows(str(dest))
+        read_fc_register_rows(str(dest), listed_sha256=listed(str(dest)))
     assert caught.value.__cause__ is None
 
 
 def test_an_unmutated_fixture_still_reads(tmp_path: Path) -> None:
-    bundle = read_fc_register_rows(str(_copy(tmp_path)))
+    copy = str(_copy(tmp_path))
+    bundle = read_fc_register_rows(copy, listed_sha256=listed(copy))
     assert bundle is not None
     assert len(bundle.rows) == 10
 
@@ -165,7 +191,7 @@ def test_two_distinct_towers_cannot_share_a_place_code(tmp_path: Path) -> None:
     dest = tmp_path / "stand_in_register.json"
     dest.write_text(json.dumps(parsed), encoding="utf-8")
     with pytest.raises(RegisterRefusal, match=r"^row_shape$"):
-        read_fc_register_rows(str(dest))
+        read_fc_register_rows(str(dest), listed_sha256=listed(str(dest)))
 
 
 @pytest.mark.parametrize(
@@ -200,7 +226,7 @@ def test_one_broken_register_field_is_refused(tmp_path: Path, plant: str) -> Non
     dest = tmp_path / "stand_in_register.json"
     dest.write_text(json.dumps(parsed), encoding="utf-8")
     with pytest.raises(RegisterRefusal, match="row_shape"):
-        read_fc_register_rows(str(dest))
+        read_fc_register_rows(str(dest), listed_sha256=listed(str(dest)))
 
 
 def test_an_invalid_value_stops_the_start_naming_the_variable(
@@ -227,7 +253,7 @@ def _assert_start_hides_path(
     tiles.mkdir()
     caplog.set_level(logging.DEBUG)
     with pytest.raises(ConfigError) as caught:
-        create_app(tiles)
+        create_app(tiles, fc_listed_reader=lambda _store: "0" * 64)
     formatted = "".join(traceback.format_exception(caught.value))
     blob = formatted + repr(caught.value) + str(caught.value) + caplog.text
     assert str(caught.value) == "EII_FC_REGISTER_FILE"

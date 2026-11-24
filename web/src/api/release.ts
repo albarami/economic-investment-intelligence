@@ -9,7 +9,7 @@ import type {
   SourceRow,
 } from '../facts/types';
 
-function closed(
+export function closed(
   value: unknown,
   keys: readonly string[],
 ): Record<string, unknown> {
@@ -23,7 +23,7 @@ function closed(
     throw new Error('chain_refused');
   return row;
 }
-function text(value: unknown): string {
+export function text(value: unknown): string {
   if (typeof value !== 'string' || value.trim() === '')
     throw new Error('chain_refused');
   return value;
@@ -41,6 +41,56 @@ function appendConsistent<T>(
   if (existing && JSON.stringify(existing) !== JSON.stringify(row))
     throw new Error('chain_refused');
   if (!existing) rows.push(row);
+}
+
+/** The fifteen fields of document 03's fact object, closed. */
+export const FACT_KEYS = [
+  'fact_id',
+  'value',
+  'unit',
+  'period',
+  'geography',
+  'provenance',
+  'input_classes',
+  'evidence_status',
+  'reliability',
+  'coverage_keys',
+  'caveat_keys',
+  'label_en',
+  'label_ar',
+  'lineage_ref',
+  'release_id',
+] as const;
+
+/** A Public lineage source row, closed; any other kind or class is refused. */
+export function sourceRow(value: unknown): SourceRow {
+  const source = closed(value, [
+    'sourceId',
+    'kind',
+    'inputClass',
+    'publisher',
+    'datasetOrPage',
+    'licenceOrTerms',
+    'retrievalDate',
+    'sha256',
+  ]);
+  if (
+    !['public_dataset', 'public_document', 'reviewed_config'].includes(
+      text(source.kind),
+    ) ||
+    source.inputClass !== 'public'
+  )
+    throw new Error('chain_refused');
+  return {
+    sourceId: text(source.sourceId),
+    kind: source.kind as SourceRow['kind'],
+    inputClass: 'public',
+    publisher: text(source.publisher),
+    datasetOrPage: text(source.datasetOrPage),
+    licenceOrTerms: text(source.licenceOrTerms),
+    retrievalDate: text(source.retrievalDate),
+    sha256: text(source.sha256),
+  };
 }
 
 async function get(path: string): Promise<unknown> {
@@ -94,23 +144,7 @@ export async function loadRegistryInput(
   const lineages: LineageRow[] = [];
   const sources: SourceRow[] = [];
   for (const fact of facts) {
-    closed(fact, [
-      'fact_id',
-      'value',
-      'unit',
-      'period',
-      'geography',
-      'provenance',
-      'input_classes',
-      'evidence_status',
-      'reliability',
-      'coverage_keys',
-      'caveat_keys',
-      'label_en',
-      'label_ar',
-      'lineage_ref',
-      'release_id',
-    ]);
+    closed(fact, FACT_KEYS);
     if (
       !/^f_[0-9a-f]{32}$/.test(fact.fact_id) ||
       fact.release_id !== releaseId ||
@@ -192,33 +226,7 @@ export async function loadRegistryInput(
       (row) => row.lineageId + ':' + row.factId,
     );
     for (const value of list(chain.sources)) {
-      const source = closed(value, [
-        'sourceId',
-        'kind',
-        'inputClass',
-        'publisher',
-        'datasetOrPage',
-        'licenceOrTerms',
-        'retrievalDate',
-        'sha256',
-      ]);
-      if (
-        !['public_dataset', 'public_document', 'reviewed_config'].includes(
-          text(source.kind),
-        ) ||
-        source.inputClass !== 'public'
-      )
-        throw new Error('chain_refused');
-      const held: SourceRow = {
-        sourceId: text(source.sourceId),
-        kind: source.kind as SourceRow['kind'],
-        inputClass: 'public',
-        publisher: text(source.publisher),
-        datasetOrPage: text(source.datasetOrPage),
-        licenceOrTerms: text(source.licenceOrTerms),
-        retrievalDate: text(source.retrievalDate),
-        sha256: text(source.sha256),
-      };
+      const held = sourceRow(value);
       appendConsistent(sources, held, (row) => row.sourceId);
     }
     const companion = closed(chain.binding, [

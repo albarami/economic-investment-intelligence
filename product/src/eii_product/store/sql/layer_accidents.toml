@@ -1,0 +1,34 @@
+[[tables]]
+name = "pub_accident_zone"
+anchor = "7.3 Columns"
+key = ["source_zone", "period"]
+
+[[tables.columns]]
+name = "period"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_zone"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "zone_code"
+type = "string"
+nullable = true
+
+[[tables.columns]]
+name = "accident_count"
+type = "int"
+nullable = true
+
+[[tables.columns]]
+name = "coverage_key"
+type = "string"
+nullable = false
+
+[[tables.columns]]
+name = "source_id"
+type = "string"
+nullable = false

@@ -29,15 +29,24 @@ export function unitWord(language: Language, unit: string): string | null {
   return text(language, key);
 }
 
-const FIRM_COUNT_METRIC = 'firms_per_tower';
+/** S3-T12: a count of recorded road accidents, whose noun agrees with it. */
+const ACCIDENT_COUNT_METRIC = 'accident_count';
+/** Counts of things other than people name their own unit. */
+const COUNT_UNITS: Readonly<Record<string, StringKey>> = {
+  firms_per_tower: 'unit.firms',
+  building_height_pairs: 'unit.buildings',
+};
 
 export function unitLabel(
   language: Language,
   unit: string,
   metricKey: string,
+  form: Intl.LDMLPluralRule = 'other',
 ): string | null {
-  if (unit === 'count' && metricKey === FIRM_COUNT_METRIC) {
-    return text(language, 'unit.firms');
+  if (unit === 'count' && Object.hasOwn(COUNT_UNITS, metricKey))
+    return text(language, COUNT_UNITS[metricKey] as StringKey);
+  if (unit === 'count' && metricKey === ACCIDENT_COUNT_METRIC) {
+    return text(language, `unit.accidents.${form}`);
   }
   return unitWord(language, unit);
 }

@@ -313,6 +313,8 @@ def public_layer_descriptors() -> tuple[ToolDescriptor, ...]:
             "land_prices": ("layer_district_geometry",),
             "property_prices": ("layer_district_geometry",),
             "night_lights": ("layer_night_lights_months",),
+            # S3-T12: the sealed table list first, so an absent table is never read.
+            "accidents": ("public_release_manifest", "layer_zone_geometry"),
             "zone_electricity_growth": (
                 "layer_zone_geometry",
                 "sector_facts_utility",

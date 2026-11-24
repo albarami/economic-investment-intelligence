@@ -1,12 +1,14 @@
 """Exact reader refusals against the imported invented stand-in only."""
 
-import codecs
 import json
 from pathlib import Path
 from typing import Any
 
 import pytest
-from product.tests.test_fc_register_read import FIXTURE, _copy, _plant_reader
+from product.tests.test_fc_register_read import FIXTURE, _copy, _plant_reader, listed
+from product.tests.test_fc_register_read import (
+    configured_register as configured_register,
+)
 
 from eii_product.register_file import RegisterRefusal, read_fc_register_rows
 
@@ -24,13 +26,16 @@ def _refusal(caught: pytest.ExceptionInfo[RegisterRefusal], reason: str) -> None
 @pytest.mark.parametrize("setting", ["", False, 3, []])
 def test_setting_refusal(setting: object) -> None:
     with pytest.raises(RegisterRefusal) as caught:
-        read_fc_register_rows(_unchecked(setting))
+        read_fc_register_rows(_unchecked(setting), listed_sha256="0" * 64)
     _refusal(caught, "row_shape")
 
 
 def test_path_refusal(tmp_path: Path) -> None:
     with pytest.raises(RegisterRefusal) as caught:
-        read_fc_register_rows(str(_copy(tmp_path)), asked_path="invented-other.json")
+        copy = str(_copy(tmp_path))
+        read_fc_register_rows(
+            copy, listed_sha256=listed(copy), asked_path="invented-other.json"
+        )
     _refusal(caught, "path_refused")
 
 
@@ -39,7 +44,7 @@ def test_document_refusal(tmp_path: Path, raw: str) -> None:
     path = _copy(tmp_path)
     path.write_text(raw, encoding="utf-8")
     with pytest.raises(RegisterRefusal) as caught:
-        read_fc_register_rows(str(path))
+        read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
     _refusal(caught, "row_shape")
 
 
@@ -75,7 +80,7 @@ def test_existing_plants_have_exact_refusals(tmp_path: Path, plant: str) -> None
     path = _copy(tmp_path)
     path.write_text(json.dumps(parsed), encoding="utf-8")
     with pytest.raises(RegisterRefusal) as caught:
-        read_fc_register_rows(str(path))
+        read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
     _refusal(caught, "row_shape")
 
 
@@ -124,7 +129,7 @@ def test_field_refusals(
     path = _copy(tmp_path)
     path.write_text(json.dumps(parsed), encoding="utf-8")
     with pytest.raises(RegisterRefusal) as caught:
-        read_fc_register_rows(str(path))
+        read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
     _refusal(caught, "row_shape")
 
 
@@ -134,13 +139,13 @@ def test_duplicate_district_refusal(tmp_path: Path) -> None:
     path = _copy(tmp_path)
     path.write_text(json.dumps(parsed), encoding="utf-8")
     with pytest.raises(RegisterRefusal) as caught:
-        read_fc_register_rows(str(path))
+        read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
     _refusal(caught, "row_shape")
 
 
 def test_gazetteer_fields_and_explicit_same_path(tmp_path: Path) -> None:
     path = str(_copy(tmp_path))
-    bundle = read_fc_register_rows(path, asked_path=path)
+    bundle = read_fc_register_rows(path, listed_sha256=listed(path), asked_path=path)
     assert bundle is not None
     assert tuple(bundle.gazetteer) == (
         "Invented Tower Aleph",
@@ -167,20 +172,15 @@ def test_gazetteer_fields_and_explicit_same_path(tmp_path: Path) -> None:
     )
 
 
-def test_reader_explicit_utf8(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_reader_decodes_utf8_after_the_hash(tmp_path: Path) -> None:
+    parsed = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    parsed["rows"][0]["card"]["trade_name"] = "Invented \u0628\u064a\u062a"
     path = _copy(tmp_path)
-    original = Path.read_text
-    encodings: list[str | None] = []
-
-    def read_text(
-        self: Path, encoding: str | None = None, errors: str | None = None
-    ) -> str:
-        encodings.append(encoding)
-        return original(self, encoding=encoding, errors=errors)
-
-    monkeypatch.setattr(Path, "read_text", read_text)
-    assert read_fc_register_rows(str(path)) is not None
-    assert len(encodings) == 1
-    encoding = encodings[0]
-    assert encoding is not None
-    assert codecs.lookup(encoding).name == "utf-8"
+    path.write_bytes(json.dumps(parsed, ensure_ascii=False).encode("utf-8"))
+    bundle = read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
+    assert bundle is not None
+    assert bundle.rows[0].card[0] == ("trade_name", "Invented \u0628\u064a\u062a")
+    path.write_bytes(json.dumps(parsed, ensure_ascii=False).encode("utf-16"))
+    with pytest.raises(RegisterRefusal) as caught:
+        read_fc_register_rows(str(path), listed_sha256=listed(str(path)))
+    _refusal(caught, "row_shape")

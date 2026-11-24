@@ -81,6 +81,8 @@ def test_run_build_calls_ordered_production_assembly(
     )
     assert outcome.failure is None
     assert seen == [17]
+    assert "COVERAGE map_basemap basemap_missing 1" in outcome.lines
+    assert "COVERAGE map_fonts fonts_missing 1" in outcome.lines
 
 
 @pytest.mark.parametrize(

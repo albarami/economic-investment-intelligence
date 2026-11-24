@@ -209,6 +209,7 @@ def _file_record(
         "key": entry.key,
         "licence_basis": entry.licence_basis,
         "licence_id": entry.licence_id,
+        "publisher": receipt["publisher"],
         "retrieved_utc": receipt["retrieved_utc"],
         "role": "read",
         "sha256": digest,

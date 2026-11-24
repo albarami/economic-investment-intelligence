@@ -19,6 +19,7 @@ import {
   category,
   plain,
 } from '../fixtures/layers';
+import { numeralsOutsideChips } from '../fixtures/numerals';
 import type { LayerPayload } from '../../src/stage/layers/payload';
 import '../../src/styles/answer.css';
 
@@ -37,23 +38,6 @@ function applyAnswerCss(): void {
 afterEach(() => {
   cleanup();
 });
-
-const DIGIT = /[0-9\u0660-\u0669\u06F0-\u06F9]/u;
-
-function numeralsOutsideChips(root: ParentNode): string[] {
-  const leaked: string[] = [];
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  let node = walker.nextNode();
-  while (node) {
-    const content = node.textContent ?? '';
-    if (DIGIT.test(content)) {
-      const parent = node.parentElement;
-      if (!parent?.closest('[data-fact-chip]')) leaked.push(content);
-    }
-    node = walker.nextNode();
-  }
-  return leaked;
-}
 
 function nightScene(): LayerPayload {
   return basePayload({

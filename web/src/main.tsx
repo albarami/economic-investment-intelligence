@@ -9,6 +9,7 @@ import '@fontsource/ibm-plex-sans-arabic/500.css';
 import '@fontsource/ibm-plex-sans-arabic/600.css';
 import './styles/tokens.css';
 import './styles/answer.css';
+import { glyphReadiness } from './api/glyphs';
 import { App } from './app/App';
 import { direction, text } from './i18n';
 
@@ -22,18 +23,26 @@ const families = [
   { family: 'IBM Plex Sans', sample: text('en', 'opening.question') },
   { family: 'IBM Plex Sans Arabic', sample: text('ar', 'opening.question') },
 ];
-// Demand the actual scripts at every shipped interface weight before the first
-// story frame. Missing local font files refuse readiness rather than swapping.
-void Promise.all(
-  families.flatMap(({ family, sample }) =>
-    [400, 500, 600].map((weight) =>
-      document.fonts.load(`${weight} 16px "${family}"`, sample),
+// Demand the actual scripts at every shipped interface weight, and the served
+// Arabic glyph ranges, before the first story frame. Missing local font files
+// or glyph ranges refuse readiness rather than swapping.
+void Promise.all([
+  Promise.all(
+    families.flatMap(({ family, sample }) =>
+      [400, 500, 600].map((weight) =>
+        document.fonts.load(`${weight} 16px "${family}"`, sample),
+      ),
     ),
-  ),
-)
-  .then((faces) => {
+  ).then((faces) => {
     if (faces.some((loaded) => loaded.length === 0))
       throw new Error('interface_font_absent');
+    return faces;
+  }),
+  glyphReadiness(globalThis.location?.origin ?? '').then((refusal) => {
+    if (refusal !== null) throw new Error(refusal);
+  }),
+])
+  .then(() => {
     root.render(
       <StrictMode>
         <App />

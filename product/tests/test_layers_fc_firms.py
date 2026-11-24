@@ -5,6 +5,10 @@ import json
 from pathlib import Path
 
 import pytest
+from product.tests.test_fc_register_read import (
+    configured_register as configured_register,
+)
+from product.tests.test_fc_register_read import listed
 
 from eii_core.facts import fact_id, validate_chain
 from eii_product.api.app import create_app
@@ -35,7 +39,11 @@ def _copy(tmp_path: Path) -> Path:
 def _app(tmp_path: Path, path: Path) -> object:
     tiles = tmp_path / "tiles"
     tiles.mkdir()
-    return create_app(tiles, fc_setting_reader=lambda: str(path))
+    return create_app(
+        tiles,
+        fc_setting_reader=lambda: str(path),
+        fc_listed_reader=lambda _store: listed(path),
+    )
 
 
 def _ok(tmp_path: Path) -> dict[str, object]:
@@ -68,7 +76,7 @@ def test_every_count_is_a_public_observed_fact_with_a_resolved_chain(
 ) -> None:
     copy = _copy(tmp_path)
     _status, body = _get(_app(tmp_path, copy), "/api/layers/fc_firms_per_tower")
-    bundle = read_fc_register_rows(str(copy))
+    bundle = read_fc_register_rows(str(copy), listed_sha256=listed(str(copy)))
     assert bundle is not None
     assert (
         validate_chain(

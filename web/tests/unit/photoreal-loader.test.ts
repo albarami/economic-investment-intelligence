@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { validateGLB, visibleCredits } from '../../src/stage/photoreal-loader';
 function fixture(change: object = {}) {
   const body = new TextEncoder().encode(
@@ -43,6 +43,8 @@ it('aggregates visible tile copyright by count then text and refuses missing cre
 });
 
 import { qualifiedLayer } from '../../src/stage/photoreal-loader';
+import { photorealSession } from '../../src/stage/photoreal-session';
+import { operationalMeter } from '../fixtures/operational-meter';
 function container(parts: [number, Uint8Array][], trailing = 0) {
   const length =
     12 + parts.reduce((sum, [, data]) => sum + 8 + data.length, 0) + trailing;
@@ -350,4 +352,149 @@ it('routes an error raised after a tile has loaded through the layer error path 
   expect(() => tileset._onTileLoad('SYN-tile', true)).not.toThrow();
   expect(tileset.seen).toEqual([['SYN-tile', true]]);
   expect(errors).toEqual(['photoreal unavailable']);
+});
+
+function tileFetch(layer: object) {
+  return (
+    layer as {
+      props: { loadOptions: { fetch: (input: string) => Promise<Response> } };
+    }
+  ).props.loadOptions.fetch;
+}
+
+it('returns the tile when the spend callback throws', async () => {
+  let called = false;
+  const layer = qualifiedLayer(
+    { id: 'invented-meter', data: '/api/photoreal/3dtiles/root.json' },
+    async () =>
+      new Response('{}', {
+        headers: {
+          'x-spend-meter': JSON.stringify(operationalMeter),
+          'x-spend-order': '8',
+        },
+      }),
+    () => {
+      called = true;
+      throw new Error('SYN-display');
+    },
+  );
+  const response = await tileFetch(layer)('/api/photoreal/3dtiles/root.json');
+  expect(called).toBe(true);
+  expect(response.status).toBe(200);
+});
+
+it.each([
+  ['absent', {}],
+  ['malformed', { 'x-spend-order': '08' }],
+] as const)(
+  'a ready meter with a %s order token does not call the meter',
+  async (_kind, extra) => {
+    let called = false;
+    const layer = qualifiedLayer(
+      { id: 'invented-meter', data: '/api/photoreal/3dtiles/root.json' },
+      async () =>
+        new Response('{}', {
+          headers: {
+            'x-spend-meter': JSON.stringify(operationalMeter),
+            ...extra,
+          },
+        }),
+      () => {
+        called = true;
+      },
+    );
+    const response = await tileFetch(layer)('/api/photoreal/3dtiles/root.json');
+    expect({ called, status: response.status }).toEqual({
+      called: false,
+      status: 200,
+    });
+  },
+);
+
+it('does not report a malformed spend header and still returns the tile', async () => {
+  let called = false;
+  const layer = qualifiedLayer(
+    { id: 'invented-meter', data: '/api/photoreal/3dtiles/root.json' },
+    async () =>
+      new Response('{}', { headers: { 'x-spend-meter': 'not-json' } }),
+    () => {
+      called = true;
+    },
+  );
+  const response = await tileFetch(layer)('/api/photoreal/3dtiles/root.json');
+  expect(called).toBe(false);
+  expect(response.status).toBe(200);
+});
+
+const readyHeader = {
+  'x-spend-meter': JSON.stringify(operationalMeter),
+  'x-spend-order': '8',
+};
+
+async function watchMeter(url: string, status: number) {
+  let called = false;
+  const fetcher = vi.fn(async (path: string, init?: RequestInit) => {
+    if (path === '/api/photoreal/views' && init?.method === 'POST') {
+      return new Response(JSON.stringify({ view_id: 'a'.repeat(32) }));
+    }
+    return new Response('{}', { status, headers: readyHeader });
+  });
+  const session = photorealSession(fetcher);
+  await session.open();
+  const layer = qualifiedLayer(
+    { id: 'invented-meter', data: '/api/photoreal/3dtiles/root.json' },
+    (input, init) => session.fetch(input, init),
+    () => {
+      called = true;
+    },
+  );
+  let failure: unknown = null;
+  try {
+    await tileFetch(layer)(url);
+  } catch (error) {
+    failure = error;
+  } finally {
+    session.dispose();
+  }
+  return { called, fetcher, failure };
+}
+
+it('reports a valid spend header from a successful photoreal tile', async () => {
+  const watched = await watchMeter('/api/photoreal/3dtiles/root.json', 200);
+  expect(watched.failure).toBeNull();
+  expect(watched.called).toBe(true);
+});
+
+function refusalOf(failure: unknown) {
+  return failure instanceof Error ? failure.message : null;
+}
+
+it('a valid spend header on an error response never reaches the meter callback', async () => {
+  const watched = await watchMeter('/api/photoreal/3dtiles/root.json', 500);
+  expect({
+    called: watched.called,
+    fetched: watched.fetcher.mock.calls.some(([path]) =>
+      String(path).startsWith('/api/photoreal/3dtiles/'),
+    ),
+    refusal: refusalOf(watched.failure),
+  }).toEqual({
+    called: false,
+    fetched: true,
+    refusal: 'photoreal unavailable',
+  });
+});
+
+it('a valid spend header on a satellite response never reaches the meter callback', async () => {
+  const watched = await watchMeter('/api/imagery/tiles/0/0/0', 200);
+  expect({
+    called: watched.called,
+    imagery: watched.fetcher.mock.calls.some(([path]) =>
+      String(path).startsWith('/api/imagery/'),
+    ),
+    refusal: refusalOf(watched.failure),
+  }).toEqual({
+    called: false,
+    imagery: false,
+    refusal: 'photoreal unavailable',
+  });
 });

@@ -362,6 +362,7 @@ _IMPORTS = frozenset(
         "from eii_core.manifest import by_name",
         "from eii_core.manifest import canonical_json",
         "from eii_core.manifest import engine_versions_reason",
+        "from eii_core.manifest import listed_inputs_reason",
         "from eii_core.manifest import release_hash",
         "from eii_core.manifest import schema_document",
         "from eii_core.manifest import schema_hash",

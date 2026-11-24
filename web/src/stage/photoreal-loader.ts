@@ -1,6 +1,13 @@
 /** Qualified import boundary. N1 assets and P1 hash-checked dependency transforms. */
 import { Tile3DLayer, type Tile3DLayerProps } from '@deck.gl/geo-layers';
 import { Tiles3DLoader } from '@loaders.gl/3d-tiles';
+import {
+  METER_HEADER,
+  ORDER_HEADER,
+  decideJournalOrder,
+  readMeterHeader,
+  type SpendMeter,
+} from './map-modes';
 import dracoJS from '../../node_modules/@loaders.gl/draco/dist/libs/draco_wasm_wrapper.js?url';
 import dracoWasm from '../../node_modules/@loaders.gl/draco/dist/libs/draco_decoder.wasm?url';
 
@@ -119,10 +126,27 @@ export function validateGLB(data: ArrayBuffer): void {
 export function qualifiedLayer(
   props: Tile3DLayerProps,
   fetchTile: typeof fetch,
+  onMeter: ((meter: SpendMeter) => void) | undefined = undefined,
 ) {
+  let heldOrder: string | null = null;
   const transport: typeof fetch = async (input, init) => {
     try {
       const response = await fetchTile(input, init);
+      const reading = readMeterHeader(response.headers.get(METER_HEADER));
+      if (reading.state === 'ready') {
+        const decision = decideJournalOrder(
+          heldOrder,
+          response.headers.get(ORDER_HEADER),
+        );
+        if (decision.state === 'accept') {
+          heldOrder = decision.token;
+          try {
+            onMeter?.(reading.meter);
+          } catch {
+            // Advisory only: a display fault must not refuse the tile.
+          }
+        }
+      }
       if (typeof input === 'string' && input.split('?')[0]?.endsWith('.glb'))
         validateGLB(await response.clone().arrayBuffer());
       return response;

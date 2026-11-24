@@ -7,9 +7,9 @@ the exact prepared envelope; this adapter cannot mint or refresh an approval.
 
 from __future__ import annotations
 
+import errno
 import hashlib
 import json
-import os
 import re
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -24,6 +24,7 @@ from eii_custodian.publicdata.fetch.allowlist import approve as approve_url
 from eii_custodian.publicdata.fetch.registry import PUBLIC_RECEIPT_KINDS
 from eii_custodian.publicdata.fetch.snapshots import utc
 from eii_custodian.publicdata.grids.build import FACT_LINEAGE, SOURCE_REGISTRY
+from eii_custodian.release import pinned
 from eii_custodian.release.approval import approval_reason
 from eii_custodian.release.assembly import decode, read_assembly
 from eii_custodian.release.public_only import (
@@ -44,6 +45,8 @@ PHASES = (
     "series_stage",
     "additions",
     "busyness",
+    "artefacts",
+    "routing",
 )
 _HASH = re.compile(r"[a-f0-9]{64}\Z")
 _COMMIT = re.compile(r"[a-f0-9]{40}\Z")
@@ -98,20 +101,54 @@ def _path(cache: Path, name: str) -> Path:
         raise ValueError(reason(error, "producer_path_refused")) from None
 
 
-def _read(cache: Path, name: str, files: dict[str, str]) -> dict[str, Any]:
-    path = _path(cache, name)
-    try:
-        body = path.read_bytes()
-    except OSError:
-        raise ValueError("producer_receipt_missing") from None
+def _decode(body: bytes) -> dict[str, Any]:
     try:
         value = json.loads(body, parse_float=Decimal)
         if not isinstance(value, dict):
             raise ValueError
     except (ValueError, UnicodeError) as error:
         raise ValueError(reason(error, "producer_schema_refused")) from None
+    return value
+
+
+def _load(cache: Path, name: str) -> bytes | None:
+    """The bytes of ``name`` read through ``pinned``'s descriptors, or None.
+
+    ``_path`` checks the name first; the read then walks the pinned cache with
+    no-follow descriptors, so a root, parent or leaf swapped after the check is
+    refused as ``producer_path_refused`` rather than read from elsewhere. Only
+    an entry that does not exist is absent.
+    """
+    _path(cache, name)
+    try:
+        with (
+            pinned.root(cache, "producer_path_refused") as root,
+            pinned.target(root, name, create=False) as leaf,
+        ):
+            return pinned.read(leaf)
+    except FileNotFoundError:
+        return None
+    except OSError as error:
+        if error.errno in (errno.ELOOP, errno.ENOTDIR):
+            raise ValueError("producer_path_refused") from None
+        raise ValueError("producer_receipt_missing") from None
+
+
+def _required(cache: Path, name: str) -> bytes:
+    body = _load(cache, name)
+    if body is None:
+        raise ValueError("producer_receipt_missing")
+    return body
+
+
+def _record(body: bytes, name: str, files: dict[str, str]) -> dict[str, Any]:
+    value = _decode(body)
     files[name] = hashlib.sha256(body).hexdigest()
     return value
+
+
+def _read(cache: Path, name: str, files: dict[str, str]) -> dict[str, Any]:
+    return _record(_required(cache, name), name, files)
 
 
 def _bound(cache: Path, ref: Any, files: dict[str, str]) -> bytes:
@@ -122,11 +159,7 @@ def _bound(cache: Path, ref: Any, files: dict[str, str]) -> bytes:
         or _HASH.fullmatch(ref["sha256"]) is None
     ):
         raise ValueError("producer_schema_refused")
-    path = _path(cache, ref["path"])
-    try:
-        body = path.read_bytes()
-    except OSError:
-        raise ValueError("producer_receipt_missing") from None
+    body = _required(cache, ref["path"])
     if hashlib.sha256(body).hexdigest() != ref["sha256"]:
         raise ValueError("producer_hash_mismatch")
     files[ref["path"]] = ref["sha256"]
@@ -314,18 +347,24 @@ def _lineage(name: str, keys: list[str], transform: str) -> list[dict[str, Any]]
     ]
 
 
-def _phase(cache: Path, name: str, files: dict[str, str]) -> dict[str, Any]:
-    data = _read(cache, "assembly/" + name + ".json", files)
+def _phase(cache: Path, name: str, files: dict[str, str]) -> dict[str, Any] | None:
+    """The phase record ``name`` and its tables, or None if it was not written."""
+    relative = "assembly/" + name + ".json"
+    body = _load(cache, relative)
+    if body is None:
+        return None
+    data = _record(body, relative, files)
+    if name == "artefacts":
+        from eii_custodian.release.artefacts import recorded
+
+        recorded(data)
     if name == "spine_graph":
         from eii_custodian.publicdata.review.cache_fixture import read_parquet
 
         tables = {}
         for table in ("graph_node", "graph_edge"):
             relative = "assembly/graph/" + table + ".parquet"
-            try:
-                body = _path(cache, relative).read_bytes()
-            except OSError:
-                raise ValueError("producer_receipt_missing") from None
+            body = _required(cache, relative)
             files[relative] = hashlib.sha256(body).hexdigest()
             tables[table] = list(read_parquet(body))
         data["tables"] = tables
@@ -350,7 +389,38 @@ def _source_key(tag: Any, keys: list[str], receipts: dict[str, Any]) -> str:
     return matches[0]
 
 
-def _candidate(cache: Path) -> dict[str, Any]:
+def _recorded_artefacts(phases: dict[str, Any]) -> dict[str, str]:
+    """Map each path of the ``artefacts`` phase record to its placed hash."""
+    if "artefacts" not in phases:
+        return {}
+    from eii_custodian.release.artefacts import recorded
+
+    return {item["path"]: item["sha256"] for item in recorded(phases["artefacts"])}
+
+
+def _routing_chain(
+    phases: dict[str, Any], artefacts: list[Any], receipts: dict[str, Any]
+) -> None:
+    """Bind the routing file to its build method and authenticated OSM receipt."""
+    from eii_custodian.publicdata.places.area_files import ENGINE_PIN, ROAD_KEY
+
+    routing = [ref for ref in artefacts if ref["path"] == "artefacts/routing/tiles.tar"]
+    if not routing:
+        return
+    data = phases.get("routing", {})
+    link = data.get("source_chain", {}).get(ROAD_KEY, {})
+    if (
+        data.get("method") != "public-assembly.routing"
+        or data.get("method_version") != "1"
+        or data.get("engine_version") != ENGINE_PIN
+        or routing != [data.get("artefact")]
+        or ROAD_KEY not in receipts
+        or any(link.get(field) != receipts[ROAD_KEY][field] for field in _SOURCE_FIELDS)
+    ):
+        raise ValueError("producer_chain_incomplete")
+
+
+def _candidate(cache: Path, fc_register_sha256: str | None) -> dict[str, Any]:
     files: dict[str, str] = {}
     spec = _read(cache, SPEC, files)
     if (
@@ -395,9 +465,9 @@ def _candidate(cache: Path) -> dict[str, Any]:
         registry[key], receipts[key] = _source(cache, key, ref, files)
     phases = {}
     for phase in PHASES:
-        name = "assembly/" + phase + ".json"
-        if _path(cache, name).is_file():
-            phases[phase] = _phase(cache, phase, files)
+        data = _phase(cache, phase, files)
+        if data is not None:
+            phases[phase] = data
     owners: dict[str, str] = {}
     for phase, data in phases.items():
         if not isinstance(data.get("tables"), dict):
@@ -561,11 +631,18 @@ def _candidate(cache: Path) -> dict[str, Any]:
     artefacts = spec["artefacts"]
     if not isinstance(artefacts, list):
         raise ValueError("producer_schema_refused")
+    recorded = _recorded_artefacts(phases)
+    _routing_chain(phases, artefacts, receipts)
     for ref in artefacts:
         if not ref["path"].startswith("artefacts/"):
             raise ValueError("producer_path_refused")
+        # Decision 0096: the spec copies the placed record; never a typed hash.
+        if recorded.get(ref["path"], ref["sha256"]) != ref["sha256"]:
+            raise ValueError("producer_hash_mismatch")
         _bound(cache, ref, files)
-    return dict(
+    if sorted(ref["path"] for ref in artefacts) != sorted(recorded):
+        raise ValueError("producer_chain_incomplete")
+    candidate = dict(
         version=1,
         scalars=scalars,
         sources=sources,
@@ -573,26 +650,43 @@ def _candidate(cache: Path) -> dict[str, Any]:
         artefacts=sorted(artefacts, key=lambda ref: ref["path"]),
         files=files,
     )
+    if fc_register_sha256 is not None:
+        # Computed by the lead's release build from the file's bytes (L-1509).
+        if type(fc_register_sha256) is not str or not _HASH.fullmatch(
+            fc_register_sha256
+        ):
+            raise ValueError("producer_schema_refused")
+        candidate["listed_inputs"] = [
+            dict(name="fc_register", sha256=fc_register_sha256)
+        ]
+    return candidate
 
 
-def _write(cache: Path, name: str, value: object) -> None:
-    path = _path(cache, name)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    partial = _path(cache, name + ".partial")
+def _write(cache: Path, name: str, value: object, exists: str | None = None) -> None:
+    """Publish one output through the pinned descriptors of ``pinned``; with an
+    ``exists`` reason, never replace a leaf and refuse an existing one so."""
+    _path(cache, name)
     try:
-        with partial.open("w", encoding="utf-8") as stream:
-            stream.write(canonical_json(value))
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.replace(partial, path)
-    finally:
-        partial.unlink(missing_ok=True)
+        with (
+            pinned.root(cache, "producer_path_refused") as root,
+            pinned.target(root, name) as leaf,
+            pinned.publish(leaf, replace=exists is None) as stream,
+        ):
+            stream.write(canonical_json(value).encode())
+    except FileExistsError:
+        raise ValueError(exists or "producer_path_refused") from None
+    except OSError:
+        raise ValueError("producer_path_refused") from None
 
 
-def prepare(cache: Path) -> dict[str, Any]:
-    """Write the deterministic candidate for independent review, never approval."""
+def prepare(cache: Path, *, fc_register_sha256: str | None = None) -> dict[str, Any]:
+    """Write the deterministic candidate for independent review, never approval.
+
+    ``fc_register_sha256`` is the hash the release build computed from the
+    register file's bytes; the spec never supplies one.
+    """
     try:
-        document = _candidate(cache)
+        document = _candidate(cache, fc_register_sha256)
     except (
         SourceChainRefusal,
         WriterRefusal,
@@ -605,9 +699,9 @@ def prepare(cache: Path) -> dict[str, Any]:
     return document
 
 
-def produce(cache: Path) -> dict[str, Any]:
+def produce(cache: Path, *, fc_register_sha256: str | None = None) -> dict[str, Any]:
     """Materialise only the exact independently approved candidate and review."""
-    document = prepare(cache)
+    document = prepare(cache, fc_register_sha256=fc_register_sha256)
     approval = _path(cache, APPROVAL)
     if not approval.exists() and not approval.is_symlink():
         raise ValueError("candidate_written_approval_missing")

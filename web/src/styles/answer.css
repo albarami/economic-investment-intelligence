@@ -91,6 +91,28 @@ body {
   font: var(--eii-type-caption);
 }
 
+.buildings-legend {
+  position: absolute;
+  inset-inline-end: var(--eii-space-4);
+  inset-block-end: var(--eii-space-4);
+  z-index: var(--eii-z-tools);
+  box-sizing: border-box;
+  max-inline-size: min(22rem, calc(100% - var(--eii-space-6)));
+  max-block-size: 50%;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--eii-space-2) var(--eii-space-3);
+  background: var(--eii-surface-3);
+  color: var(--eii-text);
+  border-radius: var(--eii-radius-s);
+  font: var(--eii-type-caption);
+}
+
+.buildings-legend p,
+.buildings-legend dl {
+  margin: 0;
+}
+
 .layer-sample {
   border-block-end: var(--eii-edge) solid var(--eii-map-boundary);
 }
@@ -152,6 +174,33 @@ body {
 .sheet-toggle:focus-visible {
   outline: var(--eii-focus-ring) solid var(--eii-accent);
   outline-offset: var(--eii-focus-offset);
+}
+
+.figure-cell,
+button.figure-cell {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+[data-part='class-legend'] li[data-class],
+[data-part='fc-firms-legend'] li[data-class] {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  inline-size: 100%;
+}
+
+[data-fdi-fields='all'] > .figure-cell {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  inline-size: 100%;
+}
+
+[data-fdi-fields='all'] > .figure-cell > [data-fact-chip='value'] {
+  order: 1;
+  justify-content: flex-end;
 }
 
 .chip-num {
@@ -219,6 +268,12 @@ body {
 .chip-skeleton {
   inline-size: var(--eii-space-8);
   block-size: var(--eii-space-5);
+}
+
+/* A withheld chip carries its reason in words; the box grows to hold it. */
+.chip[data-state='withheld'] .chip-withheld {
+  inline-size: auto;
+  block-size: auto;
 }
 
 .chip-skeleton {
@@ -540,6 +595,13 @@ body {
   border-color: var(--eii-accent);
 }
 
+.scenario-comparison img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  margin-block-end: var(--eii-space-2);
+}
+
 /* Controls stay in the map's flow, in either writing direction. */
 .map-controls {
   position: relative;
@@ -605,8 +667,10 @@ body {
 }
 
 .operational-quantity {
-  display: inline-flex;
+  display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
+  inline-size: 100%;
   gap: var(--eii-space-2);
 }
 

@@ -7,15 +7,20 @@ import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Literal
+from pathlib import Path, PurePosixPath
+from typing import Literal, cast
 
 from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.responses import JSONResponse
 
 from eii_core.reasons import closed_code, reason
+from eii_product.api.frontend import _font_path
+from eii_product.api.map_assets import basemap_entry, font_entries
+from eii_product.api.tiles import tile_status
+from eii_product.config import ConfigError
 from eii_product.store.protocol import ReleaseStore
+from eii_product.store.release_check import CheckedRelease
 
 AssetStatus = Literal["ok", "missing", "invalid"]
 
@@ -32,19 +37,34 @@ def asset_reason(assets: tuple[AssetStatus, AssetStatus, AssetStatus]) -> str:
     )
 
 
+def _font_assets(checked: CheckedRelease, web: Path) -> AssetStatus:
+    try:
+        entries = font_entries(checked)
+    except ConfigError:
+        return "missing"
+    if not any((web / "assets").glob("*.woff2")):
+        return "missing"
+    root = checked.folder / "artefacts/fonts"
+    for entry in entries:
+        parts = PurePosixPath(entry).parts
+        if _font_path(root, parts[2], parts[3]) is None:
+            return "invalid"
+    return "ok"
+
+
 def local_assets(
-    release: Path, web: Path
+    checked: CheckedRelease, web: Path
 ) -> tuple[AssetStatus, AssetStatus, AssetStatus]:
-    """Observe the selected local assets; template mode has no replay dependency."""
-    tile: AssetStatus = (
-        "ok" if (release / "tiles/basemap.pmtiles").is_file() else "missing"
-    )
-    font: AssetStatus = (
-        "ok"
-        if any((web / "assets").glob("*.woff2")) and (release / "fonts").is_dir()
-        else "missing"
-    )
-    return tile, font, "ok"
+    """Observe map artefacts selected by the checked manifest."""
+    try:
+        basemap_entry(checked)
+        tiles = cast(
+            AssetStatus,
+            tile_status(checked.folder / "artefacts/tiles", "basemap.pmtiles"),
+        )
+    except ConfigError:
+        tiles = "missing"
+    return tiles, _font_assets(checked, web), "ok"
 
 
 class _Probe:

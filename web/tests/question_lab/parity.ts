@@ -1,7 +1,15 @@
 /** Deterministic card oracle: application strings by exact locale and slot. */
 import { catalogue, fragmentField } from '../../src/brief/catalogue';
-import en from '../../src/i18n/en.json';
-import ar from '../../src/i18n/ar.json';
+import en from '../../src/i18n/en.json' with { type: 'json' };
+import ar from '../../src/i18n/ar.json' with { type: 'json' };
+
+/** A digit outside a Fact chip is a loose numeral, never permitted text. */
+export const LOOSE_NUMERAL = /\p{Nd}/u;
+
+/** True when a node sits strictly inside a Fact chip (permitted content). */
+export function insideFactChip(node: Node): boolean {
+  return !!node.parentElement?.closest('[data-fact-chip]');
+}
 
 export function catalogueTextProblems(
   root: HTMLElement,
@@ -19,10 +27,10 @@ export function catalogueTextProblems(
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   while (walker.nextNode()) {
     const node = walker.currentNode;
-    if (node.parentElement?.closest('[data-fact-chip]')) continue;
+    if (insideFactChip(node)) continue;
     const text = node.textContent?.trim() ?? '';
     if (!text) continue;
-    if (/\p{Nd}/u.test(text)) problems.add('loose-numeral');
+    if (LOOSE_NUMERAL.test(text)) problems.add('loose-numeral');
     if (!allowed.has(text)) problems.add('uncatalogued-text');
   }
   for (const card of root.querySelectorAll<HTMLElement>(

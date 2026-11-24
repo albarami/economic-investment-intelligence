@@ -6,6 +6,7 @@
  */
 import type { PlaceBody } from '../controls/area-request';
 import { plainHoldsDigit } from '../stage/layers/checks';
+import { isRecord } from '../guards';
 
 export interface ShapeGeometryBody {
   geometry: {
@@ -483,8 +484,4 @@ function readPublicPointIds(value: unknown): PublicPointIds | null {
     memberships[key] = ids;
   }
   return memberships;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

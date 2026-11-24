@@ -43,6 +43,11 @@ INVENTORY = (
         ("assembly/reviewed_selections.json",),
     ),
     InventoryItem(
+        "routing",
+        ("reviewed_selections", "roads_osm"),
+        ("assembly/routing.json",),
+    ),
+    InventoryItem(
         "frame",
         (
             "reviewed_selections",

@@ -11,18 +11,18 @@ import pytest
 from fastapi import Depends, FastAPI, Request
 from product.tests.public_http_support import AreaStore, Client
 from product.tests.test_public_context import context as fact_context
+from routing_release_fixture import TILES, extract_from_road
 
 from eii_core.grid import cell_centre
 from eii_product.api.area_context import AreaContextFactory, RoutingSource
 from eii_product.api.session_store import SessionStore
-from eii_product.areas_spike.engine import scaled_actor
 from eii_product.tools.area_outline import read_outline
 from eii_product.tools.make_area import MakeAreaContext, decode_area, make_area
 from eii_product.tools.public_context import read_night_lights, read_population_age_sex
 
 
 @pytest.mark.parametrize("native", [False, True])
-def test_routed_context_make_decode_and_both_cards(native):
+def test_routed_context_make_decode_and_both_cards(native, tmp_path):
     store = AreaStore()
     centres = {r["cell"]: cell_centre(r["cell"]) for r in store.tables["grid_cell"]}
     latitude, longitude = next(iter(centres.values()))
@@ -53,8 +53,8 @@ def test_routed_context_make_decode_and_both_cards(native):
         for node in road["nodes"]:
             node["lat"] += offset[0]
             node["lon"] += offset[1]
-        _actor, temporary = scaled_actor(json.dumps(road, sort_keys=True), 1.0)
-        source = RoutingSource.from_tiles(Path(temporary.name))
+        extract_from_road(road, tmp_path / TILES)
+        source = RoutingSource.from_tiles(tmp_path / TILES, tmp_path)
     else:
         source = RoutingSource.from_call(recorder)
     factory = AreaContextFactory(store.release_id, source)
@@ -137,14 +137,14 @@ def test_native_routing_on_actual_tool_endpoints(tmp_path):
     for node in road["nodes"]:
         node["lat"] += offset[0]
         node["lon"] += offset[1]
-    _actor, temporary = scaled_actor(json.dumps(road, sort_keys=True), 1.0)
+    extract_from_road(road, tmp_path / TILES)
     ledger = LocalLedger(tmp_path / "ledger.sqlite")
     try:
         app = create_app(
             Path("product/tests/fixtures/tiles"),
             store=store,
             ledger=ledger,
-            routing=RoutingSource.from_tiles(Path(temporary.name)),
+            routing=RoutingSource.from_tiles(tmp_path / TILES, tmp_path),
             fc_setting_reader=lambda: None,
         )
 
@@ -220,4 +220,3 @@ def test_native_routing_on_actual_tool_endpoints(tmp_path):
             assert json.dumps({"area_id": area}, separators=(",", ":")) in stream
     finally:
         ledger.close()
-        temporary.cleanup()

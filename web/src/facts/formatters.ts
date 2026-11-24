@@ -65,6 +65,19 @@ function localeOf(language: Language): string {
   return language === 'ar' ? 'ar-QA-u-nu-latn' : 'en-QA';
 }
 
+/**
+ * The grammatical form a count takes in the chip's language (Arabic: zero,
+ * one, two, few, many or other). It chooses a word, never a shown number.
+ */
+export function countForm(
+  value: unknown,
+  language: Language,
+): Intl.LDMLPluralRule {
+  return typeof value === 'number'
+    ? new Intl.PluralRules(localeOf(language)).select(value)
+    : 'other';
+}
+
 function stripBidi(value: string): string {
   return value.replace(BIDI, '');
 }

@@ -401,6 +401,7 @@ class BoundaryControls(WorkspaceCase):
                 "operations.runtime.installed", return_value=(self.root, {})
             ) as installed,
             patch("operations.runtime.check_stores"),
+            patch("eii_product.store.release_check.check_release"),
             patch(
                 "eii_product.api.health.local_assets", return_value=("ok", "ok", "ok")
             ),
@@ -1024,6 +1025,7 @@ class BoundaryControls(WorkspaceCase):
             patch("operations.runtime.verify_peers"),
             patch("operations.runtime.installed", return_value=(self.root, {})),
             patch("operations.runtime.check_stores"),
+            patch("eii_product.store.release_check.check_release"),
             patch(
                 "eii_product.api.health.local_assets", return_value=("ok", "ok", "ok")
             ),

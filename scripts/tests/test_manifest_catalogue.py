@@ -36,7 +36,7 @@ class Catalogue(unittest.TestCase):
         parsed = section_rows(text)
         stored = [(row.name, row.label, row.key) for row in manifest.CATALOGUE]
         self.assertEqual(stored, parsed)
-        self.assertEqual(len(parsed), 95)
+        self.assertEqual(len(parsed), 96)
         removed = text.replace(
             "| `district` | Frame (Public geometry) |",
             "| `removed_district` | Frame (Public geometry) |",

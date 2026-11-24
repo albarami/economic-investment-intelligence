@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from functools import partial
 from pathlib import Path
 from typing import Any, Literal
 from urllib.request import urlopen
@@ -19,6 +20,10 @@ from eii_product.api.address_search import (
 )
 from eii_product.api.answers import Gate, default_gate
 from eii_product.api.area_context import AreaContextFactory, RoutingSource
+from eii_product.api.building_heights import (
+    ReleasedBuildingHeights,
+    building_heights_router,
+)
 from eii_product.api.frontend import build_router as build_frontend_router
 from eii_product.api.gis_imagery import ReleasedImagery, imagery_router
 from eii_product.api.health import HealthSource
@@ -50,6 +55,24 @@ from eii_product.register_file import (
     read_fc_register_rows,
 )
 from eii_product.store.protocol import ReleaseStore
+from eii_product.tools.public_context_tools import read
+
+
+def listed_fc_register_sha256(store: ReleaseStore | None) -> str | None:
+    """The register file's hash the loaded release lists, through its fixed read.
+
+    The loader repeats the value on every row. No store, no listed value or
+    two disagreeing stored values list nothing.
+    """
+    if store is None:
+        return None
+    values = {
+        row["fc_register_sha256"] for row in read(store, "release_fc_register_sha256")
+    }
+    if len(values) != 1:
+        return None
+    value = values.pop()
+    return value if type(value) is str else None
 
 
 def create_app(
@@ -57,6 +80,7 @@ def create_app(
     *,
     addresses: Search | None = None,
     imagery: ReleasedImagery | None = None,
+    heights: ReleasedBuildingHeights | None = None,
     store: ReleaseStore | None = None,
     ledger: LocalLedger | None = None,
     gate: Gate = default_gate,
@@ -66,6 +90,9 @@ def create_app(
     opener: Callable[..., object] = urlopen,
     fc_setting_reader: Callable[[], str | None] = read_fc_register_file,
     fc_rows_reader: Callable[..., RegisterBundle | None] = read_fc_register_rows,
+    fc_listed_reader: Callable[
+        [ReleaseStore | None], str | None
+    ] = listed_fc_register_sha256,
     count_path: Path = COUNT_PATH,
     web_dir: Path | None = None,
     release_dir: Path | None = None,
@@ -81,7 +108,8 @@ def create_app(
     A ledger is required when a store is supplied. Existing callers pass only
     the tile folder. The address route defaults to the config reader, offline
     unset and the live transport. The financial centre register is read once
-    here; an invalid value stops the start.
+    here, against the hash the loaded release lists; an invalid value, an
+    unlisted release or other bytes stop the start.
     """
     if store is not None and (release_dir is not None or web_dir is not None):
         if startup_policy is None:
@@ -94,9 +122,11 @@ def create_app(
     if routing is not None and not isinstance(routing, RoutingSource):
         raise ConfigError("routing_tiles")
     fc_setting = fc_setting_reader()
+    fc_reader = fc_rows_reader
     if fc_setting is not None:
+        fc_reader = partial(fc_rows_reader, listed_sha256=fc_listed_reader(store))
         try:
-            fc_rows_reader(fc_setting)
+            fc_reader(fc_setting)
         except RegisterRefusal as exc:
             if exc.reason == "read_refused":
                 raise ConfigError("EII_FC_REGISTER_FILE") from None
@@ -110,6 +140,9 @@ def create_app(
         else None
     )
     app.state.release_mount = mount
+    if heights is None and mount is not None:
+        # Every startup path mounts its checked release here (S3-T16).
+        heights = mount.heights
     app.include_router(build_health_router(health_source))
     app.include_router(build_release_router(mount))
     # Catalogue-only construction probes have no serving-store identity.
@@ -128,6 +161,7 @@ def create_app(
         address_router(AddressIndex(None) if addresses is None else addresses)
     )
     app.include_router(imagery_router(imagery))
+    app.include_router(building_heights_router(heights))
     app.include_router(
         build_router(key_reader, offline_reader, transport_factory, opener)
     )
@@ -153,7 +187,6 @@ def create_app(
             )
     readers = None
     if store is not None and app.state.area_contexts is not None:
-        from functools import partial
 
         def mounted_layer(key: str, month: str | None) -> dict[str, Any]:
             body = read_layer(store, key, month)
@@ -161,7 +194,7 @@ def create_app(
 
         readers = {key: partial(mounted_layer, key) for key in PUBLIC_LAYER_KEYS}
     app.include_router(
-        build_layer_router(fc_setting, fc_rows_reader, public_readers=readers)
+        build_layer_router(fc_setting, fc_reader, public_readers=readers)
     )
     app.include_router(
         build_map_router(

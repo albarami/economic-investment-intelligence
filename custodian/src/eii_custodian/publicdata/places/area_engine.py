@@ -43,6 +43,10 @@ class PinnedEngine:
         config["mjolnir"]["concurrency"] = 1
         config["mjolnir"]["admin"] = str(folder / "absent-admin.sqlite")
         config["mjolnir"]["timezone"] = str(folder / "absent-timezone.sqlite")
+        for key in ("landmarks", "traffic_extract", "transit_dir", "transit_feeds_dir"):
+            config["mjolnir"][key] = str(folder / ("absent-" + key))
+        config["additional_data"] = {"elevation": str(folder / "absent-elevation")}
+
         path = folder / "config.json"
         path.write_text(json.dumps(config), encoding="utf-8")
         built = subprocess.run(
@@ -66,6 +70,35 @@ class PinnedEngine:
         self._config = str(path)
         self._actor = Actor(self._config)
         self._digest = digest
+
+    def write_extract(self, road: bytes, destination: Path) -> None:
+        """Package the existing wheel-built tiles; no region/download options."""
+        try:
+            self.prepare(road)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "valhalla.valhalla_build_extract",
+                    "-c",
+                    self._config,
+                    "-i",
+                    json.dumps(
+                        {
+                            "mjolnir": {
+                                "tile_dir": str(Path(self._config).parent),
+                                "tile_extract": str(destination),
+                            }
+                        }
+                    ),
+                ],
+                capture_output=True,
+                check=False,
+            )
+            if result.returncode != 0:
+                raise RuntimeError("tile extract failed")
+        finally:
+            self._close()
 
     def polygon(self, request: AreaRequest, road: bytes) -> bytes:
         """Return the isochrone as WKB. Tiles are built by prepare."""

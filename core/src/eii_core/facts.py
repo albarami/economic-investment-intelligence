@@ -124,6 +124,12 @@ METRIC_KEYS = frozenset(
         "place_name",
         "place_licence",
         "place_source_attribution",
+        "accident_count",
+        "accident_source_zone",
+        "building_height_pairs",
+        "building_height_mean_signed_error",
+        "building_height_mean_abs_error",
+        "building_height_median_abs_error",
     )
 )
 QUALIFIER_KEYS = frozenset(
@@ -155,6 +161,7 @@ QUALIFIER_KEYS = frozenset(
         "day_of_week",
         "hour",
         "field",
+        "height_source",
     }
 )
 KEY = re.compile(r"[a-z][a-z0-9_]*")

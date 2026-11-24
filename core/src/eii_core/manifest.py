@@ -35,6 +35,10 @@ COMMON_SCALARS = (
     "engine_versions",
 )
 ENGINE_VERSION_KEYS = ("duckdb", "postgis_target", "python")
+# A file read outside the release folder, listed by name and hash only (L-1509).
+LISTED_INPUT_NAMES = frozenset({"fc_register"})
+_LISTED_INPUT_KEYS = ("name", "sha256")
+_SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 _ENGINE_VERSION_KEY_SET = frozenset(ENGINE_VERSION_KEYS)
 _LOGICAL = frozenset(
     {"string", "int", "bool", "date", "month", "timestamp", "cell", "geometry"}
@@ -137,6 +141,31 @@ def engine_versions_reason(value: object) -> str | None:
         item = value[key]
         if type(item) is not str or item == "":
             return "manifest_type_invalid"
+    return None
+
+
+def listed_inputs_reason(value: object) -> str | None:
+    """Refusal reason, or none for a non-empty list of closed name and hash entries."""
+    if type(value) is not list or not value:
+        return "manifest_type_invalid"
+    seen: set[str] = set()
+    for entry in value:
+        if type(entry) is not dict:
+            return "manifest_type_invalid"
+        for key in entry:
+            if type(key) is not str or key not in _LISTED_INPUT_KEYS:
+                lowered = str(key).lower() in _LISTED_INPUT_KEYS
+                return "manifest_key_case" if lowered else "unknown_manifest_key"
+        name, digest = entry.get("name"), entry.get("sha256")
+        if type(name) is not str or type(digest) is not str:
+            return "manifest_type_invalid"
+        if _SHA256.fullmatch(digest) is None:
+            return "manifest_type_invalid"
+        if name not in LISTED_INPUT_NAMES:
+            return "unknown_manifest_key"
+        if name in seen:
+            return "duplicate_key"
+        seen.add(name)
     return None
 
 
@@ -509,6 +538,13 @@ _RAW: tuple[tuple[str, str, str, tuple[str, ...], str], ...] = (
         "Public",
         "rail feature: a line, a planned station or a protection zone",
         ("feature_key",),
+        "publicdata",
+    ),
+    (
+        "pub_accident_zone",
+        "Public",
+        "source zone x source year",
+        ("source_zone", "period"),
         "publicdata",
     ),
     (

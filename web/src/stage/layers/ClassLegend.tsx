@@ -52,6 +52,7 @@ export function ClassLegend({
             <span>{text(language, CLASS_TEXT[band.class_id])}</span>
             <FactChip
               variant="compact"
+              figureCell
               factId={band.fact_id}
               registry={registry}
               language={language}

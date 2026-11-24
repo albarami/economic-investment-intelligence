@@ -211,6 +211,18 @@ export const LAYER_ENTRIES: readonly LayerEntry[] = [
     metricKeys: ['rail_feature'],
   },
   {
+    // S3-T12: whole source-zone outlines with a bound count, beside rail.
+    key: 'accidents',
+    table: 'pub_accident_zone',
+    className: 'Public',
+    writer: 'S3-T12',
+    implemented: true,
+    reason: '',
+    hero: false,
+    layerTypes: ['GeoJsonLayer'],
+    metricKeys: ['accident_count'],
+  },
+  {
     key: 'health_centres',
     table: 'pub_health_centre',
     className: 'Public',

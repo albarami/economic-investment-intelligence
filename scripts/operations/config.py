@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -28,6 +28,12 @@ API_NAMES = frozenset(
         "EII_DECISION_PROVIDER",
     }
 )
+# Decision 0022 item 1 and ruling L-1508: live and staging alone read the
+# financial-centre register, and only through this one setting.
+ENVIRONMENT_NAMES = {
+    "staging": frozenset({"EII_FC_REGISTER_FILE"}),
+    "live": frozenset({"EII_FC_REGISTER_FILE"}),
+}
 INSTALL_NAMES = frozenset({"EII_SOURCE_RELEASE_DIR", "EII_APPLICATION_ARCHIVE"})
 RESTRICTED = frozenset(
     {
@@ -59,7 +65,10 @@ def api_port(value: str, default: int = 8000) -> int:
 def runtime_environment(
     environ: Mapping[str, str], *, installing: bool = False
 ) -> dict[str, str]:
-    allowed = API_NAMES | (INSTALL_NAMES if installing else frozenset())
+    served = API_NAMES | ENVIRONMENT_NAMES.get(
+        environ.get("EII_ENVIRONMENT") or "development", frozenset()
+    )
+    allowed = served | (INSTALL_NAMES if installing else frozenset())
     for name, value in environ.items():
         if (
             value
@@ -78,13 +87,22 @@ def runtime_environment(
     ):
         if environ.get(name, "") not in ("", expected):
             raise Refusal(reason, 1)
-    result = {name: value for name, value in environ.items() if name in API_NAMES}
+    result = {name: value for name, value in environ.items() if name in served}
     result.update(
         EII_DECISION_PROVIDER="none",
         EII_PRESENTER="0",
         EII_TRAFFIC_PROVIDER="simulated",
     )
     return result
+
+
+def fc_setting_reader(name: str) -> Callable[[], str | None]:
+    """The register reader for live and staging; development keeps its stand-in."""
+    if "EII_FC_REGISTER_FILE" not in ENVIRONMENT_NAMES.get(name, frozenset()):
+        return lambda: None
+    from eii_product.config import read_fc_register_file
+
+    return read_fc_register_file
 
 
 def database_identity(value: str) -> tuple[str, int, str]:

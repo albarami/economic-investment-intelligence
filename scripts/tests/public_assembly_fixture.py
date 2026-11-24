@@ -20,8 +20,18 @@ def dump(path: Path, value: object) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def inputs(cache: Path) -> dict[str, Any]:
-    """Only invented bytes, using the existing fetcher's receipt archive shape."""
+def inputs(cache: Path, *, keyed: bool = False) -> dict[str, Any]:
+    """Only invented bytes, using the existing fetcher's receipt archive shape.
+
+    `keyed` adds the catalogue key column `activity_key`, which the loader's
+    digest needs; the default keeps the unkeyed bytes the producer tests pin.
+    """
+    key = dict(activity_key="INVENTED-activity") if keyed else {}
+    key_column = (
+        [dict(name="activity_key", logical_type="string", nullable=False)]
+        if keyed
+        else []
+    )
     body = b'[{"period":"2026","value":"25.00"}]'
     receipt = dict(
         source_id="INVENTED-source",
@@ -59,7 +69,7 @@ def inputs(cache: Path) -> dict[str, Any]:
             },
             table_sources={"pub_bank_credit": ["INVENTED-source"]},
             tables={
-                "pub_bank_credit": [dict(period="2026", value="25.00")],
+                "pub_bank_credit": [dict(key, period="2026", value="25.00")],
             },
         ),
     )
@@ -84,6 +94,7 @@ def inputs(cache: Path) -> dict[str, Any]:
                 name="pub_bank_credit",
                 phase="gis_property_singles",
                 columns=[
+                    *key_column,
                     dict(name="period", logical_type="string", nullable=False),
                     dict(name="value", logical_type="decimal(18,2)", nullable=False),
                 ],
@@ -96,8 +107,8 @@ def inputs(cache: Path) -> dict[str, Any]:
     return spec
 
 
-def approve(cache: Path) -> dict[str, Any]:
-    candidate = producer.prepare(cache)
+def approve(cache: Path, *, fc_register_sha256: str | None = None) -> dict[str, Any]:
+    candidate = producer.prepare(cache, fc_register_sha256=fc_register_sha256)
     review = dict(
         verdict="APPROVED",
         builder="INVENTED-builder",

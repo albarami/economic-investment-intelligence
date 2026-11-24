@@ -284,6 +284,7 @@ class ClosedReasons(WorkspaceCase):
             stack.enter_context(
                 patch("operations.runtime.installed", return_value=(self.root, {}))
             )
+            stack.enter_context(patch("eii_product.store.release_check.check_release"))
             stack.enter_context(
                 patch(
                     "eii_product.api.health.local_assets",

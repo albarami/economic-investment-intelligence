@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { NAMED_SIZES } from '../fixtures/viewports';
+
 const VIEWPORTS = [
   { width: 3840, height: 2160 },
   { width: 1920, height: 1080 },
@@ -202,7 +204,7 @@ test('map attribution is visible in both directions', async ({ page }) => {
     const url = new URL(request.url());
     if (url.origin !== 'http://127.0.0.1:41731') foreign.push(request.url());
   });
-  await page.goto('/');
+  await page.goto('/tests/visual/index.html?lang=en&theme=dark');
   await expect(page.locator('[data-part="attribution"]')).toContainText(
     'OpenStreetMap',
   );
@@ -227,10 +229,10 @@ test('the empty page requests no tile', async ({ page }) => {
   page.on('request', (request) => {
     const url = request.url();
     requests.push(url);
-    if (url.includes('pmtiles') || url.includes('.pbf')) tiles.push(url);
+    if (url.includes('pmtiles') || url.includes('/tiles/')) tiles.push(url);
   });
   await page.goto('/');
-  await expect(page.locator('[data-state="asset-absent"]')).toBeVisible();
+  await expect(page.getByRole('alert')).toBeVisible();
   expect(tiles).toEqual([]);
   const own = new URL(page.url()).origin;
   for (const url of requests) expect(new URL(url).origin).toBe(own);
@@ -453,20 +455,6 @@ async function drawerAtRest(page: Page) {
       Promise.all(node.getAnimations().map((a) => a.finished)),
     );
 }
-
-/** Decision 0049 item 2: the eight named sizes, phones in both orientations. */
-const NAMED_SIZES = [
-  { width: 360, height: 640 },
-  { width: 640, height: 360 },
-  { width: 390, height: 844 },
-  { width: 844, height: 390 },
-  { width: 768, height: 1024 },
-  { width: 1366, height: 768 },
-  { width: 1920, height: 1080 },
-  { width: 2560, height: 1440 },
-  { width: 3440, height: 1440 },
-  { width: 3840, height: 2160 },
-] as const;
 
 async function inside(page: Page, selector: string) {
   return page.locator(selector).evaluateAll((nodes) =>

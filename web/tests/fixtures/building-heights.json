@@ -1,0 +1,347 @@
+{
+  "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929",
+  "buildings": [
+    {
+      "building_key": "SYN-B-0001",
+      "footprint": [
+        [51.5, 25.3],
+        [51.5005, 25.3],
+        [51.5005, 25.3005],
+        [51.5, 25.3005],
+        [51.5, 25.3]
+      ],
+      "height_m": "30.00",
+      "height_source": "recorded"
+    },
+    {
+      "building_key": "SYN-B-0004",
+      "footprint": [
+        [51.501, 25.3],
+        [51.5015, 25.3],
+        [51.5015, 25.3005],
+        [51.501, 25.3005],
+        [51.501, 25.3]
+      ],
+      "height_m": "20.00",
+      "height_source": "floor_count"
+    },
+    {
+      "building_key": "SYN-B-0005",
+      "footprint": [
+        [51.502, 25.3],
+        [51.502500000000005, 25.3],
+        [51.502500000000005, 25.3005],
+        [51.502, 25.3005],
+        [51.502, 25.3]
+      ],
+      "height_m": "6.00",
+      "height_source": "wsf3d"
+    },
+    {
+      "building_key": "SYN-B-0006",
+      "footprint": [
+        [51.503, 25.3],
+        [51.5035, 25.3],
+        [51.5035, 25.3005],
+        [51.503, 25.3005],
+        [51.503, 25.3]
+      ],
+      "height_m": null,
+      "height_source": "none"
+    }
+  ],
+  "fallback_errors": [
+    {
+      "source": "floor_count",
+      "pairs_fact_id": "f_f42f7d9df1bcaa65dc133321552f7551",
+      "mean_signed_fact_id": "f_d7b5e290674103b6f2cd36f86d3c1e23",
+      "mean_abs_fact_id": "f_279c01f0676118b26db55fa471b85593",
+      "median_abs_fact_id": "f_6275993379c31773cf95635054b6b1df"
+    },
+    {
+      "source": "3dglobfp",
+      "reason": "no_pairs"
+    },
+    {
+      "source": "wsf3d",
+      "pairs_fact_id": "f_09b0b6c119531b2eb7a1ba02a1c1a66e",
+      "mean_signed_fact_id": "f_e9b2d525a56d0c9684ebce49020c8768",
+      "mean_abs_fact_id": "f_ab1082e73e6593d66227b0d25976724d",
+      "median_abs_fact_id": "f_c2141d2d1a5452627f28fa6150a1dd70"
+    }
+  ],
+  "facts": [
+    {
+      "fact": {
+        "fact_id": "f_f42f7d9df1bcaa65dc133321552f7551",
+        "value": 2,
+        "unit": "count",
+        "period": "2026-11-02",
+        "geography": {
+          "kind": "national"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["heights_are_estimates"],
+        "label_en": "Buildings with both heights",
+        "label_ar": "المباني التي لها الارتفاعان",
+        "lineage_ref": "lin_asset_heights",
+        "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929"
+      },
+      "binding": {
+        "metricKey": "building_height_pairs",
+        "qualifiers": {
+          "height_source": "floor_count"
+        }
+      }
+    },
+    {
+      "fact": {
+        "fact_id": "f_d7b5e290674103b6f2cd36f86d3c1e23",
+        "value": 1.0,
+        "unit": "metres",
+        "period": "2026-11-02",
+        "geography": {
+          "kind": "national"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["heights_are_estimates"],
+        "label_en": "Mean signed error",
+        "label_ar": "متوسط الخطأ بإشارته",
+        "lineage_ref": "lin_asset_heights",
+        "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929"
+      },
+      "binding": {
+        "metricKey": "building_height_mean_signed_error",
+        "qualifiers": {
+          "height_source": "floor_count"
+        }
+      }
+    },
+    {
+      "fact": {
+        "fact_id": "f_279c01f0676118b26db55fa471b85593",
+        "value": 1.0,
+        "unit": "metres",
+        "period": "2026-11-02",
+        "geography": {
+          "kind": "national"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["heights_are_estimates"],
+        "label_en": "Mean absolute error",
+        "label_ar": "متوسط الخطأ المطلق",
+        "lineage_ref": "lin_asset_heights",
+        "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929"
+      },
+      "binding": {
+        "metricKey": "building_height_mean_abs_error",
+        "qualifiers": {
+          "height_source": "floor_count"
+        }
+      }
+    },
+    {
+      "fact": {
+        "fact_id": "f_6275993379c31773cf95635054b6b1df",
+        "value": 1.0,
+        "unit": "metres",
+        "period": "2026-11-02",
+        "geography": {
+          "kind": "national"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["heights_are_estimates"],
+        "label_en": "Median absolute error",
+        "label_ar": "وسيط الخطأ المطلق",
+        "lineage_ref": "lin_asset_heights",
+        "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929"
+      },
+      "binding": {
+        "metricKey": "building_height_median_abs_error",
+        "qualifiers": {
+          "height_source": "floor_count"
+        }
+      }
+    },
+    {
+      "fact": {
+        "fact_id": "f_09b0b6c119531b2eb7a1ba02a1c1a66e",
+        "value": 2,
+        "unit": "count",
+        "period": "2026-11-02",
+        "geography": {
+          "kind": "national"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["heights_are_estimates"],
+        "label_en": "Buildings with both heights",
+        "label_ar": "المباني التي لها الارتفاعان",
+        "lineage_ref": "lin_asset_heights",
+        "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929"
+      },
+      "binding": {
+        "metricKey": "building_height_pairs",
+        "qualifiers": {
+          "height_source": "wsf3d"
+        }
+      }
+    },
+    {
+      "fact": {
+        "fact_id": "f_e9b2d525a56d0c9684ebce49020c8768",
+        "value": -10.0,
+        "unit": "metres",
+        "period": "2026-11-02",
+        "geography": {
+          "kind": "national"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["heights_are_estimates"],
+        "label_en": "Mean signed error",
+        "label_ar": "متوسط الخطأ بإشارته",
+        "lineage_ref": "lin_asset_heights",
+        "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929"
+      },
+      "binding": {
+        "metricKey": "building_height_mean_signed_error",
+        "qualifiers": {
+          "height_source": "wsf3d"
+        }
+      }
+    },
+    {
+      "fact": {
+        "fact_id": "f_ab1082e73e6593d66227b0d25976724d",
+        "value": 10.0,
+        "unit": "metres",
+        "period": "2026-11-02",
+        "geography": {
+          "kind": "national"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["heights_are_estimates"],
+        "label_en": "Mean absolute error",
+        "label_ar": "متوسط الخطأ المطلق",
+        "lineage_ref": "lin_asset_heights",
+        "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929"
+      },
+      "binding": {
+        "metricKey": "building_height_mean_abs_error",
+        "qualifiers": {
+          "height_source": "wsf3d"
+        }
+      }
+    },
+    {
+      "fact": {
+        "fact_id": "f_c2141d2d1a5452627f28fa6150a1dd70",
+        "value": 10.0,
+        "unit": "metres",
+        "period": "2026-11-02",
+        "geography": {
+          "kind": "national"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["heights_are_estimates"],
+        "label_en": "Median absolute error",
+        "label_ar": "وسيط الخطأ المطلق",
+        "lineage_ref": "lin_asset_heights",
+        "release_id": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929"
+      },
+      "binding": {
+        "metricKey": "building_height_median_abs_error",
+        "qualifiers": {
+          "height_source": "wsf3d"
+        }
+      }
+    }
+  ],
+  "lineage": {
+    "lineageId": "lin_asset_heights",
+    "releaseId": "98ee539b0bce75ecfb96724ded0f4fa3be3d6a63cd65a72b33726fce2cc3a929",
+    "tableName": "asset_heights",
+    "method": "MTH-125",
+    "methodVersion": "C47",
+    "sourceIds": [
+      "bldg_3dglobfp/invented-part",
+      "bldg_ovt/invented-part-0",
+      "bldg_wsf3d/invented-cell",
+      "landmark_heights/SYN-LM-0001"
+    ],
+    "inputClasses": ["public"]
+  },
+  "sources": [
+    {
+      "sourceId": "bldg_3dglobfp/invented-part",
+      "kind": "public_dataset",
+      "inputClass": "public",
+      "publisher": "Invented heights publisher",
+      "datasetOrPage": "https://heights.invalid/globfp/part.zip",
+      "licenceOrTerms": "CC-BY-4.0",
+      "retrievalDate": "2026-11-01",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "sourceId": "bldg_ovt/invented-part-0",
+      "kind": "public_dataset",
+      "inputClass": "public",
+      "publisher": "Invented inventory publisher",
+      "datasetOrPage": "https://inventory.invalid/part-0.json",
+      "licenceOrTerms": "ODbL-1.0",
+      "retrievalDate": "2026-10-30",
+      "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+    },
+    {
+      "sourceId": "bldg_wsf3d/invented-cell",
+      "kind": "public_dataset",
+      "inputClass": "public",
+      "publisher": "Invented settlement publisher",
+      "datasetOrPage": "https://settlement.invalid/wsf/cell.tif",
+      "licenceOrTerms": "invented-terms",
+      "retrievalDate": "2026-11-02",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    {
+      "sourceId": "landmark_heights/SYN-LM-0001",
+      "kind": "public_dataset",
+      "inputClass": "public",
+      "publisher": "Invented landmark publisher",
+      "datasetOrPage": "https://landmark.invalid/SYN/page",
+      "licenceOrTerms": "pending",
+      "retrievalDate": "2026-10-29",
+      "sha256": "5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  ]
+}

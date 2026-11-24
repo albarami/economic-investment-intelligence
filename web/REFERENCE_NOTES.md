@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Draft written by task S0-T13 on 2026-11-12; pages P21 to P24, statements S39 to S44 and runs R9 and R10 added by task S3-T27 on 2026-11-19; every row is as true as the page or run it names, on the date it names |
-| Date | 2026-11-20 |
+| Date | 2026-11-23 |
 | Owner | Project owner (see OPEN_ITEMS.md) |
 | Purpose | Record the official pages read and the idioms that changed from earlier major versions for MapLibre GL JS 6, deck.gl 9.4 and the deck.gl MapLibre module (FE-02), and the two confirmations of DES-25 and DES-45 recorded in the section "Confirmations assigned to this task". |
 | Read first | [docs/10_FRONTEND.md](../docs/10_FRONTEND.md) section 2, [the notes for DuckDB, PostgreSQL and the Claude API](../docs/REFERENCE_NOTES.md) |
@@ -74,6 +74,7 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 | R8 | maplibre-gl 6.17.0 | 2026-11-12 | `cd v6 && node -e 'const f=require("fs");const t=f.readFileSync("node_modules/maplibre-gl/dist/maplibre-gl.d.ts","utf8");console.log(t.includes("declare function setWorkerUrl(value: string): void"),f.existsSync("node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs"))'` | true true |
 | R9 | pmtiles 4.5.0 | 2026-11-19 | `cd web && node --input-type=module -e 'import {Protocol} from "pmtiles"; const p=new Protocol(); console.log(typeof Protocol, typeof p.tile)'` | function function |
 | R10 | maplibre-gl 6.17.0 | 2026-11-19 | `cd web && node --input-type=module -e 'import * as m from "maplibre-gl"; console.log(typeof m.getRTLTextPluginStatus, typeof m.setRTLTextPlugin)'` | function function |
+| R11 | IBM Plex and Noto Fontsource packages | 2026-11-23 | `cd web && node --input-type=module -e 'import fs from "node:fs";const p=JSON.parse(fs.readFileSync("package-lock.json","utf8"));for(const n of ["ibm-plex-sans","ibm-plex-sans-arabic","noto-sans","noto-sans-arabic"])console.log(n,p.packages["node_modules/@fontsource/"+n].version)'` | ibm-plex-sans 5.3.0; ibm-plex-sans-arabic 5.3.0; noto-sans 5.3.0; noto-sans-arabic 5.3.0 |
 
 ### Idioms that changed
 
@@ -138,6 +139,7 @@ Setup, in an empty folder: three sub-folders `v6`, `v5` and `mb`, each with a `p
 | S46 | The stock navigation control combines zoom buttons and a compass. | READ | P26 | "A NavigationControl control contains zoom buttons and a compass." |
 | S47 | LngLatBounds.extend accepts supplied geographic bounds or points. | READ | P27 | "Extend the bounds to include a given LngLatLike or LngLatBoundsLike." |
 | S48 | With lazy true, the plugin finishes loading before RTL text renders. | READ | P28 | "rtl text will then be rendered only after the plugin finishes loading." |
+| S49 | The package lock holds the exact interface-font pins @fontsource/ibm-plex-sans and @fontsource/ibm-plex-sans-arabic 5.3.0, and the map-font pins @fontsource/noto-sans and @fontsource/noto-sans-arabic 5.3.0. | OBSERVED | R11 | - |
 
 ### Slice S1 confirmation
 
@@ -212,6 +214,8 @@ Same setup and folders as the Runs table of the MapLibre section.
 | S20 | The current loader source offers loadGLTF to parse embedded binaries; installed-module identity remains a separate qualification (docs/10_FRONTEND.md FE-148). | READ | P11 | "Whether to parse any embedded glTF binaries" |
 | S21 | The invented fixture decoded PNG into ImageBitmap and closed the decoded image on exit (docs/10_FRONTEND.md FE-148). | OBSERVED | R2 | - |
 | S22 | Root completion starts traversal using the current viewport; late completion after exit destroys the tileset (docs/10_FRONTEND.md FE-148). | OBSERVED | R3 | - |
+| S23 | P6 reread on 2026-11-23: the shadow effect is experimental and needs the _shadow prop of a directional light; a layer's shadowEnabled prop toggles it per layer (docs/10_FRONTEND.md FE-143; decision 0048). | READ | P6 | "For rendering experimental shadow effect, _shadow prop of DirectionalLight must be set to true" |
+| S24 | P8 reread on 2026-11-23: _shadow is an optional boolean of a directional light, default false, that enables the experimental shadow effect; the sun light inherits it. | READ | P8 | "Enable experimental shadow effect, default value is false" |
 
 
 ### Slice S1 confirmation

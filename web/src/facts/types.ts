@@ -100,6 +100,8 @@ export interface FactBinding {
     hour?: string;
     age_band?: string;
     sex?: 'female' | 'male' | 'none';
+    /** The fallback a building-height error statistic measures (C47). */
+    height_source?: string;
   }>;
   rangeLowId?: string;
   rangeHighId?: string;

@@ -28,7 +28,11 @@ def verify_runtime() -> None:
         APPLICATION_ROOT / "runtime/dependencies.json", "offline_dependency_missing"
     )
     for name, version in dependencies["packages"].items():
-        if importlib.metadata.version(name) != version:
+        try:
+            installed = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            raise Refusal("offline_dependency_missing") from None
+        if installed != version:
             raise Refusal("offline_dependency_missing")
     # Import all serving dependencies before any socket is bound.
     __import__("eii_product.api.app")
@@ -43,17 +47,20 @@ def main() -> int:
         verify_runtime()
         return 0
     from eii_product.api.app import create_app
+    from eii_product.api.area_context import routing_from_release
     from eii_product.api.health import HealthSource, local_assets
+    from eii_product.api.map_assets import map_asset_paths
     from eii_product.api.startup import ServingPolicy
     from eii_product.ledger.local import LocalLedger
     from eii_product.store.embedded import EmbeddedStore
     from eii_product.store.postgres import PostgresStore
     from eii_product.store.receipt import read_receipt
     from eii_product.store.registry import PACKAGED
+    from eii_product.store.release_check import CheckedRelease
     from eii_product.store.startup import postgres_snapshot, verify_startup
     from operations.activation import entries
     from operations.common import Refusal
-    from operations.config import persistent_paths, read_environment
+    from operations.config import fc_setting_reader, persistent_paths, read_environment
     from operations.deploy import request_for, staging_probe
     from operations.evidence import exposure, verify_evidence
     from operations.runtime import app_connection, installed
@@ -95,8 +102,11 @@ def main() -> int:
         raise Refusal("embedded_environment_refused")
     connection = None if embedded else app_connection(os.environ)
 
+    checked: CheckedRelease
+
     def verify() -> None:
-        verify_startup(
+        nonlocal checked
+        checked = verify_startup(
             env.release,
             environment=env.name,
             embedded=embedded,
@@ -106,6 +116,7 @@ def main() -> int:
         )
 
     verify()
+    assets = map_asset_paths(checked)
     identity = request["release_id"]
     standby = EmbeddedStore(env.release / "release.duckdb", identity, PACKAGED)
     store = standby if embedded else PostgresStore(connection, identity, PACKAGED)
@@ -130,21 +141,22 @@ def main() -> int:
         store,
         receipt_valid,
         ledger.row_count,
-        lambda: local_assets(env.release, application / "web/dist"),
+        lambda: local_assets(checked, application / "web/dist"),
     )
     app = create_app(
-        env.release / "tiles",
+        assets.tile_dir,
         store=store,
         ledger=ledger,
         count_path=count_path,
         web_dir=application / "web/dist",
         release_dir=env.release,
-        font_dir=env.release / "fonts",
-        basemap_name="basemap.pmtiles",
+        routing=routing_from_release(checked),
+        font_dir=assets.font_dir,
+        basemap_name=assets.basemap_name,
         startup_policy=policy,
         health_source=health,
         key_reader=lambda: None,
-        fc_setting_reader=lambda: None,
+        fc_setting_reader=fc_setting_reader(env.name),
     )
     import uvicorn
 

@@ -83,6 +83,7 @@ class Production:
             "reviewed_selections": self.reviewed_selections,
             "frame": self.frame,
             "register_tables": self.register_tables,
+            "routing": self.routing,
             "spine_graph": self.spine_graph,
             "additions": self.additions,
             "gis_property_singles": self.gis_property_singles,
@@ -239,6 +240,11 @@ class Production:
                 read_snapshot(local(source_cache, entry.key), digest).body
             )
         return payload
+
+    def routing(self) -> dict[str, str]:
+        from .routing import build_routing
+
+        return build_routing(self)
 
     def needed_frame(self) -> FrameResult:
         if self.frame_result is None:

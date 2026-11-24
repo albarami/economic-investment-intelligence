@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import tempfile
 from decimal import Decimal
 from pathlib import Path
@@ -457,10 +458,15 @@ def test_pending_final_audit_remains_blocking(tmp_path):
 
 
 def test_artifact_bytes_are_bound_and_copied_as_descriptors(tmp_path):
+    from eii_custodian.release.artefacts import place_artefact
+
     spec = inputs(tmp_path)
     path = "artefacts/INVENTED-evidence.json"
-    digest = dump(tmp_path / path, dict(method="INVENTED-evidence.v1"))
-    spec["artefacts"] = [dict(path=path, sha256=digest)]
+    digest = dump(tmp_path / "INVENTED-evidence", dict(method="INVENTED-evidence.v1"))
+    # Decision 0096: the spec copies the placed record, never a typed hash.
+    placed = place_artefact(tmp_path, path, tmp_path / "INVENTED-evidence")
+    assert placed == dict(path=path, sha256=digest)
+    spec["artefacts"] = [placed]
     dump(tmp_path / "review/release_spec.json", spec)
     approve(tmp_path)
     producer.produce(tmp_path)
@@ -1359,14 +1365,64 @@ def test_public_receipt_kinds_are_exactly_the_approved_release_set():
 def test_refused_receipt_kind_never_reads_its_body(tmp_path, monkeypatch, kind):
     spec = inputs(tmp_path)
     change_receipt(tmp_path, spec, lambda receipt: receipt.update(kind=kind))
-    body_path = tmp_path / spec["sources"]["INVENTED-source"]["body"]["path"]
-    read_bytes = Path.read_bytes
+    body_name = spec["sources"]["INVENTED-source"]["body"]["path"]
+    load = producer._load
+    names = []
 
-    def guarded_read(path):
-        if path == body_path:
+    def guarded_load(cache, name):
+        names.append(name)
+        if name == body_name:
             raise AssertionError("refused_source_body_read")
-        return read_bytes(path)
+        return load(cache, name)
 
-    monkeypatch.setattr(Path, "read_bytes", guarded_read)
+    monkeypatch.setattr(producer, "_load", guarded_load)
     with pytest.raises(ValueError, match="producer_non_public"):
         producer.prepare(tmp_path)
+    assert spec["sources"]["INVENTED-source"]["receipt"]["path"] in names
+
+
+# Round 3c: the refusal branches of the pinned producer read, one input each.
+def test_a_missing_input_folder_is_absent_and_never_created(tmp_path):
+    graph_inputs(tmp_path)
+    shutil.rmtree(tmp_path / "assembly/graph")
+    refuses_without_candidate(tmp_path, "producer_receipt_missing")
+    assert not (tmp_path / "assembly/graph").exists()
+
+
+def test_a_file_in_place_of_an_input_folder_is_refused(tmp_path):
+    graph_inputs(tmp_path)
+    shutil.rmtree(tmp_path / "assembly/graph")
+    (tmp_path / "assembly/graph").write_bytes(b"INVENTED-not-a-folder")
+    refuses_without_candidate(tmp_path, "producer_path_refused")
+
+
+def test_a_folder_in_place_of_an_input_file_is_refused(tmp_path):
+    inputs(tmp_path)
+    (tmp_path / "assembly/final_audit.json").unlink()
+    (tmp_path / "assembly/final_audit.json").mkdir()
+    refuses_without_candidate(tmp_path, "producer_path_refused")
+
+
+def test_an_unreadable_input_file_is_a_missing_receipt(tmp_path):
+    inputs(tmp_path)
+    (tmp_path / "assembly/final_audit.json").chmod(0)
+    refuses_without_candidate(tmp_path, "producer_receipt_missing")
+
+
+@given(
+    stored=st.lists(st.sampled_from("abc"), min_size=1, max_size=3),
+    asked=st.lists(st.sampled_from("abc"), min_size=1, max_size=3),
+    body=st.binary(max_size=64),
+)
+def test_a_pinned_read_returns_exactly_the_stored_bytes_or_absent(stored, asked, body):
+    """Any stored file reads back exactly; any other name is absent, made nowhere."""
+    with tempfile.TemporaryDirectory() as folder:
+        cache = Path(folder) / "INVENTED-cache"
+        stored_path = cache.joinpath(*stored[:-1], "INVENTED-" + stored[-1])
+        stored_path.parent.mkdir(parents=True)
+        stored_path.write_bytes(body)
+        before = sorted(cache.rglob("*"))
+        name = "/".join([*asked[:-1], "INVENTED-" + asked[-1]])
+        loaded = producer._load(cache, name)
+        assert loaded == (body if asked == stored else None)
+        assert sorted(cache.rglob("*")) == before

@@ -31,6 +31,8 @@ def fixture_root(tmp: Path) -> Path:
         scripts / "count-reporter.mjs",
     )
     shutil.copy2(ROOT / "web" / "vitest.config.ts", tmp / "web" / "vitest.config.ts")
+    # The copied configuration names the provider request log as a setup file.
+    shutil.copytree(ROOT / "web" / "tests" / "setup", tmp / "web" / "tests" / "setup")
     for rel in (
         "scripts",
         "scripts/tests",

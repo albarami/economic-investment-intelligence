@@ -46,6 +46,17 @@ export const REFUSAL_CODES = [
   'night_acknowledgement_missing',
   'numeral_in_plain_segment',
   'planned_label_missing',
+  // S3-T12 accident context and the rail beside it.
+  'accident_point_map',
+  'accident_geography_allocation',
+  'accident_safety_verdict',
+  'accident_caveat_missing',
+  'rail_as_operating',
+  // RV1: closed presentation fields and the bound source zone.
+  'accident_field_unexpected',
+  'presentation_field_unexpected',
+  'accident_zone_unbound',
+  'accident_zone_mismatch',
 ] as const;
 
 export type RefusalCode = (typeof REFUSAL_CODES)[number];

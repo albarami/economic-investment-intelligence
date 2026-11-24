@@ -150,6 +150,7 @@ def build_fixture(
     playbook: bool = False,
     cards: bool = False,
     resolver: bool = False,
+    artefacts: tuple[dict[str, str], ...] = (),
 ) -> str:
     """Build the fixture release and return its release id."""
     return write_public_only(
@@ -163,6 +164,7 @@ def build_fixture(
         else _playbook_tables()
         if playbook
         else fixture_tables(),
+        artefacts=artefacts,
     )
 
 
@@ -887,6 +889,24 @@ def _cards_tables() -> tuple[TableWrite, ...]:
         elif table.name == "pub_rail_plan":
             rows = [
                 row(feature_key="fea-abcdefabcdefabcd", feature_kind="planned_station")
+            ]
+        elif table.name == "pub_accident_zone":
+            # S3-T12: invented source zones; an older year, a zero count and a
+            # zone without a reviewed crosswalk (never zero, never placed).
+            rows = [
+                row(
+                    source_zone=source_zone,
+                    period=period,
+                    zone_code=None if code is None else "INVENTED-zone-" + code,
+                    accident_count=count,
+                    coverage_key="counted" if code else "geography_missing",
+                )
+                for source_zone, period, code, count in (
+                    ("51", "2023", "a", 9),
+                    ("51", "2024", "a", 5),
+                    ("52", "2024", "b", 0),
+                    ("53", "2024", None, None),
+                )
             ]
         elif table.name == "pub_health_centre":
             rows = [

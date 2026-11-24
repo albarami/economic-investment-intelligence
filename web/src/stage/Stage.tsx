@@ -3,7 +3,13 @@ import { FactChip } from '../facts/FactChip';
  * The map column. With no extract the page draws land and sea and
  * does not construct a map or request a tile.
  */
-import { useEffect, useRef, useState, type ReactElement } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactElement,
+} from 'react';
 
 import { direction, text, type Language } from '../i18n';
 import { directiveAccepted, type AnswerDirective } from '../brief/catalogue';
@@ -17,7 +23,7 @@ import {
   setFrame,
   usePort,
 } from '../state/area-actions';
-import type { LayerPayload } from './layers/payload';
+import type { LayerNotice, LayerPayload } from './layers/payload';
 import { LayerPlate, PublicLayers } from './layers/PublicLayers';
 import type { FactRegistry } from '../facts/registry';
 import {
@@ -35,6 +41,8 @@ import { Swipe, type ComparisonInput } from './Swipe';
 import { useArea } from '../state/store';
 import type { AreaOutline } from '../api/areas';
 import { ContextRing, contextRingVertices } from '../controls/ContextRing';
+import { BuildingsLegend } from './BuildingsLegend';
+import { useBuildings } from './use-buildings';
 
 const UNAVAILABLE: MapModes = {
   open: { available: true, reason: null },
@@ -59,6 +67,7 @@ export function Stage({
   mapStarter,
   inert = false,
   layerPayload = null,
+  layerNotice = null,
   registry = null,
   onOpenChain,
   overlayFactory,
@@ -68,6 +77,7 @@ export function Stage({
   contextRing = null,
   quiet = false,
   compactControls = false,
+  buildingCap,
 }: {
   comparison?: ComparisonInput | null;
   dayBasis?: string;
@@ -79,8 +89,10 @@ export function Stage({
   mapStarter?: MapStarter;
   inert?: boolean;
   layerPayload?: LayerPayload | null;
+  layerNotice?: LayerNotice | null;
   registry?: FactRegistry | null;
-  onOpenChain?: (factId: string) => void;
+  /** Opens a fact's chain; a read with its own chain passes its registry. */
+  onOpenChain?: (factId: string, from?: FactRegistry) => void;
   overlayFactory?: (
     payload: LayerPayload,
     registry: FactRegistry | null,
@@ -90,6 +102,8 @@ export function Stage({
   contextRing?: AreaOutline | null;
   quiet?: boolean;
   compactControls?: boolean;
+  /** The shadow cap; the provisional one until box 7 measures it. */
+  buildingCap?: number;
 }) {
   const [reportedModes, setModes] = useState<MapModes>(UNAVAILABLE);
   const modes: MapModes = reportedModes;
@@ -376,6 +390,29 @@ export function Stage({
     result.handle,
   ]);
 
+  const isLive = useCallback(
+    (handle: MapHandle) => activeHandle.current === handle,
+    [],
+  );
+  const buildings = useBuildings({
+    isLive,
+    handle: result.handle ?? null,
+    ready: phase === 'ready',
+    hidden: quiet || mode === 'photoreal',
+    cap: buildingCap,
+  });
+
+  useEffect(() => {
+    const handle = result.handle;
+    if (!handle || handle !== activeHandle.current || phase !== 'ready') return;
+    return handle.onSpendMeter?.((meter) => {
+      setModes((previous) => ({
+        ...previous,
+        photoreal: { ...previous.photoreal, meter },
+      }));
+    });
+  }, [phase, requestKey, result.handle]);
+
   useEffect(() => {
     const handle = result.handle;
     if (!handle || handle !== activeHandle.current || phase !== 'ready') return;
@@ -466,6 +503,7 @@ export function Stage({
           language={language}
           collapsible={compactControls}
           payload={quiet ? null : layerPayload}
+          notice={layerNotice}
           registry={registry}
           onOpenChain={onOpenChain}
         />
@@ -499,9 +537,19 @@ export function Stage({
         language={language}
         collapsible={compactControls}
         payload={quiet ? null : layerPayload}
+        notice={layerNotice}
         registry={registry}
         onOpenChain={onOpenChain}
       />
+      {buildings ? (
+        <BuildingsLegend
+          language={language}
+          heights={buildings.heights}
+          selection={buildings.selection}
+          picked={buildings.picked}
+          onOpenChain={(id) => onOpenChain?.(id, buildings.heights.registry)}
+        />
+      ) : null}
       {canvas}
       {ring}
     </section>
@@ -512,12 +560,14 @@ function LayerChrome({
   collapsible,
   language,
   payload,
+  notice,
   registry,
   onOpenChain,
 }: {
   language: Language;
   collapsible?: boolean;
   payload: LayerPayload | null;
+  notice: LayerNotice | null;
   registry: FactRegistry | null;
   onOpenChain?: (factId: string) => void;
 }) {
@@ -534,6 +584,7 @@ function LayerChrome({
   const content = (
     <PublicLayers
       payload={payload}
+      notice={notice}
       language={language}
       registry={registry}
       onOpenChain={onOpenChain ?? (() => undefined)}

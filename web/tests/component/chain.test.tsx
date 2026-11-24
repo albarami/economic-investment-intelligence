@@ -34,6 +34,7 @@ import {
   makeSource,
   registryFrom,
 } from '../fixtures/facts';
+import { numeralsOutsideChips } from '../fixtures/numerals';
 
 const DIGIT = /\p{Nd}/u;
 const CLASS_WORD =
@@ -41,21 +42,6 @@ const CLASS_WORD =
 
 function buttonOf(view: { container: HTMLElement }): HTMLElement {
   return within(view.container).getByRole('button');
-}
-
-function digitsOutsideChips(root: ParentNode): string[] {
-  const found: string[] = [];
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  let node = walker.nextNode();
-  while (node) {
-    const value = node.textContent ?? '';
-    if (DIGIT.test(value)) {
-      const parent = node.parentElement;
-      if (!parent?.closest('[data-fact-chip]')) found.push(value);
-    }
-    node = walker.nextNode();
-  }
-  return found;
 }
 
 describe('incomplete lineage', () => {
@@ -343,7 +329,7 @@ describe('source chain', () => {
         />,
       );
       expect(view.container.textContent).toContain('INVENTED-dataset2026');
-      expect(digitsOutsideChips(view.container)).toEqual([]);
+      expect(numeralsOutsideChips(view.container)).toEqual([]);
     },
   );
   it('titles the drawer Source chain in both languages', () => {
@@ -395,7 +381,7 @@ describe('source chain', () => {
     expect(within(open.container).getByRole('link').getAttribute('href')).toBe(
       '/privacy-receipt',
     );
-    expect(digitsOutsideChips(open.container)).toEqual([]);
+    expect(numeralsOutsideChips(open.container)).toEqual([]);
     open.unmount();
     const closed = render(
       <SourceChainDrawer
@@ -646,7 +632,7 @@ describe('F10 chip and chain plants', () => {
         <span data-fact-chip="value">4</span>
       </div>,
     );
-    expect(digitsOutsideChips(view.container)).toEqual(['4']);
+    expect(numeralsOutsideChips(view.container)).toEqual(['4']);
   });
 
   it('gives the withheld mark and every status mark a word and a shape', () => {

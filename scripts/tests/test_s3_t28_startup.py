@@ -56,17 +56,32 @@ class Startup(WorkspaceCase):
                 self.assertEqual(json.loads(response.body)["store"], "postgres")
 
     def test_local_assets_reflect_present_and_missing_inputs(self) -> None:
+        from eii_product.store.release_check import CheckedRelease
+
         release, web = self.root / "release", self.root / "web"
-        (release / "tiles").mkdir(parents=True)
-        (release / "fonts").mkdir()
+        (release / "artefacts/tiles").mkdir(parents=True)
+        (release / "artefacts/fonts/Noto Sans Medium").mkdir(parents=True)
         (web / "assets").mkdir(parents=True)
-        (release / "tiles/basemap.pmtiles").write_bytes(b"INVENTED-tile")
+        (release / "artefacts/tiles/basemap.pmtiles").write_bytes(b"INVENTED-tile")
+        (release / "artefacts/fonts/Noto Sans Medium/0-255.pbf").write_bytes(
+            b"INVENTED-glyph"
+        )
         (web / "assets/font.woff2").write_bytes(b"INVENTED-font")
-        self.assertEqual(local_assets(release, web), ("ok", "ok", "ok"))
-        (release / "tiles/basemap.pmtiles").unlink()
-        self.assertEqual(local_assets(release, web), ("missing", "ok", "ok"))
+        checked = CheckedRelease(
+            release,
+            {
+                "artefacts": [
+                    {"path": "artefacts/tiles/basemap.pmtiles"},
+                    {"path": "artefacts/fonts/Noto Sans Medium/0-255.pbf"},
+                ]
+            },
+            {},
+        )
+        self.assertEqual(local_assets(checked, web), ("ok", "ok", "ok"))
+        (release / "artefacts/tiles/basemap.pmtiles").unlink()
+        self.assertEqual(local_assets(checked, web), ("missing", "ok", "ok"))
         (web / "assets/font.woff2").unlink()
-        self.assertEqual(local_assets(release, web), ("missing", "missing", "ok"))
+        self.assertEqual(local_assets(checked, web), ("missing", "missing", "ok"))
 
     def test_failed_new_entry_readiness_stops_only_that_owned_child(self) -> None:
         from operations.config import Environment

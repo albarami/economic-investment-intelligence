@@ -348,16 +348,19 @@ for (const combo of MATRIX) {
 test('planted absent archive and glyphs fail every proof', async ({ page }) => {
   const seen = watch(page);
   await page.goto(`${BROKEN_BASE}/?lang=en&theme=dark`);
-  await page.locator('.stage[data-state="ready"]').waitFor({ timeout: 60_000 });
+  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(page.locator('[data-scene]')).toHaveCount(0);
   const features = await renderedFeatures(page);
   expect(
     features?.some((feature) => feature.sourceLayer === 'earth'),
   ).toBeFalsy();
-  const coverage = routeCoverage(seen);
-  expect(coverage).toContain('no ranged extract bytes');
-  expect(coverage).toContain('no glyph request');
-  expect(seen.request).toContain(`${BROKEN_BASE}${EXTRACT}`);
-  expect(seen.status.get(`${BROKEN_BASE}${EXTRACT}`)).toBe(404);
+  const glyphs = seen.request.filter((url) =>
+    url.startsWith(`${BROKEN_BASE}/fonts/`),
+  );
+  expect(glyphs.length).toBeGreaterThan(0);
+  expect(glyphs.every((url) => seen.status.get(url) === 404)).toBe(true);
+  expect(seen.request).not.toContain(`${BROKEN_BASE}${EXTRACT}`);
+  expect(seen.status.get(`${BROKEN_BASE}${EXTRACT}`)).toBeUndefined();
 });
 
 test('a planted missing glyph file fails the arabic proof', async ({
@@ -368,14 +371,14 @@ test('a planted missing glyph file fails the arabic proof', async ({
   renameSync(missing, held);
   try {
     const seen = watch(page);
-    await page.goto(`${BASE}/?lang=ar&theme=dark`);
-    await page
-      .locator('.stage[data-state="ready"]')
-      .waitFor({ timeout: 60_000 });
-    await page.waitForResponse(
+    const refused = page.waitForResponse(
       (response) => response.url().includes('65024-65279.pbf'),
       { timeout: 30_000 },
     );
+    await page.goto(`${BASE}/?lang=ar&theme=dark`);
+    await refused;
+    await expect(page.getByRole('alert')).toBeVisible();
+    await expect(page.locator('[data-scene]')).toHaveCount(0);
     expect(seen.status.get(`${BASE}${FONT_URL}/65024-65279.pbf`)).toBe(404);
     expect(routeCoverage(seen)).toContain('glyph request refused');
   } finally {
@@ -406,17 +409,15 @@ test('a planted wrong-type file and a symlink escape are refused', async ({
     const response = await page.request.get(`${BASE}${FONT_URL}/0-255.pbf`);
     expect(response.status()).toBe(404);
     const seen = watch(page);
-    await page.goto(`${BASE}/?lang=en&theme=dark`);
-    await page
-      .locator('.stage[data-state="ready"]')
-      .waitFor({ timeout: 60_000 });
-    await page.waitForResponse((response) =>
+    const refused = page.waitForResponse((response) =>
       response.url().includes(`${FONT_URL}/0-255.pbf`),
     );
+    await page.goto(`${BASE}/?lang=en&theme=dark`);
+    await refused;
+    await expect(page.getByRole('alert')).toBeVisible();
+    await expect(page.locator('[data-scene]')).toHaveCount(0);
     expect(routeCoverage(seen)).toContain('glyph request refused');
-    expect(await labelProof(page, seen, 'en')).toContain(
-      'no latin glyph range served',
-    );
+    expect(glyphRanges(seen)).toEqual([]);
   } finally {
     rmSync(stack, { force: true });
     renameSync(`${stack}.held`, stack);

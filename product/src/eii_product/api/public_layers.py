@@ -5,7 +5,7 @@ from collections.abc import Mapping
 from decimal import Decimal
 from typing import Any, cast
 
-from eii_core.calc.facts import CalculationFact
+from eii_core.calc.facts import CalculationFact, SourceChain
 from eii_core.calc.firms_per_tower import CLASS_KEYS
 from eii_core.calc.layer_classes import equal_count_classes
 from eii_core.calc.public_methods import AnnualEnergy, reliability, zone_momentum
@@ -32,6 +32,7 @@ PUBLIC_LAYER_KEYS = (
     "night_lights",
     "zone_electricity_growth",
     "company_points",
+    "accidents",
 )
 # The same closed point/listing set the browser filters. Source-geography
 # layers (including point-shaped rail features) never enter this snapshot.
@@ -81,6 +82,7 @@ TABLES = {
     "night_lights": "pub_night_lights",
     "zone_electricity_growth": "pub_zone_utility",
     "company_points": "pub_register_company",
+    "accidents": "pub_accident_zone",
 }
 METRICS = {
     "public_places": "place_listing",
@@ -97,6 +99,7 @@ METRICS = {
     "night_lights": "radiance_class",
     "zone_electricity_growth": "electricity_growth_class",
     "company_points": "register_company_point",
+    "accidents": "accident_count",
 }
 
 # Document 03 section 7.3, including the additional page fields loaded by S2-T12.
@@ -148,6 +151,19 @@ FDI_FIELDS = (
     "fdi_sector_name",
     "province",
 )
+# The contract columns that travel as Fact chips rather than published words.
+FDI_FACT_FIELDS = ("capex_value", "jobs", "announced", "lat", "lng")
+FDI_CONTRACT_FIELDS = frozenset(FDI_FIELDS + FDI_FACT_FIELDS)
+
+
+def fdi_field_problem(row: dict[str, Any]) -> str | None:
+    """S3-T12: a row holds every contract column and no column the route leaves off."""
+    keys = set(row) - {"source_id"}
+    if FDI_CONTRACT_FIELDS - keys:
+        return "fdi_field_dropped"
+    if keys - FDI_CONTRACT_FIELDS:
+        return "fdi_field_unexpected"
+    return None
 
 
 def segments(value: str, record: str) -> list[dict[str, str]]:
@@ -221,6 +237,22 @@ class LayerRead:
         self.facts: dict[str, Fact] = {}
         self.sources: dict[str, dict[str, Any]] = {}
 
+    def verified(
+        self, table: str, source_id: str | None
+    ) -> tuple[SourceChain, list[dict[str, Any]]] | None:
+        """The table's complete chain, holding the named source; else None."""
+        try:
+            source, lines, sources = chain(self.store, table)
+        except ValueError:
+            return None
+        if validate_chain(source.lineage_ref, lines, sources) is not None:
+            return None
+        if source_id is not None and source_id not in {
+            line["source_id"] for line in lines if line["table_name"] == table
+        }:
+            return None
+        return source, sources
+
     def fact(
         self,
         table: str,
@@ -232,17 +264,13 @@ class LayerRead:
         qualifiers: Mapping[str, str] | None = None,
         caveats: tuple[str, ...] = (),
         source_id: str | None = None,
+        evidence_status: str = "observed",
+        labels: tuple[str, str] = ("Published layer value", "قيمة الطبقة المنشورة"),
     ) -> Fact | None:
-        try:
-            source, lines, sources = chain(self.store, table)
-        except ValueError:
+        verified = self.verified(table, source_id)
+        if verified is None:
             return None
-        if validate_chain(source.lineage_ref, lines, sources) is not None:
-            return None
-        if source_id is not None and source_id not in {
-            line["source_id"] for line in lines if line["table_name"] == table
-        }:
-            return None
+        source, sources = verified
         geography = {"kind": "public", "public_code": code}
         identifier = fact_id(
             release_id=self.store.release_id,
@@ -260,12 +288,12 @@ class LayerRead:
                 geography=geography,
                 provenance="public",
                 input_classes=["public"],
-                evidence_status="observed",
+                evidence_status=evidence_status,
                 reliability=reliability(None),
                 coverage_keys=[],
                 caveat_keys=list(caveats),
-                label_en="Published layer value",
-                label_ar="قيمة الطبقة المنشورة",
+                label_en=labels[0],
+                label_ar=labels[1],
                 lineage_ref=source.lineage_ref,
                 release_id=self.store.release_id,
             )
@@ -359,6 +387,8 @@ def read_layer(
         return hero(ctx)
     if key == "land_prices":
         return land(ctx)
+    if key == "accidents":
+        return accidents(ctx)
     if key == "night_lights":
         months = read(store, "layer_night_lights_months")
         if month_key is None:
@@ -456,6 +486,142 @@ def land(ctx: LayerRead) -> dict[str, Any]:
             )
         )
     return ctx.response(features, **({"class_breaks": groups} if groups else {}))
+
+
+# S3-T12 / decision 0047: recorded accidents on the source's own zones. The
+# closed NO_DATA reasons of the absence matrix (document 03, accident read).
+ACCIDENT_REASONS = (
+    "accident_source_missing",
+    "accident_measure_unconfirmed",
+    "accident_geography_missing",
+)
+ACCIDENT_LABELS = ("accident_count_context",)
+_ACCIDENT_COVERAGE = ("counted", "measure_unconfirmed", "geography_missing")
+
+
+def accident_no_data(
+    ctx: LayerRead, reason: str, counts: Mapping[str, int]
+) -> dict[str, Any]:
+    """The one closed Public-layer NO_DATA envelope: no fact, no feature."""
+    if reason not in ACCIDENT_REASONS:
+        raise ValueError("accident_reason_unknown")
+    ctx.facts.clear()
+    body = ctx.response([])
+    body["reason"] = reason
+    body["coverage_report"] = {"counts": dict(counts)}
+    return body
+
+
+def accident_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Refuse a corrupt table; return the rows of the latest source year."""
+    if not rows:
+        raise ValueError("accident_table_empty")
+    keys: set[tuple[str, str]] = set()
+    for row in rows:
+        state, count = row["coverage_key"], row["accident_count"]
+        if state not in _ACCIDENT_COVERAGE:
+            raise ValueError("accident_coverage_invalid")
+        if (state == "counted") != (count is not None) or (
+            state != "measure_unconfirmed"
+            and (state == "counted") != (row["zone_code"] is not None)
+        ):
+            raise ValueError("accident_coverage_invalid")
+        # Text shape, not a numeric compare: route modules compare no number.
+        if count is not None and (
+            type(count) is not int or re.fullmatch(r"0|[1-9][0-9]*", str(count)) is None
+        ):
+            raise ValueError("accident_count_invalid")
+        if re.fullmatch(r"[1-9][0-9]{3}", str(row["period"])) is None:
+            raise ValueError("accident_period_invalid")
+        if re.fullmatch(r"0|[1-9][0-9]*", str(row["source_zone"])) is None:
+            raise ValueError("accident_zone_invalid")
+        key = (row["source_zone"], row["period"])
+        if key in keys:
+            raise ValueError("accident_row_duplicate")
+        keys.add(key)
+    unconfirmed = {row["coverage_key"] == "measure_unconfirmed" for row in rows}
+    if unconfirmed not in ({True}, {False}):
+        raise ValueError("accident_coverage_invalid")
+    # Queries return period order; the latest published year is the default.
+    latest = [row for row in rows if row["period"] == rows[-1]["period"]]
+    codes = [row["zone_code"] for row in latest if row["zone_code"] is not None]
+    if len(codes) != len(set(codes)):
+        raise ValueError("accident_geography_allocation")
+    return latest
+
+
+def accidents(ctx: LayerRead) -> dict[str, Any]:
+    tables = {row["table_name"] for row in read(ctx.store, "public_release_manifest")}
+    if "pub_accident_zone" not in tables:
+        # Sealed absence: the release holds no table, so none is queried.
+        return accident_no_data(ctx, "accident_source_missing", {})
+    rows = read(ctx.store, "layer_accidents")
+    latest = accident_rows(rows)
+    # A present table's chain holds every row's source before any absence.
+    for source_id in sorted({row["source_id"] for row in rows}):
+        if ctx.verified("pub_accident_zone", source_id) is None:
+            raise ValueError("accident_lineage_broken")
+    if latest[0]["coverage_key"] == "measure_unconfirmed":
+        return accident_no_data(
+            ctx, "accident_measure_unconfirmed", {"measure_unconfirmed": len(latest)}
+        )
+    zones = {r["zone_code"]: r for r in read(ctx.store, "layer_zone_geometry")}
+    features = []
+    for row in latest:
+        zone = zones.get(row["zone_code"])
+        if zone is None:
+            continue
+        code = "zone:" + row["zone_code"]
+        fact = ctx.fact(
+            "pub_accident_zone",
+            "accident_count",
+            row["accident_count"],
+            "count",
+            row["period"],
+            code,
+            caveats=("accidents_recorded_not_risk",),
+            source_id=row["source_id"],
+            evidence_status="inferred",
+            labels=("Recorded accidents", "الحوادث المسجلة"),
+        )
+        # The zone reference is a fact of the same release row as the count.
+        zone_fact = ctx.fact(
+            "pub_accident_zone",
+            "accident_source_zone",
+            row["source_zone"],
+            "published_text",
+            row["period"],
+            code,
+            source_id=row["source_id"],
+        )
+        if fact is None or zone_fact is None:
+            raise ValueError("accident_lineage_broken")
+        feature = ctx.feature(
+            "accidents:" + row["source_zone"] + ":" + row["period"],
+            fact,
+            "accident_count",
+            source_id=row["source_id"],
+            geography_code=code,
+            source_zone=row["source_zone"],
+            source_zone_fact_id=zone_fact.fact_id,
+            year=row["period"],
+            label_key=ACCIDENT_LABELS[0],
+            evidence_status="inferred",
+            caveat_keys=["accidents_recorded_not_risk"],
+            **polygon_fields(zone["geometry"]),
+            name_segments=segments(zone["name_en"], code),
+        )
+        feature["geometry_kind"] = "outline"
+        features.append(feature)
+    counts = {
+        "counted": len(features),
+        "geography_missing": len(latest) - len(features),
+    }
+    if not features:
+        return accident_no_data(ctx, "accident_geography_missing", counts)
+    body = ctx.response(features)
+    body["coverage_report"] = {"counts": counts}
+    return body
 
 
 def hero(ctx: LayerRead) -> dict[str, Any]:
@@ -706,6 +872,9 @@ def fdi_fields(
     filter_options: dict[str, list[dict[str, Any]]],
 ) -> None:
     """Copy the closed published columns. Never infer a field or a location."""
+    problem = fdi_field_problem(row)
+    if problem:
+        raise ValueError(problem)
     identifier = row["project_key"]
     year = row["announced"][:4] if row["announced"] else str(row["project_year"] or "")
     feature.update(

@@ -1,7 +1,11 @@
 /** Ephemeral native renderer on the map's existing interleaved overlay. */
 import type { Layer } from '@deck.gl/core';
 import { qualifiedLayer, visibleCredits } from './photoreal-loader';
-import { ModeFailure, type ModeFailureReason } from './map-modes';
+import {
+  ModeFailure,
+  type ModeFailureReason,
+  type SpendMeter,
+} from './map-modes';
 import { photorealSession } from './photoreal-session';
 
 let serial = 0;
@@ -20,6 +24,7 @@ export function photoreal(
   attach: (layer: Layer | null) => void,
   credit: (text: string) => void,
   failure: (reason: ModeFailureReason) => void,
+  onMeter: ((meter: SpendMeter) => void) | undefined = undefined,
 ) {
   const session = photorealSession();
   let closed = false;
@@ -99,6 +104,7 @@ export function photoreal(
             },
           },
           session.fetch,
+          onMeter,
         );
         if (!closed) attach(layer);
       } catch {

@@ -1025,8 +1025,9 @@ sources:
     nightly_live_fetch: true
     public_splits: ["nationality"]
     commit_allowed: false
-    release_tables: []
-    caveat_keys: []
+    release_tables: ["pub_accident_zone"]
+    # S3-T12: the pending source's NO_DATA coverage row (document 03 caveats).
+    caveat_keys: ["accident_source_missing"]
     # Lead metadata reading, 2026-11-16 (L-701).
     columns:
       - {name: "accident_year", type: "string"}

@@ -6,12 +6,18 @@ import shutil
 from product.tests.public_http_support import Client
 from product.tests.test_mounted_release_http import loaded as loaded
 
+from eii_product.api.area_context import RoutingSource
 from operations.development import serve_embedded
 
 
 def test_explicit_embedded_serves_checked_release_without_postgres(
     loaded, tmp_path, monkeypatch
 ):
+    # This test isolates the no-PostgreSQL boundary; test_served_routing mounts tiles.
+    monkeypatch.setattr(
+        "eii_product.api.area_context.routing_from_release",
+        lambda checked: RoutingSource.from_call(lambda *args: ()),
+    )
     source, identity, _ = loaded
     home = tmp_path / "development"
     target = home / "releases" / identity
@@ -34,6 +40,12 @@ def test_explicit_embedded_serves_checked_release_without_postgres(
         response = Client(app).get("/api/release")
         assert response.status_code == 200
         assert response.json()["release_id"] == identity
+        health = Client(app).get("/health")
+        assert health.status_code == 503
+        assert (health.json()["tiles"], health.json()["fonts"]) == (
+            "missing",
+            "missing",
+        )
 
     serve_embedded(
         tmp_path,

@@ -54,6 +54,7 @@ from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.report import (
     TERMS_HOST_NOT_LISTED,
     citation_line,
+    coverage_count_line,
     coverage_line,
     evidence_line,
     fail_line,
@@ -559,6 +560,14 @@ def _seeded_assembly(
     )
     try:
         build.run()
+        from eii_custodian.release.map_assets import (
+            configured_sources,
+            place_map_assets,
+        )
+
+        coverage = place_map_assets(cache, *configured_sources(cache.parent.parent))
+        for asset, reason in sorted(coverage.items()):
+            build.lines.append(coverage_count_line(f"map_{asset}", reason, 1))
     except Exception as exc:
         # No exception text crosses the source/credential boundary. Preserve
         # an existing structured fetch failure and its network exit code.

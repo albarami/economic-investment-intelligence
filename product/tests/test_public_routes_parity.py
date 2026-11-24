@@ -142,7 +142,7 @@ def test_all_named_reads_are_executed(executed):
             ("layer_", "night_lights_", "venue_busyness_", "population_age_sex_")
         )
     }
-    assert len(new) == 23
+    assert len(new) == 24
     assert "layer_fdi_gazetteer" in new
     assert "layer_company_points" in new
     assert new <= union
@@ -178,7 +178,8 @@ def test_each_missing_query_trace_is_refused(executed, removed):
 
 @pytest.mark.parametrize(
     "group,index",
-    [("public_layers", i) for i in range(13)] + [("public_cards", i) for i in range(3)],
+    [("public_layers", i) for i in range(len(public_layer_descriptors()))]
+    + [("public_cards", i) for i in range(3)],
 )
 def test_each_missing_case_is_refused(executed, group, index):
     tools, cases, inventory, result = executed[group]

@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { loadPublicLayer, type PublicLayerKey } from '../api/public-layer';
+import {
+  composeLayers,
+  loadPublicLayer,
+  type PublicLayerKey,
+  type PublicLayerResult,
+} from '../api/public-layer';
 import { loadBasemapUrl } from '../api/release';
 import {
   loadBusyness,
@@ -38,14 +43,19 @@ export const PUBLIC_LAYERS = [
   'fdi_projects',
   'property_prices',
   'company_points',
+  'accidents',
   'fc_firms_per_tower',
 ] as const;
 type LayerKey = PublicLayerKey | 'fc_firms_per_tower';
+/** S3-T12: recorded accidents are read beside the planned rail context. */
+const CONTEXT_LAYERS: Partial<Record<LayerKey, readonly LayerKey[]>> = {
+  accidents: ['rail_plan'],
+};
+/** S3-T12: the access result is pending (PO-S3-B8-ACCESS); never a figure. */
+const ACCESS_PENDING: ReadonlySet<LayerKey> = new Set(['accidents']);
 
 export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
-  const [mounted, setMounted] = useState<Awaited<
-    ReturnType<typeof loadPublicLayer>
-  > | null>(null);
+  const [mounted, setMounted] = useState<PublicLayerResult | null>(null);
   const [mountedExtract, setMountedExtract] = useState<string | null>(null);
   const [language, setLanguage] = useState<Language>(
     requestParam('lang') === 'ar' ? 'ar' : 'en',
@@ -82,7 +92,12 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
   }, [extractUrl]);
   useEffect(() => {
     const token = ++layerGeneration.current;
-    void loadPublicLayer(layer)
+    void Promise.all(
+      [layer, ...(CONTEXT_LAYERS[layer] ?? [])].map((key) =>
+        loadPublicLayer(key),
+      ),
+    )
+      .then((results) => composeLayers(results))
       .then((result) => {
         if (token !== layerGeneration.current) return;
         setMounted(result);
@@ -147,6 +162,14 @@ export function MountedPublicShell({ extractUrl }: { extractUrl: string }) {
         theme={theme}
         extractUrl={mountedExtract}
         sourceLayers={mounted?.payload ?? null}
+        layerNotice={
+          mounted
+            ? {
+                noData: mounted.reason,
+                accessPending: ACCESS_PENDING.has(layer),
+              }
+            : null
+        }
         registry={registry}
         quiet={scene === 'opening'}
         rings={currentStory?.rings ?? null}

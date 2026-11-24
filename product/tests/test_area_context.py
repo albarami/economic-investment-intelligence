@@ -1,8 +1,11 @@
 """Trusted routing configuration and one session-aware context factory."""
 
+import json
 from types import SimpleNamespace
 
 import pytest
+from product.tests.test_routing_extract import extract as extract
+from routing_release_fixture import TILES
 
 from eii_product.api.app import create_app
 from eii_product.api.area_context import (
@@ -20,10 +23,11 @@ def call(*args):
     return ((0, 0), (0, 1), (1, 1), (0, 0))
 
 
-def test_sources_context_and_cookie_only(tmp_path):
-    (tmp_path / "config.json").write_text("{}")
-    source = RoutingSource.from_tiles(tmp_path)
-    assert source.tile_folder == tmp_path and source.call is None
+def test_sources_context_and_cookie_only(tmp_path, extract):
+    source = RoutingSource.from_tiles(extract[0] / TILES, extract[0])
+    config = json.loads((source.tile_folder / "config.json").read_bytes())
+    assert config["mjolnir"]["tile_extract"] == str((extract[0] / TILES).resolve())
+    assert source.call is None
     factory = AreaContextFactory("ab" * 32, RoutingSource.from_call(call))
     sessions = SessionStore()
     held = sessions.admit(None)
@@ -52,9 +56,9 @@ def test_sources_context_and_cookie_only(tmp_path):
 def test_source_refusals(tmp_path, kind):
     with pytest.raises(ConfigError, match=r"^routing_tiles$"):
         if kind == "missing":
-            RoutingSource.from_tiles(tmp_path / "absent")
+            RoutingSource.from_tiles(tmp_path / "absent", tmp_path)
         elif kind == "no-config":
-            RoutingSource.from_tiles(tmp_path)
+            RoutingSource.from_tiles(tmp_path, tmp_path)
         elif kind == "both":
             RoutingSource(tile_folder=tmp_path, call=call)
         elif kind == "neither":
@@ -67,28 +71,17 @@ def test_source_refusals(tmp_path, kind):
             )
 
 
-def test_checked_release_path_rules(tmp_path):
-    root = tmp_path / "release"
-    tiles = root / "artefacts" / "routing"
-    tiles.mkdir(parents=True)
-    (tiles / "config.json").write_text("{}")
-    checked = CheckedRelease(root, {"artefacts": [{"path": "artefacts/routing/"}]}, {})
-    assert routing_from_release(checked).tile_folder == tiles.resolve()
+def test_checked_release_path_rules(extract):
+    root, reference = extract
+    checked = CheckedRelease(root, {"artefacts": [reference]}, {})
+    source = routing_from_release(checked)
+    config = json.loads((source.tile_folder / "config.json").read_bytes())
+    assert config["mjolnir"]["tile_extract"] == str((root / TILES).resolve())
     for entries in (
         [],
         [{"path": "/routing/"}],
         [{"path": "artefacts/../routing/"}],
-        [{"path": "artefacts/routing/"}] * 2,
+        [reference] * 2,
     ):
         with pytest.raises(ConfigError, match=r"^routing_tiles$"):
             routing_from_release(CheckedRelease(root, {"artefacts": entries}, {}))
-    (tiles / "config.json").unlink()
-    with pytest.raises(ConfigError, match=r"^routing_tiles$"):
-        routing_from_release(checked)
-    tiles.rmdir()
-    outside = tmp_path / "outside"
-    outside.mkdir()
-    (outside / "config.json").write_text("{}")
-    tiles.symlink_to(outside, target_is_directory=True)
-    with pytest.raises(ConfigError, match=r"^routing_tiles$"):
-        routing_from_release(checked)

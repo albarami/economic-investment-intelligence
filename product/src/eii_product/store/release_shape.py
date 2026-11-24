@@ -13,6 +13,7 @@ from eii_core.manifest import (
     ColumnSpec,
     by_name,
     engine_versions_reason,
+    listed_inputs_reason,
     written_by_privacy,
 )
 from eii_core.source_chain import (
@@ -70,7 +71,9 @@ _TABLE_KEYS = frozenset(
     }
 )
 _ARTEFACT_KEYS = frozenset({"path", "sha256"})
-_KNOWN_KEYS = _MANIFEST_KEYS | FORBIDDEN_PUBLIC_ONLY
+# Optional: absent means the release lists no outside file (L-1509).
+_OPTIONAL_KEYS = frozenset({"listed_inputs"})
+_KNOWN_KEYS = _MANIFEST_KEYS | _OPTIONAL_KEYS | FORBIDDEN_PUBLIC_ONLY
 
 
 def refuse_document(document: Mapping[str, object]) -> None:
@@ -93,6 +96,10 @@ def refuse_document(document: Mapping[str, object]) -> None:
     if type(sources) is not list:
         raise ReleaseRefusal("manifest_type_invalid")
     _refuse_artefacts(document.get("artefacts"))
+    if "listed_inputs" in document:
+        listed = listed_inputs_reason(document["listed_inputs"])
+        if listed is not None:
+            raise ReleaseRefusal(listed)
     seen: set[str] = set()
     for entry in tables:
         name = _refuse_table_entry(entry)
@@ -170,9 +177,9 @@ def _refuse_manifest_keys(document: Mapping[str, object]) -> None:
             raise ReleaseRefusal("unknown_manifest_key")
         if key in FORBIDDEN_PUBLIC_ONLY:
             raise ReleaseRefusal("forbidden_manifest_field")
-        if key.lower() in known_lower and key not in _MANIFEST_KEYS:
+        if key.lower() in known_lower and key not in _MANIFEST_KEYS | _OPTIONAL_KEYS:
             raise ReleaseRefusal("manifest_key_case")
-        if key not in _MANIFEST_KEYS:
+        if key not in _MANIFEST_KEYS | _OPTIONAL_KEYS:
             raise ReleaseRefusal("unknown_manifest_key")
     for key in _MANIFEST_KEYS:
         if key not in document:

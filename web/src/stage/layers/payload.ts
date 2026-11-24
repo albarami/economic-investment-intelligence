@@ -99,6 +99,10 @@ export interface LayerFeature {
   evidence_status?: 'observed' | 'inferred' | 'still_to_test';
   method_id?: string;
   geography_code?: string;
+  /** S3-T12: the publisher's own zone number, shown as a reference. */
+  source_zone?: string;
+  /** Its `accident_source_zone` fact, of the count's own release row. */
+  source_zone_fact_id?: string;
   identifier?: string;
   omit_mark?: boolean;
   omit_year?: boolean;
@@ -153,6 +157,20 @@ export const CLASSED_LAYER_KEYS = [
   'land_prices',
   'zone_electricity_growth',
 ] as const;
+
+/** The closed reasons of the Public-layer NO_DATA envelope (S3-T12). */
+export const LAYER_NO_DATA_REASONS = [
+  'accident_source_missing',
+  'accident_measure_unconfirmed',
+  'accident_geography_missing',
+] as const;
+export type LayerNoDataReason = (typeof LAYER_NO_DATA_REASONS)[number];
+
+/** What the plate says beside its layers: a closed absence and the access panel. */
+export interface LayerNotice {
+  noData: LayerNoDataReason | null;
+  accessPending: boolean;
+}
 
 export interface LayerRequest {
   key: string;

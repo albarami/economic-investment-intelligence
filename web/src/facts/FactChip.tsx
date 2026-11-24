@@ -12,7 +12,12 @@ import {
   type Language,
   type StringKey,
 } from '../i18n';
-import { formatFactValue, formatRange, type SignMode } from './formatters';
+import {
+  countForm,
+  formatFactValue,
+  formatRange,
+  type SignMode,
+} from './formatters';
 import { NumericInput, type Preset } from './NumericInput';
 import type { FactRegistry } from './registry';
 import type { Resolution } from './types';
@@ -43,6 +48,7 @@ export type FactChipProps =
       language: Language;
       onOpen: Open;
       figure?: boolean;
+      figureCell?: boolean;
     }
   | {
       variant: 'compact';
@@ -52,6 +58,7 @@ export type FactChipProps =
       language: Language;
       onOpen: Open;
       figure?: boolean;
+      figureCell?: boolean;
     }
   | {
       variant: 'input';
@@ -198,10 +205,13 @@ function readyBody(
   onOpen: Open,
 ): { state: string; label: string; body: ReactNode } {
   if (resolution.display === 'withheld') {
+    // The reason in words, never a value and never zero (decision 0042 item 7).
+    const reason = text(language, 'chip.withheld');
+    const action = text(language, 'chip.open');
     return {
       state: 'withheld',
-      label: text(language, 'chip.open'),
-      body: <span className="chip-withheld" />,
+      label: language === 'ar' ? `${reason}، ${action}` : `${reason} ${action}`,
+      body: <span className="chip-withheld chip-unit">{reason}</span>,
     };
   }
   const fact = resolution.binding.fact;
@@ -279,7 +289,12 @@ function readyBody(
   const unit =
     fact.unit === 'percent'
       ? null
-      : unitLabel(language, fact.unit, resolution.binding.metricKey);
+      : unitLabel(
+          language,
+          fact.unit,
+          resolution.binding.metricKey,
+          countForm(fact.value, language),
+        );
   const signed =
     resolution.binding.presentation === 'change'
       ? suppliedDirection(
@@ -453,7 +468,7 @@ export function FactChip(props: FactChipProps) {
   if (props.figure) {
     return (
       <span
-        className="chip"
+        className={props.figureCell ? 'chip figure-cell' : 'chip'}
         data-fact-chip={props.variant}
         data-fact-id={props.factId}
         data-state={view.state}
@@ -467,7 +482,7 @@ export function FactChip(props: FactChipProps) {
   return (
     <button
       type="button"
-      className="chip"
+      className={props.figureCell ? 'chip figure-cell' : 'chip'}
       data-fact-chip={props.variant}
       data-fact-id={props.factId}
       data-state={view.state}
@@ -506,7 +521,7 @@ function OperationalChip({
       unit === 'published_text' ? 'reference' : 'operational',
     );
     return (
-      <span className="operational-quantity" data-quantity={name}>
+      <span className="operational-quantity figure-cell" data-quantity={name}>
         <span className="chip-unit">{text(language, label)}</span>
         {formatted.ok ? (
           <Isolate language={language} automatic={unit === 'calendar_date'}>

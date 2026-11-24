@@ -16,17 +16,21 @@ import rtlPluginUrl from '../../node_modules/@mapbox/mapbox-gl-rtl-text/dist/map
 import { Protocol } from 'pmtiles';
 import type { AreaOutline } from '../api/areas';
 import { circleBoundary } from './layers/area-filter';
-import type { MapMode, ModeFailureReason } from './map-modes';
+import type { MapMode, ModeFailureReason, SpendMeter } from './map-modes';
 import { modeRenderer } from './mode-renderer';
 import { overlayFor } from './layers/overlay';
+import type { ShadowView } from './buildings3d';
 
 import { restoreNamed, suspendNamed, type GestureBag } from './gestures';
+import { isRecord } from '../guards';
 
 export interface OverlayMount {
   setClock?(timestamp: number): void;
   getPayloadLayers?(): Layer[];
   setPayloadLayers?(layers: Layer[]): void;
   setPhotoreal?(layer: Layer | null): void;
+  /** Verified building layers under a shadow cap (S3-T16). */
+  setBuildings?(layers: Layer[], cap: number): void;
   onAdd(map: Map): HTMLElement;
   onRemove(map: Map): void;
 }
@@ -59,8 +63,13 @@ export interface MapHandle {
   onModeError?(
     listener: (mode: MapMode, reason: ModeFailureReason) => void,
   ): () => void;
+  onSpendMeter?(listener: (meter: SpendMeter) => void): () => void;
   setMode?(mode: MapMode, credit: (text: string) => void): Promise<void>;
   setClock?(timestamp: number): void;
+  /** Kept across overlay changes; the mounted overlay verifies them. */
+  setBuildings?(layers: Layer[], cap: number): void;
+  /** The view's centre and edges in degrees, for the shadow selection. */
+  viewBounds?(): ShadowView;
   remove(): void;
   mountOverlay(overlay: OverlayMount): void;
   bind(type: string, listener: (event: DrawingEvent) => void): void;
@@ -141,6 +150,7 @@ export async function startMap(
   };
   let modeListener:
     ((mode: MapMode, reason: ModeFailureReason) => void) | null = null;
+  let meterListener: ((meter: SpendMeter) => void) | null = null;
   let photorealLayer: Layer | null = null;
   const modes = modeRenderer(
     map,
@@ -150,10 +160,12 @@ export async function startMap(
       photorealLayer = layer;
       clockOverlay.setPhotoreal?.(layer);
     },
+    (meter) => meterListener?.(meter),
   );
   let clockOverlay: OverlayMount = overlayFor(null, null, undefined, true);
   clockOverlay.onAdd(map);
   let timestamp: number | null = null;
+  let buildings: { layers: Layer[]; cap: number } | null = null;
   return {
     ...createHandle(surfaceFrom(map), {
       mount(overlay) {
@@ -165,6 +177,7 @@ export async function startMap(
         clockOverlay = overlay;
         overlay.onAdd(map);
         overlay.setPhotoreal?.(photorealLayer);
+        if (buildings) overlay.setBuildings?.(buildings.layers, buildings.cap);
         if (timestamp !== null) overlay.setClock?.(timestamp);
       },
       remove() {
@@ -224,6 +237,12 @@ export async function startMap(
         modeListener = null;
       };
     },
+    onSpendMeter(listener) {
+      meterListener = listener;
+      return () => {
+        if (meterListener === listener) meterListener = null;
+      };
+    },
     async setMode(mode, credit) {
       await modes.setMode(mode, credit);
       if (timestamp !== null) clockOverlay.setClock?.(timestamp);
@@ -231,6 +250,23 @@ export async function startMap(
     setClock(value) {
       timestamp = value;
       clockOverlay.setClock?.(value);
+    },
+    setBuildings(layers, cap) {
+      clockOverlay.setBuildings?.(layers, cap);
+      buildings = { layers, cap };
+    },
+    viewBounds() {
+      const bounds = map.getBounds();
+      const center = map.getCenter();
+      return {
+        centre: [center.lng, center.lat],
+        bounds: [
+          bounds.getWest(),
+          bounds.getSouth(),
+          bounds.getEast(),
+          bounds.getNorth(),
+        ],
+      };
     },
   };
 }
@@ -341,10 +377,6 @@ function drawingEvent(value: unknown): DrawingEvent {
 
 function finite(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function bag(surface: MapSurface): GestureBag {

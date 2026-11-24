@@ -1,46 +1,15 @@
 // @vitest-environment jsdom
-import { execFileSync } from 'node:child_process';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
 
 import { createRegistry } from '../../src/facts/registry';
-import type { RegistryInput } from '../../src/facts/types';
 import { PublicLayers } from '../../src/stage/layers/PublicLayers';
-import type { LayerPayload } from '../../src/stage/layers/payload';
 import { acceptPayload } from '../../src/stage/layers/refuse';
 import { deckLayers } from '../../src/stage/layers/overlay';
 import { FDI_WORD_FIELDS } from '../../src/stage/layers/fdi';
+import { apiLayerCases } from '../fixtures/api-layer-cases';
 
-type Case = {
-  status: number;
-  body: { payload: LayerPayload };
-  registry: RegistryInput;
-};
-// An actual API response on every run, not a separately hand-authored payload.
-const cases = JSON.parse(
-  execFileSync(
-    'uv',
-    [
-      'run',
-      '--locked',
-      'python',
-      '-m',
-      'product.tests.public_layer_render_fixture',
-    ],
-    {
-      cwd: '..',
-      env: {
-        ...process.env,
-        UV_OFFLINE: '1',
-        PYTHONPATH: 'scripts:scripts/tests',
-      },
-      encoding: 'utf8',
-    },
-  )
-    .trim()
-    .split('\n')
-    .at(-1)!,
-) as Record<string, Case>;
+const cases = apiLayerCases();
 afterEach(cleanup);
 
 for (const language of ['en', 'ar'] as const) {

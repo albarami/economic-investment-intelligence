@@ -43,12 +43,22 @@ const theme = params.get('theme') === 'light' ? 'light' : 'dark';
 const scene = params.get('scene');
 const marked = params.get('marked') === '1';
 
-/** Separate withheld negative fixture; never a production Public success. */
+/**
+ * Separate withheld negative fixture; never a production Public success.
+ * `plant=withheld-zero` shows the withheld record as a Public zero, a card
+ * shown from withheld data, which the context-card specs must reject.
+ */
 function withheldContextRegistry() {
   const input = contextInput();
-  input.facts[0]!.fact.provenance = 'suppressed';
-  input.facts[0]!.fact.value = 987;
+  const shown = params.get('plant') === 'withheld-zero';
+  input.facts[0]!.fact.provenance = shown ? 'public' : 'suppressed';
+  input.facts[0]!.fact.value = shown ? 0 : 987;
   return registryFrom(input);
+}
+
+/** The context scene records the fact a Source control opened. */
+function recordOpen(id: string) {
+  document.body.dataset.contextOpened = id;
 }
 
 const root = document.getElementById('root');
@@ -340,7 +350,7 @@ createRoot(root).render(
                 ? withheldContextRegistry()
                 : contextRegistry()
             }
-            onOpen={silence}
+            onOpen={recordOpen}
           />
         ))}
       </section>

@@ -3,7 +3,7 @@
  */
 import type { ReferenceKind } from '../../facts/FactChip';
 import type { FactRegistry } from '../../facts/registry';
-import type { Resolution } from '../../facts/types';
+import type { Fact, Resolution } from '../../facts/types';
 import type { RefusalCode } from './codes';
 import {
   COMPANY_ABSENT_REASON,
@@ -24,8 +24,10 @@ import {
 } from './payload';
 import { rampToken } from './ramp';
 import { layerEntry, type LayerEntry } from './registry';
+import { isRecord } from '../../guards';
 
-const PLAIN_DIGIT = /[0-9\u0660-\u0669\u06F0-\u06F9]/u;
+/** A decimal digit of any script, as in `scripts/check-answer.mjs`. */
+const PLAIN_DIGIT = /\p{Nd}/u;
 const CARD_FIELDS = new Set(['trade_name', 'activity']);
 const SYNTHETIC_MARK = 'SYN-';
 const REFERENCE_KINDS = [
@@ -49,10 +51,6 @@ void referenceKindsClosed;
 
 export type FcSectionVerdict =
   { ok: true; section: FcFirmsSection } | { ok: false; code: RefusalCode };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
 
 function hasOnlyKeys(
   value: Record<string, unknown>,
@@ -476,7 +474,11 @@ export function creditsReady(credits: InvestmentCredits | undefined): boolean {
 }
 
 export type BindingCode =
-  'incomplete_source_chain' | 'measure_on_named_feature' | 'not_public';
+  | 'incomplete_source_chain'
+  | 'measure_on_named_feature'
+  | 'not_public'
+  | 'accident_geography_allocation'
+  | 'accident_zone_mismatch';
 
 export function fdiReferenceProblem(
   segments: readonly TextSegment[],
@@ -594,8 +596,46 @@ export function bindingProblem(
       )
         return 'measure_on_named_feature';
     }
+    if (entry.key === 'accidents') {
+      // The count stays on the zone it was published for; no reallocation.
+      const geography = resolved.binding.fact.geography;
+      if (
+        geography.kind !== 'public' ||
+        geography.public_code !== feature.geography_code
+      )
+        return 'accident_geography_allocation';
+      if (accidentZone(feature, resolved.binding.fact, registry) === null)
+        return 'accident_zone_mismatch';
+    }
   }
   return null;
+}
+
+/**
+ * The source zone an accident outline shows (RV1 finding 2): the value of its
+ * `accident_source_zone` fact, of the count's own release row (same table,
+ * geography and period) and equal to the feature's reference; else null.
+ */
+export function accidentZone(
+  feature: LayerFeature,
+  count: Fact,
+  registry: FactRegistry,
+): string | null {
+  const resolved = registry.resolve(feature.source_zone_fact_id ?? '');
+  if (resolved.status !== 'ready') return null;
+  const zone = resolved.binding.fact;
+  // The count's own lineage row fixes the zone's table and release.
+  return resolved.binding.metricKey === 'accident_source_zone' &&
+    zone.provenance === 'public' &&
+    zone.unit === 'published_text' &&
+    zone.lineage_ref === count.lineage_ref &&
+    zone.period === count.period &&
+    zone.geography.kind === 'public' &&
+    zone.geography.public_code === feature.geography_code &&
+    typeof zone.value === 'string' &&
+    zone.value === feature.source_zone
+    ? zone.value
+    : null;
 }
 
 export function chainProblem(

@@ -58,6 +58,7 @@ RELEASE_MANIFEST_COLUMNS = (
     ColumnSpec("code_version", "string", False),
     ColumnSpec("rules_version_id", "string", False),
     ColumnSpec("engine_versions", "string", False),
+    ColumnSpec("fc_register_sha256", "string", True),
 )
 
 
@@ -206,8 +207,13 @@ def digest_value(value: object, column: ColumnSpec) -> object:
 
 
 def manifest_rows(document: Mapping[str, object]) -> tuple[dict[str, object], ...]:
-    """One release_manifest row per verified table. engine_versions is canonical text."""
+    """One release_manifest row per verified table. engine_versions is canonical text.
+
+    ``fc_register_sha256`` repeats the hash the release lists for the register
+    file, or is null when the release lists none (L-1509).
+    """
     engines = canonical_json(document["engine_versions"])
+    fc_register = _listed_sha256(document, "fc_register")
     rows: list[dict[str, object]] = []
     tables = document["tables"]
     if type(tables) is not list:
@@ -221,6 +227,7 @@ def manifest_rows(document: Mapping[str, object]) -> tuple[dict[str, object], ..
                 "built_at": document["built_at"],
                 "code_version": document["code_version"],
                 "engine_versions": engines,
+                "fc_register_sha256": fc_register,
                 "file": entry["file"],
                 "provenance_class": entry["provenance_class"],
                 "release_contract_version": document["release_contract_version"],
@@ -234,6 +241,16 @@ def manifest_rows(document: Mapping[str, object]) -> tuple[dict[str, object], ..
             }
         )
     return tuple(rows)
+
+
+def _listed_sha256(document: Mapping[str, object], name: str) -> object:
+    listed = document.get("listed_inputs", [])
+    if type(listed) is not list:
+        return None
+    for item in listed:
+        if type(item) is dict and item.get("name") == name:
+            return item.get("sha256")
+    return None
 
 
 def _loads(payload: str) -> object:

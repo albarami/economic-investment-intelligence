@@ -738,7 +738,6 @@ describe('firms per tower payload', () => {
 
   it('test_every_existing_point_layer_keeps_its_current_props', () => {
     const extras: Record<string, Record<string, string>> = {
-      rail_plan: { status_key: 'planned' },
       fdi_projects: { subject: 'fdi_project', year: '2024' },
     };
     const pointLayers = LAYER_ENTRIES.filter(
@@ -748,7 +747,9 @@ describe('firms per tower payload', () => {
         entry.key !== 'fc_firms_per_tower' &&
         // S3-T12's new establishment points carry their own pinned style
         // (tests/component/company-points.test.tsx).
-        entry.key !== 'company_points',
+        entry.key !== 'company_points' &&
+        // S3-T12 planned stations share it (tests/unit/accident-layer.test.ts).
+        entry.key !== 'rail_plan',
     );
     expect(pointLayers.length).toBeGreaterThan(0);
     for (const entry of pointLayers) {

@@ -59,6 +59,21 @@ export const FDI_WORD_FIELDS = [
 
 export type FdiWordField = (typeof FDI_WORD_FIELDS)[number];
 
+/** The contract columns that arrive as Fact chips rather than words. */
+export const FDI_FACT_FIELDS = [
+  'capex_value',
+  'jobs',
+  'announced',
+  'lat',
+  'lng',
+] as const;
+
+/** Every column of document 03 `fdi_projects`; none is dropped at loading. */
+export const FDI_CONTRACT_FIELDS: readonly string[] = [
+  ...FDI_WORD_FIELDS,
+  ...FDI_FACT_FIELDS,
+];
+
 export type FdiFilter = (typeof FDI_FILTERS)[number];
 
 export function fdiFilterAllowed(key: string): key is FdiFilter {

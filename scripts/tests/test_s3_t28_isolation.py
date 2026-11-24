@@ -86,6 +86,7 @@ class Isolation(unittest.TestCase):
             ),
             patch("operations.runtime.installed", return_value=(self.root, {})),
             patch("operations.runtime.check_stores"),
+            patch("eii_product.store.release_check.check_release"),
             patch(
                 "eii_product.api.health.local_assets", return_value=("ok", "ok", "ok")
             ),

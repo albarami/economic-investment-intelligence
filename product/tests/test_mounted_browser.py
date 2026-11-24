@@ -7,6 +7,7 @@ import threading
 import time
 from pathlib import Path
 
+from product.tests import map_assets
 from product.tests.test_mounted_release_http import loaded as loaded
 from uvicorn import Config, Server
 
@@ -21,6 +22,8 @@ def test_built_browser_uses_mounted_http(loaded, tmp_path):
     folder, identity, _ = loaded
     store = EmbeddedStore(folder / "release.duckdb", identity, PACKAGED)
     ledger = LocalLedger(tmp_path / "browser-ledger.sqlite")
+    fonts = tmp_path / "fonts"
+    map_assets.write_assets(tmp_path / "tiles", fonts)
     server = None
     thread = None
     try:
@@ -31,6 +34,7 @@ def test_built_browser_uses_mounted_http(loaded, tmp_path):
             release_dir=folder,
             startup_policy=developer_policy(folder),
             web_dir=Path("web/dist"),
+            font_dir=fonts,
             fc_setting_reader=lambda: None,
             key_reader=lambda: None,
         )

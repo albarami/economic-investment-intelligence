@@ -483,6 +483,13 @@ and live receipt remain required; tests use invented shapes only.
 - S3-T02 — Build, load and verify in both stores a `release_kind: public_only` release with no Protected or Simulated table and none of the protected-window manifest fields, with the Public tables of decisions 0017 and 0019 among its tables. Its loader-written, non-manifest `load_receipt.json` has `state: complete` and the matching `release_id`.
 - S3-T03 — Implement `resolve` with Public facts and statuses.
 - S3-T04 — Implement Public-only `make_area` on the fixed base-cell frame, with no privacy-derived release-unit, protected-table or simulated-table read, plus the staffing-only drive option, free-drawn polygons and radii, keeping the exact shape for Public point layers.
+  S3-P05 implementation: ordinary Public assembly builds the checked single-file
+  routing extract from the reviewed `roads_osm` receipt through the pinned wheel
+  and `place_artefact` (decision 0096 item 2). Installed and embedded serving
+  construct process-local configuration and pass the trusted routing source to
+  the API. The producer binds the routing record and source chain. Invented
+  served/refusal tests supply local evidence; independent review, real-input
+  coverage and the slice gate remain with the lead.
 - S3-T05 — Implement `scan_places` with network distances and coverage caveats, inside the exact shape of the area.
 - S3-T06 — Implement `sector_facts` through `eii_core.calc`.
 - S3-T07 — Create the four closed, versioned claim, component, fragment and question catalogues and their schema validators.
@@ -610,7 +617,10 @@ remains unavailable on the mounted projection, native Arabic review remains
 OI-09, and the independent running-interface audit and the lead's actual loaded
 release, two-store, configured-preflight and merged-head evidence are still
 required. The absent firms-register input follows its governed no-data path;
-no invented browser provenance substitutes for a mounted firm chain. Task-owned
+no invented browser provenance substitutes for a mounted firm chain. The
+component test `web/tests/component/opening-firms-chain.test.tsx` reads an
+invented successful firms chain through the existing client in both languages;
+it is test evidence of the client path, not a mounted chain (OI-376). Task-owned
 checks and pending criteria are recorded in the S3-T10 evidence and PROGRESS.
 
 

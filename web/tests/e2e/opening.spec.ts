@@ -727,6 +727,64 @@ test('missing interface faces refuse font readiness and never show a story', asy
   await expect(page.getByRole('alert')).toContainText('خطوط الواجهة غير متاحة');
 });
 
+test('the first opening frame waits for the served Arabic glyph ranges', async ({
+  page,
+  mounted,
+}) => {
+  await page.addInitScript(() => {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    Object.defineProperty(globalThis, 'releaseOpeningGlyphs', {
+      value: () => release(),
+    });
+    const load = Reflect.get(window, 'fetch').bind(window);
+    Object.defineProperty(window, 'fetch', {
+      value: (input, init) => {
+        const url = typeof input === 'string' ? input : input.url;
+        if (url.includes('/fonts/')) return gate.then(() => load(input, init));
+        return load(input, init);
+      },
+    });
+  });
+  await page.goto(mounted.origin + '/?lang=ar');
+  await expect(page.locator('#root')).toBeEmpty();
+  await page.evaluate(() => Reflect.get(globalThis, 'releaseOpeningGlyphs')());
+  await expect(page.locator('[data-scene="opening"] h1')).toBeVisible();
+  expect(
+    await page.evaluate(() =>
+      performance
+        .getEntriesByType('resource')
+        .some(({ name }) => name.includes('/fonts/')),
+    ),
+  ).toBe(true);
+});
+
+test('a missing glyph range refuses readiness and never shows a story', async ({
+  page,
+  mounted,
+}) => {
+  await page.route('**/fonts/**/1536-1791.pbf', (route) =>
+    route.fulfill({ status: 404, contentType: 'application/json', body: '{}' }),
+  );
+  await page.goto(mounted.origin + '/?lang=ar');
+  await expect(page.locator('[data-scene="opening"]')).toHaveCount(0);
+  await expect(page.getByRole('alert')).toContainText('خطوط الواجهة غير متاحة');
+});
+
+test('a glyph range served with the wrong MIME type refuses readiness', async ({
+  page,
+  mounted,
+}) => {
+  await page.route('**/fonts/**/1536-1791.pbf', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/plain', body: 'x' }),
+  );
+  await page.goto(mounted.origin + '/?lang=ar');
+  await expect(page.locator('[data-scene="opening"]')).toHaveCount(0);
+  await expect(page.getByRole('alert')).toContainText('خطوط الواجهة غير متاحة');
+});
+
 for (const lang of ['en', 'ar'] as const) {
   test(`camera buttons pan, zoom, recentre and retain the view on language change (${lang})`, async ({
     page,

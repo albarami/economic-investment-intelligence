@@ -3,6 +3,7 @@
  * Nothing here requests a tile or a layer route.
  */
 import { LightingEffect, type Layer } from '@deck.gl/core';
+import { verifyBuildingLayers } from '../buildings3d';
 import { ClockLight, lightPosition, nightVisible } from '../clock-light';
 import { MapLibreOverlay } from '@deck.gl/maplibre';
 import { H3HexagonLayer } from '@deck.gl/geo-layers';
@@ -307,10 +308,11 @@ export function deckLayers(
               getFillColor: (row: DrawnPoint) => fillColor(row.classId),
               radiusUnits: 'pixels' as const,
             }
-          : layer.key === 'company_points'
+          : layer.key === 'company_points' || layer.key === 'rail_plan'
             ? {
                 // One size and one neutral colour: an establishment point
-                // carries no class, figure or origin meaning (S3-T12).
+                // or a planned station carries no class, figure or origin
+                // meaning (S3-T12).
                 getRadius: COMPANY_POINT_RADIUS_PX,
                 getFillColor: () => boundaryColor(),
                 radiusUnits: 'pixels' as const,
@@ -329,6 +331,8 @@ export function attachClock(overlay: MapLibreOverlay, layers: Layer[]) {
   let previous = '';
   let night: boolean | null = null;
   let sun: ClockLight | null = null;
+  let buildings: Layer[] = [];
+  let timestamp: number | null = null;
   const nightLayer = (layer: Layer, visible: boolean) => {
     const duration = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')
       .matches
@@ -354,7 +358,7 @@ export function attachClock(overlay: MapLibreOverlay, layers: Layer[]) {
       const props = { ...visible.props, beforeId: undefined };
       return photoreal ? visible.clone(props) : visible;
     }),
-    ...(photoreal ? [photoreal] : []),
+    ...(photoreal ? [photoreal] : buildings),
     anchor,
   ];
   const applySun = (
@@ -415,11 +419,24 @@ export function attachClock(overlay: MapLibreOverlay, layers: Layer[]) {
       map = null;
       onRemove(target);
     },
-    setClock(timestamp: number) {
+    /** Verified building layers; their shadows switch the sun's shadow on. */
+    setBuildings(next: Layer[], cap: number) {
+      verifyBuildingLayers(next, cap);
+      buildings = next;
+      if (timestamp === null) overlay.setProps({ layers: shownLayers() });
+      else this.setClock(timestamp);
+    },
+    setClock(next: number) {
       previous = '';
-      sun = new ClockLight(timestamp, (direction) => {
-        if (map) applySun(direction, map);
-      });
+      timestamp = next;
+      const shadow = buildings.length > 0 && photoreal === null;
+      sun = new ClockLight(
+        next,
+        (direction) => {
+          if (map) applySun(direction, map);
+        },
+        shadow,
+      );
       overlay.setProps({
         layers: shownLayers(),
         effects: [new LightingEffect({ sun })],

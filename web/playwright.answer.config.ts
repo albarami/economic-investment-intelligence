@@ -28,6 +28,7 @@ export default defineConfig({
     '**/answer.spec.ts',
     '**/draw.spec.ts',
     '**/source-geometry.spec.ts',
+    '**/context-sizes.spec.ts',
   ],
   fullyParallel: false,
   workers: 1,

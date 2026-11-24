@@ -143,6 +143,7 @@ def run_preflight(
         )
         if operational:
             from eii_product.api.health import asset_reason, local_assets
+            from eii_product.store.release_check import check_release
             from operations.config import read_environment
             from operations.deploy import request_for
             from operations.runtime import check_stores, installed, verify_peers
@@ -153,7 +154,8 @@ def run_preflight(
                 request = request_for(env, environ)
                 api_port = request["backend_port"]
                 application, _ = installed(env, request)
-                assets = local_assets(env.release, application / "web/dist")
+                checked = check_release(env.release)
+                assets = local_assets(checked, application / "web/dist")
                 tile_line = store.Line(
                     "PASS" if assets == ("ok", "ok", "ok") else "FAIL",
                     "tiles-glyphs-fonts",

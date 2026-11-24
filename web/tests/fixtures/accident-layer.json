@@ -1,0 +1,778 @@
+{
+  "release": {
+    "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+    "release_kind": "public_only",
+    "rules_version_id": "invented-rules",
+    "tables": [
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "access_score_grid"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "district"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "fact_lineage"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "fdi_projects"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "gazetteer"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "graph_edge"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "graph_node"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "grid_cell"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "municipality"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_accident_zone"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_active_nationality_occupation"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_active_sex_age"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_address_point"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_bank_credit"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_building_permits"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_census_2015_municipality"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_census_district"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_census_national"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_census_zone"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_compensation_nationality"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_completions_ext"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_comtrade_trade"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_coverage_ext"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_customs_import"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_district_cooling"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_establishment_size"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_fdi_stats"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_health_centre"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_hotel_ext"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_hotel_monthly"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_hotels_municipality"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_investqa_page"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_investqa_record"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_jobseekers"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_labour_sex_municipality"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_land_price"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_licence_active"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_licence_cancelled"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_licence_issued"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_manufacturing"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_night_lights"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_parcel"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_place"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_place_fsq"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_place_verification"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_poi_comm"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_pop_agesex_grid"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_population_age"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_population_age_sex"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_population_municipality"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_price_ext"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_price_index"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_property_quarter"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_property_resi"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_property_sale"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_rail_plan"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_register_company"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_register_snapshot"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_sector_accounts"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_students"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_survey_ext"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_talent_ext"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_tender"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_trade_ext"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_trade_logistics"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_trade_wr"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_transit_monthly"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_utilities_ext"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_venue_busyness"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_venue_visits"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_visitor_markets"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_wage_table"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_zone_utility"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_zoning"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "source_registry"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "zone"
+      },
+      {
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "zone_type"
+      }
+    ],
+    "hour_keys": [],
+    "day_keys": [],
+    "month_keys": ["2026-02", "2026-03"],
+    "basemap_url": null
+  },
+  "chains": {
+    "f_075b557084c01e6cdf8f2d066e0acf91": {
+      "fact_id": "f_075b557084c01e6cdf8f2d066e0acf91",
+      "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+      "lineage": {
+        "lineageId": "lin_pub_accident_zone",
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_accident_zone",
+        "method": "invented.module.hold",
+        "methodVersion": "v1",
+        "sourceIds": ["src-invented"],
+        "inputClasses": ["public"]
+      },
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "kind": "public_dataset",
+          "inputClass": "public",
+          "publisher": "INVENTED-publisher",
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      ],
+      "binding": {
+        "metricKey": "accident_count",
+        "presentation": "ordinary",
+        "qualifiers": {}
+      }
+    },
+    "f_d8d6cb531294de184239db90efea43a0": {
+      "fact_id": "f_d8d6cb531294de184239db90efea43a0",
+      "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+      "lineage": {
+        "lineageId": "lin_pub_accident_zone",
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_accident_zone",
+        "method": "invented.module.hold",
+        "methodVersion": "v1",
+        "sourceIds": ["src-invented"],
+        "inputClasses": ["public"]
+      },
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "kind": "public_dataset",
+          "inputClass": "public",
+          "publisher": "INVENTED-publisher",
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      ],
+      "binding": {
+        "metricKey": "accident_count",
+        "presentation": "ordinary",
+        "qualifiers": {}
+      }
+    },
+    "f_e001196a3011b025c621131cca06df29": {
+      "fact_id": "f_e001196a3011b025c621131cca06df29",
+      "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+      "lineage": {
+        "lineageId": "lin_pub_rail_plan",
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_rail_plan",
+        "method": "invented.module.hold",
+        "methodVersion": "v1",
+        "sourceIds": ["src-invented"],
+        "inputClasses": ["public"]
+      },
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "kind": "public_dataset",
+          "inputClass": "public",
+          "publisher": "INVENTED-publisher",
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      ],
+      "binding": {
+        "metricKey": "rail_feature",
+        "presentation": "ordinary",
+        "qualifiers": {}
+      }
+    },
+    "f_d1f329b4ef3f9b9299d008faedd7ef12": {
+      "fact_id": "f_d1f329b4ef3f9b9299d008faedd7ef12",
+      "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+      "lineage": {
+        "lineageId": "lin_pub_accident_zone",
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_accident_zone",
+        "method": "invented.module.hold",
+        "methodVersion": "v1",
+        "sourceIds": ["src-invented"],
+        "inputClasses": ["public"]
+      },
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "kind": "public_dataset",
+          "inputClass": "public",
+          "publisher": "INVENTED-publisher",
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      ],
+      "binding": {
+        "metricKey": "accident_source_zone",
+        "presentation": "ordinary",
+        "qualifiers": {}
+      }
+    },
+    "f_eba3d3c20ef0dc7a03feb03fc75e2f6c": {
+      "fact_id": "f_eba3d3c20ef0dc7a03feb03fc75e2f6c",
+      "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+      "lineage": {
+        "lineageId": "lin_pub_accident_zone",
+        "releaseId": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4",
+        "tableName": "pub_accident_zone",
+        "method": "invented.module.hold",
+        "methodVersion": "v1",
+        "sourceIds": ["src-invented"],
+        "inputClasses": ["public"]
+      },
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "kind": "public_dataset",
+          "inputClass": "public",
+          "publisher": "INVENTED-publisher",
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02",
+          "sha256": "abababababababababababababababababababababababababababababababab"
+        }
+      ],
+      "binding": {
+        "metricKey": "accident_source_zone",
+        "presentation": "ordinary",
+        "qualifiers": {}
+      }
+    }
+  },
+  "accidents": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_075b557084c01e6cdf8f2d066e0acf91",
+        "value": 5,
+        "unit": "count",
+        "period": "2024",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-a"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["accidents_recorded_not_risk"],
+        "label_en": "Recorded accidents",
+        "label_ar": "الحوادث المسجلة",
+        "lineage_ref": "lin_pub_accident_zone",
+        "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4"
+      },
+      {
+        "fact_id": "f_d1f329b4ef3f9b9299d008faedd7ef12",
+        "value": "51",
+        "unit": "published_text",
+        "period": "2024",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-a"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_accident_zone",
+        "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4"
+      },
+      {
+        "fact_id": "f_d8d6cb531294de184239db90efea43a0",
+        "value": 0,
+        "unit": "count",
+        "period": "2024",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-b"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "inferred",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": ["accidents_recorded_not_risk"],
+        "label_en": "Recorded accidents",
+        "label_ar": "الحوادث المسجلة",
+        "lineage_ref": "lin_pub_accident_zone",
+        "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4"
+      },
+      {
+        "fact_id": "f_eba3d3c20ef0dc7a03feb03fc75e2f6c",
+        "value": "52",
+        "unit": "published_text",
+        "period": "2024",
+        "geography": {
+          "kind": "public",
+          "public_code": "zone:INVENTED-zone-b"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_accident_zone",
+        "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4"
+      }
+    ],
+    "coverage_report": {
+      "counts": {
+        "counted": 2,
+        "geography_missing": 1
+      }
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "accidents",
+          "visible": true,
+          "source_chain_fact_id": "f_075b557084c01e6cdf8f2d066e0acf91",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "accidents:51:2024",
+              "metric_key": "accident_count",
+              "provenance": "public",
+              "fact_id": "f_075b557084c01e6cdf8f2d066e0acf91",
+              "subject": "statistic",
+              "geometry_kind": "outline",
+              "source_id": "src-invented",
+              "geography_code": "zone:INVENTED-zone-a",
+              "source_zone": "51",
+              "year": "2024",
+              "label_key": "accident_count_context",
+              "evidence_status": "inferred",
+              "caveat_keys": ["accidents_recorded_not_risk"],
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-a"
+                }
+              ],
+              "source_zone_fact_id": "f_d1f329b4ef3f9b9299d008faedd7ef12"
+            },
+            {
+              "feature_id": "accidents:52:2024",
+              "metric_key": "accident_count",
+              "provenance": "public",
+              "fact_id": "f_d8d6cb531294de184239db90efea43a0",
+              "subject": "statistic",
+              "geometry_kind": "outline",
+              "source_id": "src-invented",
+              "geography_code": "zone:INVENTED-zone-b",
+              "source_zone": "52",
+              "year": "2024",
+              "label_key": "accident_count_context",
+              "evidence_status": "inferred",
+              "caveat_keys": ["accidents_recorded_not_risk"],
+              "ring": [
+                [0.0, 0.0],
+                [3.0, 0.0],
+                [3.0, 3.0],
+                [0.0, 3.0],
+                [0.0, 0.0]
+              ],
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-zone-b"
+                }
+              ],
+              "source_zone_fact_id": "f_eba3d3c20ef0dc7a03feb03fc75e2f6c"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "rail_plan": {
+    "status": "ok",
+    "facts": [
+      {
+        "fact_id": "f_e001196a3011b025c621131cca06df29",
+        "value": "2026-01-02",
+        "unit": "calendar_date",
+        "period": "published",
+        "geography": {
+          "kind": "public",
+          "public_code": "feature:fea-abcdefabcdefabcd"
+        },
+        "provenance": "public",
+        "input_classes": ["public"],
+        "evidence_status": "observed",
+        "reliability": "not_applicable",
+        "coverage_keys": [],
+        "caveat_keys": [],
+        "label_en": "Published layer value",
+        "label_ar": "قيمة الطبقة المنشورة",
+        "lineage_ref": "lin_pub_rail_plan",
+        "release_id": "db199f1be96e2be0d4d297586f1231014fb8cb8a0612b83070170738b5a7a1f4"
+      }
+    ],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "rail_plan",
+          "visible": true,
+          "source_chain_fact_id": "f_e001196a3011b025c621131cca06df29",
+          "source_id": "src-invented",
+          "features": [
+            {
+              "feature_id": "rail_plan:fea-abcdefabcdefabcd",
+              "metric_key": "rail_feature",
+              "provenance": "public",
+              "fact_id": "f_e001196a3011b025c621131cca06df29",
+              "subject": "place",
+              "geometry_kind": "point",
+              "source_id": "src-invented",
+              "name_segments": [
+                {
+                  "kind": "plain",
+                  "text": "INVENTED-pub_rail_plan-name_en"
+                }
+              ],
+              "position": [1.0, 2.0],
+              "status_key": "planned"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "sourceId": "src-invented",
+          "attribution": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-dataset"
+            }
+          ],
+          "publisher": [
+            {
+              "kind": "plain",
+              "text": "INVENTED-publisher"
+            }
+          ],
+          "datasetOrPage": "INVENTED-dataset",
+          "licenceOrTerms": "INVENTED-licence",
+          "retrievalDate": "2026-01-02"
+        }
+      ],
+      "gazetteer_points": []
+    }
+  },
+  "geography_missing": {
+    "status": "NO_DATA",
+    "facts": [],
+    "coverage_report": {
+      "counts": {
+        "counted": 0,
+        "geography_missing": 3
+      }
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "accidents",
+          "visible": true,
+          "source_chain_fact_id": "",
+          "source_id": "",
+          "features": []
+        }
+      ],
+      "sources": [],
+      "gazetteer_points": []
+    },
+    "reason": "accident_geography_missing"
+  },
+  "source_missing": {
+    "status": "NO_DATA",
+    "facts": [],
+    "coverage_report": {
+      "counts": {}
+    },
+    "payload": {
+      "layers": [
+        {
+          "key": "accidents",
+          "visible": true,
+          "source_chain_fact_id": "",
+          "source_id": "",
+          "features": []
+        }
+      ],
+      "sources": [],
+      "gazetteer_points": []
+    },
+    "reason": "accident_source_missing"
+  }
+}

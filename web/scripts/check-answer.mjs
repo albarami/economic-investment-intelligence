@@ -351,9 +351,7 @@ function collect(dir, files) {
   }
 }
 
-function styleProblems(file) {
-  if (!fs.existsSync(file)) return ['style-missing'];
-  const text = fs.readFileSync(file, 'utf8');
+export function physicalAxis(text) {
   if (/(?:^|[^-\w])(?:left|right)\s*:/m.test(text)) return ['physical-axis'];
   if (
     /\b(?:margin|padding|border|inset|scroll-margin|scroll-padding)-(?:left|right)\b/.test(
@@ -362,6 +360,11 @@ function styleProblems(file) {
   )
     return ['physical-axis'];
   return [];
+}
+
+function styleProblems(file) {
+  if (!fs.existsSync(file)) return ['style-missing'];
+  return physicalAxis(fs.readFileSync(file, 'utf8'));
 }
 
 function licenceProblems(web) {

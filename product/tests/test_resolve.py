@@ -253,7 +253,10 @@ def test_six_queries_are_read_once_and_name_no_public_place() -> None:
         query.name
         for query in PACKAGED.queries
         if query.name.startswith("scan_places_")
-    } | public_reads | set(public_transport_queries())
+    } | public_reads | set(public_transport_queries()) | {
+        # S3-P10 (L-1509): the served register file's release-listed hash.
+        "release_fc_register_sha256"
+    }
 
 
 def test_order_cap_and_a_second_call_keep_the_same_rank() -> None:

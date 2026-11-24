@@ -22,7 +22,7 @@ import {
 } from '../state/area-actions';
 import { useArea } from '../state/store';
 import { Stage, type MapStarter } from '../stage/Stage';
-import type { LayerPayload } from '../stage/layers/payload';
+import type { LayerNotice, LayerPayload } from '../stage/layers/payload';
 
 export function AnswerShell({
   language,
@@ -34,6 +34,7 @@ export function AnswerShell({
   paused = false,
   mapStarter,
   sourceLayers = null,
+  layerNotice = null,
   areaClient = null,
   renderBrief,
   quiet = false,
@@ -49,6 +50,8 @@ export function AnswerShell({
   mapStarter?: MapStarter;
   /** Layers the Stage already holds. Null when this base has none. */
   sourceLayers?: LayerPayload | null;
+  /** A closed absence and the pending access panel beside the layers. */
+  layerNotice?: LayerNotice | null;
   /** Stand-in for a shell test. Production leaves this unset. */
   areaClient?: FetchLike | null;
   renderBrief?: (
@@ -62,7 +65,13 @@ export function AnswerShell({
   const area = useArea();
   const [opener, setOpener] = useState<HTMLElement | null>(null);
   const returnFocus = useRef(false);
-  const [openId, setOpenId] = useState<string | null>(null);
+  // The open fact and the registry it came from: a chip of a read with its
+  // own chain (the building heights) opens that chain, never the shell's.
+  const [openChain, setOpenChain] = useState<{
+    id: string;
+    registry: FactRegistry | null;
+  } | null>(null);
+  const openId = openChain?.id ?? null;
   const [expanded, setExpanded] = useState(false);
   const sheetControl = useRef<HTMLButtonElement>(null);
   const controlFocused = useRef(false);
@@ -101,18 +110,18 @@ export function AnswerShell({
     return () => phone.removeEventListener('change', onResize);
   }, [briefId]);
 
-  function open(factId: string) {
+  function open(factId: string, from?: FactRegistry) {
     setOpener(
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null,
     );
-    setOpenId(factId);
+    setOpenChain({ id: factId, registry: from ?? registry });
   }
 
   function close() {
     returnFocus.current = true;
-    setOpenId(null);
+    setOpenChain(null);
   }
 
   useEffect(() => {
@@ -144,6 +153,7 @@ export function AnswerShell({
             area.filtered,
             sourceLayers,
           )}
+          layerNotice={layerNotice}
           registry={registry}
           onOpenChain={open}
           canvas={<AreaOutline language={language} />}
@@ -211,7 +221,7 @@ export function AnswerShell({
         </button>
         <div className="brief-column">
           {renderBrief ? (
-            renderBrief(open, () => setOpenId(null))
+            renderBrief(open, () => setOpenChain(null))
           ) : (
             <Brief
               id={briefId}
@@ -225,10 +235,10 @@ export function AnswerShell({
           {!quiet ? <AreaSummary language={language} /> : null}
         </div>
       </div>
-      {openId && registry ? (
+      {openChain?.registry ? (
         <SourceChainDrawer
-          factId={openId}
-          registry={registry}
+          factId={openChain.id}
+          registry={openChain.registry}
           language={language}
           receiptHref={receiptHref}
           onClose={close}

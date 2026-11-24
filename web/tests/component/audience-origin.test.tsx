@@ -355,7 +355,11 @@ const SURFACES: Record<
           selected="open"
           onChange={() => undefined}
         />
-        <MapCredits language={language} mode="satellite" credit="Example imagery credit" />
+        <MapCredits
+          language={language}
+          mode="satellite"
+          credit="Example imagery credit"
+        />
       </div>,
     ),
   'sunlight clock': (language) =>

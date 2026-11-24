@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import hashlib
 import os
 import shutil
 import sys
@@ -12,6 +14,24 @@ from typing import Any
 
 from eii_core.reasons import closed_code, reason
 from operations.common import Refusal, read_json
+
+
+def fc_register_sha256() -> str | None:
+    """Hash the file EII_FC_REGISTER_FILE names, from the lead's shell (L-1509).
+
+    Unset lists nothing. The bytes come from the product's one register read
+    (a regular file, no symlink); an unreadable file or value refuses with a
+    fixed reason that carries neither the value nor the path.
+    """
+    from eii_product.config import ConfigError, read_fc_register_file
+    from eii_product.register_file import RegisterRefusal, read_register_bytes
+
+    with contextlib.suppress(ConfigError, RegisterRefusal):
+        setting = read_fc_register_file()
+        if setting is None:
+            return None
+        return hashlib.sha256(read_register_bytes(setting)).hexdigest()
+    raise Refusal("fc_register_unreadable") from None
 
 
 def build_release(
@@ -58,8 +78,9 @@ def build_release(
             if spec.exists() or spec.is_symlink():
                 from eii_custodian.release.producer import produce
 
+                listed = fc_register_sha256()
                 try:
-                    produce(layout.cache)
+                    produce(layout.cache, fc_register_sha256=listed)
                 except Exception as error:
                     code = reason(error)
                     raise Refusal(

@@ -25,7 +25,7 @@ def read_assembly(cache: Path) -> dict[str, Any]:
         review = json.loads((cache / "assembly/release_review.json").read_bytes())
         if (
             type(value) is not dict
-            or set(value)
+            or set(value) - {"listed_inputs"}
             != {"version", "scalars", "sources", "tables", "artefacts", "files"}
             or value["version"] != 1
             or not isinstance(value["files"], dict)
@@ -99,6 +99,7 @@ def build(cache: Path, destination: Path) -> str:
         document["sources"],
         tables,
         artefacts=document["artefacts"],
+        listed_inputs=document.get("listed_inputs", ()),
     )
     # Artefacts are copied only from the reviewed, bound inventory.
     for item in document["artefacts"]:

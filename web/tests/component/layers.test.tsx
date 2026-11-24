@@ -291,6 +291,53 @@ describe('public layer screen', () => {
     expect(view.container.querySelector('[data-part="apportion"]')).toBeNull();
   });
 
+  // RV1 finding 1: a presentation word or status renders on its owning layer.
+  it.each([
+    ['zoning', 'permitted_use', { words: { permitted_use: 'Invented use' } }],
+    ['parcels', 'plot_state', { status_key: 'permitted_empty' }],
+  ] as const)(
+    'renders the %s presentation on its own layer',
+    (key, metric, field) => {
+      const payload = basePayload({
+        layers: [
+          {
+            key,
+            visible: true,
+            source_chain_fact_id: CHAIN_ID,
+            source_id: 'src_places',
+            features: [
+              {
+                feature_id: 'feat_owned',
+                metric_key: metric,
+                provenance: 'public',
+                subject: 'gis_feature',
+                geometry_kind: 'outline',
+                ...field,
+              },
+            ],
+          },
+        ],
+      });
+      const view = render(
+        <PublicLayers
+          payload={payload}
+          language="en"
+          registry={sceneRegistry()}
+          onOpenChain={() => undefined}
+        />,
+      );
+      fireEvent.click(
+        view.container.querySelector('[data-feature="feat_owned"]')!,
+      );
+      const label = key === 'zoning' ? 'permitted' : 'plot';
+      expect(
+        view.container.querySelector(`[data-label="${label}"]`)?.textContent,
+      ).toContain(
+        key === 'zoning' ? 'Invented use' : en.strings['layers.plot.label'],
+      );
+    },
+  );
+
   it('F7 shows capex and jobs together and hides by a supplied sector', () => {
     const payload = scene();
     const feature = payload.layers[2]!.features[0]!;

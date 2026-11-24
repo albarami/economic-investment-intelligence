@@ -143,14 +143,16 @@ def git(
     """Run git against a scratch repository.
 
     Args:
-        repo: The repository directory.
+        repo: The repository directory. When that directory is absent, the
+            command still runs from its parent so ``git -C`` can refuse the path.
         env: The child environment.
         *args: The git arguments.
 
     Returns:
         The completed process.
     """
-    return run(["git", "-C", str(repo), *args], cwd=repo, env=env)
+    folder = repo if repo.is_dir() else repo.parent
+    return run(["git", "-C", str(repo), *args], cwd=folder, env=env)
 
 
 def plain_repo(parent: Path, env: Mapping[str, str]) -> Path:

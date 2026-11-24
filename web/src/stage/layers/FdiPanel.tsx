@@ -190,24 +190,37 @@ export function FdiCredits({
     <details data-part="fdi-credits" data-surface={surface}>
       <summary>{text(language, 'layers.fdi.credits')}</summary>
       {credits ? (
-        <p>
-          <span data-credit-field="publisher">
+        <dl>
+          <dt data-credit-label="publisher">
+            {text(language, 'layers.fdi.credit.publisher')}
+          </dt>
+          <dd data-credit-field="publisher">
             <SegmentText segments={credits.publisher} language={language} />
-          </span>
-          <span data-credit-field="gatherer">
+          </dd>
+          <dt data-credit-label="gatherer">
+            {text(language, 'layers.fdi.credit.gatherer')}
+          </dt>
+          <dd data-credit-field="gatherer">
             <SegmentText segments={credits.gatherer} language={language} />
-          </span>
-          <a href={credits.dashboard_url}>
-            {text(language, 'layers.fdi.dashboard')}
-          </a>
-          <FactChip
-            variant="reference"
-            language={language}
-            kind="calendar_date"
-            value={credits.read_on}
-            recordId={`fdi-read-on-${surface}`}
-          />
-        </p>
+          </dd>
+          <dt data-credit-label="read_on">
+            {text(language, 'layers.fdi.credit.read_on')}
+          </dt>
+          <dd data-credit-field="read_on">
+            <FactChip
+              variant="reference"
+              language={language}
+              kind="calendar_date"
+              value={credits.read_on}
+              recordId={`fdi-read-on-${surface}`}
+            />
+          </dd>
+        </dl>
+      ) : null}
+      {credits ? (
+        <a data-credit-field="dashboard" href={credits.dashboard_url}>
+          {text(language, 'layers.fdi.dashboard')}
+        </a>
       ) : null}
       <p data-caveat="fdi_estimates_sentence">
         {text(language, 'layers.fdi.caveat.estimates')}
@@ -231,7 +244,6 @@ function FdiFields({
   onOpenChain: (factId: string) => void;
 }) {
   if (!feature) return null;
-  const announced = feature.caveat_keys?.includes('fdi_estimates');
   const capexId =
     feature.capex_fact_id ??
     (feature.metric_key === 'fdi_capex' ? feature.fact_id : undefined);
@@ -251,6 +263,7 @@ function FdiFields({
       ))}
       <FactSlot
         field="capex_value"
+        estimate
         factId={capexId}
         year={feature.year}
         language={language}
@@ -259,6 +272,7 @@ function FdiFields({
       />
       <FactSlot
         field="jobs"
+        estimate
         factId={jobsId}
         year={feature.year}
         language={language}
@@ -294,11 +308,6 @@ function FdiFields({
           text(language, 'layers.fdi.unstated')
         )}
       </span>
-      {announced ? (
-        <span data-label="announced">
-          {text(language, 'layers.fdi.announced')}
-        </span>
-      ) : null}
     </div>
   );
 }
@@ -307,11 +316,14 @@ function FactSlot({
   field,
   factId,
   year,
+  estimate = false,
   language,
   registry,
   onOpenChain,
 }: {
   field: string;
+  /** Capex and jobs: the announced-estimate label sits in the value's own slot. */
+  estimate?: boolean;
   factId: string | undefined;
   year: string | undefined;
   language: Language;
@@ -324,7 +336,7 @@ function FactSlot({
     );
   }
   return (
-    <span data-field={field}>
+    <span className="figure-cell" data-field={field}>
       <FactChip
         variant="value"
         size="standard"
@@ -341,6 +353,11 @@ function FactSlot({
           value={year}
           recordId={`${factId}-year`}
         />
+      ) : null}
+      {estimate ? (
+        <span data-label="announced">
+          {text(language, 'layers.fdi.announced')}
+        </span>
       ) : null}
     </span>
   );

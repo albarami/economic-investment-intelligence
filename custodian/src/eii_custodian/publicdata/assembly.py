@@ -20,6 +20,7 @@ PHASES = (
     "fetch_archive",
     "investment_capture",
     "reviewed_selections",
+    "routing",
     "frame",
     "register_tables",
     "spine_graph",

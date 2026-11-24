@@ -7,7 +7,12 @@ from pathlib import Path
 from typing import Any
 
 from operations.common import atomic_json
-from operations.config import persistent_paths, read_environment, write_target
+from operations.config import (
+    fc_setting_reader,
+    persistent_paths,
+    read_environment,
+    write_target,
+)
 from operations.runtime import verify_peers
 
 
@@ -15,7 +20,9 @@ def serve_embedded(
     root: Path, environ: Mapping[str, str], *, server: Callable[..., Any] | None = None
 ) -> None:
     from eii_product.api.app import create_app
+    from eii_product.api.area_context import routing_from_release
     from eii_product.api.health import HealthSource, local_assets
+    from eii_product.api.map_assets import map_asset_paths
     from eii_product.api.startup import developer_policy
     from eii_product.ledger.local import LocalLedger
     from eii_product.store.embedded import EmbeddedStore
@@ -25,6 +32,7 @@ def serve_embedded(
     env = read_environment(environ, embedded=True)
     verify_peers(env)
     checked = verify_startup(env.release, environment="development", embedded=True)
+    assets = map_asset_paths(checked)
     identity = str(checked.document["release_id"])
     env.state.mkdir(parents=True, exist_ok=True)
     atomic_json(
@@ -41,21 +49,24 @@ def serve_embedded(
         store,
         policy.verify,
         ledger.row_count,
-        lambda: local_assets(env.release, root / "web/dist"),
+        lambda: local_assets(checked, root / "web/dist"),
     )
     try:
         app = create_app(
-            env.release / "tiles",
+            assets.tile_dir,
             store=store,
             ledger=ledger,
             count_path=count_path,
             web_dir=root / "web/dist",
             release_dir=env.release,
+            routing=routing_from_release(checked),
+            font_dir=assets.font_dir,
+            basemap_name=assets.basemap_name,
             startup_policy=policy,
             health_source=health,
             key_reader=lambda: None,
             offline_reader=lambda: True,
-            fc_setting_reader=lambda: None,
+            fc_setting_reader=fc_setting_reader(env.name),
         )
         if server is None:
             import uvicorn

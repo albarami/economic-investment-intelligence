@@ -6,6 +6,7 @@ import uuid
 from collections.abc import Callable
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from typing import TypedDict
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, Response
@@ -15,7 +16,11 @@ from eii_product.photoreal_tiles.limit import (
     LOCK,
     Budget,
     BudgetFailure,
+    JournalStep,
     billable_limit,
+    encode_spend_meter,
+    journal_order_token,
+    meter_for_count,
 )
 from eii_product.photoreal_tiles.native import NativeFailure, NativeViews
 from eii_product.photoreal_tiles.proxy import (
@@ -168,6 +173,7 @@ def build_router(
                 )
             except NativeFailure:
                 return refuse()
+            step = JournalStep()
             try:
                 result = budget.request(
                     limit(),
@@ -180,9 +186,11 @@ def build_router(
                         native=target,
                     ),
                     lambda response: 200 <= response[0] < 300,
+                    step,
                 )
             except BudgetFailure as error:
                 return refuse(str(error))
+            issued = meter_header(pricing, step.count)
             status, raw, headers = result
             if not 200 <= status < 300 or not safe_response(raw, headers, key):
                 native.dispose(view)
@@ -197,7 +205,13 @@ def build_router(
             except NativeFailure:
                 native.dispose(view)
                 return refuse()
-            return deliver((status, raw, headers), key, require_credit=False)
+            return deliver(
+                (status, raw, headers),
+                key,
+                require_credit=False,
+                meter=None if issued is None else issued["meter"],
+                order=None if issued is None else issued["order"],
+            )
 
     return router
 
@@ -211,8 +225,38 @@ def refuse(reason: str = "no_key") -> JSONResponse:
     )
 
 
+class IssuedSpend(TypedDict):
+    meter: str
+    order: str
+
+
+def meter_header(
+    pricing: Callable[[], tuple[Decimal, int]],
+    step: int | None,
+) -> IssuedSpend | None:
+    """Meter and order token for the journal step just appended.
+
+    A failed read sends neither. The token is that step, not a later count.
+    """
+    if step is None:
+        return None
+    try:
+        price, maximum = pricing()
+        return {
+            "meter": encode_spend_meter(meter_for_count(step, maximum, price)),
+            "order": journal_order_token(step),
+        }
+    except BudgetFailure:
+        return None
+
+
 def deliver(
-    result: tuple[int, bytes, dict[str, str]], key: str, *, require_credit: bool
+    result: tuple[int, bytes, dict[str, str]],
+    key: str,
+    *,
+    require_credit: bool,
+    meter: str | None = None,
+    order: str | None = None,
 ) -> Response:
     status, raw, headers = result
     if not 200 <= status < 300 or not safe_response(raw, headers, key):
@@ -225,6 +269,10 @@ def deliver(
         return refuse()
     if credit:
         outgoing["X-Attribution"] = credit
+    if meter is not None:
+        outgoing["X-Spend-Meter"] = meter
+        if order is not None:
+            outgoing["X-Spend-Order"] = order
     content_type = headers.get("content-type", "application/octet-stream")
     if content_type not in {
         "image/png",
