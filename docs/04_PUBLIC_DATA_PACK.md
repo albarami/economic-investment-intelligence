@@ -1118,6 +1118,25 @@ Optional `satellite_cdse_backup` covers Qatar at the owner-targeted resolution w
 
 ### 3.1 Registry and sidecar record
 
+**Required large-source intake (S2-P84, L-1717).** Every key admitted by
+`fetch/large.py` has a total-byte bound and a completeness check. The existing
+Overture path retains its reviewed exact size and ETag checks. Other admitted
+keys require the registry's `stream_max_bytes`: a positive integer byte ceiling,
+with null or absence meaning unconfirmed. Malformed non-null values refuse
+`stream_max_bytes` in the closed registry loader. Without an exact size or a
+confirmed ceiling, intake refuses `bound_unconfirmed` before opening the stream.
+Without an exact size, a missing Content-Length refuses `length_undeclared`
+before reading any body. A declared length must match the bytes received
+(`length_mismatch`); exceeding the source ceiling or a tighter existing scoped
+cap refuses `body_bytes`, before writing the over-limit chunk. The existing
+chunk, host, exact-size, ETag and empty-body refusals remain. Each successful
+stream adds the closed boolean `declared_length_present` to its receipt and
+immutable acquisition-check record; a repeated identical snapshot retains its
+original receipt and records the current observation in `checks/`.
+`cus_imp_2019`, `trade_ext/qatar-imports-2014-2018`, `bldg_wsf3d` and both
+registered `bldg_gba` tiles have explicit null ceilings pending separate lead
+confirmation from receipted sizes. No source-size value is inferred here.
+
 The dedicated national imagery archive follows [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) item 3 and `custodian/src/eii_custodian/publicdata/gis/SNAPSHOT.md`: its closed registry is `custodian/publicdata/review/gis_snapshot.json`, with ordinary and nightly eligibility false. A shard receipt includes imagery date, metadata/boundary/enumeration hashes, member names and hashes, publisher, terms/basis, retrieval UTC, byte size and generator version. Completion is published last after every enumerated key is accounted for as a verified tile or a recorded gap; staging is never complete. Resume verifies every skipped shard and its receipt. A release selects a reviewed all-date manifest hash explicitly; it never selects the newest directory.
 
 S2-T51 uses one boundary-chain check at resume and selection over source id/key,

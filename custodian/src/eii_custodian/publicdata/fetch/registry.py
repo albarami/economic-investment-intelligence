@@ -77,6 +77,7 @@ BANNED_SOURCE_IDS = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range"})
 FIELDS = frozenset(
     {
         "refetch",
+        "stream_max_bytes",
         "key",
         "source_id",
         "slug",
@@ -299,6 +300,7 @@ class Entry:
     cache_role: str = ""
     chain_intermediate_sha256: str = ""
     comtrade_policy: object | None = None
+    stream_max_bytes: int | None = None
     refetch: Cadence = _UNCONFIRMED_REFETCH
 
 
@@ -619,6 +621,7 @@ def _entry(row: object) -> Entry:
         cache_role=file_fields.cache_role,
         chain_intermediate_sha256=_chain_pin(row),
         comtrade_policy=comtrade_policy,
+        stream_max_bytes=_stream_max_bytes(row),
     )
 
 
@@ -889,6 +892,14 @@ def _bool(row: dict[object, object], name: str) -> bool:
     value = row[name]
     if not isinstance(value, bool):
         raise RegistryError(f"{name} is not a boolean")
+    return value
+
+
+def _stream_max_bytes(row: dict[object, object]) -> int | None:
+    """A reviewed positive byte ceiling; null is an explicit unconfirmed hold."""
+    value = row.get("stream_max_bytes")
+    if value is not None and (type(value) is not int or value <= 0):
+        raise RegistryError("stream_max_bytes")
     return value
 
 

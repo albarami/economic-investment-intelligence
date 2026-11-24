@@ -6901,3 +6901,15 @@ introduced.
 - EVIDENCE: the original S2-P82 PROGRESS block and workspace alert preserve exit 1 with 21 additional bytecode entries while pytest collected tests concurrently, followed by a serial pass. The fingerprint includes directories and regular bytecode files. Fix-round verification ran the unchanged suite alone after pytest finished: exit 0, 37 tests. This supports the scheduling diagnosis; a green rerun does not close the original failure.
 - NEEDED: the lead decides the run-order treatment under AGENTS.md rule 39; keep boundary checks separate from concurrent package-tree writers. No guard or assertion is relaxed.
 - NEEDED BY: lead verification scheduling; remains open for triage.
+
+
+## PROPOSED PO-S2-P84-01 — Confirm required stream byte ceilings
+
+Under S2-P84 and ruling L-1717, the lead must supply separately reviewed positive
+`stream_max_bytes` values from receipted sizes for `cus_imp_2019`,
+`trade_ext/qatar-imports-2014-2018`, `bldg_wsf3d`,
+`bldg_gba/e050_n25_e055_n20` and `bldg_gba/e050_n30_e055_n25`.
+Each registry placeholder remains null and intake refuses `bound_unconfirmed`.
+No bound is guessed; this proposed item closes neither OI-308 nor the original
+S2-T08 acceptance criterion. Different-maker review and the lead's whole-suite
+run remain pending.

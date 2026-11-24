@@ -53627,3 +53627,96 @@ The two notes below belong to the S2-P77 and S2-P76 round 3 evidence rows of the
 | 2026-11-24 | S2-P82 reviews | rv1 (Anthropic Claude C) REJECTED `17f7da4325` on one finding: skipping `head` let a page that omits `</head>` hide its whole body, and a title-only robot check passed. fx1 `c0834b9c2f` (OpenAI Codex A): `_citation_obstacle` skips only `script`, `style`, `noscript` and `template`; the title is scanned; tests for the omitted `</head>` wall, title markers and a generated head-closure property; document 04 section 3.1 wording. rv2 (Anthropic Claude C) APPROVED `c0834b9c2fdd49cf8be51fbee5df888d3bb3984f`: with `head` planted back the citation test file exits 1 (7 failed, 66 passed); restored, 73 passed; five-file selection 254 passed. | lead |
 | 2026-11-24 | Correction to the S2-P82 fx1 row above (append only; S2-P82.rv2 proposed open item R-1) | Its words "This round remains uncommitted as its brief requires" describe the worktree before the lead's commit; the round is committed as `c0834b9c2fdd49cf8be51fbee5df888d3bb3984f`. | lead |
 | 2026-11-24 | Train S2-30 identity | The two S2-P82 commits `17f7da4325` and `c0834b9c2f` cherry-picked onto main `5eb45fab65` with no conflict; lead join proof: every file of both own changes identical, 0 that differ. | lead |
+
+## S2-P84 — Required large-stream bounds and completeness (2026-11-24)
+
+Builder persona: senior data-acquisition security engineer. Strict self-review
+persona: strict reviewer of intake refusals and security boundaries. Base HEAD:
+`5eb45fab65fec6e68c2f474cc7d26d81149a398f`; this worktree is detached at that
+base and this task creates no commit, as its brief directs. Different-maker
+review, the lead's full suite and the original S2-T08 acceptance remain pending.
+
+Implemented ruling L-1717 using `Entry.stream_max_bytes` and its closed loader:
+positive integer bytes only, with null/absence an unconfirmed hold. `receive`
+refuses `bound_unconfirmed` before opening an unbounded stream and
+`length_undeclared` before reading an unverifiable body. A confirmed source cap
+combines with the existing scoped cap by the tighter bound, and the existing
+`body_bytes` checks precede an over-limit write. Exact-size/ETag intake is
+preserved. Successful receipts and immutable acquisition checks carry
+`declared_length_present`; existing snapshot receipts remain immutable.
+Only the five named registry rows gain a null bound field; no ceiling value is
+inferred. Doc 04 section 3.1 and proposed open item PO-S2-P84-01 record that hold.
+
+Initial test-first evidence, `UV_OFFLINE=1`:
+`uv run --locked python -m pytest custodian/tests/test_large_bounds.py -q`
+exited 1 (25 failures against the original implementation), then exited 0
+(25 passed after implementation). After adding explicit hostile-leaf and
+reacquisition cases, the same file with `--hypothesis-seed=84` exited 0
+(42 passed). The earlier runs used the repository's time-derived seed, which
+quiet output did not retain; final verification and all deletion proofs pin
+seed 84. No random failure is claimed or closed by a rerun.
+
+The first regression run of `uv run --locked python -m pytest
+custodian/tests/test_large_intake.py custodian/tests/test_large_bounds.py
+custodian/tests/test_publicdata_heights.py custodian/tests/test_assembly_refusals.py
+-q` exited 0 (1764 passed); this run collected the initial 25-case new file.
+The final expanded test file is verified separately below.
+
+Initial `uv run --locked ruff check .` exited 1: import ordering and raw-pattern
+lint errors in the new test file. Those were fixed; the next run exited 0.
+`ruff format --check .`, `mypy` (530 source files),
+`python3 scripts/check_docs.py`, `python3 scripts/check_tree.py` and
+`git diff --check` each exited 0. Formatting was applied only to touched Python
+files. No pin, baseline, workflow, hook or privacy control was changed.
+
+Skills applied: project-orientation located the existing staged receiver and
+receipt-check path; task-standards supplied the acquisition-security and strict
+self-review personas; test-driven-development (brief-equivalent rules) required
+red tests before implementation; sharp-edges rejected null/malformed bounds and
+undeclared completeness; property-based-testing added a chunk-split acceptance
+oracle and hostile-leaf cases; dimensional-analysis (scoped brief-equivalent
+rule) kept exact size, declared length, ceilings and accumulated count in bytes;
+security-review (brief-equivalent rules) preserved existing refusals;
+spec-to-code-compliance (scoped brief-equivalent rules) mapped L-1717 to doc 04
+and enforcement; differential-review compares the final diff with the required
+base; github-flow keeps this task uncommitted for lead review; sanad-provenance
+ties the claims to commands and code. Final verification and muhasabah follow
+in the appended evidence below.
+
+
+S2-P84 diagnostic correction: captured pytest output automatically included
+source addresses and absolute workspace prefixes. A value-free scan found this
+in scratch diagnostic logs; `.overnight/ALERT.md` records the issue. Completed
+logs were redacted while retaining commands, exits, assertions and counts; the
+active run will be redacted after completion. No source, fixture, test, guard,
+pin or baseline was changed for this correction.
+
+
+### S2-P84 final verification and handoff
+
+Final environment: Linux x86_64, Python 3.14.6, uv 0.11.31; `UV_OFFLINE=1`,
+repository Hypothesis profile unchanged, explicit seed 84 for final pytest and
+all deletion proofs. TMPDIR is inside the worktree. No provider, network,
+whole-suite invocation, commit or push was selected.
+
+- `uv run --locked python -m pytest custodian/tests/test_large_intake.py custodian/tests/test_large_bounds.py custodian/tests/test_publicdata_heights.py --hypothesis-seed=84 -vv`: exit 0, 335 passed.
+- `uv run --locked python -m pytest custodian/tests -k "large or intake or stream or registry or assembly or build_public" --hypothesis-seed=84 -vv`: exit 0, 2804 passed, 12395 deselected by the required expression, two rasterio NotGeoreferencedWarning diagnostics from unchanged GIS snapshot fixture tests. No warning was suppressed or baseline changed.
+- After every pytest/plant run finished, `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -k public -k registry -k boundary -v`: exit 0, 42 tests passed.
+- Then `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'`: exit 0, 37 tests passed.
+- `UV_OFFLINE=1 python3 .overnight/tmp/guard_proofs.py`: exit 0; all 22 isolated deletions red 1, restored green 0, original bytes verified identical. Exact commands, guard names and red/green logs are retained with the task return. These are guard-deletion proofs, not a replacement for the deferred full mutation campaign.
+- The supplemental pinned-base local receiver probe initially exited 1 for its missing workspace import path, before testing a receiver. With `PYTHONPATH=.` it exited 0: undeclared short and declared over-ceiling cases were accepted by the base for all five keys and refused by the patch with `length_undeclared` and `body_bytes`. The initial diagnostic and corrected result are retained.
+- An in-memory YAML comparison against the full base registry exited 0: after removing exactly the five new null `stream_max_bytes` fields, the documents are equal. No other registry row or field changed.
+- Static checks recorded above remain green: ruff check/format, mypy, docs, tree and diff. AGENTS.md and CLAUDE.md remain byte-identical (cmp exit 0).
+
+The diagnostic redaction is complete for finished log files; it preserves the
+failure assertions and real exit evidence. ALERT.md discloses the correction.
+Longest new function by AST span: `test_chunk_splits_accept_iff_complete_and_bounded`,
+35 lines excluding decorators. No block copied; the existing stream helper is
+reused. Every new production quantity is bytes, with no conversion or rounding.
+Strict self-review: APPROVE for the scoped build, with its differential/attack
+review in the return artifacts. Verification-before-completion and
+muhasabah-gate: PASS for this local handoff; the null lead inputs,
+different-maker approval, lead whole suite and slice-gate obligations are not
+claimed complete. Denied tool calls: none.
+
+S2-P84 final records recheck: `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`, `git diff --check` and `cmp AGENTS.md CLAUDE.md` each exited 0 after the final evidence block.
