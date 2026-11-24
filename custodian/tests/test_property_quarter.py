@@ -55,7 +55,12 @@ def _frame(folder: Path) -> dict[str, object]:
         encoding="utf-8",
     )
     (folder / "district_crosswalk.csv").write_text(
-        "name,district_keys\nSYN North,syn_north\nSYN North AR,syn_north\n",
+        "name,municipality_code,district_keys,basis\n"
+        "SYN North,syn_coast,syn_north,two_language_exact\n"
+        "SYN North AR,syn_coast,syn_north,two_language_exact\n"
+        "SYN North,syn_inland,syn_inland,two_language_exact\n"
+        "SYN North AR,syn_inland,syn_inland,two_language_exact\n"
+        "SYN One,syn_coast,syn_one,one_language_exact\n",
         encoding="utf-8",
     )
     return {"frame": folder}
@@ -336,14 +341,40 @@ def test_a_district_outside_the_reviewed_crosswalk_fails(tmp_path: Path) -> None
     assert _blocked(parsed, "unmatched_district") == 1
 
 
+def test_two_matching_languages_must_name_the_same_district(tmp_path: Path) -> None:
+    _frame(tmp_path)
+    path = tmp_path / "district_crosswalk.csv"
+    path.write_text(
+        path.read_text(encoding="utf-8").replace(
+            "SYN North AR,syn_coast,syn_north,two_language_exact",
+            "SYN North AR,syn_coast,syn_inland,two_language_exact",
+        ),
+        encoding="utf-8",
+    )
+    parsed = parse_bulletin([_resi()], "prop_resi_units", _map(), {"frame": tmp_path})
+    assert parsed.deals == ()
+    assert _blocked(parsed, "district_disagreement") == 1
+
+
+def test_the_old_unqualified_crosswalk_header_is_refused(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.frame.checks import FrameError
+
+    _frame(tmp_path)
+    (tmp_path / "district_crosswalk.csv").write_text(
+        "name,district_keys\nSYN North,syn_north\n", encoding="utf-8"
+    )
+    with pytest.raises(FrameError, match=r"^district_alias: CSV header$"):
+        parse_bulletin([_resi()], "prop_resi_units", _map(), {"frame": tmp_path})
+
+
 def test_an_unmapped_municipality_fails(tmp_path: Path) -> None:
     with pytest.raises(AdditionError) as municipality:
         _parse([_resi(municipality_name="SYN Unmapped Muni")], tmp_path)
     assert municipality.value.name == "unmapped_municipality"
 
 
-def test_an_ambiguous_district_is_blocked_not_kept(tmp_path: Path) -> None:
-    """A district name read under two municipalities enters no aggregate."""
+def test_a_shared_district_name_uses_each_municipality(tmp_path: Path) -> None:
+    """The same source name maps to each municipality's own frame key."""
     rows = [
         _resi(),
         _resi(
@@ -353,8 +384,19 @@ def test_an_ambiguous_district_is_blocked_not_kept(tmp_path: Path) -> None:
         ),
     ]
     parsed = _parse(rows, tmp_path)
-    assert parsed.deals == ()
-    assert _blocked(parsed, "ambiguous_district") == 2
+    assert {deal.district_key for deal in parsed.deals} == {"syn_north", "syn_inland"}
+    assert _blocked(parsed, "ambiguous_district") == 0
+
+
+def test_one_exact_language_is_enough(tmp_path: Path) -> None:
+    parsed = _parse([_resi(district_name="SYN One", sm_lmntq="SYN One AR")], tmp_path)
+    assert [deal.district_key for deal in parsed.deals] == ["syn_one"]
+    assert _blocked(parsed, "unmatched_district") == 0
+
+
+def test_a_no_break_space_matches_the_reviewed_name(tmp_path: Path) -> None:
+    parsed = _parse([_resi(district_name="SYN\u00a0North")], tmp_path)
+    assert [deal.district_key for deal in parsed.deals] == ["syn_north"]
 
 
 def test_a_usage_field_that_is_not_text_fails(tmp_path: Path) -> None:

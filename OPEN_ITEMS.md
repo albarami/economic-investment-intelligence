@@ -6918,3 +6918,25 @@ run remain pending.
   `test_reviewed_ceilings_are_pinned`; the null hold now applies only to a
   future key without a confirmed ceiling. The item stays open for the
   different-maker acceptance and the lead's whole-suite run.
+
+## OI-412 — Review one-language district matches and unmapped property names
+
+- ID: OI-412
+- TYPE: OPEN (lead review)
+- RAISED BY: S2-P87, 2026-11-24
+- CONCERNS: ruling L-1725 M2 rows and every property district group left unmapped by M3.
+- EVIDENCE: `.overnight/OUT/P87-account.json` recomputes the complete account. Unmapped `prop_sales`: `ambiguous_in_municipality` 0 groups / 0 rows, `municipality_conflict` 19 / 1,008, `unreviewed_variant` 24 / 2,298, `name_missing` 2 / 3. Unmapped `prop_resi_units`: 0 / 0, 3 / 34, 2 / 177 and 0 / 0 in the same order. The 26 M2 groups awaiting review are:
+  - `prop_resi_units`: Thuaileb / غار ثعيلب, municipality 5, QAT001069114, 14 rows, Arabic; Legtaifiyah / لقطيفية, municipality 1, QAT006066105, 6 rows, Arabic.
+  - `prop_sales`, Arabic: Simaisma / سميسمة, municipality 5, QAT001070268, 428 rows; Leqtaifiya / لقطيفية, 1, QAT006066105, 130; Al Doha Al Jadeeda / الدوحة الجديدة, 1, QAT006015013, 87; Rayan Al-ateeq / الريان العتيق, 2, QAT003052061, 50; Bu Fasseela / بو فسيلة, 4, QAT007071129, 40; Al Ghuwariyah / لغويرية, 6, QAT002076336, 38; Al-Shahaniya / الشيحانية, 8, QAT008080451, 28; Al Mirqab al jadeed / المرقاب الجديد, 1, QAT006039039, 11; Msheireb 13 / مشيرب 13, 1, QAT006013778, 5; Al Wajbah / الوجبة, 2, QAT003053066, 4; Al Mazrouah / وادي المزروعه, 4, QAT007071150, 2; Al Ruwais / المشاف, 3, QAT005091640, 1; Al Ghashamia / الغشامية, 7, QAT004077375, 1; Jabal Thuaileb / غار ثعيلب, 5, QAT001069114, 1; Ras Abu Aboud 28 / راس بو عبود 28, 1, QAT006028787, 1; حالة اوبير / حالة اوبير, 5, QAT001070283, 1; Ain Sinan / عين سنان with a plain English space, 7, QAT004077366, 1; Ain Sinan / عين سنان with an English NO-BREAK SPACE, 7, QAT004077366, 1; Al Ghashamia / الغانم العتيق 6, 1, QAT006006779, 1.
+  - `prop_sales`, English: New Slata / السلطة الجديدة, municipality 1, QAT006040041, 272 rows; Lijmiliya / لجميليه, 8, QAT008073210, 25; Umm Besher / أم بشر, 3, QAT005091767, 10; Al Khulaifat / فريج الخليفات, 1, QAT006028025, 1; Al Souq / السلطة, 1, QAT006007009, 1.
+- NEEDED: the lead accepts or rejects every M2 group and reviews the spelling, article and zone-number proposals in `.overnight/RETURN.md`. No proposal adds a crosswalk row without a later reviewed generation. Unmapped municipality conflicts, missing names and ambiguous names stay excluded.
+- NEEDED BY: before the affected property district figures are treated as fully reviewed.
+
+## PO-S2-32-01 — A closed set for the district crosswalk basis at load
+
+- ID: PO-S2-32-01
+- TYPE: PROPOSED (records point of S2-P87.rv1)
+- RAISED BY: S2-P87.rv1 (Cognition Devin), 2026-11-24
+- CONCERNS: `basis` of the property district crosswalk rows is enforced on the committed file's contents but is not checked against a closed set when the file is loaded, so a later regeneration with a wrong basis value would not be refused.
+- NEEDED: a closed-set check on `basis` at load, with a planted violation, when the file is next regenerated.
+- NEEDED BY: the next regeneration of the district crosswalk.

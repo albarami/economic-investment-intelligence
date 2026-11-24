@@ -27,7 +27,6 @@ from eii_custodian.publicdata.additions.common import (
     read_measure,
 )
 from eii_custodian.publicdata.additions.property_venues import (
-    _ambiguous_districts,
     _district,
     _district_rows,
     _identifier_values,
@@ -190,18 +189,20 @@ def parse_bulletin(
     districts = _district_rows(crosswalk)
     known = _known_districts(districts)
     identifiers = _identifier_values(rows)
-    ambiguous = _ambiguous_districts(rows, names)
     prepared: list[Deal] = []
     counts: dict[str, int] = defaultdict(int)
     for row in rows:
         if set(row) - BULLETIN_FIELDS:
             raise AdditionError("unknown_source_field")
         municipality = _municipality(row, names)
-        english = _text(row, "district_name")
-        if english in ambiguous:
-            counts["ambiguous_district"] += 1
-            continue
-        district = _district(english, _text(row, "sm_lmntq"), districts, known, counts)
+        district = _district(
+            _text(row, "district_name"),
+            _text(row, "sm_lmntq"),
+            municipality,
+            districts,
+            known,
+            counts,
+        )
         if district is None:
             continue
         mapping = use_lookup(mappings, source_id, _text(row, "nw_l_qr"), _usage(row))

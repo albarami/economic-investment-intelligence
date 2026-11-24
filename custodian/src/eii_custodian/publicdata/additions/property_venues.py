@@ -37,6 +37,7 @@ from eii_custodian.publicdata.additions.common import (
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.frame.checks import FrameError
 from eii_custodian.publicdata.frame.crosswalk import (
+    DISTRICT_CROSSWALK_HEADER,
     district_keys,
     load_municipality_names,
     municipality_key,
@@ -357,16 +358,18 @@ def _prepare_property_rows(
     known: set[str],
     unit_types: dict[str, str],
 ) -> tuple[list[dict[str, object]], list[Coverage]]:
-    ambiguous = _ambiguous_districts(raw, names)
     prepared: list[dict[str, object]] = []
     counts: dict[str, int] = defaultdict(int)
     for row in raw:
         municipality = _municipality(row, names)
-        english = _text(row, "district_name")
-        if english in ambiguous:
-            counts["ambiguous_district"] += 1
-            continue
-        district = _district(english, _text(row, "sm_lmntq"), districts, known, counts)
+        district = _district(
+            _text(row, "district_name"),
+            _text(row, "sm_lmntq"),
+            municipality,
+            districts,
+            known,
+            counts,
+        )
         if district is None:
             continue
         unit = unit_types.get(_text(row, "property_type"))
@@ -499,15 +502,6 @@ def _working_precision(number: Decimal, *, places: int, carry: int) -> int:
     return max(digits, integer_digits + places + carry, 1)
 
 
-def _ambiguous_districts(
-    raw: list[dict[str, object]], names: list[dict[str, str]]
-) -> set[str]:
-    seen: dict[str, set[str]] = defaultdict(set)
-    for row in raw:
-        seen[_text(row, "district_name")].add(_municipality(row, names))
-    return {name for name, codes in seen.items() if len(codes) > 1}
-
-
 def _municipality(row: Mapping[str, object], names: list[dict[str, str]]) -> str:
     try:
         english = municipality_key(_text(row, "municipality_name"), names)
@@ -522,25 +516,31 @@ def _municipality(row: Mapping[str, object], names: list[dict[str, str]]) -> str
 def _district(
     english: str,
     arabic: str,
+    municipality: str,
     districts: list[dict[str, str]],
     known: set[str],
     counts: dict[str, int],
 ) -> str | None:
     try:
-        english_keys, english_error = district_keys(english, districts, known)
-        arabic_keys, arabic_error = district_keys(arabic, districts, known)
+        english_keys, english_error = district_keys(
+            english, municipality, districts, known
+        )
+        arabic_keys, arabic_error = district_keys(
+            arabic, municipality, districts, known
+        )
     except FrameError:
         raise AdditionError("district_crosswalk") from None
-    if english_error is not None or arabic_error is not None:
+    if english_error is not None and arabic_error is not None:
         counts["unmatched_district"] += 1
         return None
-    if english_keys != arabic_keys:
+    if english_error is None and arabic_error is None and english_keys != arabic_keys:
         counts["district_disagreement"] += 1
         return None
-    if len(english_keys) != 1:
+    keys = english_keys if english_error is None else arabic_keys
+    if len(keys) != 1:
         counts["district_key_not_singular"] += 1
         return None
-    return english_keys[0]
+    return keys[0]
 
 
 def _venue(
@@ -639,7 +639,7 @@ def _district_rows(crosswalks: Mapping[str, object]) -> list[dict[str, str]]:
 
     if not isinstance(review, Path):
         raise AdditionError("crosswalk_missing")
-    return read_csv(review / "district_crosswalk.csv")
+    return read_csv(review / "district_crosswalk.csv", header=DISTRICT_CROSSWALK_HEADER)
 
 
 def _known_districts(rows: list[dict[str, str]]) -> set[str]:

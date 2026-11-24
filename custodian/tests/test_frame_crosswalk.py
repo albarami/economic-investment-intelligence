@@ -5,6 +5,8 @@ from pathlib import Path
 import pytest
 from custodian.tests.repository_root import repository_root
 from custodian.tests.test_frame_coverage import invented_frame
+from hypothesis import given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.frame.checks import FrameError, safe_key
 from eii_custodian.publicdata.frame.crosswalk import (
@@ -48,15 +50,94 @@ def test_municipality_spelling_pairs():
         municipality_key("SYN-Unknown", rows)
 
 
+def _district_row(name, municipality, keys):
+    return {
+        "name": name,
+        "municipality_code": municipality,
+        "district_keys": keys,
+        "basis": "two_language_exact",
+    }
+
+
 def test_district_unmatched_is_listed_never_guessed():
-    rows = [{"name": "Invented mapped", "district_keys": "SYN-D"}]
-    assert district_keys("Invented mapped", rows, {"SYN-D"}) == (("SYN-D",), None)
-    assert district_keys("Invented unmatched", rows, {"SYN-D"}) == (
-        (),
-        "unmatched district: Invented unmatched",
+    rows = [_district_row("Invented mapped", "SYN-A", "AAA100000001")]
+    known = {"AAA100000001"}
+    assert district_keys("Invented mapped", "SYN-A", rows, known) == (
+        ("AAA100000001",),
+        None,
     )
-    with pytest.raises(FrameError, match="unknown district"):
-        district_keys("Invented mapped", rows, {"SYN-E"})
+    assert district_keys("Invented unmatched", "SYN-A", rows, known) == (
+        (),
+        "unmatched_district",
+    )
+    with pytest.raises(FrameError, match=r"^district_crosswalk: outside_frame$"):
+        district_keys("Invented mapped", "SYN-A", rows, {"BBB200000002"})
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    [
+        "Invented Mapped",
+        "Invented mapped suffix",
+        "Al Invented mapped",
+        "Invented mapped 69",
+    ],
+)
+def test_district_case_prefix_article_and_zone_variants_stay_unmatched(candidate):
+    rows = [_district_row("Invented mapped", "SYN-A", "AAA100000001")]
+    assert district_keys(candidate, "SYN-A", rows, {"AAA100000001"}) == (
+        (),
+        "unmatched_district",
+    )
+
+
+def test_shared_name_uses_the_labelled_municipality():
+    rows = [
+        _district_row("Invented shared", "SYN-A", "AAA100000001"),
+        _district_row("Invented shared", "SYN-B", "BBB200000002"),
+    ]
+    known = {"AAA100000001", "BBB200000002"}
+    assert district_keys("Invented shared", "SYN-A", rows, known) == (
+        ("AAA100000001",),
+        None,
+    )
+    assert district_keys("Invented shared", "SYN-B", rows, known) == (
+        ("BBB200000002",),
+        None,
+    )
+
+
+def test_no_break_space_matches_after_normalisation():
+    rows = [_district_row("Invented mapped name", "SYN-A", "AAA100000001")]
+    assert district_keys(
+        "Invented\u00a0mapped  name", "SYN-A", rows, {"AAA100000001"}
+    ) == (("AAA100000001",), None)
+
+
+@given(
+    municipality=st.sampled_from(("SYN-A", "SYN-B")),
+    reverse=st.booleans(),
+    leading=st.text(alphabet=" \t\u00a0", max_size=3),
+    trailing=st.text(alphabet=" \t\u00a0", max_size=3),
+)
+def test_lookup_never_returns_another_municipality_key(
+    municipality, reverse, leading, trailing
+):
+    rows = [
+        _district_row("Invented shared", "SYN-A", "AAA100000001"),
+        _district_row("Invented shared", "SYN-B", "BBB200000002"),
+    ]
+    expected = {"SYN-A": "AAA100000001", "SYN-B": "BBB200000002"}[municipality]
+    if reverse:
+        rows.reverse()
+    keys, reason = district_keys(
+        leading + "Invented shared" + trailing,
+        municipality,
+        rows,
+        {"AAA100000001", "BBB200000002"},
+    )
+    assert reason is None
+    assert keys == (expected,)
 
 
 @pytest.mark.parametrize("size", [8, 11])
@@ -79,18 +160,20 @@ def test_polygon_equality_and_disagreements():
 
 
 def test_duplicate_district_mapping_fails():
-    rows = [{"name": "Invented mapped", "district_keys": "SYN-D"}] * 2
+    rows = [_district_row("Invented mapped", "SYN-A", "AAA100000001")] * 2
     with pytest.raises(FrameError, match="duplicate district mapping"):
-        district_keys("Invented mapped", rows, {"SYN-D"})
+        district_keys("Invented mapped", "SYN-A", rows, {"AAA100000001"})
 
 
 def test_valid_keys_and_explicit_district_split():
     assert safe_key("SYN-A") == "SYN-A"
-    rows = [{"name": "Invented mapped", "district_keys": "SYN-D;SYN-E"}]
-    assert district_keys("Invented mapped", rows, {"SYN-D", "SYN-E"}) == (
-        ("SYN-D", "SYN-E"),
-        None,
-    )
+    rows = [_district_row("Invented mapped", "SYN-A", "AAA100000001;BBB200000002")]
+    assert district_keys(
+        "Invented mapped",
+        "SYN-A",
+        rows,
+        {"AAA100000001", "BBB200000002"},
+    ) == (("AAA100000001", "BBB200000002"), None)
 
 
 def test_boundary_names_required():

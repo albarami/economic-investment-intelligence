@@ -8,6 +8,7 @@ import pytest
 from custodian.tests.test_property_quarter import _all_row, _parse, _resi, _sale
 
 from eii_custodian.publicdata.additions.common import AdditionError
+from eii_custodian.publicdata.frame.build import FrameResult
 from eii_custodian.publicdata.gis.layers import land_price_rows
 from eii_custodian.publicdata.property.price_as_of import (
     as_of_from_receipt,
@@ -18,6 +19,21 @@ from eii_custodian.publicdata.property.quarter import quarter_aggregates
 
 INVENTED_AS_OF = "2026-11-14"
 OTHER_AS_OF = "2026-11-15"
+
+
+def _assembly_frame() -> FrameResult:
+    return FrameResult(
+        {
+            "grid_cell": [],
+            "district": [
+                {"district_key": "syn_north"},
+                {"district_key": "syn_inland"},
+                {"district_key": "syn_one"},
+            ],
+        },
+        [],
+        {},
+    )
 
 
 def test_as_of_from_receipt_uses_snapshot_retrieval_date() -> None:
@@ -96,7 +112,6 @@ def test_assembly_land_price_rows_carry_receipt_as_of(tmp_path) -> None:
     from custodian.tests.test_source_completeness import receipt
 
     from eii_custodian.publicdata.fetch.registry import load_registry
-    from eii_custodian.publicdata.frame.build import FrameResult
     from eii_custodian.publicdata.review.cache_fixture import write_cached
 
     row = replace(
@@ -121,7 +136,7 @@ def test_assembly_land_price_rows_carry_receipt_as_of(tmp_path) -> None:
     build = context(tmp_path, (row,))
     build.selected = {row.key: digest.stem}
     build.receipts = {row.key: receipt(row)}
-    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.frame_result = _assembly_frame()
     build.gis_property_singles()
     expected = as_of_from_receipt(build.receipts[row.key])
     for land_row in build.tables["pub_land_price"]:
@@ -140,7 +155,6 @@ def test_assembly_refuses_land_price_missing_as_of(
 
     import eii_custodian.publicdata.gis.layers as gis_layers
     from eii_custodian.publicdata.fetch.registry import load_registry
-    from eii_custodian.publicdata.frame.build import FrameResult
     from eii_custodian.publicdata.review.cache_fixture import write_cached
 
     row = replace(
@@ -174,7 +188,7 @@ def test_assembly_refuses_land_price_missing_as_of(
     build = context(tmp_path, (row,))
     build.selected = {row.key: digest.stem}
     build.receipts = {row.key: receipt(row)}
-    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.frame_result = _assembly_frame()
     with pytest.raises(AdditionError, match="price_as_of_missing"):
         build.gis_property_singles()
 
@@ -190,7 +204,6 @@ def test_assembly_property_quarter_carries_receipt_as_of(tmp_path) -> None:
     from custodian.tests.test_source_completeness import receipt
 
     from eii_custodian.publicdata.fetch.registry import load_registry
-    from eii_custodian.publicdata.frame.build import FrameResult
     from eii_custodian.publicdata.review.cache_fixture import write_cached
 
     row = replace(
@@ -205,7 +218,7 @@ def test_assembly_property_quarter_carries_receipt_as_of(tmp_path) -> None:
     build.review = tmp_path
     build.selected = {row.key: digest.stem}
     build.receipts = {row.key: receipt(row)}
-    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.frame_result = _assembly_frame()
     build.gis_property_singles()
     quarter_row = next(row for row in build.tables["pub_property_quarter"])
     assert quarter_row["as_of"] == as_of_from_receipt(build.receipts[row.key])
@@ -239,7 +252,6 @@ def test_assembly_refuses_quarter_identifier_before_writing_table(
 
     import eii_custodian.publicdata.property.quarter as quarter_mod
     from eii_custodian.publicdata.fetch.registry import load_registry
-    from eii_custodian.publicdata.frame.build import FrameResult
     from eii_custodian.publicdata.review.cache_fixture import write_cached
 
     registry = load_registry()
@@ -264,7 +276,7 @@ def test_assembly_refuses_quarter_identifier_before_writing_table(
     build = context(tmp_path, entries)
     build.review = tmp_path
     build.selected = selected
-    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.frame_result = _assembly_frame()
     with pytest.raises(AdditionError, match="identifier_leak") as caught:
         build.gis_property_singles()
     assert caught.value.name == "identifier_leak"
@@ -286,7 +298,6 @@ def test_assembly_refuses_quarter_foreign_source_as_of(
 
     import eii_custodian.publicdata.property.quarter as quarter_mod
     from eii_custodian.publicdata.fetch.registry import load_registry
-    from eii_custodian.publicdata.frame.build import FrameResult
     from eii_custodian.publicdata.review.cache_fixture import write_cached
 
     sale_row = replace(
@@ -300,9 +311,11 @@ def test_assembly_refuses_quarter_foreign_source_as_of(
     _frame(tmp_path)
     shutil.copy(USE_MAP, tmp_path / "property_use_map.csv")
     (tmp_path / "district_crosswalk.csv").write_text(
-        "name,district_keys\n"
-        "SYN North,syn_north\nSYN North AR,syn_north\n"
-        "SYN Inland,syn_inland\nSYN Inland AR,syn_inland\n",
+        "name,municipality_code,district_keys,basis\n"
+        "SYN North,syn_coast,syn_north,two_language_exact\n"
+        "SYN North AR,syn_coast,syn_north,two_language_exact\n"
+        "SYN Inland,syn_inland,syn_inland,two_language_exact\n"
+        "SYN Inland AR,syn_inland,syn_inland,two_language_exact\n",
         encoding="utf-8",
     )
     inland = dict(
@@ -337,7 +350,7 @@ def test_assembly_refuses_quarter_foreign_source_as_of(
     build = context(tmp_path, (sale_row, resi_row))
     build.review = tmp_path
     build.selected = {sale_row.key: sale_digest.stem, resi_row.key: resi_digest.stem}
-    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.frame_result = _assembly_frame()
     with pytest.raises(AdditionError, match="price_as_of_missing"):
         build.gis_property_singles()
 
@@ -356,7 +369,6 @@ def test_assembly_refuses_quarter_wrong_snapshot_as_of(
 
     import eii_custodian.publicdata.property.quarter as quarter_mod
     from eii_custodian.publicdata.fetch.registry import load_registry
-    from eii_custodian.publicdata.frame.build import FrameResult
     from eii_custodian.publicdata.review.cache_fixture import write_cached
 
     row = replace(
@@ -382,6 +394,6 @@ def test_assembly_refuses_quarter_wrong_snapshot_as_of(
     build.review = tmp_path
     build.selected = {row.key: digest.stem}
     build.receipts = {row.key: receipt(row)}
-    build.frame_result = FrameResult({"grid_cell": []}, [], {})
+    build.frame_result = _assembly_frame()
     with pytest.raises(AdditionError, match="price_as_of_missing"):
         build.gis_property_singles()
