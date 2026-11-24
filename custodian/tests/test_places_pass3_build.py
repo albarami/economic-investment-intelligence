@@ -31,7 +31,7 @@ def test_run_build_reaches_the_frame_only_when_ready(tmp_path: Path) -> None:
         "name_ar": "مكان تجريبي",
         "aliases": None,
         "source_id": "places_ovt",
-        "record_key": "SYN-LAND",
+        "record_ref": "SYN-LAND",
         "arabic_review": "pending native review",
     }
     (review / "showcase_gazetteer.yaml").write_text(

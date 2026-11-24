@@ -10,6 +10,7 @@ from typing import Any
 
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.grids.build import build_grids
+from eii_custodian.publicdata.places.review import review_file_spec
 
 from .build import FrameResult, read_cached
 from .census import census_rows, validate_tables, workbook_rows
@@ -109,7 +110,10 @@ def build_live_frame(
     points = _place_points(cache)
     resolved: list[dict[str, Any]] = []
     for filename in ("showcase_gazetteer.yaml", "flagship_candidates.yaml"):
-        specs = json.loads((review / filename).read_text(encoding="utf-8"))
+        specs = [
+            review_file_spec(row)
+            for row in json.loads((review / filename).read_text(encoding="utf-8"))
+        ]
         resolved.extend(
             resolve_reviewed_specs(specs, points, tables["grid_cell"], report)
         )

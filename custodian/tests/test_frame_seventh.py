@@ -363,7 +363,7 @@ def test_filled_place_point_enters_the_live_gazetteer(seventh_build, tmp_path):
                     "name_ar": "اسم تجريبي",
                     "aliases": None,
                     "source_id": "places_ovt",
-                    "record_key": "SYN-R",
+                    "record_ref": "SYN-R",
                     "arabic_review": "pending native review",
                 }
             ]

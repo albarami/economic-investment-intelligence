@@ -6,7 +6,7 @@
     "name_ar": "لوسيل",
     "aliases": null,
     "source_id": null,
-    "record_key": null,
+    "record_ref": null,
     "arabic_review": "pending native review"
   },
   {
@@ -16,7 +16,7 @@
     "name_ar": "الخليج الغربي",
     "aliases": null,
     "source_id": null,
-    "record_key": null,
+    "record_ref": null,
     "arabic_review": "pending native review"
   },
   {
@@ -26,7 +26,7 @@
     "name_ar": "مشيرب",
     "aliases": null,
     "source_id": null,
-    "record_key": null,
+    "record_ref": null,
     "arabic_review": "pending native review"
   },
   {
@@ -36,7 +36,7 @@
     "name_ar": "اللؤلؤة",
     "aliases": null,
     "source_id": null,
-    "record_key": null,
+    "record_ref": null,
     "arabic_review": "pending native review"
   }
 ]

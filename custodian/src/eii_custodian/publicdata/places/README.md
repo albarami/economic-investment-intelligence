@@ -72,7 +72,7 @@ The category loader refuses repeated `basic_category` tokens, identical or confl
 with `duplicate_category`. Showcase areas require unique `place_key`s
 (`showcase_area_duplicate`) and the `places_ovt` source (`showcase_area_source`). The
 stage and area-request producer pass the gazetteer to the loader; an area pin must
-match its `(place_key, source_id, record_key)` (`showcase_area_gazetteer_mismatch`).
+match its `(place_key, source_id, record_ref)` (`showcase_area_gazetteer_mismatch`).
 An empty area list stays valid. `required_verification` selects kept food-service ids
 inside the showcase walks plus explicitly supplied story ids (empty pending OI-397).
 Only counts are added to `build_report.json`: `required_verification.by_area` keyed

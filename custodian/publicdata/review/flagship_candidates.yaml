@@ -5,8 +5,8 @@
     "name_en": "Manarat Lusail",
     "name_ar": "منارات لوسيل",
     "aliases": null,
-    "source_id": null,
-    "record_key": null,
+    "source_id": "bldg_ovt",
+    "record_ref": "0155d0bb-624a-4d46-9276-46f1aa8cc40c",
     "arabic_review": "pending native review"
   },
   {
@@ -15,8 +15,8 @@
     "name_en": "Burj Al Fardan",
     "name_ar": "برج الفردان",
     "aliases": null,
-    "source_id": null,
-    "record_key": null,
+    "source_id": "bldg_ovt",
+    "record_ref": "d7df8f5b-905e-4b5e-b51a-f2ffdfa6dde7",
     "arabic_review": "pending native review"
   },
   {
@@ -25,8 +25,8 @@
     "name_en": "Marina Twin Towers",
     "name_ar": "برجا المارينا",
     "aliases": null,
-    "source_id": null,
-    "record_key": null,
+    "source_id": "bldg_ovt",
+    "record_ref": "7f418f15-9610-4f08-b7f0-f8747400f094",
     "arabic_review": "pending native review"
   },
   {
@@ -36,7 +36,7 @@
     "name_ar": "بلاس فاندوم",
     "aliases": null,
     "source_id": null,
-    "record_key": null,
+    "record_ref": null,
     "arabic_review": "pending native review"
   },
   {
@@ -45,8 +45,8 @@
     "name_en": "Q Tower",
     "name_ar": "برج كيو",
     "aliases": null,
-    "source_id": null,
-    "record_key": null,
+    "source_id": "bldg_ovt",
+    "record_ref": "ae00c465-6ce5-414f-9cde-7dd19b80fd64",
     "arabic_review": "pending native review"
   },
   {
@@ -55,8 +55,8 @@
     "name_en": "QiG Tower",
     "name_ar": "برج كيو آي جي",
     "aliases": null,
-    "source_id": null,
-    "record_key": null,
+    "source_id": "bldg_ovt",
+    "record_ref": "fe010a93-937e-4b30-bc16-554d89527b2e",
     "arabic_review": "pending native review"
   },
   {
@@ -65,8 +65,8 @@
     "name_en": "Sendian Tower",
     "name_ar": "برج سنديان",
     "aliases": null,
-    "source_id": null,
-    "record_key": null,
+    "source_id": "bldg_ovt",
+    "record_ref": "840a5409-76f4-4ed6-b785-ad3b33ed89f3",
     "arabic_review": "pending native review"
   }
 ]

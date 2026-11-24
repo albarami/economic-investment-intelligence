@@ -161,11 +161,17 @@ def spec(
         "name_ar": name_ar,
         "aliases": None,
         "source_id": None,
-        "record_key": None,
+        "record_ref": None,
         "arabic_review": "pending native review",
     }
     row.update(extra)
     return row
+
+
+def internal_spec(row: Mapping[str, object]) -> dict[str, object]:
+    result = dict(row)
+    result["record_key"] = result.pop("record_ref")
+    return result
 
 
 class World(unittest.TestCase):
@@ -238,7 +244,7 @@ class GazetteerRows(World):
         self.assertEqual(code, 0)
         row = self.rows("showcase_gazetteer.yaml")[0]
         self.assertEqual(
-            (row["source_id"], row["record_key"]), ("places_ovt", "SYN-P-1")
+            (row["source_id"], row["record_ref"]), ("places_ovt", "SYN-P-1")
         )
         self.assertEqual(
             out,
@@ -253,7 +259,7 @@ class GazetteerRows(World):
         self.review_files(gazetteer=[spec("landmark:0", "Syn Tower")])
         code, out = self.run_tool()
         self.assertEqual(code, 0)
-        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_ref"])
         self.assertIn(
             "matches=0 kept=na footprints=na inside=na written=false reason=match_0",
             out,
@@ -269,7 +275,7 @@ class GazetteerRows(World):
         self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
         code, out = self.run_tool()
         self.assertEqual(code, 0)
-        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_ref"])
         self.assertIn(
             "matches=n kept=na footprints=na inside=na written=false reason=match_n",
             out,
@@ -285,7 +291,7 @@ class GazetteerRows(World):
         code, out = self.run_tool()
         self.assertEqual(code, 0)
         self.assertEqual(
-            self.rows("showcase_gazetteer.yaml")[0]["record_key"], "SYN-P-1"
+            self.rows("showcase_gazetteer.yaml")[0]["record_ref"], "SYN-P-1"
         )
         self.assertIn("written=true reason=ok", out)
 
@@ -296,7 +302,7 @@ class GazetteerRows(World):
         )
         self.assertEqual(self.run_tool()[0], 0)
         self.assertEqual(
-            self.rows("showcase_gazetteer.yaml")[0]["record_key"], "SYN-P-1"
+            self.rows("showcase_gazetteer.yaml")[0]["record_ref"], "SYN-P-1"
         )
 
     def test_aliases_not_a_list_is_refused(self) -> None:
@@ -309,7 +315,7 @@ class GazetteerRows(World):
     def test_filled_row_is_left_alone(self) -> None:
         self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
         filled = spec(
-            "landmark:0", "Syn Souq", source_id="places_ovt", record_key="SYN-P-1"
+            "landmark:0", "Syn Souq", source_id="places_ovt", record_ref="SYN-P-1"
         )
         self.review_files(gazetteer=[filled])
         before = (self.review / "showcase_gazetteer.yaml").read_bytes()
@@ -332,7 +338,7 @@ class FlagshipRows(World):
         code, out = self.run_tool()
         self.assertEqual(code, 0)
         row = self.rows("flagship_candidates.yaml")[0]
-        self.assertEqual((row["source_id"], row["record_key"]), ("bldg_ovt", "SYN-B-1"))
+        self.assertEqual((row["source_id"], row["record_ref"]), ("bldg_ovt", "SYN-B-1"))
         self.assertEqual(
             out,
             "building:0 matches=1 kept=true footprints=1 "
@@ -344,14 +350,14 @@ class FlagshipRows(World):
         self.cache_buildings(1, [building("SYN-B-9", 51.1, 25.1)])
         self.assertEqual(self.run_tool()[0], 0)
         self.assertEqual(
-            self.rows("flagship_candidates.yaml")[0]["record_key"], "SYN-B-9"
+            self.rows("flagship_candidates.yaml")[0]["record_ref"], "SYN-B-9"
         )
 
     def test_point_in_no_footprint_stays_null(self) -> None:
         self.flagship_world([building("SYN-B-2", 51.3, 25.3)])
         code, out = self.run_tool()
         self.assertEqual(code, 0)
-        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_ref"])
         self.assertIn(
             "matches=1 kept=true footprints=0 inside=na "
             "written=false reason=footprint_0",
@@ -364,7 +370,7 @@ class FlagshipRows(World):
         )
         code, out = self.run_tool()
         self.assertEqual(code, 0)
-        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_ref"])
         self.assertIn(
             "matches=1 kept=true footprints=n inside=na "
             "written=false reason=footprint_n",
@@ -378,7 +384,7 @@ class FlagshipRows(World):
         )
         code, out = self.run_tool()
         self.assertEqual(code, 0)
-        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_ref"])
         self.assertIn(
             "matches=1 kept=true footprints=1 inside=false "
             "written=false reason=outside_boundary",
@@ -393,7 +399,7 @@ class FlagshipRows(World):
             (0, "building:0 check=true kept=true\n"),
         )
         rows = self.rows("flagship_candidates.yaml")
-        rows[0]["record_key"] = "SYN-B-WRONG"
+        rows[0]["record_ref"] = "SYN-B-WRONG"
         self.review_files(flagship=rows)
         self.assertEqual(
             self.run_tool("--check"),
@@ -403,7 +409,7 @@ class FlagshipRows(World):
     def test_check_flags_a_wrong_source_id(self) -> None:
         self.flagship_world([building("SYN-B-1", 51.1, 25.1)])
         filled = spec(
-            "building:0", "Syn Tower", source_id="places_ovt", record_key="SYN-B-1"
+            "building:0", "Syn Tower", source_id="places_ovt", record_ref="SYN-B-1"
         )
         self.review_files(flagship=[filled])
         self.assertEqual(
@@ -422,7 +428,7 @@ class BuildFilters(World):
         self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
         code, out = self.run_tool()
         self.assertEqual(code, 0)
-        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_ref"])
         self.assertEqual(
             out,
             "landmark:0 matches=0 kept=false footprints=na "
@@ -438,7 +444,7 @@ class BuildFilters(World):
         self.review_files(flagship=[spec("building:0", "Syn Tower")])
         code, out = self.run_tool()
         self.assertEqual(code, 0)
-        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("flagship_candidates.yaml")[0]["record_ref"])
         self.assertIn("written=false reason=excluded_by_keep_null_confidence", out)
 
     def test_duplicate_dropped_by_the_build_stays_null(self) -> None:
@@ -451,7 +457,7 @@ class BuildFilters(World):
         self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
         code, out = self.run_tool()
         self.assertEqual(code, 0)
-        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_ref"])
         self.assertEqual(
             out,
             "landmark:0 matches=0 kept=false footprints=na "
@@ -469,7 +475,7 @@ class BuildFilters(World):
         self.review_files(gazetteer=[spec("landmark:0", "Syn Market")])
         self.assertEqual(self.run_tool()[0], 0)
         self.assertEqual(
-            self.rows("showcase_gazetteer.yaml")[0]["record_key"], "SYN-P-2"
+            self.rows("showcase_gazetteer.yaml")[0]["record_ref"], "SYN-P-2"
         )
 
     def drop_attribution_row(self) -> None:
@@ -497,7 +503,7 @@ class BuildFilters(World):
     def test_check_fails_a_filled_key_whose_attribution_row_is_missing(self) -> None:
         self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
         filled = spec(
-            "landmark:0", "Syn Souq", source_id="places_ovt", record_key="SYN-P-1"
+            "landmark:0", "Syn Souq", source_id="places_ovt", record_ref="SYN-P-1"
         )
         self.review_files(gazetteer=[filled])
         self.assertEqual(
@@ -513,7 +519,7 @@ class BuildFilters(World):
             [place("SYN-P-1", 51.1, 25.1, "Syn Souq", dataset="OpenStreetMap")]
         )
         filled = spec(
-            "landmark:0", "Syn Souq", source_id="places_ovt", record_key="SYN-P-1"
+            "landmark:0", "Syn Souq", source_id="places_ovt", record_ref="SYN-P-1"
         )
         self.review_files(gazetteer=[filled])
         self.assertEqual(
@@ -590,7 +596,7 @@ class FrameBoundary(World):
         self.assertEqual(code, 0)
         self.assertIn("written=true reason=ok", out)
         self.assertEqual(
-            self.rows("showcase_gazetteer.yaml")[0]["record_key"], "SYN-P-1"
+            self.rows("showcase_gazetteer.yaml")[0]["record_ref"], "SYN-P-1"
         )
 
     def test_zero_municipalities_is_refused(self) -> None:
@@ -615,7 +621,7 @@ class FrameBoundary(World):
         )
         self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
         self.assertEqual(self.run_unpatched(), (2, "REFUSED attribution_header\n"))
-        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
+        self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_ref"])
 
 
 def without_municipalities(body: bytes) -> bytes:
@@ -657,7 +663,8 @@ class Refusals(World):
             "landmark:0", 1, True, None, None, "SYN-P-1", "ok", "place_name"
         )
         for field in ("record_key", "source_id"):
-            filled = spec("landmark:0", "Syn Souq", **{field: "SYN-OTHER"})
+            filled = internal_spec(spec("landmark:0", "Syn Souq"))
+            filled[field] = "SYN-OTHER"
             with self.assertRaises(keys_tool.ReviewError) as caught:
                 keys_tool.apply([filled], [proposal], "places_ovt")
             self.assertEqual(caught.exception.reason, "overwrite_refused")
@@ -673,7 +680,7 @@ class Refusals(World):
             return "committed", ()
 
         changed = spec(
-            "landmark:0", "Syn Souq", source_id="places_ovt", record_key="SYN-P-1"
+            "landmark:0", "Syn Souq", source_id="places_ovt", record_ref="SYN-P-1"
         )
         with self.assertRaises(keys_tool.ReviewError) as caught:
             keys_tool.write_reviewed([(path, [changed], other)])
@@ -708,7 +715,15 @@ class RowBinding(World):
         self.two_rows("landmark:1")
         self.assertEqual(self.run_tool()[0], 0)
         stored = self.rows("showcase_gazetteer.yaml")
-        self.assertEqual([row["record_key"] for row in stored], [None, "SYN-P-1"])
+        self.assertEqual([row["record_ref"] for row in stored], [None, "SYN-P-1"])
+
+    def test_fill_keeps_the_field_order_of_every_row(self) -> None:
+        self.two_rows("landmark:1")
+        before = [list(row) for row in self.rows("showcase_gazetteer.yaml")]
+        self.assertEqual(self.run_tool()[0], 0)
+        stored = self.rows("showcase_gazetteer.yaml")
+        self.assertEqual([row["record_ref"] for row in stored], [None, "SYN-P-1"])
+        self.assertEqual([list(row) for row in stored], before)
 
     def test_repeated_place_key_is_refused_before_writing(self) -> None:
         self.two_rows("landmark:0")
@@ -721,12 +736,15 @@ class RowBinding(World):
         self.assertEqual(self.run_tool("--check"), (2, "REFUSED duplicate_place_key\n"))
 
     def test_apply_binds_each_proposal_to_its_own_row(self) -> None:
-        rows = [spec("landmark:0", "Syn Tower"), spec("landmark:0", "Syn Souq")]
+        rows = [
+            internal_spec(spec("landmark:0", "Syn Tower")),
+            internal_spec(spec("landmark:0", "Syn Souq")),
+        ]
         found = keys_tool.Proposal(
             "landmark:0", 1, True, None, None, "SYN-P-1", "ok", "place_name"
         )
         filled = keys_tool.apply(rows, [None, found], "places_ovt")
-        self.assertEqual([row["record_key"] for row in filled], [None, "SYN-P-1"])
+        self.assertEqual([row["record_ref"] for row in filled], [None, "SYN-P-1"])
 
 
 class SelectedParts(World):
@@ -813,9 +831,18 @@ class BothFilesStaged(Pair):
         self.write(self.valid())
         before = set(self.files())
         self.assertEqual(self.run_tool()[0], 0)
-        self.assertEqual(self.rows(FLAGSHIP)[0]["record_key"], "SYN-B-1")
-        self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-2")
+        self.assertEqual(self.rows(FLAGSHIP)[0]["record_ref"], "SYN-B-1")
+        self.assertEqual(self.rows(GAZETTEER)[0]["record_ref"], "SYN-P-2")
         self.assertEqual(set(self.files()), before)
+
+    def test_fill_and_check_round_trip_writes_record_ref(self) -> None:
+        self.write(self.valid())
+        self.assertEqual(self.run_tool()[0], 0)
+        for name, identifier in ((FLAGSHIP, "SYN-B-1"), (GAZETTEER, "SYN-P-2")):
+            row = self.rows(name)[0]
+            self.assertEqual(row["record_ref"], identifier)
+            self.assertNotIn("record_key", row)
+        self.assertEqual(self.run_tool("--check")[0], 0)
 
     def test_refusal_in_the_second_file_changes_neither(self) -> None:
         for kind in self.KINDS:
@@ -1051,8 +1078,8 @@ class CleanupNeverMasks(Pair):
             run = self.run_tool()
         self.assertEqual(run[0], 0)
         self.assertEqual(len(set(self.files()) - before), 2)
-        self.assertEqual(self.rows(FLAGSHIP)[0]["record_key"], "SYN-B-1")
-        self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-2")
+        self.assertEqual(self.rows(FLAGSHIP)[0]["record_ref"], "SYN-B-1")
+        self.assertEqual(self.rows(GAZETTEER)[0]["record_ref"], "SYN-P-2")
 
 
 class InterruptedUnwinding(Pair):
@@ -1718,7 +1745,7 @@ class BuildingNameBasis(World):
 
     def outcome(self) -> tuple[tuple[int, str], object]:
         run = self.run_tool()
-        return run, self.rows(FLAGSHIP)[0]["record_key"]
+        return run, self.rows(FLAGSHIP)[0]["record_ref"]
 
     def refused_line(
         self, reason: str, footprints: str = "n", inside: str = "na"
@@ -1838,7 +1865,7 @@ class BuildingNameBasis(World):
             self.cache, self.registry[PARTS[0]], parquet(self.scratch, columns, rows)
         )
         self.assertEqual(self.run_tool(), (2, "REFUSED building_names_form\n"))
-        self.assertIsNone(self.rows(FLAGSHIP)[0]["record_key"])
+        self.assertIsNone(self.rows(FLAGSHIP)[0]["record_ref"])
 
     def test_check_agrees_then_fails_once_a_second_footprint_is_named(self) -> None:
         self.world()
@@ -1970,7 +1997,7 @@ class FateFirstCounting(World):
                 "written=true reason=ok basis=place_name excluded=1\n",
             ),
         )
-        self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-1")
+        self.assertEqual(self.rows(GAZETTEER)[0]["record_ref"], "SYN-P-1")
 
     def test_a_kept_namesake_is_match_n(self) -> None:
         self.world(51.2)
@@ -1982,7 +2009,7 @@ class FateFirstCounting(World):
                 "written=false reason=match_n basis=place_name excluded=0\n",
             ),
         )
-        self.assertIsNone(self.rows(GAZETTEER)[0]["record_key"])
+        self.assertIsNone(self.rows(GAZETTEER)[0]["record_ref"])
 
     def test_two_excluded_matches_are_match_0(self) -> None:
         self.cache_places(
@@ -2014,7 +2041,7 @@ class LandmarkCategories(World):
                 )
                 self.review_files(gazetteer=[spec("landmark:0", "Syn Quarter")])
                 self.assertEqual(self.run_tool()[0], 0)
-                self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-1")
+                self.assertEqual(self.rows(GAZETTEER)[0]["record_ref"], "SYN-P-1")
 
     def test_a_shop_named_like_the_landmark_is_refused(self) -> None:
         for category in ("syn_electronics_store", "District", " district"):
@@ -2033,11 +2060,11 @@ class LandmarkCategories(World):
                         "basis=place_name excluded=0\n",
                     ),
                 )
-                self.assertIsNone(self.rows(GAZETTEER)[0]["record_key"])
+                self.assertIsNone(self.rows(GAZETTEER)[0]["record_ref"])
 
     def test_check_fails_a_stored_key_of_a_shop(self) -> None:
         filled = spec(
-            "landmark:0", "Syn Quarter", source_id="places_ovt", record_key="SYN-P-1"
+            "landmark:0", "Syn Quarter", source_id="places_ovt", record_ref="SYN-P-1"
         )
         for category, expected in (
             ("district", (0, "landmark:0 check=true kept=true\n")),
@@ -2058,7 +2085,7 @@ class LandmarkCategories(World):
         self.cache_buildings(0, [building("SYN-B-1", 51.1, 25.1)])
         self.review_files(flagship=[spec("building:0", "Syn Tower")])
         self.assertEqual(self.run_tool()[0], 0)
-        self.assertEqual(self.rows(FLAGSHIP)[0]["record_key"], "SYN-B-1")
+        self.assertEqual(self.rows(FLAGSHIP)[0]["record_ref"], "SYN-B-1")
 
 
 class FoldedEmptyNames(unittest.TestCase):

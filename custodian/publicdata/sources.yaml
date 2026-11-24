@@ -3801,8 +3801,8 @@ sources:
     period_field: "sit=row;form=year_text;field=year"
     period_first: "2019"
     period_last: "2024"
-    row_count_min: 1162
-    row_count_max: 1162
+    row_count_min: 1142
+    row_count_max: 1142
     reconciliation: "none"
     skip_reason: ""
     extension: "json"

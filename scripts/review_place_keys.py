@@ -1,6 +1,6 @@
 """Propose reviewed place keys from the receipted cache; lead-shell only, offline.
 
-``review_place_keys.py CACHE REVIEW_DIR [--check]`` fills a null ``record_key``
+``review_place_keys.py CACHE REVIEW_DIR [--check]`` fills a null ``record_ref``
 of ``flagship_candidates.yaml`` (a building id, ``bldg_ovt``) and of
 ``showcase_gazetteer.yaml`` (a place id, ``places_ovt``). Names compare after
 ``trim_collapse_whitespace_casefold`` (N0). Each row records its basis:
@@ -99,6 +99,7 @@ from eii_custodian.publicdata.places.review import (
     load_attribution,
     load_flagship_candidates,
     load_showcase_gazetteer,
+    review_file_row,
 )
 from eii_custodian.publicdata.places_fsq.policy import normalise_duplicate_name
 
@@ -376,13 +377,13 @@ def apply(
     """Fill each row from its own proposal; a row already set is refused."""
     result = []
     for row, item in zip(rows, proposals, strict=True):
-        updated = dict(row)
+        updated = review_file_row(row)
         key = None if item is None else item.key
         if key is not None:
             if row.get("record_key") is not None or row.get("source_id") is not None:
                 raise ReviewError("overwrite_refused")
             updated["source_id"] = source_id
-            updated["record_key"] = key
+            updated["record_ref"] = key
         result.append(updated)
     return result
 
@@ -423,7 +424,8 @@ def stage(path: Path, rows: Sequence[Mapping[str, object]], loader: Loader) -> P
     text = json.dumps(list(rows), ensure_ascii=False, indent=2) + "\n"
     staged = write_beside(path, text.encode("utf-8"))
     try:
-        if list(loader(staged, None)[1]) != json.loads(text):
+        reloaded = [review_file_row(row) for row in loader(staged, None)[1]]
+        if reloaded != json.loads(text):
             raise ReviewError("reload_mismatch")
     except BaseException:
         discard([staged])

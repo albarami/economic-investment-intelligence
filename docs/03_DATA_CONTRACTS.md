@@ -865,7 +865,7 @@ Places review loaders refuse a repeated `basic_category` in `places_ovt_categori
 with `duplicate_category`, including identical rows. `showcase_areas.yaml` may be empty;
 otherwise each `place_key` is unique (`showcase_area_duplicate`), its `source_id` is
 `places_ovt` (`showcase_area_source`), and, when supplied, its gazetteer must hold the
-same `(place_key, source_id, record_key)` (`showcase_area_gazetteer_mismatch`). Both the
+same `(place_key, source_id, record_ref)` (`showcase_area_gazetteer_mismatch`). Both the
 stage and area-request producer supply `showcase_gazetteer.yaml` for that check.
 For `pub_place_verification` (PUB-52), the required population is the sorted unique
 kept food-service ids (`restaurant` or `italian_restaurant`) inside any showcase walk
