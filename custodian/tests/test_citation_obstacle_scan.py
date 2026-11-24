@@ -232,6 +232,12 @@ def citation_reason(body):
     return acquire._citation_obstacle(acquire._form_secret_tree(body))
 
 
+def citation_wall_refused(tmp_path, body):
+    assert citation_reason(body) == "refusal_body"
+    dec = declaration("citation_snapshot", {}, [])
+    refused("unavailable", lambda: cited(tmp_path, dec, body))
+
+
 @pytest.mark.parametrize("marker", ["paywall", "robot check", "PaYwAlL", "ROBOT CHECK"])
 @pytest.mark.parametrize(
     "hidden",
@@ -242,7 +248,6 @@ def citation_reason(body):
         "<style>/* {} */</style>",
         "<noscript><div>{}</div></noscript>",
         "<template><div>{}</div></template>",
-        "<head><title>{}</title></head>",
         "<!-- {} -->",
     ],
 )
@@ -254,25 +259,74 @@ def test_citation_hidden_obstacle_words_are_admitted(tmp_path, marker, hidden):
 
 
 @pytest.mark.parametrize(
-    "fragment",
+    "body",
     [
-        "<p>paywall</p>",
-        "<div>robot check</div>",
-        "<p>PaYwAlL</p>",
-        "<div>RoBoT ChEcK</div>",
-        "<p>pay&#119;all</p>",
-        "<div>robot&#32;check</div>",
-        "<p>pay<span>wall</span></p>",
-        "<div>robot <span>check</span></div>",
-        "<p>pay<!-- SYN -->wall</p>",
-        "<p>pay<template>ignored</template>wall</p>",
+        "<html><body>" + fragment + "</body></html>"
+        for fragment in [
+            "<p>paywall</p>",
+            "<div>robot check</div>",
+            "<p>PaYwAlL</p>",
+            "<div>RoBoT ChEcK</div>",
+            "<p>pay&#119;all</p>",
+            "<div>robot&#32;check</div>",
+            "<p>pay<span>wall</span></p>",
+            "<div>robot <span>check</span></div>",
+            "<p>pay<!-- SYN -->wall</p>",
+            "<p>pay<template>ignored</template>wall</p>",
+        ]
+    ]
+    + [
+        "<html><head><title>" + marker + "</title></head><body>SYN</body></html>"
+        for marker in REFUSAL_WORDS
     ],
 )
-def test_citation_visible_obstacle_reason_and_acquisition_refusal(tmp_path, fragment):
-    body = ("<html><body>" + fragment + "</body></html>").encode()
-    assert citation_reason(body) == "refusal_body"
+def test_citation_visible_obstacle_reason_and_acquisition_refusal(tmp_path, body):
+    citation_wall_refused(tmp_path, body.encode())
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        b"<html><head><title>SYN</title><body><p>paywall</p></body></html>",
+        b"<html><head><meta charset=utf-8><body><div>Robot Check</div></body></html>",
+    ],
+)
+def test_citation_omitted_head_end_refuses_body_wall(tmp_path, body):
+    citation_wall_refused(tmp_path, body)
+
+
+def test_citation_clean_title_with_script_and_meta_markers_is_admitted(tmp_path):
+    body = (
+        b'<html><head><title>SYN</title><meta name="syn-paywall">'
+        + b'<script>"paywall"</script>' * 4
+        + b"</head><body>SYN page</body></html>"
+    )
+    assert citation_reason(body) is None
     dec = declaration("citation_snapshot", {}, [])
-    refused("unavailable", lambda: cited(tmp_path, dec, body))
+    assert json.loads(cited(tmp_path, dec, body).body)["rows"] == []
+
+
+@given(
+    marker=st.sampled_from(REFUSAL_WORDS),
+    close_head=st.booleans(),
+    in_title=st.booleans(),
+    pad=st.text(alphabet="SYN \n", max_size=40),
+)
+def test_citation_head_closure_preserves_wall_refusal(
+    marker, close_head, in_title, pad
+):
+    title = marker if in_title else pad
+    visible = pad if in_title else marker
+    body = (
+        "<html><head><title>"
+        + title
+        + "</title>"
+        + ("</head>" if close_head else "")
+        + "<body><p>"
+        + visible
+        + "</p></body></html>"
+    )
+    assert citation_reason(body.encode()) == "refusal_body"
 
 
 def test_citation_password_reason_is_unchanged(tmp_path):

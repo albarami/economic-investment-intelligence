@@ -103,7 +103,7 @@ def _has_password_input(root: Node) -> bool:
 def _citation_obstacle(root: Node) -> str | None:
     """Citation walls use visible text; L-1615's password rule is unchanged."""
     lower = root.text(
-        skip_tags=frozenset({"script", "style", "noscript", "template", "head"})
+        skip_tags=frozenset({"script", "style", "noscript", "template"})
     ).lower()
     if any(word in lower for word in ("robot check", "paywall")):
         return "refusal_body"

@@ -6881,3 +6881,23 @@ introduced.
 - EVIDENCE (code only): `custodian/src/eii_custodian/publicdata/fc_register/acquire.py`, `obstacle`, lowercases the complete response bytes and searches them for `sign in`, `sign-in`, `robot check` and `paywall`, including script bodies and attributes. `page_acquire.fetch` / `_read` dispatches every non-citation review kind to that function before parsing, including the `embedded_json` event sources identified in `validate_entry`. `test_non_citation_obstacle_still_raw_scans` pins an otherwise-valid invented embedded response with only a hidden marker added: `refusal_body` maps to `unavailable`. This establishes the same false-positive risk on a fetched path, not an observed failure on a real source.
 - NEEDED: lead assessment and a separate task if the non-citation policy should change; preserve its existing scan until then.
 - NEEDED BY: lead triage; no citation acceptance box is changed.
+
+## PO-S2-P82-rv1-a — Displayed attributes outside the citation word scan
+
+- ID: PO-S2-P82-rv1-a
+- TYPE: PROPOSED
+- RAISED BY: S2-P82 review rv1; recorded in fix round 1, 2026-11-24.
+- CONCERNS: citation-page attributes `alt`, `title`, `value`, `placeholder` and `aria-label`.
+- EVIDENCE (code only): `_citation_obstacle` reads joined `Node.text`, which traverses child text but never attribute values. Title element text is scanned after fix round 1; attribute values remain outside the word scan. The separate password-input rule still reads its existing `type` attribute. No observed real-source attribute-only wall case is claimed.
+- NEEDED: the lead decides whether a closed set of displayed attributes should enter the citation word scan in a separate task.
+- NEEDED BY: lead triage; records only, no rejection or gate approval.
+
+## PO-S2-P82-rv1-c — Import-boundary check depends on concurrent tree writers
+
+- ID: PO-S2-P82-rv1-c
+- TYPE: PROPOSED
+- RAISED BY: S2-P82 review rv1; recorded in fix round 1, 2026-11-24.
+- CONCERNS: `ImportBoundaryRealTest.test_guard_changes_nothing` and `_tree_fingerprint` in `scripts/tests/test_import_boundary_real.py`.
+- EVIDENCE: the original S2-P82 PROGRESS block and workspace alert preserve exit 1 with 21 additional bytecode entries while pytest collected tests concurrently, followed by a serial pass. The fingerprint includes directories and regular bytecode files. Fix-round verification ran the unchanged suite alone after pytest finished: exit 0, 37 tests. This supports the scheduling diagnosis; a green rerun does not close the original failure.
+- NEEDED: the lead decides the run-order treatment under AGENTS.md rule 39; keep boundary checks separate from concurrent package-tree writers. No guard or assertion is relaxed.
+- NEEDED BY: lead verification scheduling; remains open for triage.
