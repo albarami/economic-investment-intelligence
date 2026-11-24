@@ -2804,12 +2804,13 @@ S2-T10 part A — NOT CLOSED: The stored_confidence float/integer context fix is
 ## OI-308 — The list of files that the per-file ceiling refuses
 
 - ID: OI-308
-- TYPE: OPEN
+- TYPE: CLOSED (was OPEN)
 - RAISED BY: [decision 0064](docs/decisions/0064-the-narrowing-rows-decided.md) item 11
 - CONCERNS: S2-T08 part B; L-975
 - WHY: Every refused file that feeds a figure or a card gets a named per-source ceiling or a bounded read; the table names the WSF 3D height file and two import exports, and records as to confirm whether the list of refused files is made.
 - NEEDED: The lead records whether the list is made and, if it is, the dated list of every file the ceiling of 300 MiB refuses, each with the figure or card it feeds, so that none is missed.
 - NEEDED BY: the next pass of S2-T08 part B.
+- CLOSED: 2026-11-24, by train S2-34: the list is made, and every file that feeds a figure or a card has a named per-source bound or an exact recorded size (section "OI-308 — closed (train S2-34, 2026-11-24)" below; review S2-L2g.rv2 APPROVED).
 
 ### OI-308 — S2-R8D dated inventory draft (2026-11-23; to complete after L6)
 
@@ -2834,6 +2835,51 @@ observed inventory; the two rows above are neither exhaustive nor a measured
 count. Do not reconstruct the list from `REQUIRED_KEYS`, invent byte counts or
 close S2-T08#13/OI-308 from this draft. Decision 0098 items 2, 6 and 8 and
 **Unresolved path holds**, U8, retain this evidence on the S2 path.
+
+### OI-308 — closed (train S2-34, 2026-11-24)
+
+OI-308 is CLOSED. The list of files that the ordinary per-file ceiling of
+300 MiB could refuse is made. It is the dated account of live step L2g, file
+sha256 `eff465424f632887445497f2691fafe02fcfba36499216be0d378e607032f753`,
+prepared on 2026-11-24 at `5eb45fab65` and APPROVED for that exact hash by
+the review S2-L2g.rv2 (OpenAI Codex B). Under ruling L-1733 the list is made
+from the current receipts and declared sizes (selected receipts retrieved
+2026-11-23, each recomputed hash equal to its receipt). The earlier seven-file
+list of the shape probe of 2026-11-18 is probe evidence with its stated
+limitation (no run identity and no surviving raw record); it is not relabelled
+as a build refusal. No run record shows a refusal by the ordinary ceiling.
+
+The account has 35 rows: the lead's 34 inventory rows and one account-only row,
+`bldg_ovt/part-00288` (PO-L2g-f2-01).
+
+| Rows | Sources | Disposition |
+|---|---|---|
+| 3 | `bldg_wsf3d` (8 GiB), `cus_imp_2019` and `trade_ext/qatar-imports-2014-2018` (2 GiB each), the three files decision 0064 item 11 names | Streamed, with the reviewed per-source `stream_max_bytes` of S2-P84 |
+| 2 | `bldg_gba/e050_n25_e055_n20`, `bldg_gba/e050_n30_e055_n25` (1 GiB each) | Streamed, with the reviewed per-source `stream_max_bytes` of S2-P84 |
+| 3 | `places_ovt/part-00014`, `bldg_ovt/part-00384`, `bldg_ovt/part-00385` | Streamed, with the exact recorded size |
+| 1 | `cus_imp_2025` | The ordinary ceiling applies and the file is admitted |
+| 12 | `awards_owner_scrape` (3), `bldg_ovt` (1), three landmark citation pages, `places_fsq/copy` (1), `tenders_pub` (3), `visits_museum` (1) | Refused for another reason, not by the ceiling |
+| 6 | `accident`, `events_visit_qatar`, `insurance_tables`, `manateq_tariffs`, `monaqasat_classified`, `schools_private_directory` | Never requested while their byte bound is unconfirmed; accounted under OI-309 |
+| 7 | `assembly` (4), `build-public`, `buildings`, `fetch_archive` | A run-level refusal, not a file |
+| 1 | `bldg_ovt/part-00288` (account-only row) | Excluded as a part that decision 0090 does not require, so never requested |
+
+Every file that feeds a figure or a card has a named per-source bound or an
+exact recorded size; the ordinary ceiling and its planted refusal stay for every
+other file. The five bounds are those of S2-P84 (train S2-31, PR 139, main
+`743433ae55`), and `custodian/publicdata/sources.yaml` on main `8d97268b0b`
+carries the same five values.
+
+Records points of the review, applied here:
+- PO-L2g-f2-01: 34 inventory rows plus one account-only row make 35; 34 is
+  not described as the complete combined list.
+- PO-L2g-f2-02: byte counts reach this file only in grouped or GiB form.
+- PO-L2g-f2-03: the f1 account's G1 item (no total-byte bound on five
+  streamed keys) is superseded by S2-P84; its canonical-key,
+  second-import-candidate and missing-part items are resolved by this account.
+- The refusal wording of the five bounded rows distinguishes an absent
+  recorded size with an unconfirmed bound (`bound_unconfirmed`) from a missing
+  declared length with a confirmed bound (`length_undeclared`); both refuse in
+  `fetch/large.py`.
 
 ## OI-309 — The other six registry rows not read by the live build
 
