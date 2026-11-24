@@ -20,6 +20,7 @@ from eii_custodian.publicdata.fetch.snapshots import (
     read_snapshot,
     reviewed_selections,
 )
+from eii_custodian.publicdata.frame.geometry import Boundary
 from eii_custodian.publicdata.places import PlacesError
 from eii_custodian.publicdata.places.area_files import (
     manifest_agrees,
@@ -148,6 +149,7 @@ def run_places_before_gazetteer(
     lines: list[str] | None = None,
     *,
     build_date: date | None = None,
+    districts: Sequence[Boundary] = (),
 ) -> None:
     """Run the stage where the frame can hand over boundary, grid and zones."""
     log = lines if lines is not None else _BUILD_LINES.get()
@@ -179,6 +181,7 @@ def run_places_before_gazetteer(
                 places_receipt=receipt,
                 buildings_paths=building_paths,
                 buildings_receipts=building_receipts,
+                districts=districts,
             )
         )
     except PlacesError as exc:

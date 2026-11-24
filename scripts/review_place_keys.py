@@ -20,6 +20,16 @@ of ``flagship_candidates.yaml`` (a building id, ``bldg_ovt``) and of
   carries one of the row's names, and its category is in the closed area list
   ``LANDMARK_CATEGORIES``; any other category refuses with
   ``landmark_category_refused``.
+- ``reviewed_choice`` (``--check`` only): a building row — stored ``kind``
+  ``building`` and ``source_id`` ``bldg_ovt`` — carrying a non-empty
+  ``choice_reason`` beside its ``record_ref`` is accepted when the helper
+  cannot re-derive the key and the chosen footprint is in the row's own
+  exact-or-folded name-candidate set and inside the boundary set. A
+  ``choice_reason`` on any other row refuses ``reviewed_choice_kind``; the
+  missing or blank reason ``reviewed_choice_reason_missing``; a reason the
+  helper does not need ``reviewed_choice_unneeded``; a choice outside the
+  candidate set ``reviewed_choice_not_candidate`` and outside the boundary
+  set ``reviewed_choice_outside``. The fill run never writes such a row.
 
 Only places that survive the build's own ``_keep`` exclusions, read with the
 reviewed attribution table (so ``attribution_missing`` withholds the key; H2
@@ -96,6 +106,7 @@ from eii_custodian.publicdata.places.read import (
     require_receipt,
 )
 from eii_custodian.publicdata.places.review import (
+    DISTRICT_SOURCE,
     load_attribution,
     load_flagship_candidates,
     load_showcase_gazetteer,
@@ -283,6 +294,40 @@ def by_place(
     if building not in inputs.inside:
         return replace(base, inside=False, reason="outside_boundary")
     return replace(base, inside=True, key=building, reason="ok")
+
+
+def reviewed_choice(row: Mapping[str, object], source_id: str, inputs: Inputs) -> None:
+    """Refuse a reviewed ``choice_reason`` that breaks its closed contract.
+
+    The field is a building row's only — a stored ``kind`` of ``building``
+    and a stored ``source_id`` of ``bldg_ovt``; its reason must be non-empty
+    text; a choice is needed only when the helper cannot re-derive the key;
+    and the chosen footprint must be in the row's own exact-or-folded
+    name-candidate set and inside the boundary set.
+    """
+    if (
+        source_id != BUILDINGS
+        or row.get("kind") != "building"
+        or row.get("source_id") != BUILDINGS
+    ):
+        raise ReviewError("reviewed_choice_kind")
+    reason = row.get("choice_reason")
+    if not isinstance(reason, str) or not reason.strip():
+        raise ReviewError("reviewed_choice_reason_missing")
+    if propose(row, source_id, inputs).key is not None:
+        raise ReviewError("reviewed_choice_unneeded")
+    names = candidate_names(row)
+    candidates = frozenset(
+        (
+            *named_footprints(names, inputs.named, normalise_duplicate_name),
+            *named_footprints(names, inputs.named, folded_name),
+        )
+    )
+    chosen = row.get("record_key")
+    if not isinstance(chosen, str) or chosen not in candidates:
+        raise ReviewError("reviewed_choice_not_candidate")
+    if chosen not in inputs.inside:
+        raise ReviewError("reviewed_choice_outside")
 
 
 def footprint_names(value: object) -> frozenset[str]:
@@ -571,6 +616,9 @@ def fill(review: Path, inputs: Inputs) -> list[str]:
     for name, source_id, loader in FILES:
         path = review / name
         rows = review_rows(path, loader)
+        for row in rows:
+            if "choice_reason" in row:
+                reviewed_choice(row, source_id, inputs)
         proposals = [
             propose(row, source_id, inputs) if row.get("record_key") is None else None
             for row in rows
@@ -597,7 +645,21 @@ def check(review: Path, inputs: Inputs) -> tuple[list[str], bool]:
     agrees = True
     for name, source_id, loader in FILES:
         for row in review_rows(review / name, loader):
+            if "choice_reason" in row:
+                reviewed_choice(row, source_id, inputs)
+                lines.append(f"{row['place_key']} check=yes basis=reviewed_choice")
+                continue
             if row.get("record_key") is None:
+                continue
+            if row.get("source_id") == DISTRICT_SOURCE:
+                members = row.get("members")
+                same = isinstance(members, list) and row.get("record_key") == "|".join(
+                    sorted(members)
+                )
+                agrees = agrees and same
+                lines.append(
+                    f"{row['place_key']} check={_flag(same)} kept={_flag(same)}"
+                )
                 continue
             item = propose(row, source_id, inputs)
             same = (

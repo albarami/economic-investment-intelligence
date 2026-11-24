@@ -35,8 +35,9 @@
     "name_en": "Place Vendôme",
     "name_ar": "بلاس فاندوم",
     "aliases": null,
-    "source_id": null,
-    "record_ref": null,
+    "source_id": "bldg_ovt",
+    "record_ref": "7e7b63cf-5b80-4749-96fc-20bf080529b6",
+    "choice_reason": "the one footprint carrying the row's English name exactly; the other folded candidate is a second trace of the same building (equal bounding box), carries no height and is not chosen",
     "arabic_review": "pending native review"
   },
   {

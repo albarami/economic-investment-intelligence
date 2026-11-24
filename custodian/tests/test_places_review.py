@@ -336,3 +336,167 @@ def test_a_repeated_attribution_token_is_refused(tmp_path: Path) -> None:
     )
     with pytest.raises(PlacesError, match="duplicate_token"):
         load_attribution(path, None)
+
+
+def _district_row(**changes: object) -> dict[str, object]:
+    """One valid landmark row on the reviewed district-members route."""
+    row = {
+        "place_key": "landmark:0",
+        "kind": "landmark",
+        "name_en": "SYN Area",
+        "name_ar": "منطقة تجريبية",
+        "aliases": None,
+        "source_id": "bnd_hdx.district",
+        "record_ref": None,
+        "arabic_review": "pending native review",
+        "members": ["SYN-D", "SYN-E"],
+        "member_reason": "invented district union for the invented area",
+    }
+    row.update(changes)
+    return row
+
+
+def _gazetteer_file(tmp_path: Path, rows: list[object]) -> Path:
+    path = tmp_path / "showcase_gazetteer.yaml"
+    path.write_text(json.dumps(rows), encoding="utf-8")
+    return path
+
+
+def test_a_district_landmark_loads_with_its_derived_key(tmp_path: Path) -> None:
+    """The members list derives the canonical record key; the file's ref stays null."""
+    path = _gazetteer_file(tmp_path, [_district_row()])
+    origin, specs = load_showcase_gazetteer(path, None)
+    assert origin == "committed"
+    assert specs[0]["source_id"] == "bnd_hdx.district"
+    assert specs[0]["record_key"] == "SYN-D|SYN-E"
+    assert specs[0]["members"] == ["SYN-D", "SYN-E"]
+
+
+def test_a_reversed_member_list_derives_the_same_key(tmp_path: Path) -> None:
+    """The canonical key is order-free: reversed members give the same key."""
+    reversed_row = _district_row(members=["SYN-E", "SYN-D"])
+    specs = load_showcase_gazetteer(_gazetteer_file(tmp_path, [reversed_row]), None)[1]
+    assert specs[0]["record_key"] == "SYN-D|SYN-E"
+
+
+@pytest.mark.parametrize(
+    ("change", "reason"),
+    [
+        ({"members": []}, "landmark_members_empty"),
+        ({"members": "SYN-D"}, "landmark_members_empty"),
+        ({"members": 7}, "landmark_members_empty"),
+        ({"members": ["SYN-D", 7]}, "landmark_members_empty"),
+        ({"members": ["SYN-D", ""]}, "landmark_members_empty"),
+        ({"members": None}, "landmark_members_empty"),
+        ({"members": ["SYN-D", "SYN-D"]}, "landmark_member_duplicate"),
+        ({"member_reason": None}, "landmark_reason_missing"),
+        ({"member_reason": ""}, "landmark_reason_missing"),
+        ({"member_reason": "   "}, "landmark_reason_missing"),
+        ({"member_reason": 7}, "landmark_reason_missing"),
+        ({"record_ref": "SYN-D"}, "landmark_record_ref"),
+        ({"kind": "building"}, "landmark_source_refused"),
+        ({"source_id": "bldg_ovt"}, "landmark_source_refused"),
+        ({"source_id": "gis_landmarks"}, "landmark_source_refused"),
+        ({"source_id": "places_ovt"}, "landmark_source_refused"),
+    ],
+)
+def test_a_district_row_refusal(
+    tmp_path: Path, change: dict[str, object], reason: str
+) -> None:
+    """Each one-change violation refuses the file with its own closed reason."""
+    path = _gazetteer_file(tmp_path, [_district_row(**change)])
+    with pytest.raises(PlacesError, match=rf"^{reason}$"):
+        load_showcase_gazetteer(path, None)
+
+
+def test_a_district_row_without_members_or_reason_is_refused(
+    tmp_path: Path,
+) -> None:
+    """Missing keys refuse like empty ones: members first, then the reason."""
+    row = _district_row()
+    del row["members"]
+    path = _gazetteer_file(tmp_path, [row])
+    with pytest.raises(PlacesError, match=r"^landmark_members_empty$"):
+        load_showcase_gazetteer(path, None)
+    row = _district_row()
+    del row["member_reason"]
+    path = _gazetteer_file(tmp_path, [row])
+    with pytest.raises(PlacesError, match=r"^landmark_reason_missing$"):
+        load_showcase_gazetteer(path, None)
+
+
+@pytest.mark.parametrize("leaf", ("members", "member_reason"))
+@pytest.mark.parametrize("hostile", ({"toString": None}, 7, None, []))
+def test_district_leaf_refuses_hostile_values(
+    tmp_path: Path, leaf: str, hostile: object
+) -> None:
+    """Every new leaf of a district row meets each mandated hostile value."""
+    reason = (
+        "landmark_members_empty" if leaf == "members" else "landmark_reason_missing"
+    )
+    path = _gazetteer_file(tmp_path, [_district_row(**{leaf: hostile})])
+    with pytest.raises(PlacesError, match=rf"^{reason}$"):
+        load_showcase_gazetteer(path, None)
+
+
+@pytest.mark.parametrize("hostile", ({"toString": None}, 7, None, []))
+def test_district_member_item_refuses_hostile_values(
+    tmp_path: Path, hostile: object
+) -> None:
+    """A hostile value inside the members list is an empty-members refusal."""
+    row = _district_row(members=[hostile, "SYN-E"])
+    path = _gazetteer_file(tmp_path, [row])
+    with pytest.raises(PlacesError, match=r"^landmark_members_empty$"):
+        load_showcase_gazetteer(path, None)
+
+
+def test_a_landmark_on_an_unapproved_source_is_refused(tmp_path: Path) -> None:
+    """A landmark without member fields still refuses a source outside the route."""
+    row = {
+        "place_key": "landmark:9",
+        "kind": "landmark",
+        "name_en": "SYN Place",
+        "name_ar": "مكان تجريبي",
+        "aliases": None,
+        "source_id": "places_ovt",
+        "record_ref": "SYN-LAND",
+        "arabic_review": "pending native review",
+    }
+    specs = load_showcase_gazetteer(_gazetteer_file(tmp_path, [row]), None)[1]
+    assert specs[0]["record_key"] == "SYN-LAND"
+    row["source_id"] = "gis_landmarks"
+    with pytest.raises(PlacesError, match=r"^landmark_source_refused$"):
+        load_showcase_gazetteer(_gazetteer_file(tmp_path, [row]), None)
+
+
+def test_members_on_a_non_district_row_are_refused(tmp_path: Path) -> None:
+    """Member evidence on any other source row refuses, not silently ignored."""
+    row = _district_row(source_id=None, record_ref=None, member_reason=None)
+    path = _gazetteer_file(tmp_path, [row])
+    with pytest.raises(PlacesError, match=r"^landmark_source_refused$"):
+        load_showcase_gazetteer(path, None)
+    row = _district_row(source_id="places_ovt", record_ref="SYN-LAND")
+    path = _gazetteer_file(tmp_path, [row])
+    with pytest.raises(PlacesError, match=r"^landmark_source_refused$"):
+        load_showcase_gazetteer(path, None)
+
+
+def test_a_places_row_and_a_null_row_still_load(tmp_path: Path) -> None:
+    """The district checks do not touch ordinary landmark rows."""
+    filled = _district_row(
+        source_id="places_ovt",
+        record_ref="SYN-LAND",
+        members=None,
+        member_reason=None,
+    )
+    pending = _district_row(
+        source_id=None,
+        record_ref=None,
+        members=None,
+        member_reason=None,
+    )
+    specs = load_showcase_gazetteer(_gazetteer_file(tmp_path, [filled, pending]), None)[
+        1
+    ]
+    assert specs[0]["record_key"] == "SYN-LAND"
+    assert specs[1]["record_key"] is None

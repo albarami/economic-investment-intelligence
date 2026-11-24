@@ -3993,4 +3993,19 @@ REVIEW_DATA_GUARD_CASES = [
         "row": "busyness:S2-P76",
         "stage": "busyness",
     },
+    {
+        "anchor": "places/review.py:_district_members; places/stage.py:_district_points, _district_member",
+        "plants": [
+            ["PlacesError", "landmark_member_duplicate", "landmark_member_duplicate"],
+            ["PlacesError", "landmark_member_outside", "landmark_member_outside"],
+            ["PlacesError", "landmark_member_unknown", "landmark_member_unknown"],
+            ["PlacesError", "landmark_members_empty", "landmark_members_empty"],
+            ["PlacesError", "landmark_point_outside", "landmark_point_outside"],
+            ["PlacesError", "landmark_reason_missing", "landmark_reason_missing"],
+            ["PlacesError", "landmark_record_ref", "landmark_record_ref"],
+            ["PlacesError", "landmark_source_refused", "landmark_source_refused"],
+        ],
+        "row": "frame:S2-LMK2",
+        "stage": "frame",
+    },
 ]

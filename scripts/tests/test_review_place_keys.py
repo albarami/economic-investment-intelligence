@@ -2178,5 +2178,232 @@ class BuildingNameProperty(unittest.TestCase):
         self.assertEqual((result.key, result.reason, result.basis), expected)
 
 
+class DistrictRows(World):
+    """A reviewed district-member row is never re-derived or overwritten."""
+
+    def _district_world(self) -> None:
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
+        self.cache_buildings(0, [])
+        self.review_files(
+            gazetteer=[
+                spec(
+                    "landmark:0",
+                    "Syn Area",
+                    source_id="bnd_hdx.district",
+                    members=["SYN-D", "SYN-E"],
+                    member_reason="invented district union",
+                )
+            ]
+        )
+
+    def test_check_agrees_and_fill_never_overwrites_the_row(self) -> None:
+        self._district_world()
+        self.assertEqual(
+            self.run_tool("--check"),
+            (0, "landmark:0 check=true kept=true\n"),
+        )
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertEqual(out, "")
+        row = self.rows("showcase_gazetteer.yaml")[0]
+        self.assertEqual(row["source_id"], "bnd_hdx.district")
+        self.assertIsNone(row["record_ref"])
+        self.assertEqual(row["members"], ["SYN-D", "SYN-E"])
+
+    def test_check_agrees_on_a_single_member_row(self) -> None:
+        self._district_world()
+        row = self.rows("showcase_gazetteer.yaml")[0]
+        row["members"] = ["SYN-E"]
+        self.review_files(gazetteer=[row])
+        self.assertEqual(
+            self.run_tool("--check"),
+            (0, "landmark:0 check=true kept=true\n"),
+        )
+
+
+SAFE_TEXT = st.text(alphabet="syn SYN\t", max_size=8)
+HOSTILE_VALUE = st.one_of(
+    st.none(),
+    st.integers(),
+    st.lists(SAFE_TEXT, max_size=3),
+    st.dictionaries(SAFE_TEXT, SAFE_TEXT, max_size=3),
+    st.just(""),
+    st.text(alphabet=" \t\n", min_size=1, max_size=4),
+)
+CHOICE_REFUSAL = {
+    "record_ref": "reviewed_choice_not_candidate",
+    "source_id": "reviewed_choice_kind",
+    "kind": "reviewed_choice_kind",
+    "choice_reason": "reviewed_choice_reason_missing",
+}
+
+
+class ReviewedChoice(World):
+    """A reviewed choice fills the row the name route leaves ambiguous.
+
+    The valid world: SYN-B-1 carries the row's name exactly, SYN-B-2 and the
+    outside SYN-B-3 carry it once accents are folded, and SYN-B-9 is unnamed.
+    Each negative test changes ONE input of it.
+    """
+
+    REASON = "invented reason: the exact-name trace of the invented building"
+
+    def world(self) -> None:
+        self.cache_places([UNRELATED])
+        self.cache_buildings(
+            0,
+            [
+                building("SYN-B-1", 51.1, 25.1, names=names_of("Syn Spîre")),
+                building("SYN-B-2", 51.3, 25.3, names=names_of("Syn Spire")),
+                building("SYN-B-3", 51.59, 25.1, 0.04, names=names_of("Syn Spire")),
+                building("SYN-B-9", 51.4, 25.4),
+            ],
+        )
+
+    def choice_row(self, **extra: object) -> dict[str, object]:
+        row = spec(
+            "building:0",
+            "Syn Spîre",
+            source_id="bldg_ovt",
+            record_ref="SYN-B-1",
+            choice_reason=self.REASON,
+        )
+        row.update(extra)
+        return row
+
+    def test_check_accepts_a_reviewed_choice_inside_the_candidate_set(self) -> None:
+        self.world()
+        self.review_files(flagship=[self.choice_row()])
+        self.assertEqual(
+            self.run_tool("--check"),
+            (0, "building:0 check=yes basis=reviewed_choice\n"),
+        )
+        self.assertEqual(self.rows(FLAGSHIP)[0]["record_ref"], "SYN-B-1")
+
+    def test_the_fill_run_never_writes_a_reviewed_choice(self) -> None:
+        self.world()
+        self.review_files(flagship=[self.choice_row()])
+        before = (self.review / FLAGSHIP).read_bytes()
+        self.assertEqual(self.run_tool(), (0, ""))
+        self.assertEqual((self.review / FLAGSHIP).read_bytes(), before)
+
+    def test_a_choice_outside_the_candidate_set_is_refused(self) -> None:
+        self.world()
+        self.review_files(flagship=[self.choice_row(record_ref="SYN-B-9")])
+        self.assertEqual(
+            self.run_tool("--check"), (2, "REFUSED reviewed_choice_not_candidate\n")
+        )
+
+    def test_a_choice_outside_the_boundary_set_is_refused(self) -> None:
+        self.world()
+        self.review_files(flagship=[self.choice_row(record_ref="SYN-B-3")])
+        self.assertEqual(
+            self.run_tool("--check"), (2, "REFUSED reviewed_choice_outside\n")
+        )
+
+    def test_a_missing_or_blank_choice_reason_is_refused(self) -> None:
+        for reason in (None, "", "   ", 7, ["syn"]):
+            with self.subTest(reason=reason):
+                self.setUp()
+                self.world()
+                self.review_files(flagship=[self.choice_row(choice_reason=reason)])
+                self.assertEqual(
+                    self.run_tool("--check"),
+                    (2, "REFUSED reviewed_choice_reason_missing\n"),
+                )
+
+    def test_a_choice_reason_the_helper_does_not_need_is_refused(self) -> None:
+        self.cache_places([UNRELATED])
+        self.cache_buildings(
+            0, [building("SYN-B-1", 51.1, 25.1, names=names_of("Syn Spire"))]
+        )
+        self.review_files(
+            flagship=[
+                spec(
+                    "building:0",
+                    "Syn Spire",
+                    source_id="bldg_ovt",
+                    record_ref="SYN-B-1",
+                    choice_reason=self.REASON,
+                )
+            ]
+        )
+        self.assertEqual(
+            self.run_tool("--check"), (2, "REFUSED reviewed_choice_unneeded\n")
+        )
+
+    def test_a_choice_reason_on_a_gazetteer_row_is_refused(self) -> None:
+        self.cache_places([place("SYN-P-1", 51.1, 25.1, "Syn Souq")])
+        self.review_files(
+            gazetteer=[
+                spec(
+                    "landmark:0",
+                    "Syn Souq",
+                    source_id="places_ovt",
+                    record_ref="SYN-P-1",
+                    choice_reason=self.REASON,
+                )
+            ]
+        )
+        for argv in ((), ("--check",)):
+            with self.subTest(argv=argv):
+                self.assertEqual(
+                    self.run_tool(*argv), (2, "REFUSED reviewed_choice_kind\n")
+                )
+
+    def review_bytes(self) -> dict[str, bytes]:
+        return {
+            name: (self.review / name).read_bytes() for name in (FLAGSHIP, GAZETTEER)
+        }
+
+    def test_a_choice_reason_needs_the_stored_source_and_kind(self) -> None:
+        """One-field negatives: a wrong or null stored source or kind refuses."""
+        for change in (
+            {"source_id": None},
+            {"source_id": "places_ovt"},
+            {"kind": "restaurant"},
+        ):
+            for argv in ((), ("--check",)):
+                with self.subTest(change=change, argv=argv):
+                    self.setUp()
+                    self.world()
+                    self.review_files(flagship=[self.choice_row(**change)])
+                    before = self.review_bytes()
+                    self.assertEqual(
+                        self.run_tool(*argv), (2, "REFUSED reviewed_choice_kind\n")
+                    )
+                    self.assertEqual(self.review_bytes(), before)
+
+    def test_a_list_or_mapping_reference_is_refused(self) -> None:
+        """One-field negatives: an unhashable record_ref gets a closed refusal."""
+        references: tuple[list[str], dict[str, str]] = ([], {})
+        for ref in references:
+            for argv in ((), ("--check",)):
+                with self.subTest(ref=ref, argv=argv):
+                    self.setUp()
+                    self.world()
+                    self.review_files(flagship=[self.choice_row(record_ref=ref)])
+                    before = self.review_bytes()
+                    self.assertEqual(
+                        self.run_tool(*argv),
+                        (2, "REFUSED reviewed_choice_not_candidate\n"),
+                    )
+                    self.assertEqual(self.review_bytes(), before)
+
+    @settings(deadline=None)
+    @given(st.sampled_from(tuple(CHOICE_REFUSAL)), HOSTILE_VALUE, st.booleans())
+    def test_a_hostile_value_on_one_choice_field_refuses_closed(
+        self, field: str, value: object, check: bool
+    ) -> None:
+        """Each hostile field of the valid choice refuses; never a traceback."""
+        self.world()
+        self.review_files(flagship=[self.choice_row(**{field: value})])
+        before = self.review_bytes()
+        argv = ("--check",) if check else ()
+        reason = f"REFUSED {CHOICE_REFUSAL[field]}\n"
+        self.assertEqual(self.run_tool(*argv), (2, reason))
+        self.assertEqual(self.review_bytes(), before)
+
+
 if __name__ == "__main__":
     unittest.main()
