@@ -4,6 +4,8 @@
  * interface fonts stay the only copy of each face; readiness only proves
  * the served ranges before the first story frame.
  */
+import { refusalState, type RefusalState } from './refusal';
+
 export const GLYPH_STACKS = ['Noto Sans Medium'] as const;
 
 export type GlyphStack = (typeof GLYPH_STACKS)[number];
@@ -69,8 +71,8 @@ export async function glyphReadiness(
     let response: Response;
     try {
       response = await fetcher(url);
-    } catch {
-      return 'glyph_network';
+    } catch (error) {
+      return networkRefusal(refusalState(error, 'stage.error'));
     }
     if (!response.ok) return 'glyph_status';
     const type = response.headers.get('content-type');
@@ -79,12 +81,18 @@ export async function glyphReadiness(
     let body: ArrayBuffer;
     try {
       body = await response.arrayBuffer();
-    } catch {
-      return 'glyph_network';
+    } catch (error) {
+      return networkRefusal(refusalState(error, 'stage.error'));
     }
     if (body.byteLength === 0) return 'glyph_empty';
   }
   return null;
+}
+
+/** A caught fault passes the closed projection; readiness keeps its closed code. */
+function networkRefusal(state: RefusalState): GlyphRefusal {
+  void state;
+  return 'glyph_network';
 }
 
 function defaultSpans(): string[] {
