@@ -11,8 +11,6 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 
-import pytest
-
 from eii_core.calc.facts import SourceChain
 from eii_core.calc.public_methods import private_employer_share
 from eii_custodian.publicdata.fetch.registry import load_registry
@@ -23,10 +21,28 @@ from eii_custodian.publicdata.frame.measures import check_employment
 from eii_custodian.publicdata.gis.layers import _parse_body
 from eii_custodian.publicdata.stage import _LOCAL_FIELDS
 
+from .cache import closed_case
 from .restricted_cases import CASES, case_by_id
 
 _DECIMAL = re.compile(r"-?\d+(?:\.\d+)?", re.ASCII)
 _SHA = re.compile(r"[a-f0-9]{64}")
+RESTRICTED_LOCAL_REASONS = {
+    "awaiting_routine",
+    "awaiting_expectation",
+    "expectation_mismatch",
+    "missing_record",
+    "record_invalid",
+    "record_checksum_mismatch",
+    "source_pin_mismatch",
+    "path_refused",
+    "source_invalid",
+    "zone_missing",
+}
+RESTRICTED_REASONS = {
+    f"{case.case_id}:{reason}": reason
+    for case in CASES
+    for reason in RESTRICTED_LOCAL_REASONS
+}
 
 
 class ExpectationError(ValueError):
@@ -396,6 +412,7 @@ def summary_reasons(text, exit_code):
             "path_refused",
             "source_invalid",
             "zone_missing",
+            "spine_refused",
         }:
             raise ValueError("summary_unparsed") from None
         reasons.add(case_id + ":" + reason)
@@ -413,30 +430,19 @@ def summary_reasons(text, exit_code):
     return reasons
 
 
-def check_case(cache, case):
-    """The only reporting boundary: default pytest output cannot expose values."""
+def _check_case(cache, case):
     if case.status != "ready":
-        pytest.fail(f"{case.case_id}:{case.status}", pytrace=False)
+        raise ValueError(f"{case.case_id}:{case.status}")
     try:
         expected = load_expectation(cache, case)
         actual = replay(cache, case)
         compare(case, actual.values, expected)
-        return
     except ExpectationError as error:
-        reason = str(error).split(":", 1)[-1]
-        if reason not in {
-            "missing_record",
-            "record_invalid",
-            "record_checksum_mismatch",
-            "source_pin_mismatch",
-            "path_refused",
-            "source_invalid",
-            "zone_missing",
-            "expectation_mismatch",
-        }:
-            reason = "source_invalid"
-    except (ValueError, KeyError, TypeError, OSError, ArithmeticError):
-        reason = "source_invalid"
-    # Outside the exception handler: even pytest's default chained-exception
-    # rendering must have no original parser message or calculated value.
-    pytest.fail(f"{case.case_id}:{reason}", pytrace=False)
+        raise ValueError(str(error)) from None
+
+
+def check_case(cache, case):
+    """The only reporting boundary: default pytest output cannot expose values."""
+    return closed_case(
+        case.case_id, lambda: _check_case(cache, case), RESTRICTED_REASONS
+    )

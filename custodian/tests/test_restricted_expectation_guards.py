@@ -4,6 +4,7 @@ import ast
 import hashlib
 import inspect
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -12,9 +13,12 @@ from dataclasses import asdict, replace
 from pathlib import Path
 
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.layers import COUNTS, SCHEMAS
+from eii_custodian.publicdata.review.activity import SpineError
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -839,3 +843,52 @@ def test_restricted_summary_unparsed(line):
     local, _ = modules()
     with pytest.raises(ValueError, match=r"^summary_unparsed$"):
         local.summary_reasons(line + "\n1 failed, 2 passed in 0.01s\n", 1)
+
+
+@pytest.mark.parametrize(
+    ("error_name", "reason"),
+    [("RuntimeError", "source_invalid"), ("SpineError", "spine_refused")],
+)
+def test_restricted_every_exception_is_closed(tmp_path, error_name, reason):
+    local, _ = modules()
+    cache = tmp_path / "invented_cache"
+    cache.mkdir()
+    fixture(cache)
+    sentinel = "invented-sentinel-987654321"
+    code = (
+        '"""PYTEST_DONT_REWRITE"""\n'
+        "import sys\nfrom pathlib import Path\n"
+        "sys.path.insert(0, str(Path.cwd()))\n"
+        "import custodian.data_tests.local_expectations as local\n"
+        "from custodian.data_tests.restricted_cases import case_by_id\n"
+        "from eii_custodian.publicdata.review.activity import SpineError\n"
+        f"def broken(*args):\n    raise {error_name}({sentinel!r})\n"
+        "local.replay = broken\n"
+        "def test_invented():\n"
+        "    local.check_case(Path(__file__).parent / 'invented_cache', case_by_id('PUB-71'))\n"
+    )
+    result = child_run(tmp_path, code)
+    output = result.stdout + result.stderr
+    assert result.returncode == 1, "child_not_failed"
+    assert sentinel not in output, "sentinel_leaked"
+    assert local.summary_reasons(output, result.returncode) == {f"PUB-71:{reason}"}
+
+
+@given(
+    st.text(),
+    st.sampled_from([ValueError, KeyError, TypeError, SpineError, AssertionError]),
+)
+def test_restricted_reason_map_is_closed(message, kind):
+    from custodian.data_tests.cache import closed_reason
+
+    local, _ = modules()
+    reason = closed_reason(kind(message), local.RESTRICTED_REASONS)
+    admitted = local.RESTRICTED_REASONS.get(message)
+    if kind is SpineError:
+        expected = "spine_refused"
+    elif kind is ValueError and admitted:
+        expected = admitted
+    else:
+        expected = "source_invalid"
+    assert reason == expected
+    assert re.fullmatch(r"[a-z_]+", reason)

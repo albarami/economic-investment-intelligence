@@ -65,6 +65,62 @@ It prints no file values. Its invented-cache proof and wrong-value plants are
 in `custodian/tests/test_pinned_c8.py`. The separate PUB-71 replay and its
 lead-proof failure accounting are unchanged.
 
+Case `C1` fails only as `C1:<reason>`. Its case reasons are
+`municipality_missing`, `population_indicator_unreviewed`,
+`population_duplicate`, `population_missing`, `count_mismatch`,
+`density_mismatch` and `lq_mismatch`; its other reasons are
+`public_cache_missing`, `receipt_hash_mismatch`, `source_invalid` and
+`spine_refused`. Its child-run proof is in
+`custodian/tests/test_pinned_closed_methods.py`.
+
+Case `C3` covers both parametrized wage sources and fails only as
+`C3:<reason>`, where the reason is `duplicate_wage_group`,
+`decomposition_mismatch`, `lineage`, `public_cache_missing`,
+`receipt_hash_mismatch`, `source_invalid` or `spine_refused`. Its invented
+child runs cover each reason for the occupation case and include a passing
+activity case.
+
+Case `C4` fails only as `C4:<reason>`, where the reason is `industry_row`,
+`component_label`, `norms_mismatch`, `range_mismatch`,
+`public_cache_missing`, `receipt_hash_mismatch`, `source_invalid` or
+`spine_refused`. Its invented setup keeps each source and year otherwise valid.
+
+Case `C5` fails only as `C5:<reason>`, where the reason is
+`total_mismatch`, `unit_value_mismatch`, `public_cache_missing`,
+`receipt_hash_mismatch`, `source_invalid` or `spine_refused`. Its invented
+child runs cover the total and each heading check without printing a value.
+
+Case `C8` fails only as `C8:<reason>`. Its reasons are `national_header`,
+`national_block`, `sex_block`, `national_count`, `sex_count`,
+`activity_count`, `national_denominator`, `sector_sum`,
+`zone_denominator`, `activity_sum_mismatch`, `sex_sum_mismatch`,
+`national_sector_sum`, `national_mismatch`, `national_lineage`,
+`zone_keys`, `null_zone_mismatch`, `zone_mismatch`, `zone_lineage`,
+`no_complete_zones`, `range_low_mismatch`, `range_high_mismatch`,
+`public_cache_missing`, `receipt_hash_mismatch`, `source_invalid` and
+`spine_refused`. Every expectation in `custodian/tests/test_pinned_c8.py`
+uses the exact child summary and checks that its sentinel is absent.
+
+Case `C9` fails only as `C9:<reason>`, where the reason is
+`momentum_mismatch`, `order_mismatch`, `zero_zone_missing`,
+`zero_zone_mismatch`, `public_cache_missing`, `receipt_hash_mismatch`,
+`source_invalid` or `spine_refused`. Its invented child runs cover both the
+ranked and zero-denominator branches.
+
+Case `C2-NATIONAL` fails only as `C2-NATIONAL:<reason>`, where the reason
+is `totals_mismatch`, `bulk_month_mismatch`, `bulk_share_mismatch`,
+`bulk_order_mismatch`, `month_outside_calendar`, `public_cache_missing`,
+`receipt_hash_mismatch`, `source_invalid` or `spine_refused`. Its invented
+child runs cover the named months, share, ordering and cache failures.
+
+Case `C2-MUNICIPAL` fails only as `C2-MUNICIPAL:<reason>`, where the reason
+is `cancelled_mismatch`, `stock_mismatch`, `including_mismatch`,
+`excluding_mismatch`, `geography_mismatch`, `month_outside_calendar`,
+`public_cache_missing`, `receipt_hash_mismatch`, `source_invalid` or
+`spine_refused`. A municipality or activity guard whose literal message is
+not in the closed map is `source_invalid`; the three guards have separate
+child cases.
+
 The fixture restores attribution for both sources from their registry rows,
 without census counts or shares. A registry row has no file retrieval date:
 `retrieval_date: "pinned receipt: retrieved_utc"` explicitly resolves that field
@@ -148,6 +204,16 @@ checks the same receipt identities as `read_cached`, then calls `_parse_body`.
 not assert a recovered real recipe. H2 cannot become ready until its recipe
 and partition-to-assembled-snapshot binding are confirmed and implemented.
 `bnd_muni_2025`'s row count is pinned by its registry `row_count_min`/`row_count_max`, checked by `fetch/checks.py` at fetch; it is not an inventory case.
+
+Every restricted-finding case fails only as `<case_id>:<reason>`. Its closed
+reasons are `awaiting_routine`, `awaiting_expectation`,
+`expectation_mismatch`, `missing_record`, `record_invalid`,
+`record_checksum_mismatch`, `source_pin_mismatch`, `path_refused`,
+`source_invalid`, `zone_missing` and `spine_refused`. Any other exception
+is `source_invalid`. The reporting boundary is the same `closed_case`
+helper as the method replays, and its `pytest.fail` is outside the handler
+with `pytrace=False`; no parser detail, source row, expectation or exception
+text reaches the summary.
 
 The lead prepares these **uncommitted** files by independent inspection of
 the selected source snapshots, never from output of the replay code under test:

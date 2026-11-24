@@ -3,15 +3,36 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from eii_core.calc.facts import SourceChain
 from eii_core.calc.public_series import C2_METHOD_VERSION
 from eii_custodian.publicdata.fetch.registry import load_registry
 from eii_custodian.publicdata.frame.build import read_cached
 from eii_custodian.publicdata.frame.mapping import POP_FIELDS, fields
+from eii_custodian.publicdata.review.activity import SpineError
 from eii_custodian.publicdata.series.parse import confirmed_rows, selected_source
 
 ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / "data/public_cache"
+
+
+def closed_reason(error: Exception, reasons: dict[str, str]) -> str:
+    """Map an error to a closed reason; never its own text."""
+    if type(error) is SpineError:
+        return "spine_refused"
+    if type(error) is ValueError:
+        return reasons.get(str(error), "source_invalid")
+    return "source_invalid"
+
+
+def closed_case(case, check, reasons):
+    """Safe failure: the case ID and a fixed reason, never a source value."""
+    try:
+        return check()
+    except Exception as error:
+        reason = closed_reason(error, reasons)
+    pytest.fail(f"{case}:{reason}", pytrace=False)
 
 
 def cached(cache: Path, source: str, digest: str):
