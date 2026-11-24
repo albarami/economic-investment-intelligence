@@ -6,7 +6,7 @@
  * visibly synthetic; nothing here is imported by production code.
  */
 import type { Fact } from '../../src/facts/types';
-import { makeFact, makeLineage, makeSource } from './facts';
+import { makeFact, makeLineage, makeSource, tableWire } from './facts';
 import {
   FC_ALEPH,
   FC_BREAKS,
@@ -76,6 +76,7 @@ export function firmsChain(): FirmsChain {
       release_kind: 'public_only',
       rules_version_id: 'INVENTED-rules',
       tables: [{ releaseId: LINEAGE.releaseId, tableName: TABLE }],
+      artefacts: [],
       hour_keys: [],
       day_keys: [],
       month_keys: [],
@@ -93,7 +94,7 @@ export function firmsChain(): FirmsChain {
         {
           fact_id: fact.fact_id,
           release_id: LINEAGE.releaseId,
-          lineage: LINEAGE,
+          lineage: tableWire(LINEAGE),
           sources: [SOURCE],
           binding: {
             metricKey: 'firms_per_tower',

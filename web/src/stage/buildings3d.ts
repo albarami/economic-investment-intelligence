@@ -10,7 +10,7 @@ import { SolidPolygonLayer } from '@deck.gl/layers';
 import { closed, FACT_KEYS, sourceRow, text } from '../api/release';
 import { isRecord } from '../guards';
 import { createRegistry, type FactRegistry } from '../facts/registry';
-import type { Fact, FactBinding, LineageRow } from '../facts/types';
+import type { Fact, FactBinding, TableLineage } from '../facts/types';
 import { boundaryColor } from './layers/ramp';
 
 export const HEIGHT_SOURCES = [
@@ -180,7 +180,7 @@ function factBinding(value: unknown): FactBinding {
   };
 }
 
-function lineageRow(value: unknown, releaseId: string): LineageRow {
+function lineageRow(value: unknown, releaseId: string): TableLineage {
   const row = closed(value, LINEAGE_KEYS);
   if (
     row.releaseId !== releaseId ||
@@ -191,6 +191,7 @@ function lineageRow(value: unknown, releaseId: string): LineageRow {
   return {
     lineageId: text(row.lineageId),
     releaseId,
+    link: 'table',
     tableName: text(row.tableName),
     method: text(row.method),
     methodVersion: text(row.methodVersion),
@@ -211,6 +212,7 @@ function chainRegistry(value: Record<string, unknown>) {
       facts,
       releases: [{ releaseId }],
       tables: [{ releaseId, tableName: lineage.tableName }],
+      artefacts: [],
       lineages: [lineage],
       sources: value.sources.map(sourceRow),
     });

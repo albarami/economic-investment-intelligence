@@ -166,6 +166,7 @@ it('keeps a null basemap as the explicit documented selection', async () => {
       release_kind: 'public_only',
       rules_version_id: 'INVENTED',
       tables: [],
+      artefacts: [],
       hour_keys: [],
       day_keys: [],
       month_keys: [],

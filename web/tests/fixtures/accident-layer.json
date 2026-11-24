@@ -313,6 +313,7 @@
         "tableName": "zone_type"
       }
     ],
+    "artefacts": [],
     "hour_keys": [],
     "day_keys": [],
     "month_keys": ["2026-02", "2026-03"],

@@ -10,9 +10,9 @@ import { createRegistry } from '../../src/facts/registry';
 import type {
   Fact,
   FactBinding,
-  LineageRow,
   ReleaseTable,
   SourceRow,
+  TableLineage,
 } from '../../src/facts/types';
 import type {
   LayerFeature,
@@ -45,7 +45,7 @@ export const NOT_TEXT = [
 
 /** One `/api/facts/{id}/lineage` body of the mounted route. */
 export interface MountedChain {
-  lineage: LineageRow;
+  lineage: Omit<TableLineage, 'link'>;
   sources: SourceRow[];
   binding: Pick<FactBinding, 'metricKey' | 'presentation'>;
 }
@@ -105,13 +105,14 @@ export function chainRegistry(
       presentation: chains[index]!.binding.presentation,
     })),
     lineages: unique(
-      chains.map((chain) => chain.lineage),
+      chains.map((chain) => ({ ...chain.lineage, link: 'table' as const })),
       (row) => row.lineageId,
     ),
     sources: unique(
       chains.flatMap((chain) => chain.sources),
       (row) => row.sourceId,
     ),
+    artefacts: [],
     tables: ACCIDENT_HTTP.release.tables,
     releases: [{ releaseId: facts[0]!.release_id }],
   });

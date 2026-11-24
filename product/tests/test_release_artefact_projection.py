@@ -97,11 +97,11 @@ def artefact_mount(tmp_path_factory):
     # Reuse the complete existing build/load fixture rather than copy its loader.
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(
-            public_release_fixture,
-            "write_public_only",
+            test_mounted_release_http,
+            "build_fixture",
             partial(
-                public_release_fixture.write_public_only,
-                artefacts=[{"path": PATH, "sha256": DIGEST}],
+                public_release_fixture.build_fixture,
+                artefacts=({"path": PATH, "sha256": DIGEST},),
             ),
         )
         fixture = test_mounted_release_http.loaded.__wrapped__(tmp_path_factory)
