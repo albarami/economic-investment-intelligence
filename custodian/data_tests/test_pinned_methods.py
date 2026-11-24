@@ -683,14 +683,35 @@ def wilson_period_label(active_rows, active_chain, cancelled_rows, cancelled_cha
     return matches[0]
 
 
+# The only ValueError messages admitted as failure reasons, matched exactly.
+WILSON_REASONS = {
+    "wilson_stock_mismatch": "wilson_stock_mismatch",
+    "wilson_period_no_match": "wilson_period_no_match",
+    "wilson_period_ambiguous": "wilson_period_ambiguous",
+    "month outside calendar": "month_outside_calendar",
+    **{
+        f"{reason}:{source}": reason
+        for reason in ("public_cache_missing", "receipt_hash_mismatch")
+        for source in ("lic_active", "lic_cancelled")
+    },
+}
+
+
+def wilson_reason(error: Exception) -> str:
+    """Map an error to a closed reason; any other error is `source_invalid`."""
+    if type(error) is ValueError:
+        return WILSON_REASONS.get(str(error), "source_invalid")
+    return "source_invalid"
+
+
 def _wilson_case(case, check):
     """Safe failure: the case ID and a fixed reason, never a count."""
     try:
         active_rows, active_chain = pinned("lic_active")
         cancelled_rows, cancelled_chain = pinned("lic_cancelled")
         return check(active_rows, active_chain, cancelled_rows, cancelled_chain)
-    except ValueError as error:
-        reason = str(error).split(":", 1)[0].replace(" ", "_")
+    except Exception as error:
+        reason = wilson_reason(error)
     pytest.fail(f"{case}:{reason}", pytrace=False)
 
 
