@@ -60,7 +60,13 @@ PLACE_COLUMNS = (
     ("addresses", "STRUCT(freeform VARCHAR, country VARCHAR)[]"),
     ("bbox", "STRUCT(xmin DOUBLE, xmax DOUBLE, ymin DOUBLE, ymax DOUBLE)"),
 )
-BUILDING_COLUMNS = (("id", "VARCHAR"), ("geometry", "BLOB"))
+# The source's building names shape: primary, a common map and rules entries.
+BUILDING_NAMES = (
+    'STRUCT("primary" VARCHAR, common MAP(VARCHAR, VARCHAR), rules STRUCT('
+    "variant VARCHAR, language VARCHAR, value VARCHAR, between DOUBLE[], "
+    "side VARCHAR)[])"
+)
+BUILDING_COLUMNS = (("id", "VARCHAR"), ("geometry", "BLOB"), ("names", BUILDING_NAMES))
 
 
 def place(
@@ -71,7 +77,9 @@ def place(
     arabic: str | None = None,
     dataset: str = "syn-source",
     confidence: float | None = 0.9,
+    category: str = "district",
 ) -> dict[str, object]:
+    """An invented place; its default category is one of the landmark areas."""
     common = {} if arabic is None else {"ar": arabic}
     return {
         "id": pid,
@@ -79,16 +87,43 @@ def place(
         "confidence": confidence,
         "names": {"primary": name, "common": common},
         "sources": [{"property": "", "dataset": dataset, "license": None}],
-        "basic_category": "syn_category",
+        "basic_category": category,
         "addresses": [{"freeform": "SYN street", "country": "SYN"}],
         "bbox": {"xmin": lon, "xmax": lon, "ymin": lat, "ymax": lat},
     }
 
 
 def building(
-    bid: str, west: float, south: float, size: float = 0.01
+    bid: str,
+    west: float,
+    south: float,
+    size: float = 0.01,
+    names: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
-    return {"id": bid, "geometry": box(west, south, west + size, south + size).wkb}
+    shape = box(west, south, west + size, south + size)
+    return {"id": bid, "geometry": shape.wkb, "names": names}
+
+
+def names_of(
+    primary: str | None = None,
+    common: Mapping[str, str] | None = None,
+    rules: Sequence[str] = (),
+) -> dict[str, object]:
+    """A footprint's own names in the source's shape."""
+    return {
+        "primary": primary,
+        "common": None if common is None else dict(common),
+        "rules": [
+            {
+                "variant": "alternate",
+                "language": None,
+                "value": value,
+                "between": None,
+                "side": None,
+            }
+            for value in rules
+        ],
+    }
 
 
 def parquet(
@@ -208,7 +243,7 @@ class GazetteerRows(World):
         self.assertEqual(
             out,
             "landmark:0 matches=1 kept=true footprints=na "
-            "inside=na written=true reason=ok\n",
+            "inside=na written=true reason=ok basis=place_name excluded=0\n",
         )
         for secret in ("SYN-P-1", "souq", "Souq", "51.1", "25.1"):
             self.assertNotIn(secret, out)
@@ -301,7 +336,7 @@ class FlagshipRows(World):
         self.assertEqual(
             out,
             "building:0 matches=1 kept=true footprints=1 "
-            "inside=true written=true reason=ok\n",
+            "inside=true written=true reason=ok basis=place_point excluded=0\n",
         )
 
     def test_footprint_in_second_part_is_found(self) -> None:
@@ -390,8 +425,9 @@ class BuildFilters(World):
         self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
         self.assertEqual(
             out,
-            "landmark:0 matches=1 kept=false footprints=na "
-            "inside=na written=false reason=excluded_by_keep_osm_not_merged\n",
+            "landmark:0 matches=0 kept=false footprints=na "
+            "inside=na written=false reason=excluded_by_keep_osm_not_merged "
+            "basis=place_name excluded=1\n",
         )
 
     def test_flagship_place_excluded_by_keep_stays_null(self) -> None:
@@ -418,8 +454,9 @@ class BuildFilters(World):
         self.assertIsNone(self.rows("showcase_gazetteer.yaml")[0]["record_key"])
         self.assertEqual(
             out,
-            "landmark:0 matches=1 kept=false footprints=na "
-            "inside=na written=false reason=duplicate_dropped\n",
+            "landmark:0 matches=0 kept=false footprints=na "
+            "inside=na written=false reason=duplicate_dropped "
+            "basis=place_name excluded=1\n",
         )
 
     def test_the_keeper_of_a_duplicate_is_written(self) -> None:
@@ -450,8 +487,9 @@ class BuildFilters(World):
             self.run_tool(),
             (
                 0,
-                "landmark:0 matches=1 kept=false footprints=na inside=na "
-                "written=false reason=excluded_by_keep_attribution_missing\n",
+                "landmark:0 matches=0 kept=false footprints=na inside=na "
+                "written=false reason=excluded_by_keep_attribution_missing "
+                "basis=place_name excluded=1\n",
             ),
         )
         self.assertEqual((self.review / "showcase_gazetteer.yaml").read_bytes(), before)
@@ -616,7 +654,7 @@ class Refusals(World):
 
     def test_overwrite_of_a_set_key_is_refused(self) -> None:
         proposal = keys_tool.Proposal(
-            "landmark:0", 1, True, None, None, "SYN-P-1", "ok"
+            "landmark:0", 1, True, None, None, "SYN-P-1", "ok", "place_name"
         )
         for field in ("record_key", "source_id"):
             filled = spec("landmark:0", "Syn Souq", **{field: "SYN-OTHER"})
@@ -684,7 +722,9 @@ class RowBinding(World):
 
     def test_apply_binds_each_proposal_to_its_own_row(self) -> None:
         rows = [spec("landmark:0", "Syn Tower"), spec("landmark:0", "Syn Souq")]
-        found = keys_tool.Proposal("landmark:0", 1, True, None, None, "SYN-P-1", "ok")
+        found = keys_tool.Proposal(
+            "landmark:0", 1, True, None, None, "SYN-P-1", "ok", "place_name"
+        )
         filled = keys_tool.apply(rows, [None, found], "places_ovt")
         self.assertEqual([row["record_key"] for row in filled], [None, "SYN-P-1"])
 
@@ -1451,7 +1491,7 @@ def read_place(
         pid,
         name,
         None,
-        "syn",
+        "district",
         Decimal(str(lon)),
         Decimal(str(lat)),
         None,
@@ -1481,7 +1521,7 @@ class Properties(unittest.TestCase):
     ) -> None:
         places = tuple(read_place(f"SYN-P-{n}", name) for n, name in enumerate(names))
         inputs = keys_tool.Inputs(
-            places, (), frozenset(), {p.place_id: "ok" for p in places}
+            places, (), frozenset(), {p.place_id: "ok" for p in places}, {}
         )
         folded = " ".join(target.split()).casefold()
         oracle = [
@@ -1508,6 +1548,7 @@ class Properties(unittest.TestCase):
             buildings,
             inside,
             {"SYN-P-1": "ok"},
+            {},
         )
         result = keys_tool.propose(spec("building:0", "syn tower"), "bldg_ovt", inputs)
         covering = [n for n, (covers, _flag) in enumerate(plan) if covers]
@@ -1640,6 +1681,474 @@ class AttributionTokens(World):
             self.run_tokens(self.scratch / "tokens.csv"),
             (2, "REFUSED places_file_unreceipted\n"),
         )
+
+
+SPIRE = names_of("Syn Spire")
+UNRELATED = place("SYN-P-9", 51.45, 25.45, "Syn Elsewhere")
+NAMED_LINE = (
+    "building:0 matches=na kept=na footprints=1 inside=true "
+    "written=true reason=ok basis=building_name excluded=na\n"
+)
+
+
+class BuildingNameBasis(World):
+    """A footprint's own name keys a building row first (L4 proposal 1).
+
+    The valid world: SYN-B-1 carries the row's name, SYN-B-2 is unnamed and no
+    place carries the name. Each negative test changes ONE input of it.
+    """
+
+    def world(
+        self,
+        first: Mapping[str, object] | None = SPIRE,
+        second: Mapping[str, object] | None = None,
+        places: Sequence[Mapping[str, object]] = (UNRELATED,),
+        west: float = 51.1,
+        size: float = 0.01,
+    ) -> None:
+        self.cache_places(places)
+        self.cache_buildings(
+            0,
+            [
+                building("SYN-B-1", west, 25.1, size, names=first),
+                building("SYN-B-2", 51.3, 25.3, names=second),
+            ],
+        )
+        self.review_files(flagship=[spec("building:0", "Syn Spire", "برج مخترع")])
+
+    def outcome(self) -> tuple[tuple[int, str], object]:
+        run = self.run_tool()
+        return run, self.rows(FLAGSHIP)[0]["record_key"]
+
+    def refused_line(
+        self, reason: str, footprints: str = "n", inside: str = "na"
+    ) -> str:
+        return (
+            f"building:0 matches=na kept=na footprints={footprints} inside={inside} "
+            f"written=false reason={reason} basis=building_name excluded=na\n"
+        )
+
+    def test_own_primary_name_keys_the_footprint_and_prints_no_name(self) -> None:
+        self.world()
+        run, key = self.outcome()
+        self.assertEqual((run, key), ((0, NAMED_LINE), "SYN-B-1"))
+        self.assertEqual(self.rows(FLAGSHIP)[0]["source_id"], "bldg_ovt")
+        for secret in ("SYN-B-1", "Syn Spire", "spire", "51.1", "25.1"):
+            self.assertNotIn(secret, run[1])
+
+    def test_common_and_rules_names_are_the_footprints_own_names(self) -> None:
+        for label, names in (
+            ("common", names_of("Syn Unrelated", {"ar": "برج  مخترع"})),
+            ("rules", names_of(None, None, ["SYN SPIRE"])),
+        ):
+            with self.subTest(label=label):
+                self.setUp()
+                self.world(first=names)
+                self.assertEqual(self.outcome(), ((0, NAMED_LINE), "SYN-B-1"))
+
+    def test_no_named_footprint_falls_back_to_the_place_point(self) -> None:
+        self.world(first=None, places=[place("SYN-P-1", 51.105, 25.105, "Syn Spire")])
+        run, key = self.outcome()
+        self.assertEqual(key, "SYN-B-1")
+        self.assertIn("written=true reason=ok basis=place_point excluded=0", run[1])
+
+    def test_two_named_footprints_are_building_name_n(self) -> None:
+        self.world(second=names_of("syn  spire"))
+        self.assertEqual(
+            self.outcome(), ((0, self.refused_line("building_name_n")), None)
+        )
+
+    def test_a_second_footprint_equal_only_when_folded_is_refused(self) -> None:
+        """Latin diacritics, Arabic tashkeel and tatweel each fold to one name."""
+        for first, second, row in (
+            ("Syn Spîre", "Syn Spire", "Syn Spîre"),
+            ("سوق مخترع", "سُوق مخترع", "سوق مخترع"),
+            ("سوق مخترع", "ســوق مخترع", "سوق مخترع"),
+        ):
+            for planted in (False, True):
+                with self.subTest(first=first, second=second, planted=planted):
+                    self.setUp()
+                    other = names_of(second if planted else "Syn Other")
+                    self.world(first=names_of(first), second=other)
+                    self.review_files(flagship=[spec("building:0", row)])
+                    expected: tuple[tuple[int, str], str | None]
+                    if planted:
+                        expected = (
+                            (0, self.refused_line("building_name_folded_n", "1")),
+                            None,
+                        )
+                    else:
+                        expected = ((0, NAMED_LINE), "SYN-B-1")
+                    self.assertEqual(self.outcome(), expected)
+
+    def test_a_place_point_in_another_footprint_is_basis_conflict(self) -> None:
+        for point, planted in (((51.105, 25.105), False), ((51.305, 25.305), True)):
+            with self.subTest(planted=planted):
+                self.setUp()
+                self.world(places=[place("SYN-P-1", *point, "Syn Spire")])
+                expected: tuple[tuple[int, str], str | None]
+                if planted:
+                    expected = (
+                        (0, self.refused_line("basis_conflict", "1", "true")),
+                        None,
+                    )
+                else:
+                    expected = ((0, NAMED_LINE), "SYN-B-1")
+                self.assertEqual(self.outcome(), expected)
+
+    def test_a_place_point_in_an_outside_footprint_is_basis_conflict(self) -> None:
+        outside = building("SYN-B-3", 51.59, 25.3, 0.04)
+        self.cache_places([place("SYN-P-1", 51.595, 25.32, "Syn Spire")])
+        self.cache_buildings(0, [building("SYN-B-1", 51.1, 25.1, names=SPIRE), outside])
+        self.review_files(flagship=[spec("building:0", "Syn Spire")])
+        self.assertEqual(
+            self.outcome(),
+            ((0, self.refused_line("basis_conflict", "1", "true")), None),
+        )
+
+    def test_the_one_named_footprint_outside_the_boundary_stays_null(self) -> None:
+        self.world(west=51.59, size=0.04)
+        self.assertEqual(
+            self.outcome(),
+            ((0, self.refused_line("outside_boundary", "1", "false")), None),
+        )
+
+    def test_a_part_without_a_names_column_is_refused(self) -> None:
+        self.world()
+        columns = BUILDING_COLUMNS[:2]
+        rows = [{"id": "SYN-B-1", "geometry": box(51.1, 25.1, 51.11, 25.11).wkb}]
+        write_cached(
+            self.cache, self.registry[PARTS[0]], parquet(self.scratch, columns, rows)
+        )
+        before = (self.review / FLAGSHIP).read_bytes()
+        self.assertEqual(self.run_tool(), (2, "REFUSED building_names_missing\n"))
+        self.assertEqual((self.review / FLAGSHIP).read_bytes(), before)
+
+    def test_a_names_column_of_the_wrong_form_is_refused(self) -> None:
+        self.world()
+        columns = (*BUILDING_COLUMNS[:2], ("names", "VARCHAR"))
+        rows = [
+            {
+                "id": "SYN-B-1",
+                "geometry": box(51.1, 25.1, 51.11, 25.11).wkb,
+                "names": "Syn Spire",
+            }
+        ]
+        write_cached(
+            self.cache, self.registry[PARTS[0]], parquet(self.scratch, columns, rows)
+        )
+        self.assertEqual(self.run_tool(), (2, "REFUSED building_names_form\n"))
+        self.assertIsNone(self.rows(FLAGSHIP)[0]["record_key"])
+
+    def test_check_agrees_then_fails_once_a_second_footprint_is_named(self) -> None:
+        self.world()
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(
+            self.run_tool("--check"), (0, "building:0 check=true kept=na\n")
+        )
+        filled = self.rows(FLAGSHIP)
+        self.world(second=names_of("Syn Spire"))
+        self.review_files(flagship=filled)
+        self.assertEqual(
+            self.run_tool("--check"), (1, "building:0 check=false kept=na\n")
+        )
+
+
+HOSTILE: tuple[object, ...] = ({"toString": None}, 7, None, [])
+NAME_LEAVES = ("primary", "common.ar", "rules.0.value")
+
+
+def leaf_paths(value: object, prefix: str = "") -> list[str]:
+    """Every leaf and container path of a names value, the root excluded."""
+    found = []
+    items: list[tuple[str, object]] = []
+    if isinstance(value, dict):
+        items = [(str(key), item) for key, item in value.items()]
+    elif isinstance(value, list):
+        items = [(str(index), item) for index, item in enumerate(value)]
+    for key, item in items:
+        path = f"{prefix}{key}"
+        found.append(path)
+        found.extend(leaf_paths(item, path + "."))
+    return found
+
+
+def set_path(value: object, path: str, new: object) -> object:
+    """A deep copy of value with the item at path replaced by new."""
+    copied = json.loads(json.dumps(value))
+    holder = copied
+    parts = path.split(".")
+    for part in parts[:-1]:
+        holder = holder[int(part)] if isinstance(holder, list) else holder[part]
+    last = parts[-1]
+    if isinstance(holder, list):
+        holder[int(last)] = new
+    else:
+        holder[last] = new
+    return copied
+
+
+class FootprintNamesForm(unittest.TestCase):
+    """Exhaustive leaf mutation of the stored names value (L-1603)."""
+
+    KINDS: tuple[dict[str, object], ...] = (
+        names_of("Syn Spire", {"ar": "برج مخترع"}, ["Syn Alt"]),
+        {"primary": "Syn Spire", "common": None, "rules": None},
+    )
+
+    def test_every_leaf_times_every_hostile_value_is_refused_or_read(self) -> None:
+        cases = 0
+        for kind in self.KINDS:
+            for path in leaf_paths(kind):
+                for hostile in HOSTILE:
+                    with self.subTest(path=path, hostile=hostile):
+                        cases += 1
+                        mutated = set_path(kind, path, hostile)
+                        try:
+                            read = keys_tool.footprint_names(mutated)
+                        except keys_tool.ReviewError as caught:
+                            self.assertEqual(caught.reason, "building_names_form")
+                            continue
+                        self.assertLessEqual(read, keys_tool.footprint_names(kind))
+                        if path in NAME_LEAVES:
+                            self.assertIsNone(hostile, "a non-text name is read")
+        self.assertEqual(cases, 4 * (10 + 3))
+
+    def test_a_struct_without_its_named_fields_is_refused(self) -> None:
+        kind = self.KINDS[0]
+        rule = {"variant": "alternate", "language": None, "between": None}
+        for planted in (
+            {"common": None, "rules": None},
+            {"primary": "Syn Spire", "rules": None},
+            {"primary": "Syn Spire", "common": None},
+            {**kind, "rules": [rule]},
+        ):
+            with self.subTest(planted=planted):
+                with self.assertRaises(keys_tool.ReviewError) as caught:
+                    keys_tool.footprint_names(planted)
+                self.assertEqual(caught.exception.reason, "building_names_form")
+
+    def test_the_root_of_every_hostile_form_is_refused_or_empty(self) -> None:
+        for hostile in (*HOSTILE, "Syn Spire", b"syn"):
+            with self.subTest(hostile=hostile):
+                if hostile is None:
+                    self.assertEqual(keys_tool.footprint_names(hostile), frozenset())
+                    continue
+                with self.assertRaises(keys_tool.ReviewError) as caught:
+                    keys_tool.footprint_names(hostile)
+                self.assertEqual(caught.exception.reason, "building_names_form")
+
+    def test_valid_names_are_primary_common_and_rules_values(self) -> None:
+        self.assertEqual(
+            keys_tool.footprint_names(self.KINDS[0]),
+            frozenset({"Syn Spire", "برج مخترع", "Syn Alt"}),
+        )
+        self.assertEqual(
+            keys_tool.footprint_names(names_of(" ", {"ar": ""}, ["\t"])), frozenset()
+        )
+
+
+class FateFirstCounting(World):
+    """Only places the build keeps count for match_0 and match_n (proposal 2)."""
+
+    def world(self, second_lon: float) -> None:
+        self.cache_places(
+            [
+                place("SYN-P-1", 51.1, 25.1, "Syn Souq"),
+                place("SYN-P-2", second_lon, 25.1, "Syn Souq"),
+            ]
+        )
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+
+    def test_an_excluded_namesake_is_not_counted(self) -> None:
+        self.world(51.7)
+        self.assertEqual(
+            self.run_tool(),
+            (
+                0,
+                "landmark:0 matches=1 kept=true footprints=na inside=na "
+                "written=true reason=ok basis=place_name excluded=1\n",
+            ),
+        )
+        self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-1")
+
+    def test_a_kept_namesake_is_match_n(self) -> None:
+        self.world(51.2)
+        self.assertEqual(
+            self.run_tool(),
+            (
+                0,
+                "landmark:0 matches=n kept=na footprints=na inside=na "
+                "written=false reason=match_n basis=place_name excluded=0\n",
+            ),
+        )
+        self.assertIsNone(self.rows(GAZETTEER)[0]["record_key"])
+
+    def test_two_excluded_matches_are_match_0(self) -> None:
+        self.cache_places(
+            [
+                place("SYN-P-1", 51.7, 25.1, "Syn Souq"),
+                place("SYN-P-2", 51.8, 25.1, "Syn Souq"),
+            ]
+        )
+        self.review_files(gazetteer=[spec("landmark:0", "Syn Souq")])
+        self.assertEqual(
+            self.run_tool(),
+            (
+                0,
+                "landmark:0 matches=0 kept=na footprints=na inside=na "
+                "written=false reason=match_0 basis=place_name excluded=n\n",
+            ),
+        )
+
+
+class LandmarkCategories(World):
+    """A gazetteer row resolves only to an area category (proposal 3)."""
+
+    def test_each_area_category_is_written(self) -> None:
+        for category in sorted(keys_tool.LANDMARK_CATEGORIES):
+            with self.subTest(category=category):
+                self.setUp()
+                self.cache_places(
+                    [place("SYN-P-1", 51.1, 25.1, "Syn Quarter", category=category)]
+                )
+                self.review_files(gazetteer=[spec("landmark:0", "Syn Quarter")])
+                self.assertEqual(self.run_tool()[0], 0)
+                self.assertEqual(self.rows(GAZETTEER)[0]["record_key"], "SYN-P-1")
+
+    def test_a_shop_named_like_the_landmark_is_refused(self) -> None:
+        for category in ("syn_electronics_store", "District", " district"):
+            with self.subTest(category=category):
+                self.setUp()
+                self.cache_places(
+                    [place("SYN-P-1", 51.1, 25.1, "Syn Quarter", category=category)]
+                )
+                self.review_files(gazetteer=[spec("landmark:0", "Syn Quarter")])
+                self.assertEqual(
+                    self.run_tool(),
+                    (
+                        0,
+                        "landmark:0 matches=1 kept=true footprints=na inside=na "
+                        "written=false reason=landmark_category_refused "
+                        "basis=place_name excluded=0\n",
+                    ),
+                )
+                self.assertIsNone(self.rows(GAZETTEER)[0]["record_key"])
+
+    def test_check_fails_a_stored_key_of_a_shop(self) -> None:
+        filled = spec(
+            "landmark:0", "Syn Quarter", source_id="places_ovt", record_key="SYN-P-1"
+        )
+        for category, expected in (
+            ("district", (0, "landmark:0 check=true kept=true\n")),
+            ("syn_electronics_store", (1, "landmark:0 check=false kept=true\n")),
+        ):
+            with self.subTest(category=category):
+                self.setUp()
+                self.cache_places(
+                    [place("SYN-P-1", 51.1, 25.1, "Syn Quarter", category=category)]
+                )
+                self.review_files(gazetteer=[filled])
+                self.assertEqual(self.run_tool("--check"), expected)
+
+    def test_a_building_row_takes_no_category_rule(self) -> None:
+        self.cache_places(
+            [place("SYN-P-1", 51.105, 25.105, "Syn Tower", category="syn_shop")]
+        )
+        self.cache_buildings(0, [building("SYN-B-1", 51.1, 25.1)])
+        self.review_files(flagship=[spec("building:0", "Syn Tower")])
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(self.rows(FLAGSHIP)[0]["record_key"], "SYN-B-1")
+
+
+class FoldedEmptyNames(unittest.TestCase):
+    """A name of combining marks alone folds to nothing and matches nothing."""
+
+    def test_a_name_of_marks_alone_matches_no_footprint(self) -> None:
+        named = {"SYN-B-0": frozenset({"\u0300"}), "SYN-B-1": frozenset({"\u0302"})}
+        inputs = keys_tool.Inputs(
+            (), (footprint_box(0), footprint_box(1)), frozenset(), {}, named
+        )
+        result = keys_tool.propose(spec("building:0", "\u0301"), "bldg_ovt", inputs)
+        self.assertEqual((result.reason, result.basis), ("match_0", "place_point"))
+
+
+# Each invented name with its N0 class and an independent N1 class.
+NAME_TABLE = (
+    ("Syn Spire", 0, 0),
+    ("SYN  spire", 0, 0),
+    ("Syn Spîre", 1, 0),
+    ("syn spíre", 2, 0),
+    ("سوق مخترع", 3, 3),
+    ("سُوق مخترع", 4, 3),
+    ("ســوق مخترع", 5, 3),
+    ("Syn Other", 6, 6),
+)
+FOOTPRINTS = st.lists(
+    st.tuples(st.none() | st.integers(0, len(NAME_TABLE) - 1), st.booleans()),
+    max_size=5,
+)
+
+
+def footprint_box(index: int) -> ReadBuilding:
+    return read_building(f"SYN-B-{index}", 51.1 + index * 0.02)
+
+
+class BuildingNameProperty(unittest.TestCase):
+    """propose against a class-table oracle over footprint plans (L-1389)."""
+
+    @settings(deadline=None)
+    @given(
+        FOOTPRINTS, st.integers(0, len(NAME_TABLE) - 1), st.none() | st.integers(0, 4)
+    )
+    @example([(0, True), (2, True)], 0, None)
+    @example([(0, True), (None, True)], 0, 1)
+    @example([], 0, None)
+    def test_key_and_reason_follow_the_oracle(
+        self, plan: list[tuple[int | None, bool]], target: int, at: int | None
+    ) -> None:
+        text, n0, n1 = NAME_TABLE[target]
+        buildings = tuple(footprint_box(index) for index in range(len(plan)))
+        named = {
+            f"SYN-B-{index}": frozenset({NAME_TABLE[name][0]})
+            for index, (name, _inside) in enumerate(plan)
+            if name is not None
+        }
+        inside = frozenset(f"SYN-B-{i}" for i, (_n, flag) in enumerate(plan) if flag)
+        places: tuple[ReadPlace, ...] = ()
+        if at is not None and at < len(plan):
+            places = (read_place("SYN-P-1", text, 51.1 + at * 0.02 + 0.005),)
+        inputs = keys_tool.Inputs(places, buildings, inside, {"SYN-P-1": "ok"}, named)
+        result = keys_tool.propose(spec("building:0", text), "bldg_ovt", inputs)
+        exact = [
+            i
+            for i, (n, _f) in enumerate(plan)
+            if n is not None and NAME_TABLE[n][1] == n0
+        ]
+        folded = [
+            i
+            for i, (n, _f) in enumerate(plan)
+            if n is not None and NAME_TABLE[n][2] == n1
+        ]
+        point = at if places else None
+        expected: tuple[str | None, str, str]
+        if len(exact) > 1:
+            expected = (None, "building_name_n", "building_name")
+        elif len(folded) > 1:
+            expected = (None, "building_name_folded_n", "building_name")
+        elif exact and not plan[exact[0]][1]:
+            expected = (None, "outside_boundary", "building_name")
+        elif exact and point is not None and point != exact[0]:
+            expected = (None, "basis_conflict", "building_name")
+        elif exact:
+            expected = (f"SYN-B-{exact[0]}", "ok", "building_name")
+        elif point is None:
+            expected = (None, "match_0", "place_point")
+        elif plan[point][1]:
+            expected = (f"SYN-B-{point}", "ok", "place_point")
+        else:
+            expected = (None, "outside_boundary", "place_point")
+        self.assertEqual((result.key, result.reason, result.basis), expected)
 
 
 if __name__ == "__main__":

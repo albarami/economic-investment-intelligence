@@ -348,31 +348,26 @@ def test_a_filled_key_without_its_record_is_refused() -> None:
     assert caught.value.reason == "record_missing"
 
 
-def test_the_committed_filled_key_resolves_when_its_record_is_present() -> None:
-    """The one reviewed key resolves from an invented point; the other ten stay pending."""
+def test_every_committed_key_is_null_and_stays_pending() -> None:
+    """S2-L4 fx1 cleared the one stored key (a shop, not its landmark): all eleven pend."""
     review = repository_root(Path(__file__)) / "custodian/publicdata/review"
     specs = load_showcase_gazetteer(review / "showcase_gazetteer.yaml", None)[1]
     candidates = load_flagship_candidates(review / "flagship_candidates.yaml", None)[1]
     everything = (*specs, *candidates)
     filled = [
-        (spec["place_key"], spec["source_id"], spec["record_key"])
+        spec["place_key"]
         for spec in everything
-        if spec["record_key"] is not None
+        if spec["record_key"] is not None or spec["source_id"] is not None
     ]
-    reviewed_place = "6f576882-17f2-4dbd-9e61-f9c98c439391"
-    assert filled == [("landmark:2", "places_ovt", reviewed_place)]
-    points = {("places_ovt", reviewed_place): _POINT}
+    assert filled == []
+    points = {("places_ovt", "SYN-LAND"): _POINT}
     resolved, report = resolve_review(everything, points, _POINT_GRID)
-    assert [(row["place_key"], row["source_id"]) for row in resolved] == [
-        ("landmark:2", "places_ovt")
-    ]
-    assert resolved[0]["cell"] == _POINT_GRID[0]["cell"]
+    assert resolved == []
     assert report == tuple(
         f"gazetteer: source point pending S2-T06: {spec['place_key']}"
         for spec in everything
-        if spec["record_key"] is None
     )
-    assert len(report) == 10
+    assert len(report) == 11
 
 
 def test_a_decision_file_names_its_candidate_and_a_list_stays_pending(
