@@ -6860,3 +6860,5 @@ introduced.
 - NEEDED: the lead appends the counted number as a dated note to the decision record's notes heading, if it has one, in the same train.
 - NEEDED BY: train S2-27.
 - 2026-11-24, lead: S2-P78.rv1 counted 27 module files in the loaded-module digest of the seeded path, among them `review/graph.py`, `singles/families.py` and `gis/layers.py`, which decision 0081 lists as unbound. Decision 0081 has no notes heading, so the record is not edited here (an approved decision is amended only by a new record, rule 46); this item stays open for a dated amendment record of the count.
+
+- 2026-11-24, note to OI-409 (train S2-28): the static deadline guard of S2-P80 was approved at `cfadcd32e7` after two rejected rounds (cf2, Cognition Devin). The items the reviewers left open stay open here: receiver-qualified `.walk()` such as `pathlib.Path.walk()`, and `os.path.*` and `Path.exists` or `Path.stat` calls, are not seen by the guard.
