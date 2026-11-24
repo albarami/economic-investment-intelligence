@@ -233,7 +233,7 @@ class Served(unittest.TestCase):
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             for path, error, reason in (
                 (missing, ConfigError, NAME),
-                (broken, RegisterRefusal, "row_shape"),
+                (broken, RegisterRefusal, "register_json_invalid"),
             ):
                 environ = self._child("staging", str(path))
                 with patch.dict(os.environ, environ, clear=True):
