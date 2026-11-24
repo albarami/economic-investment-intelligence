@@ -556,8 +556,96 @@ def test_configuration_refusal_branches(tmp_path, change, reason):
         load_generation_config(tmp_path)
 
 
-def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
+def test_tracked_configuration_binds_ruled_settings(tmp_path):
     from eii_custodian.publicdata.method_pin_config import load_generation_config
+
+    config = load_generation_config(repository_root(Path(__file__)))
+    expected = {
+        "c6.seed": {"value": 2981396888},
+        "c6.candidate_set": {
+            "value": "every distinct primary category among the box's confidence-filtered points; focal ids merged into one label A; A included"
+        },
+        "c7.modes": {
+            "weight_mode": "residents",
+            "travel_mode": "drive",
+            "sets": "public_only_base_cells",
+        },
+        "c7.cutoffs": {
+            "value": "[5, 10, 15]",
+            "unit": "minutes",
+            "travel_mode": "drive",
+        },
+        "c7.speed_regime": {"value": "free_flow"},
+        "wilson.period": {
+            "activity_code": "5610101",
+            "municipality": "Al Shamal",
+            "stock_period": "2025-05",
+            "year": "2024",
+            "flagged_months": "included",
+            "basis": "unique identification: C2-WILSON-PERIOD:2024 (MTH-03)",
+        },
+    }
+    assert {
+        pin: {
+            key: value for key, value in config["pins"][pin].items() if key != "anchor"
+        }
+        for pin in expected
+    } == expected
+
+    # Exercise the existing scalar-valued producer with invented source rows.
+    build, invented_config = supplied_build(tmp_path)
+    for pin in expected:
+        invented_config["pins"][pin] = config["pins"][pin]
+    build.pin_generation_config = invented_config
+    build.method_pins()
+    rows = json.loads((build.cache / PIN_ARTIFACT_NAME).read_bytes())["pins"]
+    assert {
+        row["pin_id"]: row["values"] for row in rows if row["pin_id"] in expected
+    } == expected
+
+
+def test_tracked_configuration_binds_c5_treatment_separately_from_window():
+    from eii_custodian.publicdata.method_pin_config import load_generation_config
+    from eii_custodian.publicdata.series.baskets import ACTIVITIES, reviewed_inputs
+
+    repo = repository_root(Path(__file__))
+    config = load_generation_config(repo)
+    basket = json.loads(
+        (repo / "custodian/publicdata/review/baskets.yaml").read_bytes()
+    )
+    line_keys = {
+        activity + ":" + item["name"]
+        for activity in ACTIVITIES
+        for item in reviewed_inputs(basket, activity)
+    }
+    contaminated = {
+        "5510:mattresses",
+        "5510:tableware and tea or coffee service",
+        "5630:cane or beet sugar for beverages",
+        "5630:paperboard cups",
+        "5630:packaged drinking water",
+    }
+    expected_lines = {
+        line: {
+            "parent_contains_excluded": line in contaminated,
+            "parent_treatment": "withheld" if line in contaminated else "clean",
+        }
+        for line in line_keys
+    }
+    assert len(line_keys) == 24
+    assert contaminated <= line_keys
+    for pin in ("c5.hhi", "c5.prior12", "c5.latest12", "c5.trend"):
+        settings = config["pins"][pin]
+        assert settings["prior_months"] == PRIOR
+        assert settings["lines"] == expected_lines
+        assert "latest_months" not in settings
+
+
+def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
+    from eii_custodian.publicdata.method_pin_config import (
+        configuration_pending,
+        load_generation_config,
+    )
 
     repo = repository_root(Path(__file__))
     config = load_generation_config(repo)
@@ -567,23 +655,47 @@ def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
     assert build.method_pins() == {}
     assert build.pin_pending_reason == "pin_configuration_pending"
     assert not (tmp_path / PIN_ARTIFACT_NAME).exists()
-    assert {
-        pin for pin, settings in config["pins"].items() if "pending_reason" in settings
-    } == {
-        "wilson.period",
-        "c5.hhi",
-        "c5.prior12",
-        "c5.latest12",
-        "c5.trend",
-        "c6.seed",
-        "c6.category_ids",
-        "c6.candidate_set",
-        "c7.coordinates",
-        "c7.modes",
-        "c7.cutoffs",
-        "c7.speed_regime",
-        *S7_DEFERRED_PINS,
+    pending_reasons = {
+        **{
+            pin: "OI-283: " + pin + ": latest_months awaits R1 complete-month evidence"
+            for pin in ("c5.hhi", "c5.prior12", "c5.latest12", "c5.trend")
+        },
+        "c6.category_ids": "OI-283: c6.category_ids: reviewed allow-list awaits review (L5c section 4)",
+        "c7.coordinates": "OI-283: c7.coordinates: landmark keys await ruling (L5c section 6)",
+        **{
+            pin: "OI-283: " + pin + ": computed by S6-T10"
+            for pin in ("c6.expected_clq", "c6.expected_p", "c6.expected_q")
+        },
+        **{
+            pin: "OI-283: " + pin + ": computed by S7-T05"
+            for pin in ("c7.shared_a_given_b", "c7.shared_b_given_a")
+        },
     }
+    assert {
+        pin: settings["pending_reason"]
+        for pin, settings in config["pins"].items()
+        if "pending_reason" in settings
+    } == pending_reasons
+    assert configuration_pending(config) is True
+    for pending_pin in pending_reasons.keys() - S7_DEFERRED_PINS:
+        assert (
+            configuration_pending(
+                {
+                    "pins": {
+                        pin: {"pending_reason": reason}
+                        for pin, reason in pending_reasons.items()
+                        if pin in S7_DEFERRED_PINS or pin == pending_pin
+                    }
+                }
+            )
+            is True
+        )
+    assert (
+        configuration_pending(
+            {"pins": {pin: config["pins"][pin] for pin in S7_DEFERRED_PINS}}
+        )
+        is False
+    )
 
 
 def test_automatic_rows_are_collected_again_on_the_next_invocation(tmp_path):
