@@ -10,6 +10,7 @@
 
 ## In brief
 
+- Proposed [decision 0107](decisions/0107-a-citation-page-the-publisher-no-longer-serves.md) records the S2-P81 registration of one landmark citation page the publisher no longer serves as a SKIP with the closed word `page_not_served`; different-maker review remains pending.
 - Proposed [decision 0097](decisions/0097-custodian-shard-headroom.md) records the S2-P67 custodian shard-headroom implementation under ruling L-1517 item 2, retaining decision 0086's limit and watch; different-maker review remains pending.
 
 - Read the project brief before any specialised document.
@@ -154,6 +155,7 @@
 | [0104](decisions/0104-register-row-key-letter-encoding.md) | The released register row identity spells the digits of the published row key as letters (`0-9` to `g-p`, `ROW-[a-p]{20}`), a lossless re-encoding that leaves the rule-9 digit-run guard unchanged; a `ROW-` identity is bound to the commerce source | Accepted 2026-11-23 by the advisor under the owner's delegation (the lead may ask the advisor, not the owner, about the register scan), advisor note of 2026-11-23 22:15, ruling L-1649: the letter spelling is lossless and keeps a bare 8- or 11-digit run out of the release; S2-P71 round 3 |
 | [0105](decisions/0105-register-scan-typed-columns.md) | The register token scan admits a registration or licence number of 1 to 2 digits or of the shape 19xx or 20xx in a closed list of 28 typed fields (fourteen card columns, the list's `employee_count`, the `period` columns of the snapshot and list tables, ten manifest fields: receipt times, terms date, periods, the snapshot coverage lists, absence counts, storage-added row counts, and the manifest's and receipt's `version`, and the build report's `version`, each version equal to its one fixed text), each checked by its written format and declared shape before the scan; every number of every release table meets every key; longer numbers, free text, key columns, the unlisted manifest fields, the receipt's text and the rest of the report keep the full scan | Accepted 2026-11-23 by the lead (ruling L-1647): every item is the owner's own choice (option (a) with three conditions, "a2 yes" and "a3", 2026-11-23) or the advisor's under the owner's delegation (item 8); built in S2-P71 Part 2 rounds 4 to 9, approved by another maker (`49e4c848`) and merged in train S2-24 |
 | [0106](decisions/0106-c12-parameters-fixed-at-slice-s2.md) | The C12 decay, cut-offs, supply layers, modes, presence keys and traffic settings fixed at slice S2 | Accepted 2026-11-23 by the lead under its delegation (rulings L-1633 item 1 and L-1641), after the different-maker review S2-25.rv0106 (APPROVED `07a142f05f`) |
+| [0107](decisions/0107-a-citation-page-the-publisher-no-longer-serves.md) | One landmark citation page the publisher no longer serves is a registered SKIP by the closed word `page_not_served`; a landmark height citing a skipped row refuses as `registry_skipped` | Proposed, 2026-11-24 |
 
 ## Identifiers and change control
 

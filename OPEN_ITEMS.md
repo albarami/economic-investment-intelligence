@@ -6862,3 +6862,12 @@ introduced.
 - 2026-11-24, lead: S2-P78.rv1 counted 27 module files in the loaded-module digest of the seeded path, among them `review/graph.py`, `singles/families.py` and `gis/layers.py`, which decision 0081 lists as unbound. Decision 0081 has no notes heading, so the record is not edited here (an approved decision is amended only by a new record, rule 46); this item stays open for a dated amendment record of the count.
 
 - 2026-11-24, note to OI-409 (train S2-28): the static deadline guard of S2-P80 was approved at `cfadcd32e7` after two rejected rounds (cf2, Cognition Devin). The items the reviewers left open stay open here: receiver-qualified `.walk()` such as `pathlib.Path.walk()`, and `os.path.*` and `Path.exists` or `Path.stat` calls, are not seen by the guard.
+## OI-411 — Re-probe the landmark citation page the publisher no longer serves
+
+- ID: OI-411
+- TYPE: OPEN (watch)
+- RAISED BY: S2-P81, 2026-11-24
+- CONCERNS: the single registry row of `landmark_skyscraperpage_com` in `custodian/publicdata/sources.yaml`, registered as a SKIP with `skip_reason: page_not_served` under proposed [decision 0107](docs/decisions/0107-a-citation-page-the-publisher-no-longer-serves.md).
+- EVIDENCE: the lead's probe of 2026-11-24 (status codes only): the page answers 404 to every client and address variant tried, and the site root answers 403; the live step LIVE-S2.L2d3 on `1dba941bcf` failed that one row with `http_status`.
+- NEEDED: the lead re-probes the page, status codes only, at each live build and records the status here; when it answers 200, a new task removes the word and the dated sentence of `basis_note` and the row is fetched again. A different-maker review and acceptance of decision 0107.
+- NEEDED BY: each live build; acceptance before the S2 gate record.

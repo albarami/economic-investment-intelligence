@@ -3069,7 +3069,12 @@ def test_a_landmark_citation_missing_its_cache_receipt_refuses_the_build(
 ) -> None:
     from eii_custodian.publicdata.fetch.registry import load_registry
 
-    row = next(entry for entry in load_registry() if entry.kind == "public_page")
+    # An unskipped page: a skipped row refuses earlier as registry_skipped.
+    row = next(
+        entry
+        for entry in load_registry()
+        if entry.kind == "public_page" and not entry.skip_reason
+    )
     document = _landmark_document()
     citation = document["entries"][0]["citation"]
     citation["page_url"] = row.url

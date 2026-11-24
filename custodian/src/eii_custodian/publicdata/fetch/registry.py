@@ -537,6 +537,12 @@ def _entry(row: object) -> Entry:
     folded_skip = skip_reason.casefold()
     if _SKIP_LICENCE in folded_skip or _SKIP_TERMS in folded_skip:
         raise RegistryError("skip_reason names a licence or terms")
+    if (
+        source_id.startswith("landmark_")
+        and skip_reason
+        and skip_reason not in CITATION_SKIP_REASONS
+    ):
+        raise RegistryError("citation_skip_reason")
     file_fields = _file_fields(row, source_id)
     try:
         refetch = parse_cadence(
@@ -817,6 +823,11 @@ TECHNICAL_SKIP_REASONS = frozenset(
         "certificate_chain_incomplete",
     }
 )
+
+
+# Decision 0107 (proposed): the one reason a landmark citation row may be
+# skipped; any other non-empty reason on such a row is refused at load.
+CITATION_SKIP_REASONS = frozenset({"page_not_served"})
 
 
 def _technical_reason(reason: str) -> bool:
