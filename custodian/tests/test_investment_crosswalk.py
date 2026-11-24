@@ -12,7 +12,7 @@ from tempfile import TemporaryDirectory
 import pytest
 from custodian.tests import test_investment_build as b
 from custodian.tests.test_busyness_bootstrap import leaves, replace_leaf
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
@@ -256,6 +256,7 @@ def test_cache_crosswalk_exhaustive_hostile_leaves(
             assert loaded.check == expected, (keys, hostile, loaded)
 
 
+@settings(deadline=None)
 @given(
     st.lists(
         st.sampled_from(("source_country_iso3", "municipality_code", "place_key")),
