@@ -296,6 +296,77 @@ def test_wilson_cases_print_only_case_reason_or_label(tmp_path):
         assert summary(failing) == expected
 
 
+SENTINEL = 9876543
+FAULT_CHILD = CHILD.replace(
+    "methods.pinned = invented.child_pinned({shamal!r}, {parts!r})\n",
+    "invented.plant_fault(methods, {where!r}, {kind!r})\n",
+)
+
+
+def plant_fault(methods_module, where, kind):
+    """Raise an unexpected error carrying a sentinel count from `where`."""
+    error = (
+        KeyError(f"{SENTINEL}")
+        if kind == "key"
+        else ValueError(f"{SENTINEL} rows: lic_active")
+    )
+
+    def raiser(*_args, **_kwargs):
+        raise error
+
+    methods_module.pinned = child_pinned(ONE_MATCH, (20, 8))
+    setattr(methods_module, where, raiser)
+
+
+@pytest.mark.parametrize("kind", ["key", "value"])
+@pytest.mark.parametrize("where", ["pinned", "c2_municipal_churn"])
+def test_wilson_unexpected_errors_print_only_source_invalid(tmp_path, where, kind):
+    failing = child_run(tmp_path, FAULT_CHILD.format(where=where, kind=kind))
+    output = failing.stdout + failing.stderr
+    assert failing.returncode == 1, "child_not_failed"
+    assert str(SENTINEL) not in output, "sentinel_leaked"
+    assert summary(failing) == {
+        "C2-WILSON-STOCK:source_invalid",
+        "C2-WILSON-PERIOD:source_invalid",
+    }
+
+
+@pytest.mark.parametrize(
+    ("message", "reason"),
+    [
+        ("wilson_stock_mismatch", "wilson_stock_mismatch"),
+        ("wilson_period_no_match", "wilson_period_no_match"),
+        ("wilson_period_ambiguous", "wilson_period_ambiguous"),
+        ("month outside calendar", "month_outside_calendar"),
+        ("public_cache_missing:lic_active", "public_cache_missing"),
+        ("public_cache_missing:lic_cancelled", "public_cache_missing"),
+        ("receipt_hash_mismatch:lic_active", "receipt_hash_mismatch"),
+        ("receipt_hash_mismatch:lic_cancelled", "receipt_hash_mismatch"),
+        ("wilson_stock_mismatch:28", "source_invalid"),
+        ("public_cache_missing:pop_muni", "source_invalid"),
+        ("month outside calendar ", "source_invalid"),
+        ("9876543", "source_invalid"),
+        ("", "source_invalid"),
+    ],
+)
+def test_wilson_reason_admits_only_the_closed_set(message, reason):
+    assert methods.wilson_reason(ValueError(message)) == reason
+
+
+@pytest.mark.parametrize("kind", [TypeError, ArithmeticError, UnicodeError])
+def test_wilson_reason_admits_only_a_plain_value_error(kind):
+    assert methods.wilson_reason(kind("wilson_stock_mismatch")) == "source_invalid"
+
+
+@given(st.text(), st.sampled_from([ValueError, KeyError, TypeError, StopIteration]))
+def test_wilson_reason_is_always_closed(message, kind):
+    reason = methods.wilson_reason(kind(message))
+    admitted = methods.WILSON_REASONS.get(message)
+    expected = admitted if kind is ValueError and admitted else "source_invalid"
+    assert reason == expected
+    assert re.fullmatch(r"[a-z_]+", reason)
+
+
 def test_wilson_period_warning_names_the_label_only(monkeypatch, tmp_path):
     rows = readings(tmp_path, ONE_MATCH)
     by_source = {"lic_active": rows[:2], "lic_cancelled": rows[2:]}
