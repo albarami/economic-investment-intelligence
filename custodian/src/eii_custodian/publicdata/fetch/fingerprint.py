@@ -4,7 +4,7 @@ A reuse-capable journal item (schema 2) binds one entry to the exact code and
 inputs that produced it: the closed-encoded constructed ``Entry`` (which
 carries every field of its registry row), the dispatch branch, the computed
 code closure hash, the repository modules loaded before the run began, the
-named non-module files such as the ``eii`` launcher, the global public-data
+named non-module files such as the ``eii`` launcher, the shared fetch-pass data
 input, the Python version and the locked dependency set. The code closure is
 computed from a static AST scan resolved with ``importlib.util.find_spec``
 under the actual ``sys.path``; anything dynamic or unresolvable refuses
@@ -23,8 +23,10 @@ import subprocess
 import sys
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, fields, is_dataclass
+from itertools import chain
 from pathlib import Path
-from typing import Any, ClassVar, cast
+from types import MappingProxyType
+from typing import Any, ClassVar, Literal, cast
 
 from .registry import Entry
 
@@ -99,6 +101,77 @@ BRANCH_ROOTS: dict[str, tuple[str, ...]] = {
     "register": (),
     "skipped": (),
 }
+
+
+# Closed inventory of tracked custodian/publicdata inputs (decision 0114).
+# sources.yaml is bound through the constructed Entry, never as whole-file bytes.
+# Unlisted tracked files default to shared fetch-pass; omission cannot drop a hash.
+# Review CSV/YAML files are conservative shared inputs: the FDI crosswalk reader
+# may open any matching target there before it validates the target's contents.
+INPUT_PARTITION: Mapping[
+    str, Literal["per-entry", "shared fetch-pass", "post-loop-only"]
+] = MappingProxyType(
+    {
+        "atlas.yaml": "shared fetch-pass",
+        "baci.yaml": "shared fetch-pass",
+        "benchmarks.yaml": "shared fetch-pass",
+        "gravity.yaml": "shared fetch-pass",
+        "height_rules.yaml": "post-loop-only",
+        "investment_pages.yaml": "shared fetch-pass",
+        "review/activity_spine.csv": "shared fetch-pass",
+        "review/activity_spine_audits.json": "post-loop-only",
+        "review/activity_spine_refusals.json": "post-loop-only",
+        "review/additions_industry.yaml": "shared fetch-pass",
+        "review/additions_municipal.yaml": "shared fetch-pass",
+        "review/additions_property_venues.yaml": "shared fetch-pass",
+        "review/additions_splits.yaml": "shared fetch-pass",
+        "review/arabic_tag.txt": "post-loop-only",
+        "review/baskets.yaml": "shared fetch-pass",
+        "review/busy_besttime_requests.yaml": "shared fetch-pass",
+        "review/busy_besttime_venues.csv": "shared fetch-pass",
+        "review/category_allowlist.csv": "shared fetch-pass",
+        "review/country_aliases.csv": "shared fetch-pass",
+        "review/country_iso3.csv": "shared fetch-pass",
+        "review/district_crosswalk.csv": "shared fetch-pass",
+        "review/district_layer_aliases.csv": "shared fetch-pass",
+        "review/fdi_crosswalks.yaml": "shared fetch-pass",
+        "review/flagship_candidates.yaml": "shared fetch-pass",
+        "review/gis_imagery_views.yaml": "shared fetch-pass",
+        "review/gis_layer_fields.yaml": "shared fetch-pass",
+        "review/gis_snapshot.json": "post-loop-only",
+        "review/greater_doha_municipalities.csv": "shared fetch-pass",
+        "review/landmark_heights.yaml": "shared fetch-pass",
+        "review/municipality_names.csv": "post-loop-only",
+        "review/national_boundary_outside.json": "post-loop-only",
+        "review/places_fsq_categories.csv": "shared fetch-pass",
+        "review/places_fsq_policy.yaml": "shared fetch-pass",
+        "review/places_ovt_attribution.csv": "shared fetch-pass",
+        "review/places_ovt_categories.csv": "shared fetch-pass",
+        "review/population_indicators.csv": "shared fetch-pass",
+        "review/product_activity_occupation.v1.binding.json": "post-loop-only",
+        "review/product_activity_occupation.v1.json": "post-loop-only",
+        "review/product_activity_occupation.v1.schema.json": "post-loop-only",
+        "review/property_use_map.csv": "shared fetch-pass",
+        "review/reconciliation_oi03.md": "post-loop-only",
+        "review/s2_t08_source_review.yaml": "shared fetch-pass",
+        "review/s2_t09_generation_config.json": "shared fetch-pass",
+        "review/s2_t09_source_checks.yaml": "shared fetch-pass",
+        "review/s2_t13_confirmation.yaml": "shared fetch-pass",
+        "review/s2_t17_forecast_series.md": "post-loop-only",
+        "review/s2_t19_confirmation.yaml": "shared fetch-pass",
+        "review/s2_t29_sources.yaml": "shared fetch-pass",
+        "review/showcase_areas.yaml": "shared fetch-pass",
+        "review/showcase_gazetteer.yaml": "shared fetch-pass",
+        "review/trade_publisher_readings.yaml": "shared fetch-pass",
+        "review/venue_busyness_crosswalk.csv": "shared fetch-pass",
+        "review/venue_crosswalk.csv": "shared fetch-pass",
+        "review/verified_places.csv": "shared fetch-pass",
+        "review/zone_crosswalk.csv": "shared fetch-pass",
+        "review/zones_without_districts.csv": "shared fetch-pass",
+        "sources.yaml": "per-entry",
+        "trade_reconciliation.yaml": "post-loop-only",
+    }
+)
 
 
 class FingerprintUnavailable(ValueError):
@@ -184,11 +257,12 @@ def _canonical(value: object) -> str:
 _HASH_CACHE: dict[Path, tuple[int, int, int, str]] = {}
 
 
-def _sha256(path: Path) -> str:
+def _sha256(path: Path, *, fresh: bool = False) -> str:
     stat = path.stat()
     cached = _HASH_CACHE.get(path)
     if (
-        cached is not None
+        not fresh
+        and cached is not None
         and cached[0] == stat.st_mtime_ns
         and cached[1] == stat.st_ctime_ns
         and cached[2] == stat.st_size
@@ -753,29 +827,38 @@ def closure_files(
 
 
 def _global_input(roots: CodeRoots) -> str:
-    """SHA-256 of the canonical (path, hash) list of every tracked input.
+    """Hash shared fetch inputs; keep whole-tree missing/untracked refusals.
 
-    sources.yaml stays bound per registry row. A tracked path missing from the
-    working tree, and any untracked file under publicdata, refuses rather than
-    silently leaving the input unbound.
+    The closed table excludes only proven post-loop inputs and the registry
+    bytes already bound per Entry. Every unlisted regular tracked file stays shared; symlinks refuse.
     """
     tracked = roots.tracked()
-    sources_yaml = (roots.publicdata / "sources.yaml").resolve()
-    items: list[list[str]] = []
-    for path in sorted(tracked):
+    for path in tracked:
         if not path.is_file():
             raise FingerprintUnavailable("tracked_publicdata_missing")
-        if path == sources_yaml:
+    for found in chain((roots.publicdata,), roots.publicdata.rglob("*")):
+        # Git's resolved-path set loses aliases. Never let a post-loop alias
+        # exclude shared bytes, or hash through a link before checking it.
+        if found.is_symlink():
+            raise FingerprintUnavailable("publicdata_symlink")
+        if found.is_file() and found.resolve() not in tracked:
+            raise FingerprintUnavailable("untracked_publicdata_file")
+    excluded = {
+        (roots.publicdata / name).resolve()
+        for name, group in INPUT_PARTITION.items()
+        if group in {"per-entry", "post-loop-only"}
+    }
+    items: list[list[str]] = []
+    for path in sorted(tracked):
+        if path in excluded:
             continue
         try:
             relative = path.relative_to(roots.code_root).as_posix()
         except ValueError:
             raise FingerprintUnavailable("tracked_publicdata_outside_root") from None
-        items.append([relative, _sha256(path)])
-    if roots.publicdata.is_dir():
-        for found in sorted(roots.publicdata.rglob("*")):
-            if found.is_file() and found.resolve() not in tracked:
-                raise FingerprintUnavailable("untracked_publicdata_file")
+        # Data edits may share a filesystem timestamp tick and byte count.
+        # The partition proof requires fresh bytes even in that case.
+        items.append([relative, _sha256(path, fresh=True)])
     return hashlib.sha256(_canonical(items).encode("ascii")).hexdigest()
 
 

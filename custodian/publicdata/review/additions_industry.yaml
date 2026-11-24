@@ -1,8 +1,261 @@
 # Reviewed field map for establishment size, manufacturing, wholesale and retail
 # trade, and trade logistics. Labels are the inventory's own. Nothing is renamed
-# across bulletins. The country crosswalk has no rows: the lead adds exact labels.
+# across bulletins. The country crosswalk holds reviewed rows: one exact published
+# label (no trimming, no case change) to one ISO 3166-1 alpha-3 code. Its cited
+# reference is the ISO 3166-1 standard (country codes, alpha-3), as listed in
+# country_iso3.csv. A label that is not exactly one country has no row and stops
+# the build until the lead rules it; a listed region is skipped and counted.
 version: 1
-country_crosswalk: []
+country_crosswalk:
+  - {published_label: "Afghanistan", iso3: AFG}
+  - {published_label: "Albania", iso3: ALB}
+  - {published_label: "Angola", iso3: AGO}
+  - {published_label: "Arab Republic of Egypt", iso3: EGY}
+  - {published_label: "Argentina", iso3: ARG}
+  - {published_label: "Armenia", iso3: ARM}
+  - {published_label: "Australia", iso3: AUS}
+  - {published_label: "Austria", iso3: AUT}
+  - {published_label: "Azerbaijan", iso3: AZE}
+  - {published_label: "Bahamas", iso3: BHS}
+  - {published_label: "Bahrain", iso3: BHR}
+  - {published_label: "Bangladesh", iso3: BGD}
+  - {published_label: "Barbados", iso3: BRB}
+  - {published_label: "Belarus", iso3: BLR}
+  - {published_label: "Belgium", iso3: BEL}
+  - {published_label: "Benin", iso3: BEN}
+  - {published_label: "Bolivia", iso3: BOL}
+  - {published_label: "Botswana", iso3: BWA}
+  - {published_label: "Brazil", iso3: BRA}
+  - {published_label: "Brunei", iso3: BRN}
+  - {published_label: "Bulgaria", iso3: BGR}
+  - {published_label: "Burkina Faso", iso3: BFA}
+  - {published_label: "Burundi", iso3: BDI}
+  - {published_label: "Cambodia", iso3: KHM}
+  - {published_label: "Cameroon", iso3: CMR}
+  - {published_label: "Canada", iso3: CAN}
+  - {published_label: "Cape Verde", iso3: CPV}
+  - {published_label: "Cape Verde Islands", iso3: CPV}
+  - {published_label: "Central African Republic", iso3: CAF}
+  - {published_label: "Chad", iso3: TCD}
+  - {published_label: "Chile", iso3: CHL}
+  - {published_label: "China", iso3: CHN}
+  - {published_label: "Colombia", iso3: COL}
+  - {published_label: "Comoros Islands", iso3: COM}
+  - {published_label: "Costa Rica", iso3: CRI}
+  - {published_label: "Croatia", iso3: HRV}
+  - {published_label: "Cuba", iso3: CUB}
+  - {published_label: "Cyprus", iso3: CYP}
+  - {published_label: "Czech Republic", iso3: CZE}
+  - {published_label: "Denmark", iso3: DNK}
+  - {published_label: "Djibouti", iso3: DJI}
+  - {published_label: "Dominican Republic", iso3: DOM}
+  - {published_label: "Ecuador", iso3: ECU}
+  - {published_label: "El Salvador", iso3: SLV}
+  - {published_label: "Equatorial Guinea", iso3: GNQ}
+  - {published_label: "Eritrea", iso3: ERI}
+  - {published_label: "Estonia", iso3: EST}
+  - {published_label: "Eswatini (Swaziland)", iso3: SWZ}
+  - {published_label: "Ethiopia", iso3: ETH}
+  - {published_label: "Faroe Islands", iso3: FRO}
+  - {published_label: "Finland", iso3: FIN}
+  - {published_label: "France", iso3: FRA}
+  - {published_label: "Gabon", iso3: GAB}
+  - {published_label: "Gambia", iso3: GMB}
+  - {published_label: "Georgia", iso3: GEO}
+  - {published_label: "Germany", iso3: DEU}
+  - {published_label: "Ghana", iso3: GHA}
+  - {published_label: "Greece", iso3: GRC}
+  - {published_label: "Grenada", iso3: GRD}
+  - {published_label: "Guatemala", iso3: GTM}
+  - {published_label: "Guinea", iso3: GIN}
+  - {published_label: "Guinea-Bissau", iso3: GNB}
+  - {published_label: "Guyana", iso3: GUY}
+  - {published_label: "Haiti", iso3: HTI}
+  - {published_label: "Hashemite Kingdom of Jordan", iso3: JOR}
+  - {published_label: "Honduras", iso3: HND}
+  - {published_label: "Hong Kong", iso3: HKG}
+  - {published_label: "Hungary", iso3: HUN}
+  - {published_label: "Iceland", iso3: ISL}
+  - {published_label: "India", iso3: IND}
+  - {published_label: "Indonesia", iso3: IDN}
+  - {published_label: "Iran", iso3: IRN}
+  - {published_label: "Iraq", iso3: IRQ}
+  - {published_label: "Ireland", iso3: IRL}
+  - {published_label: "Islamic Republic of Mauritania", iso3: MRT}
+  - {published_label: "Italy", iso3: ITA}
+  - {published_label: "Ivory Coast (Côte d’Ivoire)", iso3: CIV}
+  - {published_label: "Jamaica", iso3: JAM}
+  - {published_label: "Japan", iso3: JPN}
+  - {published_label: "Kazakhstan", iso3: KAZ}
+  - {published_label: "Kenya", iso3: KEN}
+  - {published_label: "Kingdom of Morocco", iso3: MAR}
+  - {published_label: "Kuwait", iso3: KWT}
+  - {published_label: "Kyrgyzstan", iso3: KGZ}
+  - {published_label: "Laos", iso3: LAO}
+  - {published_label: "Latvia", iso3: LVA}
+  - {published_label: "Lebanese Republic", iso3: LBN}
+  - {published_label: "Liberia", iso3: LBR}
+  - {published_label: "Libya", iso3: LBY}
+  - {published_label: "Liechtenstein", iso3: LIE}
+  - {published_label: "Lithuania", iso3: LTU}
+  - {published_label: "Luxembourg", iso3: LUX}
+  - {published_label: "Macau", iso3: MAC}
+  - {published_label: "Madagascar", iso3: MDG}
+  - {published_label: "Malawi", iso3: MWI}
+  - {published_label: "Malaysia", iso3: MYS}
+  - {published_label: "Maldives", iso3: MDV}
+  - {published_label: "Mali", iso3: MLI}
+  - {published_label: "Malta", iso3: MLT}
+  - {published_label: "Mauritius", iso3: MUS}
+  - {published_label: "Mexico", iso3: MEX}
+  - {published_label: "Moldova", iso3: MDA}
+  - {published_label: "Mongolia", iso3: MNG}
+  - {published_label: "Montenegro", iso3: MNE}
+  - {published_label: "Mozambique", iso3: MOZ}
+  - {published_label: "Myanmar", iso3: MMR}
+  - {published_label: "Namibia", iso3: NAM}
+  - {published_label: "Nepal", iso3: NPL}
+  - {published_label: "Netherlands", iso3: NLD}
+  - {published_label: "New Zealand", iso3: NZL}
+  - {published_label: "Nicaragua", iso3: NIC}
+  - {published_label: "Niger", iso3: NER}
+  - {published_label: "Nigeria", iso3: NGA}
+  - {published_label: "North Korea", iso3: PRK}
+  - {published_label: "Norway", iso3: NOR}
+  - {published_label: "Pakistan", iso3: PAK}
+  - {published_label: "Palestine", iso3: PSE}
+  - {published_label: "Panama", iso3: PAN}
+  - {published_label: "Papua New Guinea", iso3: PNG}
+  - {published_label: "Paraguay", iso3: PRY}
+  - {published_label: "People's Democratic Republic of Algeria", iso3: DZA}
+  - {published_label: "Peru", iso3: PER}
+  - {published_label: "Philippines", iso3: PHL}
+  - {published_label: "Poland", iso3: POL}
+  - {published_label: "Portugal", iso3: PRT}
+  - {published_label: "Puerto Rico", iso3: PRI}
+  - {published_label: "Republic of South Sudan", iso3: SSD}
+  - {published_label: "Republic of Tunisia", iso3: TUN}
+  - {published_label: "Romania", iso3: ROU}
+  - {published_label: "Russia", iso3: RUS}
+  - {published_label: "Rwanda", iso3: RWA}
+  - {published_label: "Réunion", iso3: REU}
+  - {published_label: "Saint Lucia", iso3: LCA}
+  - {published_label: "Saint Vincent and the Grenadines", iso3: VCT}
+  - {published_label: "Saudi Arabia", iso3: SAU}
+  - {published_label: "Senegal", iso3: SEN}
+  - {published_label: "Serbia", iso3: SRB}
+  - {published_label: "Seychelles", iso3: SYC}
+  - {published_label: "Sierra Leone", iso3: SLE}
+  - {published_label: "Singapore", iso3: SGP}
+  - {published_label: "Slovakia", iso3: SVK}
+  - {published_label: "Slovenia", iso3: SVN}
+  - {published_label: "Somalia", iso3: SOM}
+  - {published_label: "South Africa", iso3: ZAF}
+  - {published_label: "South Korea", iso3: KOR}
+  - {published_label: "Spain", iso3: ESP}
+  - {published_label: "Sri Lanka", iso3: LKA}
+  - {published_label: "Sudan", iso3: SDN}
+  - {published_label: "Sultanate of Oman", iso3: OMN}
+  - {published_label: "Suriname", iso3: SUR}
+  - {published_label: "Sweden", iso3: SWE}
+  - {published_label: "Switzerland", iso3: CHE}
+  - {published_label: "Syrian Arab Republic", iso3: SYR}
+  - {published_label: "Taiwan", iso3: TWN}
+  - {published_label: "Tajikistan", iso3: TJK}
+  - {published_label: "Tanzania", iso3: TZA}
+  - {published_label: "Thailand", iso3: THA}
+  - {published_label: "Togo", iso3: TGO}
+  - {published_label: "Turkey", iso3: TUR}
+  - {published_label: "Turkmenistan", iso3: TKM}
+  - {published_label: "Uganda", iso3: UGA}
+  - {published_label: "Ukraine", iso3: UKR}
+  - {published_label: "United Arab Emirates", iso3: ARE}
+  - {published_label: "United Kingdom", iso3: GBR}
+  - {published_label: "United States of America", iso3: USA}
+  - {published_label: "Uruguay", iso3: URY}
+  - {published_label: "Uzbekistan", iso3: UZB}
+  - {published_label: "Venezuela", iso3: VEN}
+  - {published_label: "Vietnam", iso3: VNM}
+  - {published_label: "Yemen", iso3: YEM}
+  - {published_label: "Zambia", iso3: ZMB}
+  - {published_label: "Zimbabwe", iso3: ZWE}
+  - {published_label: "ALGERIA", iso3: DZA}
+  - {published_label: "ANTIGUA & BARBUDA", iso3: ATG}
+  - {published_label: "AUSTRALIA", iso3: AUS}
+  - {published_label: "BAHAMAS", iso3: BHS}
+  - {published_label: "BAHRAIN", iso3: BHR}
+  - {published_label: "BANGLADESH", iso3: BGD}
+  - {published_label: "BARBADOS", iso3: BRB}
+  - {published_label: "BELGIUM", iso3: BEL}
+  - {published_label: "BELIZE", iso3: BLZ}
+  - {published_label: "BERMUDA", iso3: BMU}
+  - {published_label: "BRAZIL", iso3: BRA}
+  - {published_label: "BRUNEI", iso3: BRN}
+  - {published_label: "BULGARIA", iso3: BGR}
+  - {published_label: "CAMEROON", iso3: CMR}
+  - {published_label: "CANADA", iso3: CAN}
+  - {published_label: "CHINA", iso3: CHN}
+  - {published_label: "COMOROS", iso3: COM}
+  - {published_label: "COTE D'IVOIRE", iso3: CIV}
+  - {published_label: "CROATIA", iso3: HRV}
+  - {published_label: "CYPRUS", iso3: CYP}
+  - {published_label: "DENMARK", iso3: DNK}
+  - {published_label: "DOMINICA", iso3: DMA}
+  - {published_label: "EGYPT", iso3: EGY}
+  - {published_label: "ETHIOPIA", iso3: ETH}
+  - {published_label: "FRANCE", iso3: FRA}
+  - {published_label: "GERMANY", iso3: DEU}
+  - {published_label: "GIBRALTAR", iso3: GIB}
+  - {published_label: "GREECE", iso3: GRC}
+  - {published_label: "GUADELOUPE", iso3: GLP}
+  - {published_label: "HONG KONG", iso3: HKG}
+  - {published_label: "INDIA", iso3: IND}
+  - {published_label: "INDONESIA", iso3: IDN}
+  - {published_label: "IRAN", iso3: IRN}
+  - {published_label: "ITALY", iso3: ITA}
+  - {published_label: "JAPAN", iso3: JPN}
+  - {published_label: "JORDAN", iso3: JOR}
+  - {published_label: "KUWAIT", iso3: KWT}
+  - {published_label: "LEBANON", iso3: LBN}
+  - {published_label: "LIBERIA", iso3: LBR}
+  - {published_label: "LUXEMBOURG", iso3: LUX}
+  - {published_label: "MALAYSIA", iso3: MYS}
+  - {published_label: "MALTA", iso3: MLT}
+  - {published_label: "MARSHALL ISLAND", iso3: MHL}
+  - {published_label: "MONGOLIA", iso3: MNG}
+  - {published_label: "MYANMAR", iso3: MMR}
+  - {published_label: "NETHERLANDS", iso3: NLD}
+  - {published_label: "NORWAY", iso3: NOR}
+  - {published_label: "OMAN", iso3: OMN}
+  - {published_label: "PAKISTAN", iso3: PAK}
+  - {published_label: "PANAMA", iso3: PAN}
+  - {published_label: "PAPUA NEW GUINEA", iso3: PNG}
+  - {published_label: "PHILIPPINES", iso3: PHL}
+  - {published_label: "PORTUGAL", iso3: PRT}
+  - {published_label: "QATAR", iso3: QAT}
+  - {published_label: "RUSSIA", iso3: RUS}
+  - {published_label: "SAMOA", iso3: WSM}
+  - {published_label: "SAUDI ARABIA", iso3: SAU}
+  - {published_label: "SINGAPORE", iso3: SGP}
+  - {published_label: "SIRRA LEONE", iso3: SLE}
+  - {published_label: "SOMALIA", iso3: SOM}
+  - {published_label: "SOUTH AFRICA", iso3: ZAF}
+  - {published_label: "SOUTH KOREA", iso3: KOR}
+  - {published_label: "SPAIN", iso3: ESP}
+  - {published_label: "SRI LANKA", iso3: LKA}
+  - {published_label: "ST. KITTS & NEVIS", iso3: KNA}
+  - {published_label: "ST.VINCENT & THE GRENADINES", iso3: VCT}
+  - {published_label: "SWEDEN", iso3: SWE}
+  - {published_label: "TAIWAN", iso3: TWN}
+  - {published_label: "TANZANIA", iso3: TZA}
+  - {published_label: "THAILAND", iso3: THA}
+  - {published_label: "TOGO", iso3: TGO}
+  - {published_label: "TURKEY", iso3: TUR}
+  - {published_label: "TUVALU", iso3: TUV}
+  - {published_label: "UNITED KINGDOM", iso3: GBR}
+  - {published_label: "UNITED STATES OF AMERICA", iso3: USA}
+  - {published_label: "VANUATU", iso3: VUT}
+  - {published_label: "VIETNAM", iso3: VNM}
 regions_not_countries:
   - "African Countries"
   - "Asian Countries"
@@ -14,6 +267,7 @@ regions_not_countries:
   - "Other Arab Countries"
   - "Other Countries"
   - "South American Countries"
+  - "OTHER EUROPEAN COUNTRIES"
 certificate_types_unpublished:
   - "#N/A"
 certificate_types:

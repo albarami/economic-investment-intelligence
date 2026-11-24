@@ -37,6 +37,7 @@ from eii_custodian.publicdata.additions.property_venues import (
     _text,
 )
 from eii_custodian.publicdata.property.use_map import (
+    NO_USAGE,
     SOURCE_IDS,
     UseMapping,
     use_lookup,
@@ -267,7 +268,7 @@ def parse_bulletin(
 def _usage(row: Mapping[str, object]) -> str:
     value = row.get("property_usage")
     if value is None:
-        return ""
+        return NO_USAGE
     if not isinstance(value, str):
         raise AdditionError("measure_unparsed")
     return value

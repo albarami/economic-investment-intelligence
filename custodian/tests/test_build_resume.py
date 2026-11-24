@@ -14,7 +14,7 @@ from typing import Any
 import pytest
 from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
 from custodian.tests.support.payload_leaves import leaves, replace_leaf
-from hypothesis import HealthCheck, given, settings
+from hypothesis import HealthCheck, example, given, settings
 from hypothesis import strategies as st
 
 from commands import build_public
@@ -25,7 +25,11 @@ from eii_custodian.publicdata.fetch.cadence import Cadence
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.fetch.resume import RunRecord
 from eii_custodian.publicdata.fetch.snapshots import utc
-from eii_custodian.publicdata.fetch.transport import Response, TransportFault
+from eii_custodian.publicdata.fetch.transport import (
+    ATTEMPT_LIMIT,
+    Response,
+    TransportFault,
+)
 
 START = "2026-11-21T00:00:00Z"
 EARLIER = "2026-11-20T00:00:00Z"
@@ -76,6 +80,7 @@ class Harness:
         self.fail = True
         self.stamp = START
         self.assembled: list[int] = []
+        self.sleeps: list[float] = []
 
     def transport(self, url: str) -> Response:
         self.seen.append(url)
@@ -89,7 +94,7 @@ class Harness:
             self.transport,
             self.cache,
             lambda: self.stamp,
-            lambda seconds: None,
+            self.sleeps.append,
             seed=17,
             **kwargs,
         )
@@ -1310,3 +1315,501 @@ def test_every_reuse_proof_leaf_refuses_hostile_types(
             lines: list[str] = []
             assert run.reuse(source, lines) is None, path
             assert lines == [f"REFETCH {source.key} resume_input_unproven"], path
+
+
+@pytest.fixture
+def retry_harness(harness: Harness, monkeypatch: pytest.MonkeyPatch) -> Harness:
+    from eii_custodian.publicdata.fetch import allowlist
+
+    monkeypatch.setattr(allowlist, "ALLOWED_HOSTS", frozenset({"fetch.invalid"}))
+    harness.entries = tuple(
+        replace(row, url=f"https://fetch.invalid/{row.key}", fetch_host="fetch.invalid")
+        for row in harness.entries
+    )
+    return harness
+
+
+def scripted_attempts(harness: Harness, scripts: list[list[str]]) -> list[int]:
+    counts = [0] * len(scripts)
+    addresses = [row.url for row in harness.entries]
+
+    def transport(url: str) -> Response:
+        index = addresses.index(url)
+        harness.seen.append(url)
+        script = scripts[index]
+        result = script[min(counts[index], len(script) - 1)]
+        counts[index] += 1
+        if result != "ok":
+            raise TransportFault(result, url)
+        return Response(url, b"SYN retry bytes", ())
+
+    harness.transport = transport  # type: ignore[method-assign]
+    return counts
+
+
+def retry_lines(outcome: Any) -> list[str]:
+    return [line for line in outcome.lines if line.startswith("RETRY ")]
+
+
+def test_fetch_retry_recovers_with_ordinary_receipt(retry_harness: Harness) -> None:
+    retry_harness.entries = retry_harness.entries[:1]
+    counts = scripted_attempts(
+        retry_harness, [["unreachable"] * ATTEMPT_LIMIT + ["ok"]]
+    )
+    result = retry_harness.run()
+    assert result.failure is None
+    assert counts == [ATTEMPT_LIMIT + 1]
+    assert retry_lines(result) == ["RETRY SYN-first pass=2 result=ok"]
+    assert retry_harness.sleeps == [1, 2, 4, 60]
+    receipt = next((retry_harness.cache / "SYN-first").glob("*.meta.json"))
+    retried_bytes = receipt.read_bytes()
+    scripted_attempts(retry_harness, [["ok"]])
+    assert retry_harness.run().failure is None
+    assert receipt.read_bytes() == retried_bytes
+    assert retry_harness.assembled == [17, 17]
+
+
+def test_fetch_retry_exhausted_once(retry_harness: Harness) -> None:
+    retry_harness.entries = retry_harness.entries[:1]
+    counts = scripted_attempts(retry_harness, [["unreachable"]])
+    result = retry_harness.run()
+    assert result.failure is not None
+    assert (result.failure.code, result.failure.check) == (6, "unreachable")
+    assert counts == [2 * ATTEMPT_LIMIT]
+    assert retry_harness.sleeps == [1, 2, 4, 60, 1, 2, 4]
+    assert retry_lines(result) == ["RETRY SYN-first pass=2 result=unreachable"]
+    assert [line for line in result.lines if line.startswith("FAIL ")] == [
+        "FAIL SYN-first https://fetch.invalid/SYN-first unreachable "
+        "expected=reachable host observed=unreachable"
+    ]
+    assert retry_harness.assembled == []
+
+
+@pytest.mark.parametrize(
+    "fault,check,attempts",
+    [
+        ("http", "http_status", ATTEMPT_LIMIT),
+        ("blocked_host", "blocked_host", 1),
+        ("body_bytes", "http_status", 1),
+    ],
+)
+def test_fetch_retry_never_replays_other_failure(
+    retry_harness: Harness, fault: str, check: str, attempts: int
+) -> None:
+    counts = scripted_attempts(retry_harness, [[fault], ["ok"]])
+    result = retry_harness.run()
+    assert result.failure is not None
+    assert (result.failure.code, result.failure.check) == (1, check)
+    assert counts == [attempts, 0]
+    assert 60 not in retry_harness.sleeps
+    assert retry_lines(result) == []
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_fetch_retry_http_failure_keeps_fail_order(
+    retry_harness: Harness, reverse: bool
+) -> None:
+    scripts = [["unreachable"], ["http"]]
+    if reverse:
+        scripts.reverse()
+    counts = scripted_attempts(retry_harness, scripts)
+    result = retry_harness.run()
+    assert result.failure is not None
+    assert (result.failure.code, result.failure.check) == (1, "http_status")
+    assert counts == ([ATTEMPT_LIMIT, 0] if reverse else [ATTEMPT_LIMIT, ATTEMPT_LIMIT])
+    failures = [line.split()[1:4] for line in result.lines if line.startswith("FAIL ")]
+    expected = [["SYN-first", retry_harness.entries[0].url, scripts[0][-1]]]
+    if reverse:
+        expected[0][-1] = "http_status"
+    else:
+        expected.append(["SYN-second", retry_harness.entries[1].url, "http_status"])
+    assert failures == expected
+    assert retry_lines(result) == []
+    assert 60 not in retry_harness.sleeps
+
+
+def test_fetch_retry_success_is_reused_after_interruption(
+    retry_harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    counts = scripted_attempts(
+        retry_harness, [["unreachable"] * ATTEMPT_LIMIT + ["ok"], ["ok"]]
+    )
+    original = Production.run
+
+    def interrupt(self: Production) -> tuple[str, ...]:
+        original(self)
+        raise KeyboardInterrupt
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Production, "run", interrupt)
+        with pytest.raises(KeyboardInterrupt):
+            retry_harness.run()
+    assert counts == [ATTEMPT_LIMIT + 1, 1]
+    assert retry_harness.seen == (
+        [retry_harness.entries[0].url] * ATTEMPT_LIMIT
+        + [retry_harness.entries[1].url, retry_harness.entries[0].url]
+    )
+    assert record(retry_harness)["state"] == "interrupted"
+    assert all(row["completed"] for row in record(retry_harness)["entries"].values())
+    retry_harness.seen.clear()
+    resumed = retry_harness.run(resume=True)
+    assert resumed.failure is None
+    assert retry_harness.seen == []
+    assert len([line for line in resumed.lines if line.startswith("REUSE ")]) == 2
+    assert record(retry_harness)["state"] == "complete"
+
+
+def test_fetch_retry_mixed_attempts_are_ineligible(retry_harness: Harness) -> None:
+    counts = scripted_attempts(
+        retry_harness, [["http"] + ["unreachable"] * (ATTEMPT_LIMIT - 1), ["ok"]]
+    )
+    result = retry_harness.run()
+    assert result.failure is not None
+    assert (result.failure.code, result.failure.check) == (6, "unreachable")
+    assert counts == [ATTEMPT_LIMIT, 0]
+    assert 60 not in retry_harness.sleeps
+    assert retry_lines(result) == []
+
+
+def retry_oracle(scripts: list[list[str]]) -> tuple[int, list[int], list[str]]:
+    """Model request budgets in two fixed chunks, independently of build state."""
+    counts = [0] * len(scripts)
+    deferred = []
+    results = []
+    remaining = []
+    for index, script in enumerate(scripts):
+        chunk = script[:ATTEMPT_LIMIT]
+        if "ok" in chunk:
+            counts[index] = chunk.index("ok") + 1
+        else:
+            counts[index] = ATTEMPT_LIMIT
+            if set(chunk) != {"unreachable"}:
+                return (1 if chunk[-1] == "http" else 6), counts, []
+            deferred.append(index)
+    for index in deferred:
+        chunk = scripts[index][ATTEMPT_LIMIT:]
+        if "ok" in chunk:
+            counts[index] += chunk.index("ok") + 1
+            result = "ok"
+        else:
+            counts[index] += ATTEMPT_LIMIT
+            result = "http_status" if chunk[-1] == "http" else "unreachable"
+        results.append(f"RETRY SYN-{index} pass=2 result={result}")
+        if result == "http_status":
+            return 1, counts, results
+        if result == "unreachable":
+            remaining.append(index)
+    return (6 if remaining else 0), counts, results
+
+
+@settings(deadline=None)
+@example(scripts=[["unreachable"] * (2 * ATTEMPT_LIMIT)])
+@example(scripts=[["unreachable"] * ATTEMPT_LIMIT + ["ok"] * ATTEMPT_LIMIT])
+@example(scripts=[["unreachable"] * ATTEMPT_LIMIT + ["http"] * ATTEMPT_LIMIT])
+@example(scripts=[["unreachable"] * (2 * ATTEMPT_LIMIT)] * 3)
+@example(scripts=[["ok"] * (2 * ATTEMPT_LIMIT)] * 3)
+@example(scripts=[["http"] + ["unreachable"] * (2 * ATTEMPT_LIMIT - 1)])
+@example(
+    scripts=[
+        ["unreachable"] * ATTEMPT_LIMIT
+        + ["http"]
+        + ["unreachable"] * (ATTEMPT_LIMIT - 1),
+        ["unreachable"] * (2 * ATTEMPT_LIMIT),
+    ]
+)
+@given(
+    scripts=st.lists(
+        st.lists(
+            st.sampled_from(["ok", "unreachable", "http"]),
+            min_size=2 * ATTEMPT_LIMIT,
+            max_size=2 * ATTEMPT_LIMIT,
+        ),
+        min_size=1,
+        max_size=3,
+    )
+)
+def test_fetch_retry_matches_attempt_oracle(scripts: list[list[str]]) -> None:
+    from eii_custodian.publicdata.fetch import allowlist
+
+    with pytest.MonkeyPatch.context() as patch, tempfile.TemporaryDirectory() as folder:
+        patch.setattr(allowlist, "ALLOWED_HOSTS", frozenset({"fetch.invalid"}))
+        harness = Harness(Path(folder) / "cache")
+        harness.entries = tuple(
+            replace(entry(f"SYN-{index}"), url=f"https://fetch.invalid/SYN-{index}")
+            for index in range(len(scripts))
+        )
+        counts = scripted_attempts(harness, scripts)
+        expected_code, expected_counts, expected_results = retry_oracle(scripts)
+        result = run_build(
+            harness.entries,
+            harness.transport,
+            harness.cache,
+            lambda: START,
+            harness.sleeps.append,
+            _fetch_only=True,
+        )
+        assert (result.failure.code if result.failure else 0) == expected_code
+        assert counts == expected_counts
+        assert retry_lines(result) == expected_results
+        assert harness.sleeps.count(60) == bool(expected_results)
+
+
+@pytest.mark.parametrize("first_attempts", [0, ATTEMPT_LIMIT - 1])
+def test_fetch_retry_first_pass_success_needs_no_pause(
+    retry_harness: Harness, first_attempts: int
+) -> None:
+    retry_harness.entries = retry_harness.entries[:1]
+    counts = scripted_attempts(
+        retry_harness, [["unreachable"] * first_attempts + ["ok"]]
+    )
+    result = retry_harness.run()
+    assert result.failure is None
+    assert counts == [first_attempts + 1]
+    assert retry_lines(result) == []
+    assert 60 not in retry_harness.sleeps
+
+
+def test_fetch_retry_empty_registry_has_no_pause(retry_harness: Harness) -> None:
+    retry_harness.entries = ()
+    assert retry_harness.run().failure is None
+    assert retry_harness.seen == retry_harness.sleeps == []
+
+
+def test_fetch_retry_grid_uses_the_same_pass(retry_harness: Harness) -> None:
+    retry_harness.entries = (
+        replace(retry_harness.entries[0], source_id="worldpop_qat_agesex"),
+    )
+    counts = scripted_attempts(
+        retry_harness, [["unreachable"] * ATTEMPT_LIMIT + ["ok"]]
+    )
+    result = retry_harness.run()
+    assert result.failure is None
+    assert counts == [ATTEMPT_LIMIT + 1]
+    assert retry_lines(result) == ["RETRY SYN-first pass=2 result=ok"]
+
+
+@pytest.mark.parametrize("fault", ["certificate", "body", "check"])
+def test_fetch_retry_does_not_replay_validation_failures(
+    retry_harness: Harness, fault: str
+) -> None:
+    from eii_custodian.publicdata.fetch.certificate_pins import PinError
+    from eii_custodian.publicdata.fetch.transport import BodyTooLarge
+
+    def refused(url: str) -> Response:
+        retry_harness.seen.append(url)
+        if fault == "certificate":
+            raise PinError("certificate_chain_incomplete")
+        if fault == "body":
+            raise BodyTooLarge(url, 1, "declared 2")
+        return Response(url, b"SYN invalid JSON", ())
+
+    if fault == "check":
+        retry_harness.entries = (replace(retry_harness.entries[0], row_count_min=1),)
+    retry_harness.transport = refused  # type: ignore[method-assign]
+    result = retry_harness.run()
+    assert result.failure is not None
+    assert result.failure.code == 1
+    assert (
+        result.failure.check
+        == {
+            "certificate": "certificate_chain_incomplete",
+            "body": "body_bytes",
+            "check": "row_count",
+        }[fault]
+    )
+    assert retry_harness.seen == [retry_harness.entries[0].url]
+    assert retry_lines(result) == []
+    assert 60 not in retry_harness.sleeps
+
+
+@pytest.mark.parametrize("fault", ["unreachable", "http"])
+@pytest.mark.parametrize("falsey", [False, True])
+def test_fetch_retry_stream_failures_are_observed(
+    retry_harness: Harness, monkeypatch: pytest.MonkeyPatch, fault: str, falsey: bool
+) -> None:
+    from contextlib import contextmanager
+
+    from eii_custodian.publicdata.fetch import large
+    from eii_custodian.publicdata.fetch.transport import StreamResponse
+
+    row = replace(retry_harness.entries[0], stream_max_bytes=10)
+    retry_harness.entries = (row,)
+    monkeypatch.setattr(large, "REQUIRED_KEYS", (row.key,))
+    attempts = []
+
+    @contextmanager
+    def stream(url: str) -> Any:
+        attempts.append(url)
+        if len(attempts) == 1:
+            raise TransportFault(fault, url)
+        yield StreamResponse(url, (), 3, iter([b"SYN"]))
+
+    class FalseyStream:
+        def __bool__(self) -> bool:
+            return False
+
+        def __call__(self, url: str) -> Any:
+            return stream(url)
+
+    result = retry_harness.run(large_stream=FalseyStream() if falsey else stream)
+    assert len(attempts) == (2 if fault == "unreachable" else 1)
+    assert retry_harness.sleeps == ([60] if fault == "unreachable" else [])
+    if fault == "unreachable":
+        assert result.failure is None
+        assert retry_lines(result) == ["RETRY SYN-first pass=2 result=ok"]
+    else:
+        assert result.failure is not None
+        assert (result.failure.code, result.failure.check) == (1, "http")
+        assert retry_lines(result) == []
+
+
+def test_fetch_retry_journal_failure_is_not_retried(
+    retry_harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from eii_custodian.publicdata.fetch.resume import RunRecord
+
+    retry_harness.entries = retry_harness.entries[:1]
+    counts = scripted_attempts(
+        retry_harness, [["unreachable"] * ATTEMPT_LIMIT + ["ok"]]
+    )
+
+    def refuse(self: RunRecord, row: Entry, state: dict[str, object]) -> None:
+        raise OSError("SYN journal refusal")
+
+    monkeypatch.setattr(RunRecord, "fetched", refuse)
+    result = retry_harness.run()
+    assert result.failure is not None
+    assert (result.failure.code, result.failure.check) == (
+        1,
+        "resume_record_write_failed",
+    )
+    assert counts == [ATTEMPT_LIMIT + 1]
+    assert retry_harness.sleeps.count(60) == 1
+    assert record(retry_harness)["entries"]["SYN-first"]["completed"] is False
+
+
+@pytest.mark.parametrize("adapter", ["place", "release"])
+def test_fetch_retry_specialised_dispatch_uses_the_same_pass(
+    retry_harness: Harness, monkeypatch: pytest.MonkeyPatch, adapter: str
+) -> None:
+    from eii_custodian.publicdata.fetch import build
+    from eii_custodian.publicdata.places.fetch import FileFailure, FileFetch
+    from eii_custodian.publicdata.places_fsq.fetch import ReleaseFailure, ReleaseFetch
+
+    row = retry_harness.entries[0]
+    retry_harness.entries = (row,)
+    counts = scripted_attempts(retry_harness, [["unreachable", "ok"]])
+
+    def fetch(source: Entry, transport: Any, *_args: Any, **_kwargs: Any) -> Any:
+        # These adapters use one request per invocation. Their existing
+        # success and failure shapes stay unchanged at the orchestration seam.
+        try:
+            transport(source.url)
+        except TransportFault as exc:
+            failure_type = FileFailure if adapter == "place" else ReleaseFailure
+            return None, failure_type(
+                6, exc.url, "unreachable", "reachable host", "unreachable"
+            )
+        fetch_type = FileFetch if adapter == "place" else ReleaseFetch
+        return fetch_type("a" * 64, source.fetch_host), None
+
+    monkeypatch.setattr(
+        build,
+        "is_place_file" if adapter == "place" else "is_release_entry",
+        lambda entry: entry == row,
+    )
+    monkeypatch.setattr(
+        build, "fetch_place_file" if adapter == "place" else "fetch_release", fetch
+    )
+    result = retry_harness.run()
+    assert result.failure is None
+    assert counts == [2]
+    assert retry_harness.sleeps == [60]
+    assert retry_lines(result) == ["RETRY SYN-first pass=2 result=ok"]
+    assert record(retry_harness)["entries"][row.key] == {"completed": True}
+
+
+@pytest.mark.parametrize("code,check", [(1, "unreachable"), (6, "http_status")])
+def test_fetch_retry_closed_failure_code_is_required(
+    retry_harness: Harness, monkeypatch: pytest.MonkeyPatch, code: int, check: str
+) -> None:
+    from eii_custodian.publicdata.fetch import build
+
+    retry_harness.entries = retry_harness.entries[:1]
+    calls = []
+
+    def refused(*_args: Any, **_kwargs: Any) -> Any:
+        calls.append(True)
+        return None, build.FetchFailure(code, "SYN-first", "", check, "", "")
+
+    monkeypatch.setattr(build, "_fetch_row", refused)
+    result = retry_harness.run()
+    assert result.failure is not None
+    assert (result.failure.code, result.failure.check) == (code, check)
+    assert calls == [True]
+    assert retry_harness.sleeps == []
+    assert retry_lines(result) == []
+
+
+def test_fetch_retry_recovery_records_only_successful_investment_attempt(
+    retry_harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from eii_custodian.publicdata.fetch import build
+
+    retry_harness.entries = retry_harness.entries[:1]
+    row = retry_harness.entries[0]
+    monkeypatch.setattr(build, "INVESTMENT_SOURCES", frozenset({row.source_id}))
+    counts = scripted_attempts(
+        retry_harness, [["unreachable"] * ATTEMPT_LIMIT + ["ok"]]
+    )
+    result = run_build(
+        retry_harness.entries,
+        retry_harness.transport,
+        retry_harness.cache,
+        lambda: START,
+        retry_harness.sleeps.append,
+        _fetch_only=True,
+    )
+    assert result.failure is None
+    assert counts == [ATTEMPT_LIMIT + 1]
+    assert [attempt.status for attempt in result.investment_attempts] == ["success"]
+    assert result.investment_attempts[0].snapshot_identity is not None
+
+
+def test_fetch_retry_stream_keeps_metadata_http_ineligible(
+    retry_harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from contextlib import contextmanager
+
+    from custodian.tests.test_large_intake import meta
+
+    from eii_custodian.publicdata.fetch import large
+    from eii_custodian.publicdata.fetch.transport import StreamResponse
+
+    row = replace(retry_harness.entries[0], kind="portal_dataset", stream_max_bytes=10)
+    retry_harness.entries = (row,)
+    monkeypatch.setattr(large, "REQUIRED_KEYS", (row.key,))
+    requests = []
+    streams = []
+
+    def transport(url: str) -> Response:
+        requests.append(url)
+        if len(requests) == 1:
+            raise TransportFault("http", url)
+        return meta(row)
+
+    @contextmanager
+    def stream(url: str) -> Any:
+        streams.append(url)
+        if len(streams) <= 2:
+            raise TransportFault("unreachable", url)
+        yield StreamResponse(url, (), 3, iter([b"SYN"]))
+
+    retry_harness.transport = transport  # type: ignore[method-assign]
+    result = retry_harness.run(large_stream=stream)
+    assert result.failure is not None
+    assert (result.failure.code, result.failure.check) == (6, "unreachable")
+    assert requests == [row.url, row.url]
+    assert streams == [row.url]
+    assert retry_harness.sleeps == [1]
+    assert retry_lines(result) == []

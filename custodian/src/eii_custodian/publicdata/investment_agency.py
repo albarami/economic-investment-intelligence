@@ -155,7 +155,7 @@ class _Collector(HTMLParser):
             return
 
     def _emit(self, cap: _Cap) -> None:
-        text = _SPACE.sub(" ", "".join(cap.parts)).strip()
+        text = _collapse(cap.parts)
         if cap.tag == "h1":
             if text == "":
                 self.problem = self.problem or "empty_heading"
@@ -403,6 +403,8 @@ def _lineage(row: dict[str, object], envelope: SourceEnvelope) -> dict[str, obje
 
 # Decision 0029 item 2: the version fixes these structural lists. No CSS or
 # script is evaluated. The reviewed record reader supplies its furniture classes.
+# @2 (L-1856): they gate <section> only, a <button> inside a heading and outside
+# any <form> is text, and a line's raw text collapses before trimming.
 _PAGE_EXCLUDED = frozenset(
     {
         "header",
@@ -417,7 +419,6 @@ _PAGE_EXCLUDED = frozenset(
         "select",
         "option",
         "textarea",
-        "button",
         "label",
         "noscript",
         "template",
@@ -460,6 +461,12 @@ _PAGE_BLOCKS = frozenset(
         "hr",
     }
 )
+_PAGE_HEADINGS = frozenset({"h1", "h2", "h3", "h4", "h5", "h6"})
+
+
+def _collapse(parts: list[str]) -> str:
+    """Raw text parts joined in order, whitespace collapsed, ends trimmed."""
+    return _SPACE.sub(" ", "".join(parts)).strip()
 
 
 class _PageText(HTMLParser):
@@ -467,7 +474,7 @@ class _PageText(HTMLParser):
 
     def __init__(self, furniture: frozenset[str]) -> None:
         super().__init__(convert_charrefs=True)
-        self.furniture = furniture | _PAGE_FURNITURE
+        self.furniture = furniture
         self.stack: list[tuple[str, bool, bool]] = []
         self.languages: list[str] = []
         self.english: list[str] = []
@@ -487,6 +494,10 @@ class _PageText(HTMLParser):
         if self.lines[-1]:
             self.lines.append([])
 
+    def _in_heading(self) -> bool:
+        """A heading element is open on the stack."""
+        return any(tag in _PAGE_HEADINGS for tag, _, _ in self.stack)
+
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attr = dict(attrs)
         if tag == "html":
@@ -498,11 +509,14 @@ class _PageText(HTMLParser):
             and attr.get("href")
         ):
             self.english.append(str(attr["href"]))
+        classes = set((attr.get("class") or "").split())
         skip = (
             tag in _PAGE_EXCLUDED
+            or (tag == "button" and not self._in_heading())
             or "hidden" in attr
             or (attr.get("aria-hidden") or "").casefold() == "true"
-            or bool(set((attr.get("class") or "").split()) & self.furniture)
+            or bool(classes & _PAGE_FURNITURE)
+            or (tag == "section" and bool(classes & self.furniture))
         )
         if tag not in _VOID:
             self.stack.append((tag, tag == "main", skip))
@@ -522,7 +536,7 @@ class _PageText(HTMLParser):
     def handle_endtag(self, tag: str) -> None:
         if self.visible():
             if tag == "h1" and self.title_parts is not None:
-                self.titles.append(" ".join(self.title_parts))
+                self.titles.append(_collapse(self.title_parts))
                 self.title_parts = None
             if tag in _PAGE_BLOCKS:
                 self.boundary()
@@ -539,11 +553,10 @@ class _PageText(HTMLParser):
         import unicodedata
 
         if self.visible():
-            text = _SPACE.sub(" ", unicodedata.normalize("NFC", data)).strip()
-            if text:
-                self.lines[-1].append(text)
-                if self.title_parts is not None:
-                    self.title_parts.append(text)
+            text = unicodedata.normalize("NFC", data)
+            self.lines[-1].append(text)
+            if self.title_parts is not None:
+                self.title_parts.append(text)
 
 
 def _page_decode(body: bytes, charset: str) -> str:
@@ -589,7 +602,7 @@ def extract_page(
     manifest_sha256: str,
     charset: str = "",
     furniture: frozenset[str] = frozenset(),
-    extractor: str = "investqa_page_text@1",
+    extractor: str = "investqa_page_text@2",
 ) -> dict[str, object] | InvestmentFailure:
     """Decision 0029: extract one exact page row, or refuse the whole quotation."""
     import hashlib
@@ -620,7 +633,9 @@ def extract_page(
         or collector.stack
     ):
         return page_refusal("page_truncated", page_url)
-    page_text = "\n".join(" ".join(line) for line in collector.lines if line)
+    page_text = "\n".join(
+        part for part in (_collapse(line) for line in collector.lines) if part
+    )
     runs = re.findall(r"\d+", page_text)
     if any(len(run) in {8, 11} for run in runs):
         return page_refusal("page_identifier_shape", page_url)

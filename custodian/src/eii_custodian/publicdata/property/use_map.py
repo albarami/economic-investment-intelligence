@@ -4,8 +4,9 @@ Property type and use are read from the Arabic label and the usage field only;
 the English label is unreliable and is never read. Each committed row of
 ``custodian/publicdata/review/property_use_map.csv`` maps one
 (source id, Arabic label, usage value) pair to a reviewed ``use_key`` and a
-marker: ``land`` for land without a building, otherwise a published unit-type
-key of ``prop_resi_units``. An unmapped label or usage fails the build.
+marker: ``land`` for land without a building, ``built`` for a building or holding
+without a published unit type, otherwise a published unit-type key of
+``prop_resi_units``. An unmapped label or usage fails the build.
 """
 
 from __future__ import annotations
@@ -21,8 +22,13 @@ from eii_custodian.publicdata.additions.common import (
 from eii_custodian.publicdata.frame.crosswalk import read_csv
 
 LAND_MARKER = "land"
+BUILT_MARKER = "built"
 ANY_USAGE = "*"
+NO_USAGE = "(none)"
 UNIT_TYPES = frozenset({"residential_unit"})
+USE_KEYS = frozenset(
+    {"residential", "commercial", "mixed", "community", "agricultural", "unspecified"}
+)
 SOURCE_IDS = frozenset({"prop_sales", "prop_resi_units"})
 USE_MAP_COLUMNS = (
     "source_id",
@@ -53,7 +59,7 @@ class UseMapping:
 
     @property
     def unit_type(self) -> str | None:
-        return None if self.land else self.marker
+        return None if self.marker in {LAND_MARKER, BUILT_MARKER} else self.marker
 
 
 def load_use_map(path: Path) -> tuple[UseMapping, ...]:
@@ -72,7 +78,12 @@ def load_use_map(path: Path) -> tuple[UseMapping, ...]:
             raise AdditionError("use_map_field_empty")
         if fields["source_id"] not in SOURCE_IDS:
             raise AdditionError("use_map_source")
-        if fields["marker"] != LAND_MARKER and fields["marker"] not in UNIT_TYPES:
+        if fields["use_key"] not in USE_KEYS:
+            raise AdditionError("use_map_use_key")
+        if (
+            fields["marker"] not in {LAND_MARKER, BUILT_MARKER}
+            and fields["marker"] not in UNIT_TYPES
+        ):
             raise AdditionError("unknown_unit_type")
         parse_period_value(fields["reviewed_on"], "date")
         mapping = UseMapping(**fields)

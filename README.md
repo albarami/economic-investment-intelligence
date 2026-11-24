@@ -129,7 +129,10 @@ without an interrupted record matching the seed. Each completed entry carries
 a fingerprint of the closed-encoded constructed entry, which carries every
 field of its registry row, its dispatch branch, interpreter and
 locked-dependency versions, its computed code closure, the repository modules
-loaded before the run, the `eii` launcher and the tracked public-data inputs;
+loaded before the run, the `eii` launcher and the shared fetch-pass data inputs
+of the [closed partition](docs/decisions/0114-fetch-fingerprint-binds-only-fetch-time-inputs.md)
+(proposed decision 0114, items 1 to 5); proven post-loop-only files are excluded, and unlisted
+regular tracked files remain shared and publicdata symlinks leave reuse unproven;
 the tender portal also binds its intake receipts. An entry whose fingerprint,
 receipt or page-meta proof cannot be reproduced is fetched again, as is a
 missing, changed or pre-run file, and a

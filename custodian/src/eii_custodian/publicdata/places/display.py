@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
+from itertools import combinations
 
 from eii_custodian.publicdata.places_fsq.constants import DUPLICATE_WITHIN_M
 from eii_custodian.publicdata.places_fsq.policy import (
@@ -208,12 +209,18 @@ def frame_box_of(boundary_bounds: tuple[float, float, float, float]) -> FrameBox
 
 
 def _pairs(places: Sequence[PubPlace]) -> tuple[tuple[str, str], ...]:
-    found: list[tuple[str, str]] = []
-    for index, left in enumerate(places):
-        for right in places[index + 1 :]:
-            if _same_name(left, right) and _within(left, right):
-                found.append((left.place_id, right.place_id))
-    return tuple(found)
+    by_label: dict[str, list[int]] = {}
+    for index, place in enumerate(places):
+        for label in _labels(place):
+            by_label.setdefault(label, []).append(index)
+    candidates = {
+        pair for indices in by_label.values() for pair in combinations(indices, 2)
+    }
+    return tuple(
+        (places[left].place_id, places[right].place_id)
+        for left, right in sorted(candidates)
+        if _within(places[left], places[right])
+    )
 
 
 def _same_name(left: PubPlace, right: PubPlace) -> bool:

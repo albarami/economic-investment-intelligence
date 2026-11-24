@@ -37,6 +37,7 @@ from eii_custodian.publicdata.fetch import kinds, listing
 from eii_custodian.publicdata.fetch.fingerprint import (
     BRANCH_ROOTS,
     EXCLUDED_SCOPES,
+    INPUT_PARTITION,
     CodeRoots,
     FingerprintUnavailable,
     _git_tracked,
@@ -795,6 +796,11 @@ def _audited_fetch(
 def test_fixture_fetch_opens_only_declared_repo_files(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from custodian.tests.test_publicdata_fetch import _layer_urls
+
+    from eii_custodian.publicdata.gis import fields as gis_fields
+
+    importlib.import_module("eii_custodian.publicdata.fetch.large")
     roots = default_roots()
     tracked = roots.tracked()
     chain = roots.code_root / "data" / "public_chain"
@@ -802,9 +808,10 @@ def test_fixture_fetch_opens_only_declared_repo_files(
     state = _audit_opens(roots.code_root)
 
     def declared(path: Path) -> bool:
-        return (
-            path in tracked or path.is_relative_to(chain) or path.is_relative_to(cache)
-        )
+        if path in tracked:
+            name = path.relative_to(roots.publicdata).as_posix()
+            return INPUT_PARTITION.get(name, "shared fetch-pass") != "post-loop-only"
+        return path.is_relative_to(chain) or path.is_relative_to(cache)
 
     def transport(url: str) -> Response:
         if url.endswith("/exports/json"):
@@ -852,6 +859,23 @@ def test_fixture_fetch_opens_only_declared_repo_files(
 
     monkeypatch.setattr(listing, "prepare_listing", fake_listing)
     _audited_fetch(state, parent, transport, cache)
+    # Reuse the existing invented ArcGIS response fixture, with the real
+    # declaration reader cold so cached module state cannot hide its open.
+    monkeypatch.setattr(gis_fields, "_CACHE", None)
+    state["enabled"] = True
+    try:
+        _layer_urls(
+            replace(
+                entry("SYN-layer"),
+                kind="paged_layer",
+                layer=0,
+                extension="json",
+            ),
+            cache / "SYN-layer",
+        )
+    finally:
+        state["enabled"] = False
+    assert roots.publicdata / "review/gis_layer_fields.yaml" in state["opened"]
     violations = {path for path in state["opened"] if not declared(path)}
     assert violations == set()
     state["opened"].clear()

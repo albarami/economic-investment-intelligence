@@ -1,1 +1,101 @@
 source_key,published_name,venue_key,place_id,reviewer_role,reviewed_on
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,3-2-1 QOSM,venue:visits_museum:1,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف قطر الأولمبي والرياضي (3-2-1),venue:visits_museum:1,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,321 QOSM,venue:visits_museum:2,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,المتحف الأولمبي والرياضي,venue:visits_museum:2,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,AL-Khor Regional  (M.Arch & Ethnog),venue:visits_museum:3,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف الخور الاقليمي  (آثار  واثنوغرافي),venue:visits_museum:3,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف الخور الاقليمي (آثار  واثنوغرافي),venue:visits_museum:3,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,AL-Khor Regional  (M.Arch & Ethnog)*,venue:visits_museum:4,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف الخور الاقليمي  (آثار  واثنوغرافي)*,venue:visits_museum:4,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,AL-Khor Regional M.Arch &    Ethnog,venue:visits_museum:5,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف الخور الاقليمي - آثار + اثنوغرافي,venue:visits_museum:5,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Al Zubarah,venue:visits_museum:6,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,قلعة الزبارة,venue:visits_museum:6,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Al Zubarah Fort Exhibition,venue:visits_museum:7,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,معرض قلعة الزبارة,venue:visits_museum:7,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Al Zubarah Fort Old City,venue:visits_museum:8,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,المدينة القديمة قلعة الزبارة,venue:visits_museum:8,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Alroaq Gallery,venue:visits_museum:9,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,معرض الرواق,venue:visits_museum:9,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Art Mill Museum Exhibition,venue:visits_museum:10,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,معرض متحف مطاحن الفن,venue:visits_museum:10,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Barzan Tower,venue:visits_museum:11,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,برج برزان,venue:visits_museum:11,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,DADU Gardens,venue:visits_museum:12,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,دَدُ متحف الطفل,venue:visits_museum:12,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,DADU Gardens *,venue:visits_museum:13,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,حدائق دَدُ*,venue:visits_museum:13,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Expo - 3-2-1 QOSM Activities,venue:visits_museum:14,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,إكسبو - فعاليات متحف قطر الأولمبي والرياضي (3-2-1),venue:visits_museum:14,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Expo - DADU Gardens,venue:visits_museum:15,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,إكسبو - حدائق دَدُ,venue:visits_museum:15,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Expo - Qatar Auto Museum,venue:visits_museum:16,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,إكسبو - معرض قطر للسيارات,venue:visits_museum:16,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Fire Station,venue:visits_museum:17,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,مطافيء مقر الفنانين,venue:visits_museum:17,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Fire Station - Artist Residence,venue:visits_museum:18,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,معارض مطافيء مقر الفنانين,venue:visits_museum:18,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Katara Gallery,venue:visits_museum:19,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Qatar Museums Gallery – Katara,venue:visits_museum:19,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,معارض جاليري متاحف قطر في كتارا,venue:visits_museum:19,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,معرض كتارا,venue:visits_museum:19,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Liwan,venue:visits_museum:20,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,ليوان,venue:visits_museum:20,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,M7,venue:visits_museum:21,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,مركز قطر للابتكار وريادة الأعمال في التصميم والأزياء والتكنولوجيا ( M7),venue:visits_museum:21,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,M7*,venue:visits_museum:22,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,مركز قطر للابتكار وريادة الأعمال في التصميم والأزياء والتكنولوجيا ( M7)*,venue:visits_museum:22,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Msheireb Museum,venue:visits_museum:23,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متاحف مشيرب,venue:visits_museum:23,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Museum of Arab Art,venue:visits_museum:24,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف الفن العربي,venue:visits_museum:24,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Museum of Islamic Art,venue:visits_museum:25,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف الفن الاسلامي,venue:visits_museum:25,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,National Museum of Qatar,venue:visits_museum:26,1420832d-78c9-41cb-9745-1189f6bcb505,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف قطر الوطني,venue:visits_museum:26,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,QOSM,venue:visits_museum:27,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف قطر الأولمبي والرياضي,venue:visits_museum:27,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Watering the Desert-Yuz Museum Shanghi,venue:visits_museum:28,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,معرض و أزهرت الصحراء-متحف يوز شنغهاي,venue:visits_museum:28,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Weaponry Museum,venue:visits_museum:29,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف السلاح,venue:visits_museum:29,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Zubara Fort Museum,venue:visits_museum:30,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف قلعة الزبارة,venue:visits_museum:30,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,Zubara Fort Museum-Arch,venue:visits_museum:31,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_museum/visitors-of-museums-and-exhibition-by-month-and-museum,متحف قلعة الزبارة  - آثار,venue:visits_museum:31,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,ABN Abu Nakhla,venue:visits_phcc:1,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,ABS Abu Baker,venue:visits_phcc:2,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,ARP Airport,venue:visits_phcc:3,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,DYN Al Daayen,venue:visits_phcc:4,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,GHR Gharrafat,venue:visits_phcc:5,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,GHW Leghwairiya,venue:visits_phcc:6,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,JUM Jumailiya,venue:visits_phcc:7,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,KAR Al Karaana,venue:visits_phcc:8,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,KBN Al Kaaban,venue:visits_phcc:9,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,KHR Al Khor,venue:visits_phcc:10,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,LBB Leabaib,venue:visits_phcc:11,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,MES Mesaimeer,venue:visits_phcc:12,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,MKH M-Khalifa,venue:visits_phcc:13,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,MSH Al Mashaf,venue:visits_phcc:14,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,MSU Mobile Service Units,venue:visits_phcc:15,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,MUA Muaither,venue:visits_phcc:16,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,OBK Al Khatab,venue:visits_phcc:17,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,PSC Primary Staff Clinic,venue:visits_phcc:18,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,QUN Qatar Univ,venue:visits_phcc:19,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,RAK Rawdat,venue:visits_phcc:20,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,RUW Al Ruwais,venue:visits_phcc:21,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,RYN Al Rayyan,venue:visits_phcc:22,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,SDD Al Sadd,venue:visits_phcc:23,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,SHN Sheehaniya,venue:visits_phcc:24,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,SHS School Health Services,venue:visits_phcc:25,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,SWK South Wakra,venue:visits_phcc:26,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,THM Al Thumama,venue:visits_phcc:27,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,UMG Um Ghwalina,venue:visits_phcc:28,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,UMS Umm Slal,venue:visits_phcc:29,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,USN Umm Al Seneem,venue:visits_phcc:30,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,VCS Virtual Care Services,venue:visits_phcc:31,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,WAB Al Waab,venue:visits_phcc:32,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,WAJ AL Wajbah,venue:visits_phcc:33,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,WAK Al Wakra,venue:visits_phcc:34,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24
+visits_phcc/phcc-patient-visits-by-health-center-and-region,WBC West Bay,venue:visits_phcc:35,,model:devin-swe-2-high-bilingual-gazetteer,2026-11-24

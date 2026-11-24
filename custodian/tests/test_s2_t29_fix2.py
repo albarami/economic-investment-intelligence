@@ -151,8 +151,8 @@ def test_real_incomplete_registry_source(tmp_path, monkeypatch):
     assert outcome.failure is not None
     assert outcome.failure.check == "unreachable"
     assert outcome.failure.code == 6
-    assert calls == [entry.url] * ATTEMPT_LIMIT
-    assert sleeps == list(BACKOFF_S)
+    assert calls == [entry.url] * (2 * ATTEMPT_LIMIT)
+    assert sleeps == [*BACKOFF_S, 60, *BACKOFF_S]
     assert not (fixture_cache / entry.key).exists()
     assert "SYN-private-upstream-body" not in repr(outcome)
     assert "unreachable" in (fixture_cache / "build-log.json").read_text()

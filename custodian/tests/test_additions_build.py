@@ -864,8 +864,9 @@ def _publish(
         shutil.copyfile(_REVIEW / name, target)
     if country:
         text = (review / "additions_industry.yaml").read_text(encoding="utf-8")
+        assert text.count("country_crosswalk:\n") == 1
         text = text.replace(
-            "country_crosswalk: []\n",
+            "country_crosswalk:\n",
             'country_crosswalk:\n  - published_label: "SYN Land"\n    iso3: "SLL"\n',
             1,
         )
