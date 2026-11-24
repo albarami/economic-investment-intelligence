@@ -28,6 +28,7 @@ from .comtrade.parse import ParseError
 from .comtrade.policy import SafeRefusal
 from .fetch.award_checks import AwardError
 from .fetch.decimals import DecimalRefusal
+from .fetch.large import IntakeError
 from .fetch.page_records import PageError
 from .fetch.registry import RegistryError
 from .fetch.snapshots import SnapshotError
@@ -78,6 +79,8 @@ REASON_ATTRIBUTES: Mapping[type[Exception], str] = MappingProxyType(
 
 NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
     {
+        IntakeError: frozenset({"bound_unconfirmed", "length_undeclared"}),
+        RegistryError: frozenset({"stream_max_bytes"}),
         AdditionError: frozenset(
             """
         activity_code_form arabic_twin_mismatch bilingual_municipality

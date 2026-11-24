@@ -53627,3 +53627,111 @@ The two notes below belong to the S2-P77 and S2-P76 round 3 evidence rows of the
 | 2026-11-24 | S2-P82 reviews | rv1 (Anthropic Claude C) REJECTED `17f7da4325` on one finding: skipping `head` let a page that omits `</head>` hide its whole body, and a title-only robot check passed. fx1 `c0834b9c2f` (OpenAI Codex A): `_citation_obstacle` skips only `script`, `style`, `noscript` and `template`; the title is scanned; tests for the omitted `</head>` wall, title markers and a generated head-closure property; document 04 section 3.1 wording. rv2 (Anthropic Claude C) APPROVED `c0834b9c2fdd49cf8be51fbee5df888d3bb3984f`: with `head` planted back the citation test file exits 1 (7 failed, 66 passed); restored, 73 passed; five-file selection 254 passed. | lead |
 | 2026-11-24 | Correction to the S2-P82 fx1 row above (append only; S2-P82.rv2 proposed open item R-1) | Its words "This round remains uncommitted as its brief requires" describe the worktree before the lead's commit; the round is committed as `c0834b9c2fdd49cf8be51fbee5df888d3bb3984f`. | lead |
 | 2026-11-24 | Train S2-30 identity | The two S2-P82 commits `17f7da4325` and `c0834b9c2f` cherry-picked onto main `5eb45fab65` with no conflict; lead join proof: every file of both own changes identical, 0 that differ. | lead |
+
+## S2-P84 — Required large-stream bounds and completeness (2026-11-24)
+
+Builder persona: senior data-acquisition security engineer. Strict self-review
+persona: strict reviewer of intake refusals and security boundaries. Base HEAD:
+`5eb45fab65fec6e68c2f474cc7d26d81149a398f`; this worktree is detached at that
+base and this task creates no commit, as its brief directs. Different-maker
+review, the lead's full suite and the original S2-T08 acceptance remain pending.
+
+Implemented ruling L-1717 using `Entry.stream_max_bytes` and its closed loader:
+positive integer bytes only, with null/absence an unconfirmed hold. `receive`
+refuses `bound_unconfirmed` before opening an unbounded stream and
+`length_undeclared` before reading an unverifiable body. A confirmed source cap
+combines with the existing scoped cap by the tighter bound, and the existing
+`body_bytes` checks precede an over-limit write. Exact-size/ETag intake is
+preserved. Successful receipts and immutable acquisition checks carry
+`declared_length_present`; existing snapshot receipts remain immutable.
+Only the five named registry rows gain a null bound field; no ceiling value is
+inferred. Doc 04 section 3.1 and proposed open item PO-S2-P84-01 record that hold.
+
+Initial test-first evidence, `UV_OFFLINE=1`:
+`uv run --locked python -m pytest custodian/tests/test_large_bounds.py -q`
+exited 1 (25 failures against the original implementation), then exited 0
+(25 passed after implementation). After adding explicit hostile-leaf and
+reacquisition cases, the same file with `--hypothesis-seed=84` exited 0
+(42 passed). The earlier runs used the repository's time-derived seed, which
+quiet output did not retain; final verification and all deletion proofs pin
+seed 84. No random failure is claimed or closed by a rerun.
+
+The first regression run of `uv run --locked python -m pytest
+custodian/tests/test_large_intake.py custodian/tests/test_large_bounds.py
+custodian/tests/test_publicdata_heights.py custodian/tests/test_assembly_refusals.py
+-q` exited 0 (1764 passed); this run collected the initial 25-case new file.
+The final expanded test file is verified separately below.
+
+Initial `uv run --locked ruff check .` exited 1: import ordering and raw-pattern
+lint errors in the new test file. Those were fixed; the next run exited 0.
+`ruff format --check .`, `mypy` (530 source files),
+`python3 scripts/check_docs.py`, `python3 scripts/check_tree.py` and
+`git diff --check` each exited 0. Formatting was applied only to touched Python
+files. No pin, baseline, workflow, hook or privacy control was changed.
+
+Skills applied: project-orientation located the existing staged receiver and
+receipt-check path; task-standards supplied the acquisition-security and strict
+self-review personas; test-driven-development (brief-equivalent rules) required
+red tests before implementation; sharp-edges rejected null/malformed bounds and
+undeclared completeness; property-based-testing added a chunk-split acceptance
+oracle and hostile-leaf cases; dimensional-analysis (scoped brief-equivalent
+rule) kept exact size, declared length, ceilings and accumulated count in bytes;
+security-review (brief-equivalent rules) preserved existing refusals;
+spec-to-code-compliance (scoped brief-equivalent rules) mapped L-1717 to doc 04
+and enforcement; differential-review compares the final diff with the required
+base; github-flow keeps this task uncommitted for lead review; sanad-provenance
+ties the claims to commands and code. Final verification and muhasabah follow
+in the appended evidence below.
+
+
+S2-P84 diagnostic correction: captured pytest output automatically included
+source addresses and absolute workspace prefixes. A value-free scan found this
+in scratch diagnostic logs; `.overnight/ALERT.md` records the issue. Completed
+logs were redacted while retaining commands, exits, assertions and counts; the
+active run will be redacted after completion. No source, fixture, test, guard,
+pin or baseline was changed for this correction.
+
+
+### S2-P84 final verification and handoff
+
+Final environment: Linux x86_64, Python 3.14.6, uv 0.11.31; `UV_OFFLINE=1`,
+repository Hypothesis profile unchanged, explicit seed 84 for final pytest and
+all deletion proofs. TMPDIR is inside the worktree. No provider, network,
+whole-suite invocation, commit or push was selected.
+
+- `uv run --locked python -m pytest custodian/tests/test_large_intake.py custodian/tests/test_large_bounds.py custodian/tests/test_publicdata_heights.py --hypothesis-seed=84 -vv`: exit 0, 335 passed.
+- `uv run --locked python -m pytest custodian/tests -k "large or intake or stream or registry or assembly or build_public" --hypothesis-seed=84 -vv`: exit 0, 2804 passed, 12395 deselected by the required expression, two rasterio NotGeoreferencedWarning diagnostics from unchanged GIS snapshot fixture tests. No warning was suppressed or baseline changed.
+- After every pytest/plant run finished, `uv run --locked python -m unittest discover -s scripts/tests -p 'test_*.py' -k public -k registry -k boundary -v`: exit 0, 42 tests passed.
+- Then `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'`: exit 0, 37 tests passed.
+- `UV_OFFLINE=1 python3 .overnight/tmp/guard_proofs.py`: exit 0; all 22 isolated deletions red 1, restored green 0, original bytes verified identical. Exact commands, guard names and red/green logs are retained with the task return. These are guard-deletion proofs, not a replacement for the deferred full mutation campaign.
+- The supplemental pinned-base local receiver probe initially exited 1 for its missing workspace import path, before testing a receiver. With `PYTHONPATH=.` it exited 0: undeclared short and declared over-ceiling cases were accepted by the base for all five keys and refused by the patch with `length_undeclared` and `body_bytes`. The initial diagnostic and corrected result are retained.
+- An in-memory YAML comparison against the full base registry exited 0: after removing exactly the five new null `stream_max_bytes` fields, the documents are equal. No other registry row or field changed.
+- Static checks recorded above remain green: ruff check/format, mypy, docs, tree and diff. AGENTS.md and CLAUDE.md remain byte-identical (cmp exit 0).
+
+The diagnostic redaction is complete for finished log files; it preserves the
+failure assertions and real exit evidence. ALERT.md discloses the correction.
+Longest new function by AST span: `test_chunk_splits_accept_iff_complete_and_bounded`,
+35 lines excluding decorators. No block copied; the existing stream helper is
+reused. Every new production quantity is bytes, with no conversion or rounding.
+Strict self-review: APPROVE for the scoped build, with its differential/attack
+review in the return artifacts. Verification-before-completion and
+muhasabah-gate: PASS for this local handoff; the null lead inputs,
+different-maker approval, lead whole suite and slice-gate obligations are not
+claimed complete. Denied tool calls: none.
+
+S2-P84 final records recheck: `python3 scripts/check_docs.py`, `python3 scripts/check_tree.py`, `git diff --check` and `cmp AGENTS.md CLAUDE.md` each exited 0 after the final evidence block.
+
+S2-P84 lead ceiling commit (ruling L-1723, 2026-11-24): `custodian/publicdata/sources.yaml` sets `stream_max_bytes` for the five streamed keys to the smallest whole number of GiB at or above four times each key's receipted bytes, read by the lead from the cache meta records: `cus_imp_2019` and `trade_ext/qatar-imports-2014-2018` 2 GiB, `bldg_wsf3d` 8 GiB, both `bldg_gba` tiles 1 GiB. `custodian/tests/test_large_bounds.py`: the null-hold refusal now plants `stream_max_bytes=None` on each key, and the new `test_reviewed_ceilings_are_pinned` pins the five values. Plant: `bldg_wsf3d` set to 4 GiB made the new test fail (1 failed); restored, the file passes (43 passed). `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k "registry or large or stream or fetch or ceiling or bound"` before the test change: 5 failed (the old null assertions), 2227 passed. Changing the registry changes the fetch fingerprints of these five keys; L2e expects it.
+| 2026-11-24 | S2-P84 lead round (S2-P84.rv1 finding 1, Cognition Devin, REJECTED `4bb77a529b`) | Document 04 now states the five L-1723 ceilings pinned by `test_reviewed_ceilings_are_pinned`, with the null hold only for a future key without a confirmed ceiling; PO-S2-P84-01 gains a dated update (rv1 proposed open item); the stale comment in `test_large_intake.py` names the pin (rv1 proposed open item). `test_large_intake.py` and `test_large_bounds.py`: 116 passed, exit 0; check_docs 0; ruff format --check 0; `git diff --check` 0. `UV_OFFLINE=1`, WSL2 Linux. | lead |
+
+## Train S2-31 of slice S2 — 2026-11-24
+
+| Date | Item | Evidence | By |
+|---|---|---|---|
+| 2026-11-24 | S2-30 merge record | [PR 138](https://github.com/albarami/economic-investment-intelligence/pull/138) (train S2-30: S2-P82 citation obstacle scan reads visible text) merged into main as `7c06a567d2`. Conditions held on its exact head `c91f0a2db6`: train confirmation S2-30.cf2 (OpenAI Codex B) APPROVED, posted on the pull request word for word (round 1, S2-30.cf1 by Cognition Devin, returned BLOCKED because its seat could run no command, and gave no verdict); the lead's whole test S2-30.wt1 with seed two billion two hundred eighty-three million two hundred thirty-eight thousand seven hundred forty-eight exit 0 on that head, which equals the merge result because main stayed at `5eb45fab65`; all 17 hosted checks passed. | lead |
+| 2026-11-24 | Records points of S2-30.cf2 (append only) | (1) The lead's join proof file labelled the joined commits "own change" and the originals "train commit"; the labels were swapped, the equality stands as cf2 verified it independently; from this train on the proof names the approved commit first and the train commit second. (2) The S2-30 section did not cite the previous train's confirmation, hosted-check and whole-test evidence; this train's merge record row above carries them for S2-30. | lead |
+| 2026-11-24 | S2-P84 reviews | rv1 (Cognition Devin) REJECTED `4bb77a52` on one finding: document 04, the open item and a test comment still described the five stream ceilings as unset after ruling L-1723 set them. The lead's documents round `902b8b6950` stated the five reviewed ceilings, pinned by `test_reviewed_ceilings_are_pinned`, and updated PO-S2-P84-01. rv2 (Cognition Devin) APPROVED `902b8b6950`, no findings, no new open items. | lead |
+| 2026-11-24 | Train S2-31 identity | The three S2-P84 commits `9dd0441f`, `4bb77a52` and `902b8b6950` cherry-picked onto main `7c06a567d2` as `f50315b2`, `da8a9f8c` and `1735a4f7`. Lead join proof, approved commit first: 16 of 17 file entries identical; the one difference is in PROGRESS.md, a records join difference: the end-of-file conflict was united append only and one of the two blank lines before the S2-P84 heading was dropped, so the joined commit changes 94 lines where the approved one changed 95. OPEN_ITEMS.md was united append only with no line changed. | lead |
+| 2026-11-24 | S2-P84 fx2 registry projection pin (train S2-31.wt1 repair) | On head `d479a56b9c6372e1cb0929169504670e84d7daf6`, the S2-P81 guard now hashes only `(key, skip_reason, basis_note)` for all 891 rows, with the named row restored, using SHA-256 `d17073ec9da4f03806d6222f18ccd9e54fcff3e9d1bcb595315b94c3497d1e30` computed from base `1dba941bcf`; current and base projections match. Original focused failure exit 1 (whole-test seed 2064359451); fixed citation file 7 passed exit 0 (seed 1795502681), large intake 73 passed exit 0, large bounds 43 passed exit 0. Plants: other-row skip_reason exit 1, basis_note exit 1, stream_max_bytes exit 0, each restored alone. Import boundaries: initial parallel-run no-mutation failure exit 1 from concurrent pytest `__pycache__` writes; isolated rerun 37 tests OK exit 0. Ruff check 0, ruff format check 0, mypy 530 files 0, check_docs 0, check_tree 0, AGENTS/CLAUDE cmp 0, git diff check 0. `UV_OFFLINE=1`, WSL2 Linux, Python 3.14.6. Builder persona senior test engineer; strict self-review persona strict-reviewer; skills used: project-orientation, task-standards, test-driven-development, systematic-debugging, sharp-edges, sanad-provenance, spec-to-code-compliance, verification-before-completion, muhasabah-gate, requesting-code-review. | Kimi (Moonshot AI) |
+| 2026-11-24 | S2-P84 fx2 round 2, review finding of S2-P84fx2.rv1 (xAI Cursor REJECTED `0cb2e9b5a3`) | The three-field projection let a one-field change on another row, such as `url`, pass. The lead (Anthropic) restores the full-row pin of S2-P81: every row is hashed whole, with the named row's two fields restored, and only `stream_max_bytes` is left out. That is the one field S2-P84 adds, and it is absent at base `1dba941bcf`. The pin stays at the original value `771b96a4af`. No missing field is filled. Lead plants on the registry, each alone and then restored: another row's `url` changed by one character, exit 1; `stream_max_bytes` changed, exit 0; `skip_reason` changed, exit 1; a `basis_note` added, exit 1 (the hash differs). The file and `test_large_bounds.py` then gave 50 passed, exit 0; ruff, format and diff check exit 0. |
+| 2026-11-24 | Train S2-31 wt1 and the S2-P84 fx2 repair | The lead's whole test S2-31.wt1 (seed two billion sixty-four million three hundred fifty-nine thousand four hundred fifty-one) on `d479a56b9c` exited 1 on one test, `test_citation_page_not_served.py::test_only_this_row_changes_and_only_by_the_word_and_its_note`; every other suite passed. Cause: the S2-P81 guard hashed every field of every registry row, and the approved S2-P84 `stream_max_bytes` changed that hash. This was a deterministic interaction of two approved tasks, not a random failure. The fx2 round 1 (Factory Droid, `0cb2e9b5a3`) was REJECTED by S2-P84fx2.rv1 (xAI Cursor): the three-field projection let a `url` change pass. Round 2 (the lead, Anthropic) `ee052a69dc1bde0622a6c582d7a7208ad9e41a23` keeps the full-row pin `771b96a4af` and leaves out only `stream_max_bytes`. S2-P84fx2.rv2 (xAI Cursor) APPROVED `ee052a69dc1bde0622a6c582d7a7208ad9e41a23`. Both fix commits are appended to the train after `d479a56b9c`; the earlier train commits are unchanged. |

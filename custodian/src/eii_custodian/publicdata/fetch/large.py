@@ -3,7 +3,8 @@
 The owner ruling of 2026-11-18 requires retaining these inputs' value. Binary
 files and the imports array stream to a staged file; only individual import
 objects are decoded, under the existing general intake bound. Overture keeps
-its recorded exact size and ETag. No incomplete body can become a snapshot.
+its recorded exact size and ETag. Other streams require a reviewed byte ceiling
+and a declared length. No incomplete body can become a snapshot.
 """
 
 from __future__ import annotations
@@ -55,6 +56,7 @@ class Received:
     sha256: str
     nbytes: int
     final_url: str
+    declared_length_present: bool
 
 
 @dataclass(frozen=True)
@@ -101,7 +103,12 @@ def receive(entry: Entry, stream: StreamTransport, output: IO[bytes]) -> Receive
     if not approve(entry.url).ok:
         raise IntakeError("blocked_host")
     size = recorded_size(entry)
+    ceiling = entry.stream_max_bytes  # bytes, independent of the response headers
+    if size is None and (type(ceiling) is not int or ceiling <= 0):
+        raise IntakeError("bound_unconfirmed")
     cap = transport_module._METADATA_LIMIT.get()
+    if size is None and ceiling is not None:
+        cap = ceiling if cap is None else min(cap, ceiling)
     with stream(entry.url) as response:
         for address in (*response.hops, response.final_url):
             if not approve(address).ok:
@@ -109,6 +116,8 @@ def receive(entry: Entry, stream: StreamTransport, output: IO[bytes]) -> Receive
         length = response.declared_length
         if length is not None and (type(length) is not int or length < 0):
             raise IntakeError("declared_length")
+        if size is None and length is None:
+            raise IntakeError("length_undeclared")
         if size is not None and length is not None and length != size:
             raise IntakeError("size_mismatch")
         if cap is not None and length is not None and length > cap:
@@ -141,7 +150,12 @@ def receive(entry: Entry, stream: StreamTransport, output: IO[bytes]) -> Receive
             raise IntakeError("size_mismatch")
         if not count:
             raise IntakeError("empty_body")
-        return Received(digest.hexdigest(), count, public_address(response.final_url))
+        return Received(
+            digest.hexdigest(),
+            count,
+            public_address(response.final_url),
+            length is not None,
+        )
 
 
 def json_rows(source: TextIO) -> Iterator[dict[str, object]]:
@@ -308,6 +322,7 @@ def fetch_large(
             portal_licence=info.portal_licence if info is not None else "",
             portal_licence_url=info.portal_licence_url if info is not None else "",
         )
+        sidecar["declared_length_present"] = received.declared_length_present
         if info is not None and info.licence_unstated:
             # Ruling L-1025 item b (applying L-1016 and L-1001): the streamed
             # path records the same pending licence as the ordinary path, with

@@ -4410,6 +4410,7 @@ def test_gba_keys_use_stream_publication_and_verified_read(tmp_path, tile):
         fetch_host="data.source.coop",
         url="https://data.source.coop/SYN/tile.parquet",
     )
+    row = replace(row, stream_max_bytes=65536)
     assert row.key in REQUIRED_KEYS
     body = invented.gba_parquet(tmp_path / "tile.parquet", _GBA_GOOD)
     cache = tmp_path / "cache"
