@@ -645,7 +645,9 @@ def test_tracked_configuration_binds_c5_treatment_separately_from_window():
         settings = config["pins"][pin]
         assert settings["prior_months"] == PRIOR
         assert settings["lines"] == expected_lines
-        assert "latest_months" not in settings
+        # Decision 0112 item 1: the later window is calendar year 2025.
+        assert settings["latest_months"] == LATEST
+        assert "pending_reason" not in settings
 
 
 def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
@@ -663,10 +665,6 @@ def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
     assert build.pin_pending_reason == "pin_configuration_pending"
     assert not (tmp_path / PIN_ARTIFACT_NAME).exists()
     pending_reasons = {
-        **{
-            pin: "OI-283: " + pin + ": latest_months awaits R1 complete-month evidence"
-            for pin in ("c5.hhi", "c5.prior12", "c5.latest12", "c5.trend")
-        },
         "c7.coordinates": "OI-283: c7.coordinates: landmark keys await ruling (L5c section 6)",
         **{
             pin: "OI-283: " + pin + ": computed by S6-T10"
