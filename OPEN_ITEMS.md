@@ -6943,3 +6943,12 @@ run remain pending.
   - `prop_sales`, English: New Slata / السلطة الجديدة, municipality 1, QAT006040041, 272 rows; Lijmiliya / لجميليه, 8, QAT008073210, 25; Umm Besher / أم بشر, 3, QAT005091767, 10; Al Khulaifat / فريج الخليفات, 1, QAT006028025, 1; Al Souq / السلطة, 1, QAT006007009, 1.
 - NEEDED: the lead accepts or rejects every M2 group and reviews the spelling, article and zone-number proposals in `.overnight/RETURN.md`. No proposal adds a crosswalk row without a later reviewed generation. Unmapped municipality conflicts, missing names and ambiguous names stay excluded.
 - NEEDED BY: before the affected property district figures are treated as fully reviewed.
+
+## PO-S2-32-01 — A closed set for the district crosswalk basis at load
+
+- ID: PO-S2-32-01
+- TYPE: PROPOSED (records point of S2-P87.rv1)
+- RAISED BY: S2-P87.rv1 (Cognition Devin), 2026-11-24
+- CONCERNS: `basis` of the property district crosswalk rows is enforced on the committed file's contents but is not checked against a closed set when the file is loaded, so a later regeneration with a wrong basis value would not be refused.
+- NEEDED: a closed-set check on `basis` at load, with a planted violation, when the file is next regenerated.
+- NEEDED BY: the next regeneration of the district crosswalk.
