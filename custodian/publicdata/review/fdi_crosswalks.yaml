@@ -1,4 +1,5 @@
-# S2-T39 part A: lead fills reviewed source-issued identifiers after the build.
+# S2-T39 part A: schema-only fallback; no mapping row belongs here.
+# Lead-reviewed rows live in CACHE/review/fdi_crosswalks.yaml (decision 0108).
 # No fetched names, page text or raw source values belong here.
 # Invented mapping examples are constructed in test_investment_crosswalk.py.
 schema_version: fdi_crosswalks.v1
