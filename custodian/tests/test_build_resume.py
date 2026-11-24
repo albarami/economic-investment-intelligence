@@ -13,6 +13,7 @@ from typing import Any
 
 import pytest
 from custodian.tests.method_pin_config_fixture import stage_tracked_configuration
+from custodian.tests.support.payload_leaves import leaves, replace_leaf
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
@@ -427,26 +428,7 @@ def test_secondary_receipt_proofs_are_required(
     harness: Harness, plant: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     if plant == "auxiliary":
-        from eii_custodian.publicdata.fetch import build
-        from eii_custodian.publicdata.fetch.receipts import archive_auxiliary
-
-        original = build._fetch_row
-
-        def fetch(*args: Any, **kwargs: Any) -> Any:
-            fetched, failure = original(*args, **kwargs)
-            if fetched is not None:
-                source = args[0]
-                archive_auxiliary(
-                    source,
-                    harness.cache / source.key,
-                    "inputs",
-                    b"SYN auxiliary bytes",
-                    START,
-                    source.url,
-                )
-            return fetched, failure
-
-        monkeypatch.setattr(build, "_fetch_row", fetch)
+        archive_auxiliary_on_fetch(harness, monkeypatch)
     harness.interrupt()
     folder = harness.cache / "SYN-first"
     row = record(harness)
@@ -795,26 +777,10 @@ def test_review_auxiliary_retrieved_before_start_is_refetched(
     harness: Harness, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Fresh mtimes cannot override an auxiliary receipt's older retrieval."""
-    from eii_custodian.publicdata.fetch import build
-    from eii_custodian.publicdata.fetch.receipts import archive_auxiliary
-
-    original = build._fetch_row
-
-    def fetch(*args: Any, **kwargs: Any) -> Any:
-        fetched, failure = original(*args, **kwargs)
-        if fetched is not None:
-            source = args[0]
-            archive_auxiliary(
-                source,
-                harness.cache / source.key,
-                "inputs",
-                b"SYN auxiliary bytes",
-                EARLIER,
-                source.url,
-            )
-        return fetched, failure
-
-    monkeypatch.setattr(build, "_fetch_row", fetch)
+    # Keep the auxiliary's clock earlier while the primary fetch uses START.
+    auxiliary = Harness(harness.cache)
+    auxiliary.stamp = EARLIER
+    archive_auxiliary_on_fetch(auxiliary, monkeypatch)
     harness.interrupt()
     reasons = capture_reuse_reason(monkeypatch)
     outcome = harness.run(resume=True)
@@ -1129,6 +1095,88 @@ def test_reuse_requires_independent_fetch_and_receipt_proofs(
     assert harness.entries[0].url in harness.seen
 
 
+def archive_auxiliary_on_fetch(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Each completed fetch also archives one auxiliary at the harness clock."""
+    from eii_custodian.publicdata.fetch import build
+    from eii_custodian.publicdata.fetch.receipts import archive_auxiliary
+
+    original = build._fetch_row
+
+    def fetch(*args: Any, **kwargs: Any) -> Any:
+        fetched, failure = original(*args, **kwargs)
+        if fetched is not None:
+            source = args[0]
+            archive_auxiliary(
+                source,
+                harness.cache / source.key,
+                "inputs",
+                b"SYN auxiliary bytes",
+                harness.stamp,
+                source.url,
+            )
+        return fetched, failure
+
+    monkeypatch.setattr(build, "_fetch_row", fetch)
+
+
+def test_kept_auxiliary_receipt_cannot_ride_a_kept_primary(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    archive_auxiliary_on_fetch(harness, monkeypatch)
+    harness.interrupt()  # journal START: primary START, auxiliary START
+    harness.fail = True
+    assert harness.run().failure is not None  # fresh journal at LATER
+    saved = record(harness)["entries"]["SYN-first"]
+    assert record(harness)["started_utc"] == LATER
+    assert saved["fetch"]["retrieved_utc"] == LATER
+    assert [proof["retrieved_utc"] for proof in saved["proofs"]] == [START, START]
+    harness.fail = False
+    harness.seen.clear()
+    reasons = capture_reuse_reason(monkeypatch)
+    outcome = harness.run(resume=True)
+    assert "REFETCH SYN-first resume_input_unproven" in outcome.lines
+    assert reasons == ["lineage_changed"]
+    assert harness.entries[0].url in harness.seen
+
+
+def test_old_auxiliary_file_cannot_ride_a_kept_primary(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    harness.interrupt()  # primary START, no auxiliary yet
+    archive_auxiliary_on_fetch(harness, monkeypatch)
+    harness.fail = True
+    assert harness.run().failure is not None  # fresh journal; auxiliary LATER
+    saved = record(harness)["entries"]["SYN-first"]
+    assert [proof["retrieved_utc"] for proof in saved["proofs"]] == [START, LATER]
+    name = next(n for n in saved["proofs"][1]["files"] if n.endswith(".html"))
+    os.utime(harness.cache / name, (utc(EARLIER).timestamp(),) * 2)
+    harness.fail = False
+    harness.seen.clear()
+    reasons = capture_reuse_reason(monkeypatch)
+    outcome = harness.run(resume=True)
+    assert "REFETCH SYN-first resume_input_unproven" in outcome.lines
+    assert reasons == ["stored_bytes_changed"]
+
+
+def test_reuse_refuses_a_primary_receipt_of_another_source(
+    harness: Harness, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    harness.interrupt()
+    # Hold the fingerprint equal so only the receipt's source differs.
+    monkeypatch.setattr(RunRecord, "_fingerprint_matches", lambda *_: True)
+    harness.entries = (
+        replace(harness.entries[0], source_id="SYN-other-source"),
+        harness.entries[1],
+    )
+    reasons = capture_reuse_reason(monkeypatch)
+    outcome = harness.run(resume=True)
+    assert "REFETCH SYN-first resume_input_unproven" in outcome.lines
+    assert reasons == ["lineage_changed"]
+    assert harness.entries[0].url in harness.seen
+
+
 @settings(deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture])
 @given(
     runs=st.lists(
@@ -1234,17 +1282,6 @@ def test_fetch_sequence_reuses_exactly_current_journal_proofs(
                 )
 
 
-def proof_leaf_paths(value: Any, path: tuple[Any, ...] = ()) -> list[tuple[Any, ...]]:
-    if isinstance(value, (dict, list)):
-        pairs = value.items() if isinstance(value, dict) else enumerate(value)
-        return [
-            leaf
-            for key, child in pairs
-            for leaf in proof_leaf_paths(child, (*path, key))
-        ]
-    return [path]
-
-
 @pytest.mark.parametrize("kept", [False, True])
 def test_every_reuse_proof_leaf_refuses_hostile_types(
     harness: Harness, kept: bool
@@ -1264,17 +1301,12 @@ def test_every_reuse_proof_leaf_refuses_hostile_types(
     paths = [
         (field, *leaf)
         for field in ("fetch", "proofs", "publisher")
-        for leaf in proof_leaf_paths(item[field])
+        for leaf in leaves(item[field])
     ]
     assert len(paths) == 17
     for path in paths:
         for hostile in ({"toString": None}, 7, None, []):
-            row = json.loads(json.dumps(baseline))
-            target = row["entries"][source.key]
-            for part in path[:-1]:
-                target = target[part]
-            target[path[-1]] = hostile
-            run.row = row
+            run.row = replace_leaf(baseline, ("entries", source.key, *path), hostile)
             lines: list[str] = []
             assert run.reuse(source, lines) is None, path
             assert lines == [f"REFETCH {source.key} resume_input_unproven"], path
