@@ -1174,7 +1174,12 @@ still refuse `schema_missing`; every shape parser keeps the refusing default.
 On a citation snapshot page a `sign in`/`sign-in` word alone does not refuse:
 the credentials obstacle is a rendered `input` of `type=password`, the page
 requires exactly status 200 with any other status refusing `http_status`,
-and `robot check`/`paywall` words still refuse every kind.
+and `robot check`/`paywall` words refuse a citation snapshot only in joined
+text nodes outside `script`, `style`, `noscript`, `template` and `head`, never
+in attribute values (S2-P82). The scan reuses the same first-wins tree and
+its text walker; entities decode and adjacent text nodes join without added
+spacing. A visible marker returns `refusal_body`, mapped to `unavailable`.
+Other kinds keep the raw-byte obstacle scan.
 A bare sign-in wall this scan admits — a sign-in link and button with no
 password field — still refuses `excerpt_absent` under the landmark row's
 verbatim excerpt check when the page holds no height text (decision 0093).

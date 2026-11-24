@@ -6871,3 +6871,13 @@ introduced.
 - EVIDENCE: the lead's probe of 2026-11-24 (status codes only): the page answers 404 to every client and address variant tried, and the site root answers 403; the live step LIVE-S2.L2d3 on `1dba941bcf` failed that one row with `http_status`.
 - NEEDED: the lead re-probes the page, status codes only, at each live build and records the status here; when it answers 200, a new task removes the word and the dated sentence of `basis_note` and the row is fetched again. A different-maker review and acceptance of decision 0107.
 - NEEDED BY: each live build; acceptance before the S2 gate record.
+
+## PO-S2-P82-1 — Non-citation obstacle words still scan hidden markup
+
+- ID: PO-S2-P82-1
+- TYPE: PROPOSED
+- RAISED BY: S2-P82, 2026-11-24
+- CONCERNS: the non-citation `fc_register.acquire.obstacle` scan, outside S2-P82's citation-only scope.
+- EVIDENCE (code only): `custodian/src/eii_custodian/publicdata/fc_register/acquire.py`, `obstacle`, lowercases the complete response bytes and searches them for `sign in`, `sign-in`, `robot check` and `paywall`, including script bodies and attributes. `page_acquire.fetch` / `_read` dispatches every non-citation review kind to that function before parsing, including the `embedded_json` event sources identified in `validate_entry`. `test_non_citation_obstacle_still_raw_scans` pins an otherwise-valid invented embedded response with only a hidden marker added: `refusal_body` maps to `unavailable`. This establishes the same false-positive risk on a fetched path, not an observed failure on a real source.
+- NEEDED: lead assessment and a separate task if the non-citation policy should change; preserve its existing scan until then.
+- NEEDED BY: lead triage; no citation acceptance box is changed.

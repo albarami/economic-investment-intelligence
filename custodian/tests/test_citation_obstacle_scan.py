@@ -4,6 +4,7 @@ check as `excerpt_absent` (advisor condition of L-1617, decision 0093); a
 citation page requires exactly status 200 and shares the one first-wins
 tree of the form-secret strip (L-1619)."""
 
+import html
 import json
 from dataclasses import replace
 
@@ -224,4 +225,102 @@ def test_citation_refuses_iff_password_or_refusal_word(
     expected = "refusal_body" if refusal else "credentials" if password else None
     body = "".join(parts).encode()
     root = Tree(body, duplicate_attributes="first").root
-    assert acquire._citation_obstacle(body, root) == expected
+    assert acquire._citation_obstacle(root) == expected
+
+
+def citation_reason(body):
+    return acquire._citation_obstacle(acquire._form_secret_tree(body))
+
+
+@pytest.mark.parametrize("marker", ["paywall", "robot check", "PaYwAlL", "ROBOT CHECK"])
+@pytest.mark.parametrize(
+    "hidden",
+    [
+        '<script>const syn = "{}";</script>',
+        '<meta name="syn-analytics-{}">',
+        '<div data-syn="{}">SYN page</div>',
+        "<style>/* {} */</style>",
+        "<noscript><div>{}</div></noscript>",
+        "<template><div>{}</div></template>",
+        "<head><title>{}</title></head>",
+        "<!-- {} -->",
+    ],
+)
+def test_citation_hidden_obstacle_words_are_admitted(tmp_path, marker, hidden):
+    body = ("<html>" + hidden.format(marker) + "<body>SYN page</body></html>").encode()
+    assert citation_reason(body) is None
+    dec = declaration("citation_snapshot", {}, [])
+    assert json.loads(cited(tmp_path, dec, body).body)["rows"] == []
+
+
+@pytest.mark.parametrize(
+    "fragment",
+    [
+        "<p>paywall</p>",
+        "<div>robot check</div>",
+        "<p>PaYwAlL</p>",
+        "<div>RoBoT ChEcK</div>",
+        "<p>pay&#119;all</p>",
+        "<div>robot&#32;check</div>",
+        "<p>pay<span>wall</span></p>",
+        "<div>robot <span>check</span></div>",
+        "<p>pay<!-- SYN -->wall</p>",
+        "<p>pay<template>ignored</template>wall</p>",
+    ],
+)
+def test_citation_visible_obstacle_reason_and_acquisition_refusal(tmp_path, fragment):
+    body = ("<html><body>" + fragment + "</body></html>").encode()
+    assert citation_reason(body) == "refusal_body"
+    dec = declaration("citation_snapshot", {}, [])
+    refused("unavailable", lambda: cited(tmp_path, dec, body))
+
+
+def test_citation_password_reason_is_unchanged(tmp_path):
+    body = NEUTRAL + b'<input type="password">'
+    assert citation_reason(body) == "credentials"
+    dec = declaration("citation_snapshot", {}, [])
+    refused("unavailable", lambda: cited(tmp_path, dec, body))
+
+
+@pytest.mark.parametrize("marker", ["paywall", "robot check"])
+@pytest.mark.parametrize(
+    "hidden", ['<script>"{}"</script>', '<div data-syn="{}">SYN</div>']
+)
+def test_non_citation_obstacle_still_raw_scans(tmp_path, marker, hidden):
+    fragment = hidden.format(marker).encode()
+    assert obstacle(fragment) == "refusal_body"
+    dec, body, _ = embedded()
+    refused("unavailable", lambda: run(tmp_path, dec, body + fragment))
+
+
+GENERATED_PAGE_TEXT = st.recursive(
+    st.one_of(
+        st.text(max_size=40).map(html.escape),
+        st.sampled_from(
+            ["", "paywall", "ROBOT CHECK", '<input type="password">', "pay<b>wall</b>"]
+        ),
+    ),
+    lambda child: st.tuples(
+        st.sampled_from(["div", "p", "span", "template", "noscript", "head"]),
+        st.lists(child, max_size=3),
+    ).map(lambda pair: f"<{pair[0]}>" + "".join(pair[1]) + f"</{pair[0]}>"),
+    max_leaves=12,
+)
+
+
+@given(
+    fragment=GENERATED_PAGE_TEXT,
+    marker=st.sampled_from(REFUSAL_WORDS),
+    injection=st.sampled_from(["script", "attribute", "meta"]),
+)
+def test_citation_hidden_word_injection_preserves_outcome(fragment, marker, injection):
+    baseline = "<html><head></head><body><div>" + fragment + "</div></body></html>"
+    if injection == "script":
+        injected = baseline.replace("</body>", f'<script>"{marker}"</script></body>')
+    elif injection == "attribute":
+        injected = baseline.replace("<div>", f'<div data-syn="{marker}">', 1)
+    else:
+        injected = baseline.replace("</head>", f'<meta name="syn-{marker}"></head>', 1)
+    expected = citation_reason(baseline.encode())
+    assert expected in {None, "refusal_body", "credentials"}
+    assert citation_reason(injected.encode()) == expected
