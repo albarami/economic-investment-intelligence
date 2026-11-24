@@ -14,58 +14,121 @@ import tomllib
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 import runner_support as support
 
 ROOT = support.ROOT
 
 # OI-409: a property whose body does file or folder work per example sets
-# deadline=None; the closed call lists below mark that work.
+# deadline=None; the closed call lists below mark that work. A name bound by
+# `from M import N [as A]` counts when N is in FILE_NAMES or M.N is in
+# FILE_QUALIFIED; `import M as A` makes A.N count as M.N. Names that are file
+# work only on one module (walk, call, system, link) are qualified only, so
+# ast.walk, mock.call and platform.system stay outside.
+# Still not seen: calls into imported production code; `os.path.*` and other
+# calls through a dotted module (`os.path.exists`, `xml.etree...`); a file
+# call reached through a variable or getattr (`f = open; f(...)`); helpers in
+# another module, or methods called through anything but self or cls;
+# `importlib`/`__import__` loads; file work in a strategy, fixture or setUp
+# rather than in the decorated body; relative imports; names of the closed
+# lists not given here.
 FILE_NAMES = (
     "open",
     "Path",
     "TemporaryDirectory",
     "NamedTemporaryFile",
+    "TemporaryFile",
+    "SpooledTemporaryFile",
     "mkdtemp",
     "mkstemp",
 )
 FILE_METHODS = (
     "TemporaryDirectory",
     "NamedTemporaryFile",
+    "TemporaryFile",
+    "SpooledTemporaryFile",
     "mkdtemp",
     "mkstemp",
     "mktemp",
+    "open",
+    "fdopen",
     "read_bytes",
     "read_text",
     "write_bytes",
     "write_text",
     "mkdir",
+    "rmdir",
     "unlink",
+    "truncate",
     "iterdir",
+    "glob",
+    "iglob",
     "rglob",
+    "symlink",
     "symlink_to",
+    "chmod",
+    "chown",
     "touch",
     "rmtree",
     "copyfile",
+    "copyfileobj",
+    "copymode",
+    "copy2",
     "copytree",
+    "make_archive",
+    "ZipFile",
     "Popen",
+    "popen",
     "check_output",
     "check_call",
+    "getoutput",
+    "getstatusoutput",
 )
 FILE_QUALIFIED = (
     "subprocess.run",
+    "subprocess.call",
+    "subprocess.getoutput",
+    "subprocess.getstatusoutput",
     "sqlite3.connect",
     "duckdb.connect",
+    "io.open",
+    "codecs.open",
+    "os.open",
+    "os.fdopen",
     "os.remove",
     "os.rename",
     "os.replace",
     "os.makedirs",
+    "os.rmdir",
     "os.listdir",
     "os.scandir",
+    "os.walk",
+    "os.symlink",
+    "os.link",
+    "os.chmod",
+    "os.truncate",
+    "os.system",
+    "os.popen",
     "shutil.copy",
+    "shutil.copy2",
+    "shutil.copyfileobj",
+    "shutil.copymode",
     "shutil.move",
+    "shutil.make_archive",
+    "shutil.chown",
     "glob.glob",
+    "glob.iglob",
+    "pathlib.Path",
+    "tempfile.TemporaryFile",
+    "tempfile.SpooledTemporaryFile",
+    "zipfile.ZipFile",
+    "tarfile.open",
+    "gzip.open",
+    "bz2.open",
+    "lzma.open",
+    "shelve.open",
+    "dbm.open",
 )
 FILE_FIXTURES = ("tmp_path", "tmp_path_factory", "tmpdir", "tmpdir_factory")
 PROPERTY_ROOTS = (
@@ -77,14 +140,35 @@ PROPERTY_ROOTS = (
 )
 
 
-def _is_file_call(call: ast.Call) -> bool:
+class _Bindings(NamedTuple):
+    names: frozenset[str]
+    modules: dict[str, str]
+
+
+def _bindings(tree: ast.Module) -> _Bindings:
+    """File-call names and module aliases that the module's imports bind."""
+    names = set(FILE_NAMES)
+    modules: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            modules |= {a.asname: a.name for a in node.names if a.asname}
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            for a in node.names:
+                qualified = f"{node.module}.{a.name}"
+                if a.name in FILE_NAMES or qualified in FILE_QUALIFIED:
+                    names.add(a.asname or a.name)
+    return _Bindings(frozenset(names), modules)
+
+
+def _is_file_call(call: ast.Call, bindings: _Bindings) -> bool:
     func = call.func
     if isinstance(func, ast.Name):
-        return func.id in FILE_NAMES
+        return func.id in bindings.names
     if not isinstance(func, ast.Attribute):
         return False
     if isinstance(func.value, ast.Name):
-        if f"{func.value.id}.{func.attr}" in FILE_QUALIFIED:
+        module = bindings.modules.get(func.value.id, func.value.id)
+        if f"{module}.{func.attr}" in FILE_QUALIFIED:
             return True
     return func.attr in FILE_METHODS
 
@@ -102,6 +186,7 @@ def _does_file_work(
     function: ast.FunctionDef | ast.AsyncFunctionDef,
     helpers: dict[str, ast.FunctionDef | ast.AsyncFunctionDef],
     seen: set[str],
+    bindings: _Bindings,
 ) -> bool:
     """True when the body, or a module helper it calls, does file work."""
     arguments = function.args.posonlyargs + function.args.args
@@ -111,21 +196,22 @@ def _does_file_work(
     for node in ast.walk(function):
         if not isinstance(node, ast.Call):
             continue
-        if _is_file_call(node):
+        if _is_file_call(node, bindings):
             return True
         name = _callee(node)
         if name in helpers and name not in seen:
             seen.add(name)
-            if _does_file_work(helpers[name], helpers, seen):
+            if _does_file_work(helpers[name], helpers, seen, bindings):
                 return True
     return False
 
 
-def _settings_names(tree: ast.Module) -> set[str]:
-    names = {"settings"}
+def _hypothesis_names(tree: ast.Module, name: str) -> set[str]:
+    """`name` and every alias of it imported from hypothesis."""
+    names = {name}
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.module == "hypothesis":
-            names |= {a.asname for a in node.names if a.name == "settings" and a.asname}
+            names |= {a.asname for a in node.names if a.name == name and a.asname}
     return names
 
 
@@ -161,12 +247,14 @@ def deadline_violations(text: str) -> list[str]:
         if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
     ]
     helpers = {function.name: function for function in functions}
-    names = _settings_names(tree)
+    names = _hypothesis_names(tree, "settings")
+    givens = _hypothesis_names(tree, "given")
+    bindings = _bindings(tree)
     return [
         f"{function.name}:{function.lineno}"
         for function in functions
-        if any(_decorator_name(item) == "given" for item in function.decorator_list)
-        and _does_file_work(function, helpers, {function.name})
+        if any(_decorator_name(item) in givens for item in function.decorator_list)
+        and _does_file_work(function, helpers, {function.name}, bindings)
         and not _has_no_deadline(function, names)
     ]
 
@@ -181,6 +269,112 @@ _PLANT = (
     "    with tempfile.TemporaryDirectory() as folder:\n"
     "        assert folder\n"
 )
+_BODY = "    with tempfile.TemporaryDirectory() as folder:\n"
+# S2-P80.rv1: one plant per call form the first guard missed; each value is
+# (imports placed above the plant, the plant's first body line).
+_ROUTES_R2 = {
+    "TemporaryFile": ("", "    tempfile.TemporaryFile()\n"),
+    "SpooledTemporaryFile": ("", "    tempfile.SpooledTemporaryFile()\n"),
+    "path.open": ("", "    path.open('w')\n"),
+    "io.open": ("", "    io.open('x')\n"),
+    "os.open": ("", "    os.open('x', 0)\n"),
+    "codecs.open": ("", "    codecs.open('x')\n"),
+    "pathlib.Path": ("", "    pathlib.Path('x')\n"),
+    "os.walk": ("", "    os.walk('x')\n"),
+    "os.rmdir": ("", "    os.rmdir('x')\n"),
+    "os.symlink": ("", "    os.symlink('x', 'y')\n"),
+    "os.link": ("", "    os.link('x', 'y')\n"),
+    "os.chmod": ("", "    os.chmod('x', 0)\n"),
+    "os.fdopen": ("", "    os.fdopen(3)\n"),
+    "os.truncate": ("", "    os.truncate('x', 0)\n"),
+    "shutil.copy2": ("", "    shutil.copy2('x', 'y')\n"),
+    "shutil.copyfileobj": ("", "    shutil.copyfileobj(a, b)\n"),
+    "shutil.copymode": ("", "    shutil.copymode('x', 'y')\n"),
+    "shutil.make_archive": ("", "    shutil.make_archive('x', 'zip')\n"),
+    "shutil.chown": ("", "    shutil.chown('x')\n"),
+    "subprocess.call": ("", "    subprocess.call(['x'])\n"),
+    "subprocess.getoutput": ("", "    subprocess.getoutput('x')\n"),
+    "subprocess.getstatusoutput": ("", "    subprocess.getstatusoutput('x')\n"),
+    "os.system": ("", "    os.system('x')\n"),
+    "os.popen": ("", "    os.popen('x')\n"),
+    "path.glob": ("", "    path.glob('*')\n"),
+    "glob.iglob": ("", "    glob.iglob('*')\n"),
+    "zipfile.ZipFile": ("", "    zipfile.ZipFile('x')\n"),
+    "tarfile.open": ("", "    tarfile.open('x')\n"),
+    "gzip.open": ("", "    gzip.open('x')\n"),
+    "bz2.open": ("", "    bz2.open('x')\n"),
+    "lzma.open": ("", "    lzma.open('x')\n"),
+    "shelve.open": ("", "    shelve.open('x')\n"),
+    "dbm.open": ("", "    dbm.open('x')\n"),
+    "alias Path": ("from pathlib import Path as P\n", "    P('x')\n"),
+    "alias TemporaryDirectory": (
+        "from tempfile import TemporaryDirectory as td\n",
+        "    td()\n",
+    ),
+    "alias TemporaryFile": ("from tempfile import TemporaryFile as tf\n", "    tf()\n"),
+    "alias open": ("from io import open as io_open\n", "    io_open('x')\n"),
+    "from-import walk": ("from os import walk\n", "    walk('x')\n"),
+    "alias copy2": ("from shutil import copy2 as cp\n", "    cp('x', 'y')\n"),
+    "from-import call": ("from subprocess import call\n", "    call(['x'])\n"),
+    "module alias": ("import os as o\n", "    o.walk('x')\n"),
+    "module alias two": ("import subprocess as sp\n", "    sp.call(['x'])\n"),
+}
+# One route per new list member, so deleting the member alone turns a plant
+# red: a bare call (FILE_NAMES), a call on a non-module receiver (FILE_METHODS)
+# and a `from M import N as bound` call (FILE_QUALIFIED, N outside FILE_NAMES).
+_BARE_R2 = ("TemporaryFile", "SpooledTemporaryFile")
+_METHOD_R2 = (
+    "TemporaryFile",
+    "SpooledTemporaryFile",
+    "open",
+    "fdopen",
+    "rmdir",
+    "truncate",
+    "glob",
+    "iglob",
+    "symlink",
+    "chmod",
+    "chown",
+    "copyfileobj",
+    "copymode",
+    "copy2",
+    "make_archive",
+    "ZipFile",
+    "popen",
+    "getoutput",
+    "getstatusoutput",
+)
+_FROM_R2 = (
+    "subprocess.getoutput",
+    "subprocess.getstatusoutput",
+    "os.fdopen",
+    "os.rmdir",
+    "os.symlink",
+    "os.chmod",
+    "os.truncate",
+    "os.popen",
+    "shutil.copyfileobj",
+    "shutil.copymode",
+    "shutil.make_archive",
+    "shutil.chown",
+    "glob.iglob",
+    "zipfile.ZipFile",
+)
+_ROUTES_R2 |= {f"bare {name}": ("", f"    {name}()\n") for name in _BARE_R2}
+_ROUTES_R2 |= {f"handle.{name}": ("", f"    handle.{name}()\n") for name in _METHOD_R2}
+_ROUTES_R2 |= {
+    f"from {pair}": (
+        "from {} import {} as bound\n".format(*pair.split(".")),
+        "    bound()\n",
+    )
+    for pair in _FROM_R2
+}
+# Same-named calls that are not file work stay outside the guard.
+_NOT_FILE_WORK = {
+    "ast.walk": "    ast.walk(text)\n",
+    "mock.call": "    mock.call(text)\n",
+    "platform.system": "    platform.system()\n",
+}
 
 
 class TestBootstrap(unittest.TestCase):
@@ -324,7 +518,7 @@ class TestBootstrap(unittest.TestCase):
         self.assertEqual(deadline_violations(_PLANT.format(decorator=kept)), [])
 
     def test_deadline_guard_routes(self) -> None:
-        body = "    with tempfile.TemporaryDirectory() as folder:\n"
+        body = _BODY
         base = _PLANT.format(decorator="")
         cases = {
             "method": "    tempfile.mkdtemp()\n",
@@ -357,6 +551,36 @@ class TestBootstrap(unittest.TestCase):
         self.assertEqual(deadline_violations(replaced), ["test_plant:7"])
         marker = _PLANT.format(decorator="@marker(deadline=None)\n")
         self.assertEqual(deadline_violations(marker), ["test_plant:7"])
+
+    def test_deadline_guard_routes_round_two(self) -> None:
+        for name, (imports, line) in _ROUTES_R2.items():
+            with self.subTest(route=name):
+                red = imports + _PLANT.format(decorator="").replace(
+                    _BODY, line + "    if False:\n"
+                )
+                expected = f"test_plant:{6 + imports.count(chr(10))}"
+                self.assertEqual(deadline_violations(red), [expected])
+        for name, line in _NOT_FILE_WORK.items():
+            with self.subTest(pure=name):
+                pure = _PLANT.format(decorator="").replace(
+                    _BODY, line + "    if False:\n"
+                )
+                self.assertEqual(deadline_violations(pure), [])
+
+    def test_deadline_guard_given_alias(self) -> None:
+        alias = _PLANT.replace("given, settings", "given as g, settings")
+        alias = alias.replace("@given(", "@g(")
+        self.assertEqual(
+            deadline_violations(alias.format(decorator="")), ["test_plant:6"]
+        )
+        kept = alias.format(decorator="@settings(deadline=None)\n")
+        self.assertEqual(deadline_violations(kept), [])
+        dotted = _PLANT.replace("@given(", "@hypothesis.given(")
+        dotted = "import hypothesis\n" + dotted.format(decorator="")
+        self.assertEqual(deadline_violations(dotted), ["test_plant:7"])
+        other = _PLANT.replace("given, settings", "settings")
+        other = other.replace("@given(", "@g(").format(decorator="")
+        self.assertEqual(deadline_violations(other), [])
 
     def test_bare_run_still_prints_a_seed(self) -> None:
         self._table()
