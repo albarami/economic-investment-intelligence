@@ -6913,3 +6913,8 @@ Each registry placeholder remains null and intake refuses `bound_unconfirmed`.
 No bound is guessed; this proposed item closes neither OI-308 nor the original
 S2-T08 acceptance criterion. Different-maker review and the lead's whole-suite
 run remain pending.
+- UPDATE (2026-11-24, ruling L-1723): the lead set the five ceilings from the
+  receipted sizes (2, 2, 8, 1 and 1 GiB), pinned by
+  `test_reviewed_ceilings_are_pinned`; the null hold now applies only to a
+  future key without a confirmed ceiling. The item stays open for the
+  different-maker acceptance and the lead's whole-suite run.

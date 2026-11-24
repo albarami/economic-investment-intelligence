@@ -1133,9 +1133,13 @@ chunk, host, exact-size, ETag and empty-body refusals remain. Each successful
 stream adds the closed boolean `declared_length_present` to its receipt and
 immutable acquisition-check record; a repeated identical snapshot retains its
 original receipt and records the current observation in `checks/`.
-`cus_imp_2019`, `trade_ext/qatar-imports-2014-2018`, `bldg_wsf3d` and both
-registered `bldg_gba` tiles have explicit null ceilings pending separate lead
-confirmation from receipted sizes. No source-size value is inferred here.
+The five non-Overture keys, `cus_imp_2019`,
+`trade_ext/qatar-imports-2014-2018`, `bldg_wsf3d` and both registered
+`bldg_gba` tiles, carry the reviewed ceilings of ruling L-1723 (the smallest
+whole number of GiB at or above four times each key's receipted size), pinned
+by `test_reviewed_ceilings_are_pinned`. A future streamed key without a
+confirmed ceiling keeps the null hold and refuses `bound_unconfirmed`. No
+ceiling value is derived from a response header.
 
 The dedicated national imagery archive follows [decision 0079](decisions/0079-dated-gis-snapshot-and-structured-address-search.md) item 3 and `custodian/src/eii_custodian/publicdata/gis/SNAPSHOT.md`: its closed registry is `custodian/publicdata/review/gis_snapshot.json`, with ordinary and nightly eligibility false. A shard receipt includes imagery date, metadata/boundary/enumeration hashes, member names and hashes, publisher, terms/basis, retrieval UTC, byte size and generator version. Completion is published last after every enumerated key is accounted for as a verified tile or a recorded gap; staging is never complete. Resume verifies every skipped shard and its receipt. A release selects a reviewed all-date manifest hash explicitly; it never selects the newest directory.
 

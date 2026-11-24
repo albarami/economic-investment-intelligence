@@ -22,7 +22,7 @@ from eii_custodian.publicdata.fetch.transport import Response, StreamResponse
 
 @pytest.fixture(scope="module")
 def entries():
-    # Synthetic test ceilings; production ceilings stay null pending lead review.
+    # Synthetic test ceilings; the production ceilings are pinned in test_large_bounds.py.
     return {
         e.key: replace(e, stream_max_bytes=300 * 1024 * 1024 + 9)
         for e in load_registry()
