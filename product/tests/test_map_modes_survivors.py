@@ -30,7 +30,7 @@ def expected_meter(*, limit=None, warning=False):
     }
 
 
-def assert_refusal(response, *, capped=False, reason="no_key"):
+def assert_refusal(response, *, capped=False, reason="NOT_FOUND"):
     status, raw, headers = response
     if capped:
         assert status == 429
@@ -180,7 +180,7 @@ def test_schema_refusal_exact_body(provider):
         require_credit=False,
     )
     assert result.status_code == 404
-    assert_error(result.body, "NOT_FOUND", "no_key")
+    assert_error(result.body, "NOT_FOUND", "response_unavailable")
     assert result.headers["cache-control"] == "no-store"
 
 

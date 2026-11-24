@@ -367,6 +367,41 @@ def test_exception_output_invariant(name: str, form: str, sink: str) -> None:
 
 
 class PartBGuard(unittest.TestCase):
+    def test_d37_and_d53_planted_handlers(self) -> None:
+        for handler in (
+            'except ValueError:\n    return refusal(404, "NOT_FOUND")',
+            'except yaml.YAMLError:\n    return Refusal("NOT_MAPPING", file_name)',
+        ):
+            with self.subTest(handler=handler):
+                self.assertEqual(
+                    violations("try:\n    execute()\n" + handler + "\n"), [3]
+                )
+
+    def test_part_b_fixed_reason_family(self) -> None:
+        for code in (
+            "NOT_FOUND",
+            "NOT_MAPPING",
+            "missing_input",
+            "mount_unverified",
+            "imagery_integrity",
+            "imagery_manifest_integrity",
+            "row_shape",
+            "routing_tiles",
+            "routing tiles unavailable",
+            "count_unavailable",
+            "detail_on_point",
+            "asset_path_refused",
+        ):
+            with self.subTest(code=code):
+                self.assertEqual(
+                    violations(
+                        "try:\n    execute()\nexcept ValueError:\n    return "
+                        + repr(code)
+                        + "\n"
+                    ),
+                    [3],
+                )
+
     def test_d18_reverted(self) -> None:
         source = 'try:\n    read_layer()\nexcept Exception:\n    return refusal(500, "INTERNAL")\n'
         self.assertEqual(violations(source), [3])

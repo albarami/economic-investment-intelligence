@@ -138,8 +138,12 @@ def build_router(
     ) -> dict[str, str] | Response:
         try:
             definition = load_playbook(playbook, catalogue)
-        except (ValueError, OSError) as error:
+        except ValueError as error:
             return refusal(404, "NOT_FOUND", message_key=reason(error))
+        except OSError as error:
+            from eii_product.api.results import error_response
+
+            return error_response(error)
         try:
             inputs = Inputs.model_validate(raw)
         except ValueError:

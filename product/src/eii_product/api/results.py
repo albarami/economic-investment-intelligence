@@ -49,9 +49,14 @@ def error_response(
     diagnostic = reason(error)
     context = {"answer_id": answer_id, "release_id": release_id}
     if isinstance(error, (ArgumentError, AreaIdError)):
-        return refusal(422, "INVALID_ARGUMENT", message_key=diagnostic, **context)
+        return refusal(
+            422,
+            "INVALID_ARGUMENT",
+            message_key=None if diagnostic == "INVALID_ARGUMENT" else diagnostic,
+            **context,
+        )
     if isinstance(error, StoreRefusal) and diagnostic == "STORE_UNAVAILABLE":
-        return refusal(503, "STORE_UNAVAILABLE", message_key=diagnostic, **context)
+        return refusal(503, "STORE_UNAVAILABLE", message_key=None, **context)
     if isinstance(error, TimeoutError):
         return refusal(504, "QUERY_TIMEOUT", message_key=diagnostic, **context)
     return refusal(500, "INTERNAL", message_key=diagnostic, **context)

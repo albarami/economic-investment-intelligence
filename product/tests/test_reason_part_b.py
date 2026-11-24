@@ -14,6 +14,7 @@ from product.tests.public_http_support import Client
 from product.tests.test_public_playbook import catalogue
 
 from eii_core.calc.facts import NoData
+from eii_core.reason_codes import CODES
 from eii_core.reasons import reason
 from eii_product.api import layers, playbooks, public_layers, release, results
 from eii_product.assistant.catalogue import load
@@ -159,7 +160,7 @@ def context_failure(row):
     return result.reason
 
 
-def sector_failure(row):
+def sector_failure(row, fault=None):
     from product.tests.sector_fixture import norm_rows, release_store, with_lineage
     from product.tests.test_tools_http import CardStore
 
@@ -191,7 +192,9 @@ def sector_failure(row):
                     geography="national",
                 ),
             )
-            with patch.object(ctx, "measure", side_effect=ValueError("source_missing")):
+            with patch.object(
+                ctx, "measure", side_effect=fault or ValueError("source_missing")
+            ):
                 sector_facts._norms(ctx)
     return ctx.blocks[0]["reason_key"]
 
@@ -238,11 +241,17 @@ def api_plant(row, tmp_path):
                 release.MountedRelease(STORE, Path("INVENTED"))
         return reason(caught.value)
     if row == "D28":
-        from eii_product.api.map_modes import refuse
+        from eii_product.api import map_modes
 
-        response = refuse("offline")
+        app = FastAPI()
+        app.include_router(
+            map_modes.build_router(
+                lambda: "INVENTED-key", lambda: True, Mock(), tmp_path / "count"
+            )
+        )
+        response = Client(app).get("/api/imagery/tiles/0/0/0")
         assert response.status_code == 404
-        return api_code(response)
+        return response.json()["error"]["message_key"]
     if row == "D29":
         from eii_product.api import map_modes
 
@@ -380,7 +389,7 @@ CASES = [
     ("D30", "font_stack_refused"),
     ("D31", "input_key_missing"),
     ("D37", "unknown_question"),
-    ("D38", "STORE_UNAVAILABLE"),
+    ("D38", "store_unavailable"),
     ("D39", "geometry text refused"),
     ("D40", "coordinate_range"),
     ("D41", "geometry_refused"),
@@ -399,15 +408,9 @@ def test_part_b_inner_reason(row, expected, tmp_path):
     assert api_plant(row, tmp_path) == expected
 
 
-@given(
-    st.text().filter(
-        lambda value: value not in {"chain_refused", "row_citation_missing"}
-    )
-)
+@given(st.one_of(st.sampled_from(sorted(CODES)), st.text()))
 def test_response_never_interpolates_unknown_text(value):
-    from eii_core.reason_codes import CODES
-
     response = results.error_response(ValueError(value))
     error = json.loads(response.body)["error"]
-    assert error["message_key"] in CODES or error["message_key"] == "internal"
+    assert error["message_key"] == (value if value in CODES else "operation_failed")
     assert set(error) == {"code", "message_key", "error_id"}

@@ -1847,8 +1847,9 @@ facts emitted by the existing closed Public layer/card readers and by the
 before serialization and the ledger transaction; their index entries are
 admitted only after that transaction commits. A playbook answer's facts are
 validated inside its ledger transaction, so a refused chain rolls the answer
-back with `PLAYBOOK_FAILED`, and are admitted only after that transaction
-commits, before the answer's event stream exists. An answer's facts are held
+back with `INTERNAL` (HTTP 500) carrying the chain's closed `message_key`
+(document 08, **Closed API reasons (S3-T11 early round, Part B)**), and are
+admitted only after that transaction commits, before the answer's event stream exists. An answer's facts are held
 for the one admitted `eii_session` that received the answer (BE-109): the
 lineage read resolves them only for the session that the trusted seat
 dependency verifies, and another session, an unknown key or no session gets

@@ -7777,3 +7777,12 @@ The S3-B5 rounds 3 and 4 records were not carried by the S3-B5 re-cut (S3-B5rc2.
 ### PO-S3-P02B-2 — Concurrent boundary scan fingerprint failure retained
 
 - The initial import-boundary run exited 1 while other test/write processes were active; the captured fingerprint difference includes newly created `__pycache__` files (`.overnight/OUT/import-boundary.log`). A concurrent writer is the working diagnosis, supported by the command schedule and added bytecode paths. The final run is serialized with bytecode writes disabled and its exit is recorded in PROGRESS.md and the return. The initial failure is not erased or closed solely by a green rerun; the lead retains confirmation of its disposition. No import-boundary guard changed.
+
+### S3-P02 Part B round two — reviewer-proposed notes retained
+
+Source: `.overnight/IN/rv1-open-items.md`, S3-P02B.rv1. These are records for the lead, not fixes in this round; their meaning is unchanged.
+
+- **D43 (`tools/resolve.py`).** One malformed released row (a null key or code, a non-string geometry, a non-numeric coordinate) now withholds every resolve call. One matched place with a bad coordinate withholds the whole answer, valid activity candidates included. A failed index is not cached, so all six tables are re-read on every call. This is documented in doc 13 but needs the lead's ruling on availability.
+- **D24 (`public_point_snapshot`).** Any withheld entry in any of the five point layers now makes `make_area` and the area cards return 500. Confirm that release checks guarantee no such entry.
+- **D38.** An `AreaIdError` inside playbook execution now maps to 422 instead of 500 `PLAYBOOK_FAILED`. Whether it can be reached is unverified.
+- **D31.** A data integrity fault on the imagery tile route now carries the class `INVALID_ARGUMENT` (status 422, unchanged). Raise it for Part C or doc 08.

@@ -1114,7 +1114,10 @@ Model unavailability is not an error: it is reported as a `status` event with `w
 The BE-91 `code` selects the HTTP error class above. `message_key` preserves the
 inner closed diagnostic, without lowercasing or rewording it; the matching BE-94
 log uses that diagnostic as `error_code`. Calls with no inner diagnostic retain
-their existing default message key and log code. The sole vocabulary is
+their existing default message key and log code. In `error_response`, an inner
+reason equal to the `INVALID_ARGUMENT` or `STORE_UNAVAILABLE` class placeholder
+also keeps that class's lowercase default message key and uppercase log code;
+a specific inner diagnostic still passes through unchanged. The sole vocabulary is
 `eii_core.reason_codes.CODES`, projected by `eii_core.reasons.reason` and
 `closed_code`. No exception excerpt, YAML text, path, SQL, coordinate or provider
 response is admitted. Unstructured faults use the Part-A key/type/attribute,

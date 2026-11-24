@@ -89,7 +89,11 @@ def fetch_tile(
         status = value
 
     try:
-        return exchange_metadata(opener, request, on_status=remember_status)
+        status, raw, headers = exchange_metadata(
+            opener, request, on_status=remember_status
+        )
+        headers.pop("x-eii-error-code", None)
+        return status, raw, headers
     except HTTPError as error:
         error.close()
         return error.code, b"", {}

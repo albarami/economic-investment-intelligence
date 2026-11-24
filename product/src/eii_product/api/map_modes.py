@@ -119,13 +119,13 @@ def build_router(
             return refuse()
         key = key_reader()
         if not key:
-            return refuse()
+            return refuse("no_key")
         try:
             credit = satellite_credit(opener, map_setting("EII_IMAGERY_TILE_BASE"), key)
         except Exception as error:
             return refuse(closed_reason(error))
         if not credit:
-            return refuse()
+            return refuse("attribution_unavailable")
         try:
             result = fetch_tile(
                 opener,
@@ -138,7 +138,7 @@ def build_router(
             return refuse(closed_reason(error))
         status, raw, headers = result
         if not safe_response(raw, headers, key):
-            return refuse()
+            return refuse("response_unavailable")
         headers["x-attribution"] = credit
         return deliver((status, raw, headers), key, require_credit=True)
 
@@ -176,7 +176,7 @@ def build_router(
                 return refuse(why)
             key = read_maptile_api_key()
             if not key:
-                return refuse()
+                return refuse("no_key")
             try:
                 target = native.target(
                     view, path, map_setting("EII_PHOTOREAL_TILE_BASE")
@@ -204,9 +204,7 @@ def build_router(
             status, raw, headers = result
             if not 200 <= status < 300 or not safe_response(raw, headers, key):
                 native.dispose(view)
-                return refuse(
-                    closed_code(headers.get("x-eii-error-code"), "response_unavailable")
-                )
+                return refuse(response_reason(headers))
             try:
                 if target.path.endswith(".json"):
                     raw = native.rewrite(
@@ -228,7 +226,13 @@ def build_router(
     return router
 
 
-def refuse(reason: str = "no_key") -> JSONResponse:
+def response_reason(headers: dict[str, str]) -> str:
+    """Only the budget, never a transport result, may report a reached cap."""
+    code = closed_code(headers.get("x-eii-error-code"), "response_unavailable")
+    return "response_unavailable" if code == "cap_reached" else code
+
+
+def refuse(reason: str = "NOT_FOUND") -> JSONResponse:
     capped = reason == "cap_reached"
     response = refusal(
         429 if capped else 404,
@@ -274,15 +278,13 @@ def deliver(
 ) -> Response:
     status, raw, headers = result
     if not 200 <= status < 300 or not safe_response(raw, headers, key):
-        return refuse(
-            closed_code(headers.get("x-eii-error-code"), "response_unavailable")
-        )
+        return refuse(response_reason(headers))
     outgoing = dict(NO_STORE)
     credit = headers.get("x-attribution", "")
     if (require_credit and not credit) or (
         credit and (not credit.isascii() or any(ord(c) < 32 for c in credit))
     ):
-        return refuse()
+        return refuse("attribution_unavailable")
     if credit:
         outgoing["X-Attribution"] = credit
     if meter is not None:
@@ -297,5 +299,5 @@ def deliver(
         "application/octet-stream",
         "model/gltf-binary",
     }:
-        return refuse()
+        return refuse("response_unavailable")
     return Response(raw, status_code=status, headers=outgoing, media_type=content_type)

@@ -669,7 +669,10 @@ def _norms(ctx: Context) -> None:
                 services_percent=measure(cells["services_share"], "percent"),
                 components=components,
             )
-        except (ValueError, KeyError) as error:
+        except KeyError:
+            ctx.block("unit_economics", [], reason="input_key_missing")
+            continue
+        except ValueError as error:
             ctx.block("unit_economics", [], reason=closed_reason(error))
             continue
         ctx.block(
