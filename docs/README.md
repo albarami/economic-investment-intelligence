@@ -10,6 +10,7 @@
 
 ## In brief
 
+- Proposed [decision 0107](decisions/0107-a-citation-page-the-publisher-no-longer-serves.md) records the S2-P81 registration of one landmark citation page the publisher no longer serves as a SKIP with the closed word `page_not_served`; different-maker review remains pending.
 - Proposed [decision 0097](decisions/0097-custodian-shard-headroom.md) records the S2-P67 custodian shard-headroom implementation under ruling L-1517 item 2, retaining decision 0086's limit and watch; different-maker review remains pending.
 
 - Read the project brief before any specialised document.

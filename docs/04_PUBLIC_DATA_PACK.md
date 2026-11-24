@@ -366,6 +366,14 @@ from a source record into the repository.
 | `landmark_wikiarquitectura` | 2 | WikiArquitectura | `en.wikiarquitectura.com` | `owner_decision`; decision 0026 item 3 |
 | `landmark_wikipedia` | 19 | Wikipedia | `en.wikipedia.org` | `dataset`; CC-BY-SA-4.0 text |
 
+The one page of `landmark_skyscraperpage_com` answered 404 on 2026-11-24 and is
+registered with `skip_reason: page_not_served` under proposed
+[decision 0107](decisions/0107-a-citation-page-the-publisher-no-longer-serves.md):
+build-public reports it as a SKIP and sends no request for it. A landmark citation
+row accepts that one reason word or none; the parser refuses any other. The lead
+re-probes the page at each live build (OI-411), and the word is removed when it
+answers again.
+
 ### 2.2 Coverage, use and traps
 
 Coverage facts of the rows above `prop_resi_units` are from the project research, retrieved
