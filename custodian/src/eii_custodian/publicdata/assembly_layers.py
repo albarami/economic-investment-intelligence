@@ -15,7 +15,8 @@ if TYPE_CHECKING:
     from .assembly_adapters import Production
 
 
-def build_layers(build: Production) -> None:
+def build_layers(build: Production) -> dict[str, list[dict[str, object]]]:
+    from .additions.common import Coverage
     from .confirm_s2_t13 import completion_evidence, load_confirmation, own_run_pending
     from .frame.crosswalk import load_municipality_names, read_csv
     from .gis.layers import (
@@ -48,6 +49,7 @@ def build_layers(build: Production) -> None:
     identifiers: set[str] = set()
     deal_sources = []
     sale_sources = []
+    bulletin_coverage: dict[str, list[dict[str, object]]] = {}
     family_rows: dict[str, list[dict[str, object]]] = defaultdict(list)
     family_sources: dict[str, set[str]] = defaultdict(set)
     parsers: dict[
@@ -129,8 +131,10 @@ def build_layers(build: Production) -> None:
             )
         elif source in {"prop_sales", "prop_resi_units"}:
             raw = build.raw(entry)
+            blocked: tuple[Coverage, ...] = ()
             if source == "prop_sales":
-                raw = sales_export_rows(raw)
+                export = sales_export_rows(raw)
+                raw, blocked = export.rows, export.blocked
             result = parse_bulletin(
                 raw,
                 source,
@@ -141,6 +145,9 @@ def build_layers(build: Production) -> None:
                 },
             )
             deals.extend(result.deals)
+            bulletin_coverage[entry.key] = [
+                asdict(item) for item in (*blocked, *result.blocked)
+            ]
             identifiers.update(result.identifiers)
             deal_sources.append(entry.key)
             if source == "prop_sales":
@@ -216,6 +223,7 @@ def build_layers(build: Production) -> None:
         build.table("pub_property_quarter", list(quarter_rows), tuple(deal_sources))
     for table in sorted(family_rows):
         build.table(table, family_rows[table], tuple(sorted(family_sources[table])))
+    return bulletin_coverage
 
 
 def _features(layers: list[dict[str, Any]]) -> list[dict[str, Any]]:

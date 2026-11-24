@@ -703,6 +703,8 @@ restaurant mean monthly equivalent = 31,579 / 12 = 2,631.583..., shown as QAR 2,
 
 **Purpose.** Show the median sale price per square metre for a district and year, always with the deal count.
 
+For `prop_sales`, ruling L-1724 item 1 admits whole-property deals only (all three share fields null, or `share_value == property_value`, `share_area == area_square_meters` and `number_of_shares_2400 == 2400`, exactly); `partial_share_deal` and `share_fields_inconsistent` rows are counted exclusions, never priced, and prices read only `property_value` and `area_square_meters`.
+
 **Inputs.** Transaction rows of the Ministry of Justice weekly real-estate sales bulletin (Qatar Open Data Portal, CC BY, retrieved 2026-11-11), after the district crosswalk has matched the name. The English property-type field is not used. The release table is `pub_property_sale`. Rows that do not match the crosswalk are excluded, never guessed.
 
 **Formula.**
@@ -2218,6 +2220,8 @@ a candidate missing a criterion, with a withheld figure, or with an open median 
 | MTH-115 | The sentence of C40 states the count of runs ("holds in X of N runs") and the input with the largest total-order index, or, where no index is computed, that no input stood out (MTH-114), always beside C11's rank-stability bound where a rank is shown; it never states a percentage, a probability, a confidence level or a chance, and it never names a verdict ([decision 0023](decisions/0023-ten-additions-and-the-data-rule.md) item 5; MTH-45). No protected figure is a demand weight (PRV-41); the wage level enters only as an eligibility ceiling on the released median band; the rent is the user's own input or, labelled as prices, the guide and recorded prices of C41, and never an invented rent; a drawn price is compared only with the user's price ceiling in QAR a square foot, never with the rent ceiling. |
 
 ### C41 Property price measures
+
+For `prop_sales`, ruling L-1724 item 1 admits whole-property deals only (all three share fields null, or `share_value == property_value`, `share_area == area_square_meters` and `number_of_shares_2400 == 2400`, exactly); `partial_share_deal` and `share_fields_inconsistent` rows are counted exclusions, never priced, and prices read only `property_value` and `area_square_meters`.
 
 **Purpose.** From the property sales bulletins of the Justice Ministry and the banks' credit by economic activity, show the price per square foot by district, use and quarter with deal counts and values, the guide land price against the recorded deal price, affordability against pay, and bank credit by sector against the sector's growth, with forecasts only through C30; and, beside the prices, how near a planned station is (journeys D2 and D5; decision 0023 items 3 and 8).
 

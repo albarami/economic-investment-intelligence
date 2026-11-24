@@ -465,7 +465,50 @@ def test_group_keys_and_ties_stay_distinct_and_sorted() -> None:
 
 def test_bulletin_shape_adapter_is_used_by_the_producer(tmp_path: Path) -> None:
     raw = _rows("c14_worked_example.json")
-    adapted = sales_export_rows(raw)
+    adapted = sales_export_rows(raw).rows
     assert all("usage" not in row for row in adapted)
     parsed = _parse(adapted, tmp_path, _map(), source_id="prop_sales")
     assert sale_aggregates(parsed.deals) == (C14_ROW,)
+
+
+def test_share_exclusions_reach_the_phase_record_and_neither_price_card(
+    tmp_path: Path,
+) -> None:
+    from custodian.tests.test_property_sales_export import _whole
+
+    entry = next(e for e in load_registry() if e.key == "prop_sales")
+    build = _producer(
+        tmp_path,
+        entry,
+        [
+            _export(),
+            _whole(encrypted_transaction_number="SYN-TX-WHOLE"),
+            _whole(share_area=50, share_value=50000, number_of_shares_2400=1200),
+            _whole(share_value=50000),
+        ],
+    )
+    build.gis_property_singles()
+    record = json.loads((tmp_path / "assembly/gis_property_singles.json").read_text())
+    assert record["bulletin_coverage"][entry.key] == [
+        {"reason": "partial_share_deal", "count": 1},
+        {"reason": "share_fields_inconsistent", "count": 1},
+    ]
+    (sale,) = build.tables["pub_property_sale"]
+    assert (sale["deal_count"], sale["median_price_per_m2"]) == (2, Decimal("1000.00"))
+    quarter = next(
+        r for r in build.tables["pub_property_quarter"] if r["unit_type"] == "all"
+    )
+    assert (
+        quarter["deal_count"],
+        quarter["deal_value"],
+        quarter["median_price_per_ft2"],
+    ) == (2, Decimal("200000"), Decimal("92.90"))
+
+
+def test_all_share_rows_excluded_writes_no_price_table(tmp_path: Path) -> None:
+    entry = next(e for e in load_registry() if e.key == "prop_sales")
+    build = _producer(tmp_path, entry, [_export(share_value=0)])
+    with pytest.raises(AdditionError, match=r"^no_whole_property_deals$"):
+        build.gis_property_singles()
+    assert build.tables == {}
+    assert not (tmp_path / "assembly/gis_property_singles.json").exists()

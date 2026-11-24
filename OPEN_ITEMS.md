@@ -6920,3 +6920,13 @@ run remain pending.
   `test_reviewed_ceilings_are_pinned`; the null hold now applies only to a
   future key without a confirmed ceiling. The item stays open for the
   different-maker acceptance and the lead's whole-suite run.
+
+## OI-412 — Share-field meaning remains unconfirmed
+
+- ID: OI-412
+- TYPE: OPEN (source semantics)
+- RAISED BY: S2-P86, 2026-11-24
+- CONCERNS: S2-T19, document 07 cards C14 and C41, ruling L-1724 item 1.
+- EVIDENCE: the task brief admits exact whole-property patterns only; invented-input tests establish exclusion accounting, not publisher meaning or real-cache counts.
+- NEEDED: share-field meaning unconfirmed; partial deals are re-admitted only by a later decision. The lead compares the real-cache counts with its trace after independent review.
+- NEEDED BY: any later admission of partial deals.

@@ -83,7 +83,7 @@ MODULES = {
 def test_refusal_inventory_matches_approved_payload():
     payload = json.dumps(INVENTORY_CASES, sort_keys=True, separators=(",", ":"))
     assert sha256(payload.encode()).hexdigest() == (
-        "336f1caf739ac6763e34a875870abe40b8f5b95d480ad501a133a9d32d575e1d"
+        "e2f363e027c8c828e6b7fa5dc8ec23cd802dc086b4a36472d59cbcb602a64dc5"
     )
 
 
