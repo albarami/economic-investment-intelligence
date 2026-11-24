@@ -1709,6 +1709,8 @@
 - OPTIONS: **Recommendation:** leave to the crosswalk tasks that own the country, municipality and gazetteer maps.
 - NEEDED BY: the tasks owning the crosswalks and the cards that display mapped geography.
 
+- UPDATE 2026-11-24, S2-P85 (proposed decision 0108): the needed reviewed crosswalk rows stay in the uncommitted cache review folder after the lead's review, whose PROGRESS.md record binds their file hash; the committed file stays schema-only. This supersedes the storage wording above and in the later carry row, without closing OI-182 or claiming real mappings.
+
 ## OI-183 — Mutation-sweep pass over the merged-task survivors (with S2-T11, S2-T15)
 
 - ID: OI-183
