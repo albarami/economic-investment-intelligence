@@ -24,8 +24,13 @@ class Node:
     children: list[Node | str] = field(default_factory=list)
     parent: Node | None = field(default=None, repr=False)
 
-    def text(self) -> str:
-        return "".join(c if isinstance(c, str) else c.text() for c in self.children)
+    def text(self, *, skip_tags: frozenset[str] = frozenset()) -> str:
+        if self.tag in skip_tags:
+            return ""
+        return "".join(
+            c if isinstance(c, str) else c.text(skip_tags=skip_tags)
+            for c in self.children
+        )
 
     def nodes(self) -> list[Node]:
         return [c for c in self.children if isinstance(c, Node)]

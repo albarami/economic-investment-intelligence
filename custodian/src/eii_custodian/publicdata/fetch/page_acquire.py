@@ -100,10 +100,12 @@ def _has_password_input(root: Node) -> bool:
     )
 
 
-def _citation_obstacle(body: bytes, root: Node) -> str | None:
-    """L-1615: a sign-in link word alone never refuses a citation snapshot."""
-    lower = body.lower()
-    if any(word in lower for word in (b"robot check", b"paywall")):
+def _citation_obstacle(root: Node) -> str | None:
+    """Citation walls use visible text; L-1615's password rule is unchanged."""
+    lower = root.text(
+        skip_tags=frozenset({"script", "style", "noscript", "template"})
+    ).lower()
+    if any(word in lower for word in ("robot check", "paywall")):
         return "refusal_body"
     if _has_password_input(root):
         return "credentials"
@@ -244,7 +246,8 @@ def fetch(
                 and url != entry.terms_url
             )
             # L-1615: on a citation page a password field, not the "sign in"
-            # link word, marks the wall; other kinds keep the word scan. The
+            # link word, marks the wall; citation refusal words use visible
+            # text only (S2-P82), and other kinds keep the raw word scan. The
             # citation parse is the L-1614 first-wins tree the form-secret
             # render reuses below; never a second permissive Tree.
             root = (
@@ -257,7 +260,7 @@ def fetch(
                 if review["kind"] != "citation_snapshot":
                     return obstacle(body)
                 assert root is not None
-                return _citation_obstacle(body, root)
+                return _citation_obstacle(root)
 
             obstacle_reason = scan(response.body) if response is not None else None
             reason = failure.check if failure else obstacle_reason
