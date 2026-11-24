@@ -53943,3 +53943,49 @@ S2-P84 lead ceiling commit (ruling L-1723, 2026-11-24): `custodian/publicdata/so
 - Cause: the same-seed resume LIVE-S2.L2e3 refetched `trade_logistics/annual-certificates-of-origin-by-type-and-importing-country` (the S2-P90 fetch-code change made its fingerprint new, by design) and stopped at `row_count expected=1162..1162 observed=1142`. The portal's own dataset metadata, read from the lead's shell, gives a records count of 1142, a modified time of 2026-11-24, and the years 2019 to 2024 all present. A sweep of all 152 portal datasets with a pinned row count against the same metadata found this one entry changed and 151 unchanged.
 - Change: `custodian/publicdata/sources.yaml` pins `row_count_min` and `row_count_max` 1142 for that entry; the `trade_logistics` row of document 04 gives 1,142 rows, modified 2026-11-24, and keeps the earlier count and date as history. No other field, entry or check changes.
 - Checks: the registry and source tests (7 files) 236 passed, exit 0; `python3 scripts/check_docs.py` with the private pattern file, exit 0.
+
+## S2-P93 — the product suite in two named parts — 2026-11-24
+
+- Build, uncommitted, at base `015647659a17c55407754eaeb72b0b90e9c855cc` (ruling L-1777 item 2a; proposed
+  decision 0109). Builder: Anthropic Claude (Fable 5.2). Persona: a senior test-infrastructure engineer for pytest
+  suites and runners; strict self-review persona: strict-reviewer. Skills: project-orientation, task-standards,
+  test-driven-development, verification-before-completion, sanad-provenance, muhasabah-gate.
+- **BLOCKED on the premise, raised as PO-S2-P93-01.** The ruling's 460 and 490 seconds for `python-product` were not
+  reproduced: the unsplit `pytest product/tests` ran 816 passed in 10.84 s at the base; the row "2026-11-23, Lead
+  whole test on the train head" above records 13.5 s for the same 816 tests. Decision 0109 is written as Proposed.
+- Change: `python-product` becomes `python-product-1` and `python-product-2` in the suite table, each `pytest` over
+  `product/tests` with the unchanged 600 s limit, through the one plugin `scripts/pytest_custodian_part.py`, which
+  now holds a table of part counts (custodian 5, product 2), one option per suite and a usage error when both are
+  given. `scripts/tests/custodian_part_support.py` takes the suite name, id prefix and part count, with the custodian
+  values as defaults. The workflow matrix names the two parts and its pinned hash in
+  `scripts/tests/ci_workflow_rules.py` moves with it. `scripts/tests/test_custodian_parts.py` is unchanged.
+- Counts through the runner, processors 0-3, `UV_OFFLINE=1`: `uv run --locked python scripts/run_tests.py --suite
+  python-product-1` exit 0, 247 passed, 0 failed, 0 skipped in 13.9 s (seed one billion seven hundred ninety-five
+  million five hundred twenty-six thousand five hundred eighty-eight); `--suite python-product-2` exit 0, 569
+  passed, 0 failed, 0 skipped in 7.3 s (seed one billion seven hundred ninety-five million five hundred twenty-six
+  thousand six hundred two). 247 + 569 = 816, the whole `product/tests` count. An earlier pair of runs gave the same
+  counts in 8.9 s and 4.8 s. `--suite python-product` now exits 2, unknown suite.
+- Custodian outcome unchanged: each of the five custodian parts collects the same test ids with the changed plugin
+  as with the base commit's plugin (2792, 3073, 2439, 4193 and 3175 ids, the same SHA-256 of each id list, summing
+  to the unsplit 15672), and equals the SHA-256 modulo 5 rule computed apart from the plugin.
+- Red first: with the new guard and the changed table expectation written before the code,
+  `UV_OFFLINE=1 uv run --locked python -m pytest scripts/tests/test_custodian_parts.py
+  scripts/tests/test_runner_usage.py scripts/tests/test_product_parts.py -q -p no:cacheprovider` exited 1 (15 failed,
+  21 passed). Green after the change: exit 0, 31 passed, 46 subtests passed.
+- Guard clauses, each deleted alone and restored byte for byte (SHA-256 checked), with
+  `scripts/tests/test_product_parts.py`; every run exited 1 and the restored file exits 0: the nonempty and
+  part-count clause; the overlap clause; the whole-module clause; the union-by-id clause; the count clause; the
+  every-file-collected clause; the failed-collection refusal (it survived the first run, exit 0, so the case
+  `test_failed_collection_is_refused_and_never_read_as_empty` was added, then exit 1); the option's closed choices;
+  the one-option refusal; the empty-part refusal.
+- Planted violations of the code, each alone, exit 1 and restored: the deselection report removed; the split
+  ignoring the suite's part count; a split by test id instead of module path; both table rows selecting part 1;
+  the plugin filtering nothing; the part number losing its plus one; the digest read little-endian; the product
+  part count set to three.
+- Checks on the final files: neighbouring guards `test_ci_workflows.py`, `test_ci_shards.py`,
+  `test_test_bootstrap.py`, `test_runner_failures.py` and `test_runner_environment.py` exit 0 (78 passed, 506
+  subtests); `python -m unittest scripts.tests.mutation_runner.SourceGuardSelectionTests` exit 0 (4 tests);
+  import-boundary discovery exit 0 (37 tests); `ruff check .` 0; `ruff format --check .` 0 (1009 files); `mypy` 0
+  (531 files); `check_docs.py` 0; `check_tree.py` 0 (8 rules); `cmp AGENTS.md CLAUDE.md` 0; `git diff --check` 0.
+  Environment: WSL2 Linux, Python 3.14, `UV_OFFLINE=1`, `TMPDIR` inside the worktree, no network. The whole
+  `./eii test` is the lead's run and was not run here.

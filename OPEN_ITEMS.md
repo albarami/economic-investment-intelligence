@@ -7029,3 +7029,14 @@ run remain pending.
 - CONCERNS: `LANDMARK_CATEGORIES` tokens come from the lead's diagnosis and are not yet checked against the source's published category taxonomy. A missing real token fails closed.
 - NEEDED: check the tokens against the published taxonomy, with its citation.
 - NEEDED BY: the S2 gate record.
+
+## PO-S2-P93-01 — The product suite's measured time is not reproduced
+
+- ID: PO-S2-P93-01
+- TYPE: PROPOSED (raised by the builder of S2-P93)
+- RAISED BY: S2-P93 builder (Anthropic Claude), 2026-11-24
+- CONCERNS: ruling L-1777 item 2a gives `python-product` 460 and 490 seconds alone (77 to 82 percent of its 600-second limit). At base `015647659a17c55407754eaeb72b0b90e9c855cc` the unsplit suite ran 816 passed in 10.84 seconds, its two new parts in 8.9 and 4.8 seconds, and PROGRESS.md's row "2026-11-23, Lead whole test on the train head" records 13.5 seconds. Proposed [decision 0109](docs/decisions/0109-the-product-suite-runs-in-two-named-parts.md) is therefore not marked Accepted.
+- NEEDED: the lead names the suite whose line read 460 and 490 seconds, with its run output, and then either confirms decision 0109 as it stands, or withdraws the split and applies decision 0060's method to that suite by its own record.
+- NEEDED BY: before S2-P93 joins a train.
+- ANSWER (lead, 2026-11-24, ruling L-1784): the 460 and 490 seconds, the 510.5 seconds and the two timeouts were measured on the slice S6 stacks, where `product/tests` holds 3706 tests (S6-T18rc2 and S6-T13rc2 product runs; whole test S6-3.wt1). The lead's brief gave them as main's figures by mistake. Decision 0109 is Accepted with that Context; the split lands with slice S2 as shared infrastructure the later slices are re-cut onto.
+- STATUS: answered.
