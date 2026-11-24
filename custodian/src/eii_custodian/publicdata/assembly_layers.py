@@ -15,6 +15,23 @@ if TYPE_CHECKING:
     from .assembly_adapters import Production
 
 
+def check_property_districts(build: Production) -> None:
+    """Bind every property crosswalk key to this run's district frame."""
+    from .frame.crosswalk import (
+        DISTRICT_CROSSWALK_HEADER,
+        check_district_crosswalk,
+        read_csv,
+    )
+
+    rows = read_csv(
+        build.review / "district_crosswalk.csv", header=DISTRICT_CROSSWALK_HEADER
+    )
+    known = {
+        str(row["district_key"]) for row in build.needed_frame().tables["district"]
+    }
+    check_district_crosswalk(rows, known)
+
+
 def build_layers(build: Production) -> dict[str, list[dict[str, object]]]:
     from .additions.common import Coverage
     from .confirm_s2_t13 import completion_evidence, load_confirmation, own_run_pending
@@ -130,6 +147,7 @@ def build_layers(build: Production) -> dict[str, list[dict[str, object]]]:
                 (entry.key,),
             )
         elif source in {"prop_sales", "prop_resi_units"}:
+            check_property_districts(build)
             raw = build.raw(entry)
             blocked: tuple[Coverage, ...] = ()
             if source == "prop_sales":

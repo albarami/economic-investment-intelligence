@@ -7,6 +7,8 @@ from typing import Any
 
 from .checks import FrameError, safe_key
 
+DISTRICT_CROSSWALK_HEADER = ("name", "municipality_code", "district_keys", "basis")
+
 
 def read_csv(
     path: Path, *, header: tuple[str, ...] | None = None
@@ -102,18 +104,32 @@ def municipality_keys(
     return result
 
 
+def check_district_crosswalk(rows: list[dict[str, str]], known: set[str]) -> None:
+    """Every reviewed district key belongs to the selected frame."""
+    for row in rows:
+        keys = {safe_key(key) for key in row["district_keys"].split(";")}
+        if not keys <= known:
+            raise FrameError("district_crosswalk: outside_frame")
+
+
 def district_keys(
-    name: str, rows: list[dict[str, str]], known: set[str]
+    name: str,
+    municipality_code: str,
+    rows: list[dict[str, str]],
+    known: set[str],
 ) -> tuple[tuple[str, ...], str | None]:
-    matches = [row for row in rows if row["name"] == name]
+    matches = [
+        row
+        for row in rows
+        if normalise_name(row["name"]) == normalise_name(name)
+        and row["municipality_code"] == municipality_code
+    ]
     if not matches:
-        return (), f"unmatched district: {name}"
+        return (), "unmatched_district"
     if len(matches) != 1:
         raise FrameError("duplicate district mapping")
-    keys = tuple(safe_key(key) for key in matches[0]["district_keys"].split(";"))
-    if not set(keys) <= known:
-        raise FrameError("unknown district in reviewed mapping")
-    return keys, None
+    check_district_crosswalk(matches, known)
+    return tuple(safe_key(key) for key in matches[0]["district_keys"].split(";")), None
 
 
 def check_zones(

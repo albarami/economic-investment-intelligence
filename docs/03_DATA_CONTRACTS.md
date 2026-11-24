@@ -895,6 +895,30 @@ source order is recorded. An English alternate-language link supplies the paired
 English path key; an unpaired page keeps its own path and language. No pairing is
 guessed from a translated title or path.
 
+### District crosswalk review file
+
+`custodian/publicdata/review/district_crosswalk.csv` is the reviewed district-name
+contract for `prop_sales` and `prop_resi_units` under ruling L-1725. Its exact header is
+`name,municipality_code,district_keys,basis`. `district_keys` is a semicolon-separated
+list of frame district keys, each of the form `[A-Z]{3}[0-9]{9}`; a property deal is kept
+only when its selected list has one key. `basis` is `two_language_exact` (M1) or
+`one_language_exact` (M2).
+
+The reader applies only `normalise_name` whitespace collapsing to both names, then matches
+the normalised name and exact `municipality_code`. M1 requires both source languages to
+identify the same single key inside that municipality and writes both language rows. M2
+requires one language to identify one key and the other to identify none, and writes only
+the matching language row. One matching language is therefore sufficient at lookup; when
+both match, they must agree. Every key in the file, including keys on rows unused by the
+current input, is checked against the actual frame's `district` table before property
+assembly or the C14 pin read.
+
+Everything else is unmapped under exactly one of `ambiguous_in_municipality`,
+`municipality_conflict`, `unreviewed_variant` or `name_missing`. An unmapped source row
+is counted as `unmatched_district` and excluded. A duplicate mapping selected by lookup
+and every foreign frame key refuse the build. There is no spelling, article, zone-number, fuzzy, tolerance or
+cross-municipality name-only match; such evidence is a review proposal only.
+
 ### C8 national census indicator vocabulary
 
 [Decision 0089](decisions/0089-c8-national-census-release-indicators.md)
