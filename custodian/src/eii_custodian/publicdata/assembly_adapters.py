@@ -495,7 +495,10 @@ class Production:
             sources = [
                 e.key
                 for e in self.entries
-                if e.source_id in result.sources and name in e.release_tables
+                # Grid sources are keyed by their entry key (one per month or
+                # band), the other frame sources by their source id.
+                if (e.source_id in result.sources or e.key in result.sources)
+                and name in e.release_tables
             ]
             if sources:
                 self.table(name, rows, sources)

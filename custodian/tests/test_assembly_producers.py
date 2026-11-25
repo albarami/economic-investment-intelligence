@@ -876,3 +876,64 @@ def test_reconciliation_adapter_preserves_explicit_typed_selection(
         ]
         == "built"
     )
+
+
+def test_frame_credits_a_grid_table_whose_sources_are_keyed_by_entry_key(
+    tmp_path: Path, monkeypatch
+) -> None:
+    # asm14 (L-1987): the grid producers key their receipts by entry key
+    # (one per month or band), so a frame table of theirs was never indexed
+    # and the draw refused it as assembly_draw_table_unindexed.
+    from custodian.tests.building_fixture import PARTS, world
+
+    from eii_custodian.publicdata import assembly_adapters
+
+    prepared = world(tmp_path)
+    names = ("municipality", "zone", "district", "grid_cell")
+    prepared.entries = tuple(
+        replace(
+            row,
+            release_tables=("pub_night_lights",)
+            if row.key == PARTS[0]
+            else names
+            if row.source_id == "bnd_hdx"
+            else (),
+        )
+        for row in prepared.entries
+    )
+    build = context(prepared.cache, prepared.entries)
+    build.selected = prepared.selected
+    build.reviewed_selections()
+
+    def frame(*_args, **_kwargs):
+        prepared.produce()
+        directory = prepared.cache / "places_s2_t06"
+        directory.mkdir()
+        for filename in (
+            "pub_place.jsonl",
+            "pub_place_verification.jsonl",
+            "place_points.json",
+            "build_report.json",
+            "flagship_check.json",
+        ):
+            (directory / filename).write_text("[]")
+        tables = {
+            name: [{"municipality_code": "SYN-M", "name_en": "SYN", "name_ar": "SYN"}]
+            for name in names
+        }
+        tables["pub_night_lights"] = [{"cell": 1, "period": "2024-01"}]
+        return FrameResult(
+            tables,
+            [],
+            {
+                "bnd_hdx": {"sha256": "a" * 64},
+                "bnd_zone_2020": {"sha256": "b" * 64},
+                PARTS[0]: {"sha256": "c" * 64},
+            },
+        )
+
+    monkeypatch.setattr(assembly_adapters, "build_public_frame", frame)
+    build.frame()
+    assert build.tables["pub_night_lights"] == [{"cell": 1, "period": "2024-01"}]
+    assert build.table_sources["pub_night_lights"] == {PARTS[0]}
+    assert PARTS[1] not in build.table_sources["pub_night_lights"]
