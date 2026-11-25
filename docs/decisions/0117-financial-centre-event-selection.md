@@ -5,6 +5,7 @@
 | Status | Proposed |
 | Date | 2026-11-25 |
 | Scope | `custodian/src/eii_custodian/publicdata/registers/parse.py`; its invented parser tests; the package README; [document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)** |
+| Amends | [Document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)**, the sentences on the financial-centre events selection (proposed) |
 | Purpose | Let the financial-centre events sibling hold more than one row per company without weakening duplicate refusal in the companies or geocoded roles |
 | Read first | AGENTS.md rules 6, 7, 8, 19 and 24; document 03 **Register file projections (S2-T49)** |
 
@@ -36,6 +37,15 @@ notice expiration date. No real row value is reproduced here.
    older date that loses to a later dated row neither withholds nor counts.
    Identical rows remain subject to item 1.
 
+## Consequences
+
+A company with several events rows now has one card, not a refusal. The card keeps
+exactly one event and one notice expiration date, or both null when the winning
+group conflicts. A company whose events are withheld is counted once in the
+capture-bound `field_absences` entry `event` / `published_event_conflict`, so the
+withholding is visible in the manifest. Duplicate refusal for the companies and
+geocoded roles stays as it was. The record changes no schema and no column.
+
 ## Tests
 
 Invented five-digit company keys and synthetic event text cover identical pairs,
@@ -46,6 +56,14 @@ Companies and geocoded duplicates keep their exact refusal reason. A Hypothesis
 oracle covers empty, singleton, repeated, ordered and permuted event lists, winning
 and losing ties; a separate planted case covers `date.min` against an undated row.
 Existing privacy scans stay unchanged.
+
+## What would change it
+
+Releasing more than one event or notice date on a card, adding a column to the
+events schema, or selecting by any rule other than the later parsed notice date
+needs a further decision record and an amendment of document 03 **Register file
+projections (S2-T49)**. Admitting repeated differing rows in the companies or
+geocoded roles needs its own record, since those roles keep `duplicate_registration_key`.
 
 ## Sources
 
