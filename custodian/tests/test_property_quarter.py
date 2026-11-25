@@ -416,6 +416,14 @@ def test_a_non_text_district_name_still_refuses(tmp_path: Path) -> None:
         _parse([_resi(district_name=7)], tmp_path)
 
 
+@pytest.mark.parametrize("field", ["district_name", "sm_lmntq"])
+def test_an_absent_district_field_still_refuses(tmp_path: Path, field: str) -> None:
+    row = _resi()
+    del row[field]
+    with pytest.raises(AdditionError, match="measure_unparsed"):
+        _parse([row], tmp_path)
+
+
 def test_two_matching_languages_must_name_the_same_district(tmp_path: Path) -> None:
     _frame(tmp_path)
     path = tmp_path / "district_crosswalk.csv"

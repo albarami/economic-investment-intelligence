@@ -132,7 +132,7 @@ class SalesExport:
 
 def _name_or_blank(row: Mapping[str, object], field: str) -> str:
     """A null district name is a blank that the crosswalk counts as unmatched."""
-    return "" if row.get(field) is None else _text(row, field)
+    return "" if field in row and row[field] is None else _text(row, field)
 
 
 def quarter_of(value: object) -> str:
