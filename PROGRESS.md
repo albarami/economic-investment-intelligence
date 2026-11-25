@@ -54540,3 +54540,104 @@ PROTECTED PATHS TOUCHED: `custodian/publicdata/review/additions_industry.yaml` c
 S2-ADDSOC.b2 handoff: `git add -- PROGRESS.md TASKS.md custodian/publicdata/review/additions_industry.yaml custodian/tests/test_additions_industry.py` exited 128 because git metadata is read-only (`.overnight/OUT/b2-git.json`). No commit was attempted after staging refusal; no identity was configured. The authorised fallback is `.overnight/OUT/S2-ADDSOC.b2.patch` against full base `86e9f86589926dd52869137f84e923f52b276720`, with its adjacent SHA-256 sidecar; the lead commits it.
 
 Command-display clarification: the table above joins argv for readability. The family selector was one argument: `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k "additions or industry or registry or bulletin or assembly"`; the final selector was one argument: `uv run --locked python -m pytest custodian/tests/test_additions_industry.py -q -p no:cacheprovider -k "social or unconfirmed_indicator_labels"`. These are intentional requested deselections, not test skips. “No cache read” above means no real public cache read; the task-local uv cache was used. Formatting correction is proven by `.overnight/OUT/b2-restoration-audit.json`: test AST unchanged and production parser byte-equal to base. Record-inclusive documentation check, diff whitespace check and AGENTS/CLAUDE byte comparison are recorded in `.overnight/OUT/b2-handoff-validation.json`.
+
+
+## S2-REGC1 b1 — proposed own-company licence scan, PREBUILD (2026-11-25)
+
+Base and unchanged HEAD: `d975159db0a465586c30e405c2635fef7f724a44`, branch
+`regc1`. Maker: OpenAI; agent: Codex; model: GPT-6 family as declared by this
+session (exact serving model identifier not exposed); tools: `functions.exec`
+and `exec_command`. No commit, push, network request or real register/cache
+read. Builder persona: senior privacy engineer of release scans. Strict
+self-review persona: privacy auditor assuming every published string is hostile.
+This is implementation evidence for proposed decision 0123, not the owner's
+choice of C1, a release success, a slice-gate tick or independent approval.
+
+`InputAudit.licences_by_registration` binds intake licences to the released
+registration or existing numberless `ROW-` identity, alongside the unchanged
+complete licence set. The builder unions all captures before scanning full
+historical cards and projected tables. The shared row scanner selects the own
+licence set plus all withheld duplicate registrations; `_typed_keys` filters
+that same set. Metadata keeps its complete original egress set and the bundle
+loader keeps its no-input-only-key call. The existing row scan is extracted,
+not duplicated. The closed identifier-column, prefix, digit-run, type, encoding
+and named-digest guards remain; no new refusal code is introduced.
+
+Commands and exits (full outputs in the workspace-only `.overnight/OUT/`):
+
+- Tests first: `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_registers_row_licences.py -q -p no:cacheprovider`, exit 1: 55 failed, 2 passed. This includes four cross-company builds refusing under the original all-licence scan; new map calls also fail because the API is not implemented yet.
+- Same test command after implementation: exit 0, 57 passed. After recursive scanner cases: exit 0, 72 passed. The final expanded historical cases total 74 tests in this file, covered by the final suite and plant greens.
+- First broader register run: `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests -q -k register -p no:cacheprovider`, exit 1: 2 failed, 2612 passed, 14175 deselected. Both failures were old commerce-licence-in-financial-centre-address refusals; C1 expressly publishes those other-company matches. Their assertions now require publication. No random failure, pin, baseline or tolerance was changed.
+- Broader run after those policy-aligned assertions: same command, exit 0: 2629 passed, 14175 deselected.
+- Final broader run: `UV_OFFLINE=1 PYTEST_ADDOPTS=--hypothesis-seed=1700012345 uv run --locked python -m pytest custodian/tests -q -k register -p no:cacheprovider`, exit 0: 2631 passed, 14175 deselected in 54.70 seconds. Earlier unseeded runs used the repository's automatic time seed; those exact seed values were not captured.
+- `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_assembly_order.py -q -p no:cacheprovider`, exit 0: 90 passed.
+- `UV_OFFLINE=1 uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'`, exit 0: 37 tests.
+- `uv run --locked ruff check .`, exit 0; final offline invocation also exit 0.
+- `uv run --locked ruff format --check .`, exit 0; final offline invocation also exit 0, 1017 files formatted. Targeted formatter application commands each exited 0.
+- `uv run --locked mypy`, exit 0; final offline invocation also exit 0, 531 source files.
+- `python3 scripts/check_docs.py`, exit 0: 1382 text files, 172 Markdown files before this evidence appendix; post-record result is recorded separately below.
+- `python3 scripts/check_tree.py`, exit 0. `git diff --check`, exit 0. Byte comparison of `AGENTS.md` and `CLAUDE.md`: identical, exit 0.
+
+Environment: Linux, locked Python 3.14.6, uv 0.11.31. Plant command driver:
+`python3 .overnight/tmp/guard_plants.py`, exit 0. Its 17 individual plants each
+change one source block, run pytest, restore the exact source bytes in `finally`,
+then rerun the identical selected tests. Each uses `UV_OFFLINE=1` and
+`PYTEST_ADDOPTS=--hypothesis-seed=1700012345`; actual argv and output locations
+are in `.overnight/OUT/plants.json`. No request to any host is part of a plant.
+
+- `all-licences`: red exit 1 (4 failed, 70 deselected in 0.42s); restored green exit 0 (4 passed, 70 deselected in 0.68s).
+- `empty-row-set`: red exit 1 (54 failed, 20 deselected in 0.32s); restored green exit 0 (54 passed, 20 deselected in 0.17s).
+- `drop-withheld`: red exit 1 (5 failed, 69 deselected in 0.17s); restored green exit 0 (5 passed, 69 deselected in 0.14s).
+- `drop-intake-map`: red exit 1 (3 failed, 71 deselected in 0.38s); restored green exit 0 (3 passed, 71 deselected in 0.25s).
+- `overwrite-capture-union`: red exit 1 (2 failed, 2 passed, 70 deselected in 0.44s); restored green exit 0 (4 passed, 70 deselected in 0.34s).
+- `drop-historical-scan`: red exit 1 (4 failed, 70 deselected in 0.54s); restored green exit 0 (4 passed, 70 deselected in 0.33s).
+- `drop-identifier-column-ban`: red exit 1 (1 failed, 8 passed in 0.61s); restored green exit 0 (9 passed in 0.58s).
+- `drop-string-token-guard`: red exit 1 (40 failed, 5 passed, 29 deselected in 0.29s); restored green exit 0 (45 passed, 29 deselected in 0.18s).
+- `drop-numeric-token-guard`: red exit 1 (1 failed, 73 deselected in 0.15s); restored green exit 0 (1 passed, 73 deselected in 0.13s).
+- `drop-prefix-guard`: red exit 1 (1 failed, 9 passed in 0.62s); restored green exit 0 (10 passed in 0.61s).
+- `drop-digit-run-guard`: red exit 1 (2 failed, 4 passed in 0.38s); restored green exit 0 (6 passed in 0.25s).
+- `drop-digest-format-guard`: red exit 1 (169 failed in 0.78s); restored green exit 0 (169 passed in 0.31s).
+- `drop-named-digest-exemption`: red exit 1 (26 failed, 13 passed in 0.39s); restored green exit 0 (39 passed in 0.14s).
+- `drop-typed-admission`: red exit 1 (2 failed in 0.13s); restored green exit 0 (2 passed in 0.11s).
+- `drop-key-slot-withheld-guard`: red exit 1 (1 failed in 0.13s); restored green exit 0 (1 passed in 0.11s).
+- `drop-utf8-guard`: red exit 1 (1 failed, 9 passed in 0.68s); restored green exit 0 (10 passed in 0.64s).
+- `drop-artefact-type-guard`: red exit 1 (3 failed, 7 passed in 0.64s); restored green exit 0 (10 passed in 0.56s).
+
+Skills and effects: project-orientation reused the established parser, fixtures
+and scanner; task-standards fixed the engineer/auditor personas;
+test-driven-development established the red cross-company builds before code;
+sharp-edges covered missing ownership, overlapping licences, numberless rows and
+cross-capture order; property-based-testing draws licence maps, row values and
+ownership roles against an independent oracle; security-review and
+differential-review equivalents checked the changed key-set boundary while
+retaining metadata and digest protections; spec-to-code-compliance aligned both
+projection texts with proposed decision 0123; sanad-provenance ties all counts
+and exits to commands; github-flow preserves the supplied branch without
+commit or push; verification-before-completion records restored green runs;
+requesting-code-review prepares a concrete candidate for another maker;
+strict-reviewer equivalent records the path deviation without claiming
+independent approval; muhasabah-gate passes the implementation evidence but
+fails strict startup path compliance. Skills without workspace-local instruction
+copies use the brief's equivalent rules. The initial startup call read five
+installed instruction files outside this workspace concurrently with the brief,
+before its explicit path restriction was known; `.overnight/ALERT.md` discloses
+this unfixable historical deviation. No further task input read or edit left
+the workspace. Exact path compliance is BLOCKED; the technical prebuild is ready
+for the lead's review. Pending items are appended to OPEN_ITEMS.md.
+
+S2-REGC1 b1 post-record verification: `python3 scripts/check_docs.py` exited 0
+(1382 text files, 172 Markdown files). `git diff --check` exited 0; the inline
+append-only check against HEAD's PROGRESS.md and byte comparison of AGENTS.md
+and CLAUDE.md exited 0. Exact startup read compliance remains BLOCKED as
+recorded above; no commit was made.
+
+S2-REGC1 lead check (2026-11-25): the owner chose option C1, relayed through
+the advisor; decision 0123's Status, its new section **The owner's words**, the
+docs index row and PO-S2-REGC1-01 now say so. The lead rules the builder's
+startup reading of its own installed skill instructions an expected use of
+the named skills, not a breach: no outside file was edited and no data was read.
+Lead commands on this tree: `uv run --locked python -m pytest -q -p no:cacheprovider
+custodian/tests/ -k register` exit 0 (2631 passed); `uv run --locked ruff check`
+and `ruff format --check` on the registers package and tests exit 0;
+`python3 scripts/check_docs.py` exit 0. The real-input counts run in the lead's
+shell separately; another maker reviews before the build joins the train.

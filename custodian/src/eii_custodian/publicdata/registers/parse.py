@@ -34,6 +34,7 @@ class InputAudit:
     """Ephemeral identifiers never leave intake; only closed absence counts do."""
 
     licences: set[str] = field(default_factory=set)
+    licences_by_registration: dict[str, set[str]] = field(default_factory=dict)
     notice_absences: int = 0  # {events}; never a date estimate
     event_conflict_absences: int = 0  # {companies}; winning event group withheld
     non_registration_absences: int = 0  # {rows}; never a repaired number
@@ -153,11 +154,15 @@ def _rows(body: bytes, role: str, audit: InputAudit) -> list[dict[str, str | Non
                     row[name] = None
                 else:
                     row[name] = parse_value(value, schema[name])
-            if role == "establishments":
+            rows.append(row)
+        if role == "establishments":
+            _withhold_duplicate_registrations(rows, audit)
+            for row in rows:
                 licence = row["licence_number"]
                 assert isinstance(licence, str)  # required integer declaration
                 audit.licences.add(licence)
-            rows.append(row)
+                key = row["registration_number"] or row_identity(str(row["row_key"]))
+                audit.licences_by_registration.setdefault(key, set()).add(licence)
         return rows
     except (UnicodeError, csv.Error, TypeError, AttributeError):
         refuse("input_csv")
@@ -255,7 +260,6 @@ def parse(
     audit = InputAudit() if audit is None else audit
     parsed = {role: _rows(body, role, audit) for role, body in files.items()}
     if source_id == "biz_register":
-        _withhold_duplicate_registrations(parsed["establishments"], audit)
         companies = _keyed(parsed["establishments"], "registration_number")
         result = []
         for key, source in sorted(companies.items()):

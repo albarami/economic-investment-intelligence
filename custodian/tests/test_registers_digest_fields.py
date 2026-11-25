@@ -102,19 +102,22 @@ def test_register_padded_key_in_card_free_text_refuses(role):
 
 @pytest.mark.parametrize("plant", sorted(ORDINARY))
 @pytest.mark.parametrize("role", ["licence", "withheld"])
-def test_register_padded_key_in_ordinary_place_refuses(plant, role):
+def test_register_padded_key_in_unkeyed_place_follows_c1(plant, role):
     tables = _place(plant, PADDED)
     _scan(tables)
-    with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _scan(tables, **_input_only(role))
+    if role == "licence":
+        _scan(tables, **_input_only(role))  # row has no company key (0123)
+    else:
+        with pytest.raises(RegisterError, match=r"^registration_egress$"):
+            _scan(tables, **_input_only(role))
 
 
 @pytest.mark.parametrize("plant", sorted(ORDINARY))
-def test_register_64_digit_licence_in_ordinary_place_refuses(plant):
+def test_register_64_digit_withheld_in_ordinary_place_refuses(plant):
     tables = _place(plant, LICENCE)
     _scan(tables)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _scan(tables, licences=(LICENCE,))
+        _scan(tables, withheld=(LICENCE,))
 
 
 @pytest.mark.parametrize("plant", sorted(ORDINARY))
@@ -305,8 +308,8 @@ _PLANTS = {
     st.sampled_from(["released", "licence", "withheld"]),
 )
 def test_register_digest_shaped_ordinary_value_property(drawn, plant, role):
-    """Oracle: only a named digest field is exempt; elsewhere an input-only
-    key inside a digest-shaped string refuses and a released one publishes."""
+    """Oracle: only a named digest field is exempt. Other fields meet the
+    row's own licences and all withheld keys; unkeyed rows have no licences."""
     number, value = drawn
     if number in {"54321", "65432"}:
         return  # a key slot itself or a cross-source key, tested elsewhere
@@ -321,7 +324,10 @@ def test_register_digest_shaped_ordinary_value_property(drawn, plant, role):
         "licence": dict(licences=(number,)),
         "withheld": dict(withheld=(number,)),
     }[role]
-    if role != "released" and plant != "digest_field":
+    refuses = role == "withheld" or (
+        role == "licence" and table == "pub_register_company"
+    )
+    if refuses and plant != "digest_field":
         with pytest.raises(RegisterError, match=r"^registration_egress$"):
             _scan(tables, **sets)
     else:

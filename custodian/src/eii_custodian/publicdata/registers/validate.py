@@ -61,6 +61,19 @@ _ROW_TOKEN = re.compile(ROW_KEY.pattern.removesuffix(r"\Z"))
 _DIGEST = re.compile(r"[a-f0-9]{64}")
 
 
+_BANNED_COLUMNS = frozenset(
+    {
+        "person_id",
+        "establishment_id",
+        "legal_entity_id",
+        "group_id",
+        "file_id",
+        "firm_key",
+        "licence_number",
+    }
+)
+
+
 def _digest_field(path: str, value: object) -> bool:
     """Decision 0119 item 6: true for a named digest field, whose value must be
     one SHA-256 and is then exempt from the scans; false for any other field."""
@@ -212,7 +225,7 @@ def scan_content(value: object, content: frozenset[str], path: str = "") -> None
 def _scan_release_value(value: object, keys: frozenset[str]) -> None:
     """DAT-11 / L-1288: a typed number is no identifier string, so no prefix or
     digit-run check; its tokens still meet every key given (owner condition 1),
-    the input-only keys under decision 0119."""
+    the row's own licences and all withheld duplicates under proposed decision 0123."""
     if value is None or type(value) in (bool, int, float):
         if type(value) in (int, float) and any(
             token in keys for token in _tokens(str(value))
@@ -230,11 +243,42 @@ def _scan_release_value(value: object, keys: frozenset[str]) -> None:
         scan_artefact(value, keys)
 
 
+def _scan_release_row(
+    table: str,
+    row: Mapping[str, object],
+    licences_by_registration: Mapping[str, frozenset[str]],
+    withheld_registrations: frozenset[str],
+) -> None:
+    """Proposed decision 0123: own licences plus every withheld duplicate."""
+    registration = row.get("registration_number")
+    own = (
+        licences_by_registration.get(registration, frozenset())
+        if isinstance(registration, str)
+        else frozenset()
+    )
+    egress_keys = own | withheld_registrations
+    typed_keys = _typed_keys(egress_keys)
+    for column, value in row.items():
+        if column in _BANNED_COLUMNS or (
+            column == "registration_number" and table not in TABLE_COLUMNS
+        ):
+            refuse("release_identifier_column")
+        scan_artefact(column, egress_keys)
+        if column == "registration_number" and table in TABLE_COLUMNS:
+            continue
+        if _digest_field(f"{table}.{column}", value):
+            continue
+        # DAT-11 scans every column; numbers meet keys but no string
+        # check. The caller validates listed formats before this row scan.
+        listed = f"{table}.{column}" in TYPED_FIELDS
+        _scan_release_value(value, typed_keys if listed else egress_keys)
+
+
 def validate_release(
     tables: Mapping[str, Sequence[Mapping[str, object]]],
     frame: Frame,
     *,
-    licences: frozenset[str] = frozenset(),
+    licences_by_registration: Mapping[str, frozenset[str]] | None = None,
     withheld_registrations: frozenset[str] = frozenset(),
 ) -> frozenset[str]:
     if not set(tables) <= RELEASE_TABLES:
@@ -312,34 +356,9 @@ def validate_release(
         if row["registration_number"] not in current_keys:
             refuse("list_company_missing")
     frozen = frozenset(keys)
-    # Decision 0119 (option B): a published non-key value or column name meets
-    # the input-only keys only, never the registrations being released.
-    egress_keys = licences | withheld_registrations
-    # Decision 0105: a listed column admits only a short or year-shaped number.
-    typed_keys = _typed_keys(egress_keys)
-    banned = {
-        "person_id",
-        "establishment_id",
-        "legal_entity_id",
-        "group_id",
-        "file_id",
-        "firm_key",
-        "licence_number",
-    }
     for table, rows in tables.items():
         for row in rows:
-            for column, value in row.items():
-                if column in banned or (
-                    column == "registration_number" and table not in TABLE_COLUMNS
-                ):
-                    refuse("release_identifier_column")
-                scan_artefact(column, egress_keys)
-                if column == "registration_number" and table in TABLE_COLUMNS:
-                    continue
-                if _digest_field(f"{table}.{column}", value):
-                    continue
-                # DAT-11 scans every column; numbers meet keys but no string
-                # check. A listed column's format was checked in the loop above.
-                listed = f"{table}.{column}" in TYPED_FIELDS
-                _scan_release_value(value, typed_keys if listed else egress_keys)
+            _scan_release_row(
+                table, row, licences_by_registration or {}, withheld_registrations
+            )
     return frozen

@@ -377,8 +377,8 @@ def test_register_restored_key_leak_refuses():
 )
 @pytest.mark.parametrize("token", ["54321", "97003", "97531", "ROW-" + "a" * 20])
 def test_register_every_released_table_keeps_identifier_scan(table, token):
-    """Decision 0119: the licence 97003 and the withheld 97531 refuse in every
-    other release table; the released keys 54321 and the `ROW-` identity publish."""
+    """Decision 0123: only withheld keys refuse in rows with no company key;
+    other-company licences and released keys publish."""
     frame = Frame(frozenset())
     rows = parse(
         "biz_register",
@@ -396,10 +396,13 @@ def test_register_every_released_table_keeps_identifier_scan(table, token):
         table: [{"value": token}],
     }
     keys = dict(
-        licences=frozenset({"97003"}), withheld_registrations=frozenset({"97531"})
+        licences_by_registration={"54321": frozenset({"97003"})},
+        withheld_registrations=frozenset({"97531"}),
     )
-    if token not in {"97003", "97531"}:
-        assert token in validate_release(tables, frame, **keys)
+    if token != "97531":
+        released = validate_release(tables, frame, **keys)
+        if token != "97003":
+            assert token in released
         return
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
         validate_release(tables, frame, **keys)
@@ -409,7 +412,7 @@ def test_register_every_released_table_keeps_identifier_scan(table, token):
     "payload",
     [97003, 97003.0, {"97003": None}, {"value": [{"nested": "prefix97003suffix"}]}],
 )
-def test_register_licence_nested_and_typed_values_refuse(payload):
+def test_register_withheld_nested_and_typed_values_refuse(payload):
     frame = Frame(frozenset())
     rows = parse("biz_register", inputs(), frame)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
@@ -420,7 +423,7 @@ def test_register_licence_nested_and_typed_values_refuse(payload):
                 "source_registry": [{"value": payload}],
             },
             frame,
-            licences=frozenset({"97003"}),
+            withheld_registrations=frozenset({"97003"}),
         )
 
 

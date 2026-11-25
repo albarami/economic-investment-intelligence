@@ -57,10 +57,18 @@ added. Source-inapplicable columns are null and cannot be filled by the other
 source's schema. No worker, residence, owner or person column is accepted.
 
 DAT-11 scans every string column, including non-key address strings.
-Under decision 0119 (proposed, the owner's option B) a published non-key value
-or column name meets only the input-only keys (intake licences and withheld
-duplicate registrations): a string equal to a licence or withheld number
-refuses, and one equal to a registration being released is published. Typed capital, coordinates,
+Under proposed decision 0123 (option C1, awaiting the owner's choice), every
+published non-key value and column name meets that row's own company's licence
+numbers plus every withheld duplicate registration. A row without an entry in
+the licence map meets only the withheld duplicates. The closed typed-column
+rule applies to that same per-row set. A coincidental match with another
+company's licence is published; a released registration is still published.
+The ephemeral map is built beside the intake licence set, keyed by the released
+registration or existing `ROW-` identity, and unioned across current and historical
+captures before their full cards are scanned. Neither map nor licence value is
+exported. Key slots, the returned released-key set, metadata scans and the bundle
+loader's no-input-only-key call remain unchanged; so does decision 0119 item 6.
+Typed capital, coordinates,
 counts and cell keys are not identifier strings; artefact scanning is unchanged
 except that, under decision 0119 item 6, a string is exempt from the token and
 content scans only as the value of a named digest field (`contracts.DIGEST_FIELDS`:
@@ -72,11 +80,11 @@ The 2026-11 floor applies only to kept snapshots. Each snapshot is compared with
 its own source's current capture; current retrieval months may differ and may
 predate the keeper floor.
 
-An ephemeral input-licence set extends the same token checks to every non-key
-released field, including numeric values, and manifests/reports including table
-counts added by storage. It is never exported. The dedicated key exemption is
+The ephemeral per-company licence map protects non-key released fields,
+including numeric values. The complete intake licence set still protects
+manifests/reports including table counts added by storage. Neither is exported. The dedicated key exemption is
 unchanged: an intake licence equal to a published registration passes because
-no licence field is released and the key slot meets withheld numbers only. A
+no licence field is released and the key slot meets withheld numbers only. An own-company
 licence or withheld token in a non-key field still refuses; a released
 registration token there is published (decision 0119). Under decision 0105 (proposed), the closed typed-field list
 `contracts.TYPED_FIELDS` (the five ISO dates, `zone`, `street_number`,
@@ -90,14 +98,14 @@ the snapshot and list tables, each a real `YYYY-MM` month (else
 `snapshot_month`), each format and declared shape checked before the scan: the two
 snapshot coverage fields are lists of months, every other field one value, and
 a container in place of one value refuses) admits a token equal to a key it
-meets (a licence or withheld number in a release column; in a manifest or
+meets (an own-company licence or withheld number in a release column; in a manifest or
 report field also a published registration) only when that number has one or two
 digits or the shape 19xx or 20xx. Longer numbers, every unlisted field, the other
 manifest fields (the receipt's text included) and the rest of the report keep
 the full scan against the keys they meet; other coincidental token
 matches with those keys still refuse. Every number of every release table meets
-the licence and withheld numbers by the token match (decision 0105 item 4 as
-amended by decision 0119), with no string check.
+its own-company licences and all withheld numbers by the token match (decision
+0105 item 4 as amended by decisions 0119 and proposed 0123), with no string check.
 
 Commerce registrations accept exactly one to six ASCII digits with an optional
 slash followed by one to three ASCII digits (at most ten characters).

@@ -2780,13 +2780,17 @@ L-1288 ruling recorded in the S2-T49 fix-round brief: rule 9 binds the identifie
 the project generates; it does not prohibit a typed numeric Public capital.
 Under [decision 0105](decisions/0105-register-scan-typed-columns.md) item 4
 (proposed, owner condition 1), a typed number still meets the keys by the token
-match, with no prefix or digit-run check. Under
-[decision 0119](decisions/0119-register-release-scan-meets-input-only-keys.md)
-(proposed, the owner's option B), every published non-key value of a release
-table, typed or free text, nested or a number, and every column name meets only
-the input-only keys (the intake licences and the withheld duplicate
-registrations), never the registrations being released: a value equal to a
-released registration is published.
+match, with no prefix or digit-run check. Under proposed decision 0123 (option C1, awaiting the owner's choice), every
+published non-key value and column name meets that row's own company's licence
+numbers plus every withheld duplicate registration. A row without an entry in
+the licence map meets only the withheld duplicates. The closed typed-column
+rule applies to that same per-row set. A coincidental match with another
+company's licence is published; a released registration is still published.
+The ephemeral map is built beside the intake licence set, keyed by the released
+registration or existing `ROW-` identity, and unioned across current and historical
+captures before their full cards are scanned. Neither map nor licence value is
+exported. Key slots, the returned released-key set, metadata scans and the bundle
+loader's no-input-only-key call remain unchanged; so does decision 0119 item 6.
 Under decision 0119 item 6, a string is exempt from the token and content
 scans only as the value of a named digest field (`contracts.DIGEST_FIELDS`:
 the columns of section 7.3 that hold a SHA-256 and the manifest's frame,
@@ -2796,9 +2800,10 @@ scanned even when it looks like a digest.
 The literal TST-142 wording clash remains recorded in OPEN_ITEMS.md.
 
 Licence numbers are validated at intake but never projected, used as fallback
-keys or written to metadata. An ephemeral set of their input lexemes extends
-the token scan over non-key released fields, including typed numeric values,
-and over complete manifests and reports, including storage-appended table counts.
+keys or written to metadata. The ephemeral per-company licence map protects
+non-key released fields, including typed numeric values. The complete intake
+licence set still protects manifests and reports, including storage-appended
+table counts.
 The existing dedicated registration-key exemption stays unchanged: an intake
 licence equal to a published registration does not remove that registration.
 A licence column in another release table refuses. Under
@@ -2810,14 +2815,14 @@ under the owner's a2, under the owner's a3 the manifest's and the receipt's
 `version`, each admitting only its one fixed text, and the `period` columns of
 `pub_register_snapshot` and `register_company_list`, each only a real `YYYY-MM`
 month), each with its written format checked before the scan,
-admits a token equal to a key it meets (in a release column a licence or
-withheld number, decision 0119; in a manifest or report field also a published
+admits a token equal to a key it meets (in a release column an own-company licence or
+withheld number, proposed decision 0123; in a manifest or report field also a published
 registration) only when that
 number has one or two digits or the shape 19xx or 20xx; a longer number still
 refuses `registration_egress`, a value failing its format refuses, and the prefix
 and digit-run checks are unchanged. Every unlisted field is free text: free
-text of a release table keeps the full scan against the licence and withheld
-numbers, and the receipt's text, the other manifest fields and the rest of the
+text of a release table keeps the full scan against its own-company licences
+and all withheld numbers, and the receipt's text, the other manifest fields and the rest of the
 report keep the full scan against those and the published registrations, where
 a coincidental token match still refuses. Licence values are never exported to
 support this check; the assembly consumes only the lead-pinned verified bundle.
