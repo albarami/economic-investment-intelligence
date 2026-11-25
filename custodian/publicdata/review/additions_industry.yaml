@@ -4,7 +4,7 @@
 # label (no trimming, no case change) to one ISO 3166-1 alpha-3 code. Its cited
 # reference is the ISO 3166-1 standard (country codes, alpha-3), as listed in
 # country_iso3.csv. A label that is not exactly one country has no row and stops
-# the build until the lead rules it; a listed region is skipped and counted.
+# the build until reviewed; listed regions and withheld labels are omitted and counted.
 version: 1
 country_crosswalk:
   - {published_label: "Afghanistan", iso3: AFG}
@@ -24,6 +24,7 @@ country_crosswalk:
   - {published_label: "Belgium", iso3: BEL}
   - {published_label: "Benin", iso3: BEN}
   - {published_label: "Bolivia", iso3: BOL}
+  - {published_label: "Bosnia", iso3: BIH}
   - {published_label: "Botswana", iso3: BWA}
   - {published_label: "Brazil", iso3: BRA}
   - {published_label: "Brunei", iso3: BRN}
@@ -268,9 +269,35 @@ regions_not_countries:
   - "Other Countries"
   - "South American Countries"
   - "OTHER EUROPEAN COUNTRIES"
+  - "Caribbean"
+  - "Central Africa"
+  - "New Guinea"
+  - "Timor"
+# No ISO country is guessed from an island, city, subdivision, ambiguous name,
+# unassigned ISO label or incomplete country name. Exact labels only.
+country_labels_withheld:
+  - "Antigua"
+  - "Congo"
+  - "Grand Cayman Islands"
+  - "Kosovo"
+  - "Macedonia"
+  - "Mordovia"
+  - "NOT STATED"
+  - "Pretoria"
+  - "Scotland"
+  - "Tahiti"
+  - "Taipei"
+  - "Tasmania"
+  - "Trinidad"
+certificate_type_aliases:
+  "Certificate of Origin Under Preferential System": "Certificate of Origin under Preferential System"
+  "Gulf Cooperation Council Certificates": "GCC Certificates"
+  "Unified Gulf Cooperation Council Certificate of Origin with European Free Trade Association Countries": "Unified GCC Certificate of Origin with EFTA Countries"
+  "Unified Gulf Cooperation Council Certificate of Origin with Singapore": "Unified GCC Certificate of Origin with Singapore"
 certificate_types_unpublished:
   - "#N/A"
 certificate_types:
+  - "Certificate for Agricultural and Animal Products"
   - "Arab Certificate of Origin"
   - "Certificate of Origin under Preferential System"
   - "Certificates of Origin"
@@ -399,7 +426,7 @@ slugs:
     size_classes: *s2_sizes
     size_pairs: *s2_pairs
     unit: to_be_confirmed
-    fields: [year, activity_code, size_of_establishment, hjm_lmnsh, indicator, lbyn, value]
+    fields: [year, activity_code, main_economic_activity, lnsht_lqtsdy_lry_ysy, size_of_establishment, hjm_lmnsh, indicator, lbyn, value]
   number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-wholesale-and-retail-trade-four-digits:
     family: est_size_act
     layout: establishment
@@ -412,7 +439,7 @@ slugs:
     size_classes: *s2_sizes
     size_pairs: *s2_pairs
     unit: to_be_confirmed
-    fields: [year, activity_code, establishment_size, hjm_lmnsh, indicator, lbyn, value]
+    fields: [year, activity_code, main_economic_activity, lnsht_lqtsdy_lry_ysy, establishment_size, hjm_lmnsh, indicator, lbyn, value]
   number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-transport:
     family: est_size_act
     layout: establishment
@@ -426,7 +453,7 @@ slugs:
       Establishment: establishments
     size_classes: *s3_sizes
     unit: to_be_confirmed
-    fields: [year, activity_code, establishment_size, establishment_size_ar, item_type, item_type_ar, value]
+    fields: [year, activity_code, main_economic_activity, main_economic_activity_ar, establishment_size, establishment_size_ar, item_type, item_type_ar, value]
   number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-social-and-personal-services-two-digits:
     family: est_size_act
     layout: establishment
@@ -440,7 +467,7 @@ slugs:
     size_classes: *s2_sizes
     size_pairs: *s2_pairs
     unit: to_be_confirmed
-    fields: [year, activity_code, establishment_size, hjm_lmnsh, indicator, lbyn, value]
+    fields: [year, activity_code, main_economic_activity, lnsht_lqtsdy_lry_ysy, establishment_size, hjm_lmnsh, indicator, lbyn, value]
   number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-energy:
     family: est_size_act
     layout: establishment
@@ -455,7 +482,7 @@ slugs:
     size_classes: *s1_sizes
     size_pairs: *s1_pairs
     unit: to_be_confirmed
-    fields: [year, activity_code, establishment_size, hjm_lmnsh, indicator, lbyn, value]
+    fields: [year, activity_code, main_economic_activity, lnsht_lqtsdy_lry_ysy, establishment_size, hjm_lmnsh, indicator, lbyn, value]
   number-of-establishments-and-employees-by-size-of-establishment-and-main-economic-activity-one:
     family: est_size_act
     layout: establishment
@@ -469,7 +496,7 @@ slugs:
     size_classes: *s2_sizes
     size_pairs: *s2_pairs
     unit: to_be_confirmed
-    fields: [year, activity_code, size_of_establishment, hjm_lmnsh, indicator, lbyn, value]
+    fields: [year, activity_code, main_economic_activity, lnsht_lqtsdy_lry_ysy, size_of_establishment, hjm_lmnsh, indicator, lbyn, value]
   establishments-employees-and-compensation-of-employees-by-economic-activity-business-services:
     family: est_size_act
     layout: establishment
@@ -481,7 +508,7 @@ slugs:
       Employees: employees
       Establishments: establishments
     unit: to_be_confirmed
-    fields: [year, activity_code, indicator, lbyn, group, lmjmw, value]
+    fields: [year, activity_code, economic_activity, lnsht_lqtsdy, indicator, lbyn, group, lmjmw, value]
   manufacture-of-basic-metals:
     family: mfg_industry
     schema: a1

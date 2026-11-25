@@ -7087,3 +7087,28 @@ run remain pending.
 - DISPOSITION: the rows are counted as `no_cell`, not silently dropped; they create no table row, eligible row, duplicate link, name-check entry, unmapped-place count or closed-not-shown count.
 - NEEDED: the grid's coastal coverage is a question for the frame owner; no nearest cell is assigned. The lead's cache replay and different-maker review remain pending.
 - NAMING: the supplied task identifier also appears on an unrelated country-crosswalk approval in the earlier train ledger; this entry names Foursquare and L-1881 to distinguish the work without rewriting that evidence.
+
+## Proposed open items — S2-ADDF b1
+
+- Independent different-maker review remains required for the code and proposed
+  decision 0122 items 1 to 3. The builder's self-audit grants no approval or
+  slice-gate closure.
+- The lead must replay the receipted additions inputs in its own authorized
+  shell. This worker used invented fixtures only and makes no real-cache
+  completeness claim. The unconfirmed social-services indicator labels and
+  missing business-services size class deliberately retain their earlier
+  refusal or omission.
+- The seventeen withheld or regional country-label dispositions and the exact
+  Bosnia-to-BIH mapping need final confirmation after S2-ADDF rv1. The lead
+  accepted F2: Bosnia identifies the sole Bosnia and Herzegovina row in the
+  committed country reference and is no longer withheld. Antigua, Trinidad
+  and every other disposition remain unchanged; Kosovo receives no invented
+  ISO code. The lead still owns real-cache replay and review closure.
+- The pre-existing custodian README's assertion that every company is invented
+  conflicts with AGENTS.md rule 3 and needs a separate correction. See the task
+  alert; unrelated text was not changed here.
+
+S2-ADDF deterministic test-API correction: the added Parquet verification used
+an unavailable relation method. Its assertion-preserving correction to the
+existing `fetchall()` pattern is recorded in PROGRESS.md; it is not a random
+failure and creates no permission to refresh expected output or a baseline.

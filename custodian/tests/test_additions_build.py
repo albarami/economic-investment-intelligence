@@ -160,7 +160,7 @@ _VISITOR_KEY = (
 _VALUE_18_2 = (("value", "DECIMAL(18,2)"), ("unit", "VARCHAR"))
 _VALUE_18_4 = (("value", "DECIMAL(18,4)"), ("unit", "VARCHAR"))
 _EST_COLUMNS = _columns(_EST_KEY, _VALUE_18_2)
-_MFG_COLUMNS = _columns(_MFG_KEY, _VALUE_18_4)
+_MFG_COLUMNS = _columns(_MFG_KEY, (("value", "DECIMAL(18,6)"), ("unit", "VARCHAR")))
 _TRADE_COLUMNS = _columns(_TRADE_KEY, _VALUE_18_2)
 _LOG_COLUMNS = _columns(_MFG_KEY, _VALUE_18_2)
 _PERMIT_COLUMNS = _columns(_PERMIT_KEY, (("document_count", "INTEGER"),))
@@ -547,6 +547,8 @@ def test_a_receipt_hash_other_than_the_body_publishes_nothing(tmp_path: Path) ->
         {
             "year": "2015",
             "activity_code": "11",
+            "main_economic_activity": "SYN Activity",
+            "lnsht_lqtsdy_lry_ysy": "SYN-AR",
             "size_of_establishment": _SIZE,
             "hjm_lmnsh": _SIZE_AR,
             "indicator": "Employees",
@@ -922,6 +924,8 @@ def _read(path: Path) -> tuple[list[tuple[str, str]], list[tuple[object, ...]]]:
                 {
                     "year": "2015",
                     "activity_code": "11",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": _SIZE,
                     "hjm_lmnsh": _SIZE_AR,
                     "indicator": "Employees",

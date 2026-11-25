@@ -54225,3 +54225,155 @@ S2-P84 lead ceiling commit (ruling L-1723, 2026-11-24): `custodian/publicdata/so
 - Skills applied: project-orientation reused the existing seam and fixtures; task-standards supplied the two personas; test-driven-development equivalent established the old-rule red before the minimal change; sharp-edges constrained the exception to whole matches and checked Unicode, prefixes, malformed separators and empty/count edges; property-based-testing added a Unicode digit-group oracle plus generated year pairs; differential-review traced the baseline checks and three production functions in the call chain; security-review equivalent planted both contact refusal arms; spec-to-code-compliance traced the narrow proposed rule manually (focused child unavailable); sanad-provenance attributed saved-page counts to OI-414 and the owner's words to the brief; verification-before-completion equivalent recorded real exits and restored-source green; github-flow kept the task isolated without commits or remote operations as instructed; muhasabah-gate checked scope, provenance and pending real evidence.
 - Tool limitations: the focused read-only spec-check child failed to start with an invalid thread-store/no-rollout error. The patch tool rejected a separate additional security-review file as outside the project; the review is instead included in the explicitly requested return report. No rejected write was retried. Installed skill instruction files were read outside the worktree as required by higher-priority session instructions; all project reads and edits stayed within the workspace. See `.overnight/ALERT.md`.
 - Open: proposed decisions need their normal acceptance; the lead must rerun real stored pages, update the two flags only on evidence and tick S2-T39 box 1 only after that rerun. OI-414 remains open for the two e-mail pages. No different-maker approval is asserted.
+
+## S2-ADDF b1 — published additions shapes, local builder evidence
+
+Base: `97a8ec2b3e605b0ef32899135f46195814851368`; no commit or network
+operation. Builder: OpenAI Codex, GPT-6 family, functions exec/exec_command tools.
+Persona: senior data engineer of public statistical tables. Strict self-review:
+provenance auditor; independent different-maker approval is not claimed.
+Scope: S2-T11, document 03 section 7.3, proposed decision 0122 items 1 to 3.
+The supplied lead sweep is the source for field names and label inventories;
+only invented fixture measures were used. No real public cache was opened.
+
+Skills and effects: project-orientation reused the existing field lists and
+mapping helpers; task-standards applied the named engineering/auditor personas;
+github-flow kept the task in its supplied worktree without committing, as the
+brief requires; sanad-provenance kept snapshots and lineage intact. The brief's
+skill-equivalent rules supplied test-driven-development (red before source
+changes), sharp-edges (malformed alias maps and exact lookup),
+property-based-testing (decimal-domain and withheld-count generators),
+dimensional-analysis (published units unchanged, decimal scale only),
+spec-to-code-compliance (DDL, contract and parser aligned), and
+verification-before-completion (real exits and individually restored plants).
+Muhasabah-gate checks the return against the observed results. Further installed
+skill files were not opened outside the worktree after reading the brief; the
+initial outside-worktree skill reads are disclosed in the task alert.
+
+Commands below ran from the repository root using the installed locked
+environment, `UV_OFFLINE=1`, pytest cache provider disabled. The first test
+runs used the repository's time-derived Hypothesis seed; that seed was not
+captured and is not represented as reproducible evidence. All plant runs
+used `PYTEST_ADDOPTS=--hypothesis-seed=65211`.
+
+| Evidence | Command or exact selection | Exit | Result |
+|---|---|---|---|
+| Initial red named tests | `uv run --locked python -m pytest custodian/tests/test_additions_industry.py -q -k 'published_activity or sweep_country or published_certificate or agricultural_certificate or alias_table or withheld_country' -p no:cacheprovider` | 1 | 38 failed, 8 passed, 59 deselected |
+| Initial red including decimal property | same command, adding `or six_place_manufacturing` to the selection | 1 | 39 failed, 8 passed, 58 deselected |
+| Initial green | `uv run --locked python -m pytest custodian/tests -q -k "addition" -p no:cacheprovider` | 0 | 488 passed, 15479 deselected; expanded tests added afterward |
+| Precision plant | remove the `measure_precision` comparison guard; selection `seven_place_manufacturing` | 1 | 2 failed |
+| Unknown-column plant | remove only the unknown-source-field guard; selection `published_activity_names_do_not_admit` | 1 | 7 failed |
+| Withheld-count plant | remove only the withheld-label count increment; selection `sweep_country_labels` | 1 | 14 failed, 4 passed |
+| Alias lookup plant | remove only the mapped-value shape guard; selection `alias_table_hostile_leaf_mutations` | 1 | 2 failed, 2 passed; hostile containers lose the named refusal |
+| Alias target plant | remove only the canonical-type membership guard; selection `alias_target_must_be` | 1 | 1 failed |
+| Withheld-list plant | bypass only the closed string-list validation; selection `withheld_country_list_is_closed_text` | 1 | 4 failed |
+| Alias-container plant | remove only the mapping-container guard; selection `alias_table_container_mutations` | 1 | 3 failed, 1 passed |
+| Alias-duplicate plant | remove only duplicate-key validation in the finishing step; selection `published_certificate_spelling` | 1 | 4 failed |
+| Missing-column plant | remove only the missing-source-field guard; selection `missing_published_activity_column` | 1 | 14 failed |
+| First Ruff | `uv run --locked ruff check .` | 0 | all checks passed |
+| First format check | `uv run --locked ruff format --check .` | 0 | 1012 files formatted |
+| First typing | `uv run --locked mypy` | 0 | 531 source files |
+| First documentation | `python3 scripts/check_docs.py` | 0 | 1370 text files, 165 Markdown files |
+| Import boundary | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'` | 0 | 37 tests |
+
+Every plant was restored individually in a `finally` block. The plant runner
+itself exited 0 only after requiring exit 1 from every planted test command.
+No fallback, gate reduction, expected baseline refresh or tolerated survivor
+was introduced. Logs and the return remain under the task's `.overnight/`.
+The country-reference audit found Congo is an exact reference spelling, but
+the source label still does not distinguish the two Congos; withholding does
+not depend solely on exact reference-list membership.
+
+S2-ADDF b1 appended verification correction: the expanded full selection with
+seed `65211` exited 1 (1 failed, 526 passed, 15479 deselected). The isolated
+expanded selection with `-x` also exited 1 (1 failed, 30 passed, 105 deselected).
+The deterministic cause was the newly added test's use of DuckDB relation
+`fetchone()`, which the pinned API rejects. The test now uses the already-used
+`fetchall()` API and retains the exact `DECIMAL(18,6)` and Decimal-value
+assertions. No production code or expectation changed. The same expanded
+selection without `-x` then exited 0 (39 passed, 105 deselected). A fresh full
+selection is required after this correction; a green retry alone is not the
+explanation or closure of this failure.
+
+S2-ADDF b1 final evidence, appended after the assertion-preserving test fix:
+`PYTEST_ADDOPTS=--hypothesis-seed=65211 UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests -q -k "addition" -p no:cacheprovider`
+exited 0: 527 passed, 15479 deselected. Ruff check, Ruff format check and mypy
+all exited 0 after the correction; mypy checked 531 source files. The
+documentation check exited 0 (1370 text files, 165 Markdown files), and the
+import-boundary command exited 0 (37 tests). The initial, expanded and
+post-correction static rounds each returned 0. `git diff --check` exited 0,
+and AGENTS.md / CLAUDE.md byte parity was true. No earlier failure row was
+rewritten. The return lists the changed paths, all country dispositions,
+refusal cases, nine red plants, limitations and proposed open items.
+
+## S2-ADDF fx1 — rv1 F1/F2 correction, 2026-11-25
+
+Base remains `97a8ec2b3e605b0ef32899135f46195814851368`; changes are against
+its supplied uncommitted b1 tree. Builder: OpenAI Codex, GPT-6 (exact serving
+variant not exposed), functions exec/exec_command. Persona: senior data
+engineer of public statistical tables; strict self-review: provenance auditor.
+The supplied different-maker review is `.overnight/IN/ADDF-rv1-return.md`
+(Cognition Devin, SWE-2 High). Its two findings were accepted by the lead in
+the fx1 brief; this correction does not claim independent reapproval.
+
+Correction to the earlier b1 country-disposition evidence: thirteen labels
+remain withheld and four remain regions (seventeen omitted dispositions).
+Bosnia now maps by its exact spelling to BIH, the sole Bosnia and Herzegovina
+row in the committed country reference. Antigua, Trinidad and all other
+dispositions are unchanged. Earlier b1 rows and their historical counts are
+retained; they are superseded on this point only. Proposed decision 0122 item 3,
+the existing additions README and the b1 open-item entry now state this result.
+No parser or build implementation, precision, unit, privacy rule or gate changes.
+
+F1 is reproduced with two pinned Kosovo examples (mapped and unmapped) in the
+existing generated-label property. Its shallow copy now explicitly clears
+`country_labels_withheld`, just as its other country dispositions are replaced.
+The family sweep found only this shallow-copy label generator. The separate
+withheld-count label property already replaces withheld, regions and crosswalk;
+all other additions-family copies concern rows or schema blocks, not drawn labels.
+
+All uv commands below used `UV_OFFLINE=1`; pytest also used
+`PYTEST_ADDOPTS=--hypothesis-seed=65211` and `-p no:cacheprovider`.
+Logs are `.overnight/tmp/fx1-*.log`.
+
+| Evidence | Command or exact selection | Exit | Result |
+|---|---|---|---|
+| F1 red, old shallow copy | `uv run --locked python -m pytest custodian/tests/test_additions_industry.py -q -k a_label_is_skipped_only_when_listed -p no:cacheprovider` | 1 | 1 failed, 143 deselected; both pinned examples fail |
+| F2 initial test error | same file, `-k bosnia_maps` | 1 | 1 failed, 143 deselected; test used an incorrect reference-column name (`is_region`); corrected to the committed `human_reviewed` field before testing the defect |
+| F2 red, corrected test | same file, `-k bosnia_maps` | 1 | 1 failed, 143 deselected; Bosnia still in the old withheld list |
+| Focused green | same file, `-k 'a_label_is_skipped_only_when_listed or bosnia_maps or sweep_country_labels'` | 0 | 19 passed, 125 deselected |
+| Ruff | `uv run --locked ruff check .` | 0 | all checks passed |
+| Formatting | `uv run --locked ruff format --check .` | 0 | 1012 files already formatted |
+| Typing | `uv run --locked mypy` | 0 | 531 source files |
+| Documentation | `python3 scripts/check_docs.py` | 0 | 1370 text files, 165 Markdown files |
+| Import boundary | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'` | 0 | 37 tests |
+| Whitespace | `git diff --check` | 0 | no errors |
+| Rules parity | byte comparison of `AGENTS.md` and `CLAUDE.md` | 0 | identical |
+
+Skills and effects: project-orientation reused the existing tests/map; task-standards
+set the engineer/auditor personas; receiving-code-review verified both findings
+and swept the family; test-driven-development pinned red cases before fixes;
+property-based-testing retained the arbitrary-label oracle with isolated inputs;
+sanad-provenance bound Bosnia to the committed reference only;
+spec-to-code-compliance aligned proposed decision 0122 item 3 and the records;
+github-flow preserved the supplied worktree with no commit or push;
+verification-before-completion recorded actual exits; requesting-code-review
+prepares these two fixes for the lead's different-maker confirmation;
+muhasabah-gate limits claims to fixture evidence and records the initial
+outside-worktree instruction-file reads in `.overnight/ALERT.md`. These skills
+use the brief's equivalent rules where no workspace-local skill file exists.
+No network or real-cache read was performed. No new refusal branch or guard
+is introduced; the retained omission cases assert exact coverage reasons.
+
+S2-ADDF fx1 final verification (2026-11-25):
+`UV_OFFLINE=1 PYTEST_ADDOPTS=--hypothesis-seed=65211 uv run --locked python -m pytest custodian/tests -q -k "addition" -p no:cacheprovider`
+exited 0: 527 passed, 15479 deselected in 168.35 seconds. Environment: Linux,
+locked Python 3.14.6; no dependency, pin or baseline changes. The documentation
+check after the correction record also exited 0 (1370 text files, 165 Markdown
+files). The inline YAML comparison to the captured starting b1 tree exited 0:
+exactly Bosnia leaves withholding and gains the BIH crosswalk row; all other
+YAML entries are unchanged. The append-only comparison of PROGRESS.md exited 0.
+The return's per-file additions/removals are measured against the starting b1
+snapshot, not the clean base. No unresolved random test failure was observed;
+the incorrect initial test column is explained above. The lead's real-input
+replay and different-maker confirmation remain pending. No commit was made.
