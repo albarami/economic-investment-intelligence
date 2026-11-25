@@ -1893,7 +1893,7 @@ the build checks every input against the source under PUB-42, without a keyword 
 | PUB-49 | The display threshold is confidence of at least 0.7 outside showcase areas (**ASSUMPTION:** research counts about 11,400 such records; it trims junk while keeping most named places). Inside showcase areas, the verification status overrides confidence. |
 | PUB-50 | Every places answer carries the standing note "Open listings are incomplete": about 26,000 Qatar records against 71,203 establishments counted in Census 2020 (`places_ovt`, `est_census`). Places are named points, never a count of businesses; an absent category reads "not found in public places data". |
 | PUB-51 | De-duplication: two records are duplicate candidates when their normalised names match in either language and they lie within 50 m (**ASSUMPTION:** a typical mall-unit spacing). Outside showcase areas the higher-confidence record is kept and the other recorded in `merged_ids`; inside showcase areas the reviewer decides. |
-| PUB-52 | Each showcase area (Lusail, West Bay, Msheireb, The Pearl) is defined in `showcase_areas.yaml` by a pin at a named public landmark and the 10-minute `walk` area from it (**ASSUMPTION:** covers the flagship default of walk 5 minutes with margin). Verification covers every place in food-service categories and every place named in a prepared story answer. |
+| PUB-52 | For place verification, each showcase area is defined in `showcase_areas.yaml` by a pin at a named public landmark and the ten-minute walk area from it; for PUB-101 build-time venue selection only, a district-member landmark instead uses the reviewed member-district union in `showcase_gazetteer.yaml`, and other showcase definitions keep their walk extent. Proposed amendment: [decision 0116](decisions/0116-showcase-venue-selection-by-reviewed-district-union.md) item 3; acceptance remains pending. For verification, **ASSUMPTION:** covers the flagship default of walk 5 minutes with margin. Verification covers every place in food-service categories and every place named in a prepared story answer. |
 | PUB-53 | Each verified place has a status (`verified_open`, `closed_or_moved`, `not_found`, `duplicate`), check date, reviewer role and verification link in `pub_place_verification`. Results are committed as `verified_places.csv` with the licence texts of the sources it derives from (PUB-21). |
 | PUB-54 | Acceptable verification sources are official directories: the tenant directory of the development, mall or district operator, the place's own official website, or a public-authority listing (**ASSUMPTION** on the last two). For this verification check, review sites, delivery or booking platforms and map-search listings are not authoritative evidence, and no site is scraped for verification; checks are made by hand. The page parsers of section 3.2 read only the two investment sources of [decision 0017](decisions/0017-public-data-additions-and-public-splits.md) and are not verification sources; neither is the reader of `busy_besttime` (PUB-101). |
 | PUB-55 | OpenStreetMap points of interest may be viewed by the reviewer as a cross-check aid but are never merged into `pub_place` or `pub_place_fsq` (a table-scope choice under PUB-47, not a terms restriction on local use; ODbL duties for real use belong on document 17's list). |
@@ -2042,7 +2042,7 @@ ASSUMPTIONS (each also listed in the return message):
    hotels-and-restaurants survey tables.
 2. PUB-49: display threshold of confidence at least 0.7 outside showcase areas.
 3. PUB-51: 50 m and matching normalised names define duplicate candidates.
-4. PUB-52: a showcase area is the 10-minute walk area from a named landmark pin.
+4. PUB-52: for place verification a showcase area is the ten-minute walk area from a named landmark pin; for PUB-101 venue selection a district-member landmark uses its reviewed member-district union, and other showcase definitions use their walk extent. Proposed amendment: [decision 0116](decisions/0116-showcase-venue-selection-by-reviewed-district-union.md) item 4; acceptance remains pending.
 5. PUB-54: operator websites and public-authority listings count as official directories.
 6. PUB-57: flagship thresholds of 8 verified restaurants (walk 5) and 2 verified Italian
    restaurants (walk 10).
@@ -2070,8 +2070,12 @@ ASSUMPTIONS (each also listed in the return message):
 16. PUB-100: a pixel counts in the frame cell that holds its centre, with none split, as item 22
     of decision 0019 does for the population grid; the rule is this document's choice, confirmed at
     slice S2.
-17. PUB-101: the build-time list of venues is the named venues of the showcase areas (PUB-52) and
-    the venues of PUB-89, and the crosswalk file is `venue_busyness_crosswalk.csv`; the owner may
+17. PUB-101: the build-time list of venues is the named kept venues whose stored points are covered
+    by reviewed district-member showcase unions or other showcases' reviewed ten-minute walk
+    polygons, or PUB-89 venues with nonempty exact links to the same kept table (PUB-52;
+    proposed [decision 0116](decisions/0116-showcase-venue-selection-by-reviewed-district-union.md)
+    items 1, 2 and 4; acceptance remains pending), and the crosswalk file is
+    `venue_busyness_crosswalk.csv`; the owner may
     change either. The venues of the build-time list of `busy_besttime` are chosen for the pooled shapes first: more venues of the place types that answered in the coverage test (restaurants, malls, museums and culture, parks, hypermarkets), within the owner's monthly credit cap ([decision 0031](decisions/0031-venue-busyness-from-a-provider-interface.md) items 6 and 8).
 18. Section 12: the reason keys `series_too_short` and `no_denominator` are those of decision 0019;
     a series of the owner's list for which this pack holds no source table is listed as open and is
