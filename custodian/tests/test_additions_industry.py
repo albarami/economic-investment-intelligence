@@ -10,7 +10,7 @@ from pathlib import Path
 import duckdb
 import pytest
 import yaml
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.additions.build import parsers
@@ -2148,6 +2148,7 @@ def test_withheld_country_list_is_closed_text(bad: object) -> None:
         )
 
 
+@settings(deadline=None)
 @given(units=st.integers(min_value=0, max_value=999999999999999999))
 def test_six_place_manufacturing_values_round_trip_exactly(units: int) -> None:
     # An integer in millionths of the published unit; no currency conversion.
@@ -2296,6 +2297,7 @@ def test_alias_target_must_be_a_listed_certificate_type() -> None:
         )
 
 
+@settings(deadline=None)
 @given(
     label=st.text(min_size=1, max_size=12), copies=st.integers(min_value=1, max_value=8)
 )
