@@ -886,8 +886,10 @@ frame boundary (`landmark_member_outside`), a repeated archive district key
 or the frame boundary does not cover (`landmark_point_outside`) each refuse
 the build.
 For `pub_place_verification` (PUB-52), the required population is the sorted unique
-kept food-service ids (`restaurant` or `italian_restaurant`) inside any showcase walk
-polygon, plus the explicitly supplied prepared-story ids (empty pending OI-397).
+kept food-service ids (`restaurant`, `italian_restaurant` or `food_service`) inside
+any showcase walk polygon, plus the explicitly supplied prepared-story ids (empty
+pending OI-397). The `food_service` class covers food or beverage service places
+outside the PUB-57 restaurant count classes; see proposed decision 0118 items 1 and 2.
 The places `build_report.json` adds only `required_verification.by_area` counts keyed
 by area `place_key`, and the deduplicated `required_verification.total`, not the ids.
 Counts refer to kept records before the verification-dependent display selection;

@@ -253,7 +253,7 @@ def required_verification(
                 for place in places
                 if place.place_id in inside
                 and classes.get(place.category, place.category_class)
-                in {"restaurant", "italian_restaurant"}
+                in {"restaurant", "italian_restaurant", "food_service"}
             }
         )
     )

@@ -42,7 +42,9 @@ ACCEPTED_SOURCES = frozenset(
 REFUSED_SOURCES = frozenset(
     {"review_site", "delivery_platform", "booking_platform", "map_search"}
 )
-CATEGORY_CLASSES = frozenset({"restaurant", "italian_restaurant", "other"})
+CATEGORY_CLASSES = frozenset(
+    {"restaurant", "italian_restaurant", "food_service", "other"}
+)
 DISTRICT_SOURCE = "bnd_hdx.district"
 _CHECK_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 

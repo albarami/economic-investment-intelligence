@@ -136,6 +136,28 @@ def test_a_point_on_the_polygon_edge_is_inside() -> None:
     assert checks["b_restaurants_walk_5"] is True
 
 
+@pytest.mark.parametrize("food_service_count", [0, 1, 8, 20])
+def test_food_service_never_raises_restaurant_counts(food_service_count: int) -> None:
+    """Even open food-service venues inside both walks cannot meet PUB-57(b)."""
+    food_service = tuple(
+        CountedPlace(f"SYN-FOOD-{i}", 51.5, 25.3, "food_service", "verified_open")
+        for i in range(food_service_count)
+    )
+    record = evaluate_candidates(
+        (_candidate(_FOOT.wkb, "commercial"),),
+        _restaurants(5) + _italians(2) + food_service,
+        {"69": _ZONE_69, "70": _ZONE_70},
+        _Areas(stand_in=False),
+    )
+    assert record.body["candidates"][0]["counts"] == {
+        "restaurants_walk_5": 7,
+        "italian_walk_10": 2,
+    }
+    assert record.body["candidates"][0]["checks"]["b_restaurants_walk_5"] is False
+    with pytest.raises(PlacesError, match=r"^failed_candidate$"):
+        validate_decision(Decision("SYN-CAND-1", record.digest, True), record)
+
+
 def test_stand_in_stale_digest_and_hand_edit_are_refused() -> None:
     """A stand-in area, a stale digest and a hand-edited check do not select."""
     record = evaluate_candidates(

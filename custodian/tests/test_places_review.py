@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from datetime import date
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.places import PlacesError
 from eii_custodian.publicdata.places.review import (
+    CATEGORY_CLASSES,
     Verification,
     accept_verification,
     latest_status,
@@ -60,9 +62,6 @@ def test_committed_review_files_are_headers_only() -> None:
     """The still-unfilled files hold a header or an empty list and no invented row."""
     verified = (_REPO / "verified_places.csv").read_text(encoding="utf-8")
     assert verified == _HEADER
-    assert (_REPO / "places_ovt_categories.csv").read_text(encoding="utf-8") == (
-        "basic_category,category_class\n"
-    )
     assert json.loads((_REPO / "showcase_areas.yaml").read_text(encoding="utf-8")) == []
     origin, rows = load_verified_places(
         _REPO / "verified_places.csv", None, frozenset(), _BUILD
@@ -82,6 +81,54 @@ def test_committed_review_files_are_headers_only() -> None:
     )
     assert candidate_origin == "committed"
     assert len(candidates) == 7
+
+
+def test_committed_categories_hold_the_reviewed_rows() -> None:
+    """The reviewed categories load in unique token order with pinned class counts."""
+    origin, rows = load_categories(_REPO / "places_ovt_categories.csv", None)
+    assert origin == "committed"
+    assert len(rows) == 214
+    tokens = [token for token, _ in rows]
+    assert tokens == sorted(set(tokens))
+    assert all(kind in CATEGORY_CLASSES for _, kind in rows)
+    counts = Counter(kind for _, kind in rows)
+    assert {kind: counts[kind] for kind in CATEGORY_CLASSES} == {
+        "restaurant": 3,
+        "italian_restaurant": 0,
+        "food_service": 11,
+        "other": 200,
+    }
+
+
+@pytest.mark.parametrize(
+    "change,reason",
+    [
+        ("header", "category_header"),
+        ("empty_token", "category_row"),
+        ("unknown_class", "unknown_category_class"),
+        ("duplicate", "duplicate_category"),
+    ],
+)
+def test_food_service_loads_and_retains_category_refusals(
+    tmp_path: Path, change: str, reason: str
+) -> None:
+    """Each plant changes one input of an otherwise valid food-service table."""
+    path = tmp_path / "categories.csv"
+    valid = "basic_category,category_class\nsyn_food,food_service\n"
+    path.write_text(valid, encoding="utf-8")
+    assert load_categories(path, None) == (
+        "committed",
+        (("syn_food", "food_service"),),
+    )
+    planted = {
+        "header": valid.replace("basic_category,category_class", "basic_category,bad"),
+        "empty_token": valid.replace("syn_food", ""),
+        "unknown_class": valid.replace(",food_service", ",syn_unknown"),
+        "duplicate": valid + "syn_food,food_service\n",
+    }[change]
+    path.write_text(planted, encoding="utf-8")
+    with pytest.raises(PlacesError, match=f"^{reason}$"):
+        load_categories(path, None)
 
 
 def test_statuses_round_trip_and_the_latest_date_wins(tmp_path: Path) -> None:
