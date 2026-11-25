@@ -164,6 +164,8 @@
 | [0113](decisions/0113-activity-spine-sign-off-in-the-background-lane.md) | The activity-spine review sign-off (S2-T04#1 and S2-T04#2) and the category allow-list move from the S2 gate path to the background lane ordered for S3, consumer S3-T03; every code kept, the batches at full priority, the refetch cost named, the S3 gate condition recorded | Proposed by the lead, 2026-11-24 (ruling L-1817 item 2) |
 | [0114](decisions/0114-fetch-fingerprint-binds-only-fetch-time-inputs.md) | Closed fetch-input partition: per-entry registry rows, shared fetch-pass inputs and proven post-loop-only files, with an instrumented completeness guard | Proposed by the lead, 2026-11-24 |
 | [0116](decisions/0116-showcase-venue-selection-by-reviewed-district-union.md) | PUB-101 venue selection uses reviewed district-member showcase unions and retains other showcase walks; PUB-52 verification and its walk-margin assumption remain unchanged (items 1 to 6) | Proposed, 2026-11-25; different-maker review and acceptance remain pending |
+| [0120](decisions/0120-year-range-is-not-a-phone-shape.md) | Exact ascending ASCII year ranges are excluded from the agency-page telephone shape only; other release checks unchanged | Proposed, 2026-11-25 |
+| [0121](decisions/0121-agency-pages-box-1-covers-pages-that-pass-the-release-check.md) | S2-T39 box 1 covers pages passing the release check; refused pages retain typed records and links; two evidence flags read over stored pages | Proposed, 2026-11-25 |
 
 ## Identifiers and change control
 
