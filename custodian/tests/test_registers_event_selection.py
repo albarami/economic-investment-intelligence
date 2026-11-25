@@ -141,8 +141,10 @@ def test_non_event_companion_duplicates_still_refuse(role):
         parse("fc_register", files, FRAME)
 
 
+KNOWN_EVENT_KEYS = ("65432", "65433")
+ORPHAN_EVENT_KEY = "65434"
 EVENT_ROWS = st.tuples(
-    st.sampled_from(["65432", "65433"]),
+    st.sampled_from([*KNOWN_EVENT_KEYS, ORPHAN_EVENT_KEY]),
     st.sampled_from(["SYN alpha", "SYN beta", "SYN gamma"]),
     st.one_of(
         st.none(),
@@ -153,13 +155,54 @@ EVENT_ROWS = st.tuples(
 )
 
 
+@pytest.mark.parametrize(
+    "events",
+    [
+        [dict(event("SYN alpha", "2027-01-02"), qfc_number=ORPHAN_EVENT_KEY)],
+        [dict(event("SYN alpha"), qfc_number=ORPHAN_EVENT_KEY)],
+        [
+            dict(event("SYN alpha", "2027-01-02"), qfc_number=ORPHAN_EVENT_KEY),
+            dict(event("SYN alpha", "2027-01-02"), qfc_number=ORPHAN_EVENT_KEY),
+        ],
+        [dict(event("SYN alpha"), qfc_number=ORPHAN_EVENT_KEY)] * 2,
+        [
+            dict(event("SYN alpha", "2027-01-02"), qfc_number=ORPHAN_EVENT_KEY),
+            dict(event("SYN beta", "2027-01-02"), qfc_number=ORPHAN_EVENT_KEY),
+        ],
+        [
+            dict(event("SYN alpha"), qfc_number=ORPHAN_EVENT_KEY),
+            dict(event("SYN beta"), qfc_number=ORPHAN_EVENT_KEY),
+        ],
+        [
+            event("SYN known", "2027-01-02"),
+            dict(event("SYN orphan", "2027-02-03"), qfc_number=ORPHAN_EVENT_KEY),
+        ],
+    ],
+    ids=[
+        "singleton-dated",
+        "singleton-undated",
+        "identical-pair-dated",
+        "identical-pair-undated",
+        "differing-pair-dated",
+        "differing-pair-undated",
+        "known-company-beside-orphan",
+    ],
+)
+def test_orphan_event_shapes_refuse_before_conflict_counting(events):
+    for ordered in (events, list(reversed(events))):
+        audit = InputAudit()
+        with pytest.raises(RegisterError, match=r"^companion_keys$"):
+            selected_card(ordered, audit)
+        assert audit.event_conflict_absences == 0
+
+
 @given(rows=st.lists(EVENT_ROWS, max_size=8), data=st.data())
 @settings(max_examples=50, deadline=None)
 def test_event_selection_matches_date_oracle_for_every_row_order(rows, data):
     permutation = data.draw(st.permutations(rows))
     expected = {}
     expected_absences = 0
-    for number in ("65432", "65433"):
+    for number in KNOWN_EVENT_KEYS:
         by_date = {}
         for row_number, text, notice in set(rows):
             if row_number == number:
@@ -181,6 +224,7 @@ def test_event_selection_matches_date_oracle_for_every_row_order(rows, data):
         expected[number] = (selected_text, None if conflict else winning_date)
         expected_absences += int(conflict)
 
+    has_orphan = any(number == ORPHAN_EVENT_KEY for number, _, _ in rows)
     files = inputs("fc_register", [fc(), fc("65433", row_key="cccccccccccccccccccc")])
     files["geocoded"] = csv_bytes(
         "geocoded",
@@ -193,6 +237,11 @@ def test_event_selection_matches_date_oracle_for_every_row_order(rows, data):
         ]
         files["events"] = csv_bytes("events", events)
         audit = InputAudit()
+        if has_orphan:
+            with pytest.raises(RegisterError, match=r"^companion_keys$"):
+                parse("fc_register", files, FRAME, audit=audit)
+            assert audit.event_conflict_absences == 0
+            continue
         cards = {
             card["registration_number"]: card
             for card in parse("fc_register", files, FRAME, audit=audit)
