@@ -565,7 +565,10 @@ def test_release_value_released_key_publishes(tmp_path, frame, value):
     validate_release({**tables, "source_registry": [{"value": value}]}, frame)
 
 
-@pytest.mark.parametrize("table", ["source_registry", "fact_lineage"])
+# Decision 0119 item 6: two named digest columns; `fact_lineage` has no
+# `sha256` column, so a digest-shaped string there is scanned (see
+# test_registers_digest_fields.py).
+@pytest.mark.parametrize("table", ["source_registry", "pub_price_ext"])
 @pytest.mark.parametrize(
     "digest",
     [

@@ -289,6 +289,9 @@ _PLANTS = {
     "listed_number": lambda n: ("pub_register_company", "capital_qar", int(n)),
     "unlisted_number": lambda n: ("pub_place", "count", int(n)),
     "nested": lambda n: ("pub_place", "value", {"k": ["SYN " + n]}),
+    # Decision 0119 item 6: a digest-shaped string outside a digest field.
+    "digest_shaped": lambda n: ("pub_register_company", "name_en", n.rjust(64, "a")),
+    "digest_shaped_nested": lambda n: ("pub_place", "value", [n.rjust(64, "e")]),
 }
 
 

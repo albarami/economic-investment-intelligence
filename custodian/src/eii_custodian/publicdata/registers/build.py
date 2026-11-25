@@ -178,9 +178,9 @@ def build(
     egress = keys | frozenset(licences) | frozenset(withheld_registrations)
     for name, artefact in (("manifest", manifest), ("report", report)):
         scan_metadata(artefact, egress, name)
-        scan_content(artefact, frozenset(card_content))
+        scan_content(artefact, frozenset(card_content), name)
     # Storage appends these table descriptors; their counts also cross egress.
-    # Its remaining additions are full SHA-256 digests, already scan-exempt.
+    # Its remaining addition is the digest field `manifest.tables.sha256`.
     scan_metadata(
         {
             "tables": [

@@ -61,7 +61,13 @@ Under decision 0119 (proposed, the owner's option B) a published non-key value
 or column name meets only the input-only keys (intake licences and withheld
 duplicate registrations): a string equal to a licence or withheld number
 refuses, and one equal to a registration being released is published. Typed capital, coordinates,
-counts and cell keys are not identifier strings; artefact scanning is unchanged.
+counts and cell keys are not identifier strings; artefact scanning is unchanged
+except that, under decision 0119 item 6, a string is exempt from the token and
+content scans only as the value of a named digest field (`contracts.DIGEST_FIELDS`:
+the document-03 release columns that hold a SHA-256 and the manifest's frame,
+receipt, receipt-file and table digests), which must be 64 lowercase
+hexadecimal characters or refuses `digest_field_format`; every other string is
+scanned even when it looks like a digest.
 The 2026-11 floor applies only to kept snapshots. Each snapshot is compared with
 its own source's current capture; current retrieval months may differ and may
 predate the keeper floor.

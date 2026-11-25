@@ -4,7 +4,7 @@
 |---|---|
 | Status | Proposed |
 | Date | 2026-11-25 |
-| Scope | `custodian/src/eii_custodian/publicdata/registers/validate.py` (`validate_release`); its invented tests; the package README; [document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)** |
+| Scope | `custodian/src/eii_custodian/publicdata/registers/validate.py` (`validate_release`; for item 6 also `scan_artefact`, `scan_metadata` and `scan_content`), `contracts.py` (`DIGEST_FIELDS`, item 6) and `build.py` (item 6); its invented tests; the package README; [document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)** |
 | Amends | [Decision 0105](0105-register-scan-typed-columns.md) items 3 and 4, for the release tables only |
 | Purpose | Let the register release publish a column value that coincides with a registration number being released, while every intake licence and every withheld duplicate registration still refuses in every published column |
 | Read first | AGENTS.md rules 9, 12 and 46; DAT-11 and DAT-15 of document 03; [decision 0102](0102-register-projection-run-in-rule-44.md); [decision 0104](0104-register-row-key-letter-encoding.md); decision 0105 |
@@ -72,7 +72,16 @@ number in any column still refuses.
    registration of 3 or more digits in a typed column") hold for a withheld
    registration and for a licence; for a registration being released, the
    owner's later choice of option B governs the release tables. The manifest
-   and the build report are unchanged (below).
+   and the build report are unchanged (below), except for item 6.
+6. **Only a named digest field is exempt.** A string is exempt from the token
+   scan and the content scan only as the value of a field of the closed list
+   `contracts.DIGEST_FIELDS` (the release columns of document 03 section 7.3
+   that hold a SHA-256, and the manifest's frame, receipt, receipt-file and
+   table digests), which must be exactly 64 lowercase hexadecimal characters or
+   refuses `digest_field_format`; every other string is scanned even when it
+   looks like a digest, in release text, decoded bytes, list items, nested
+   values, mapping keys and column names, in the release tables and in the
+   manifest and the build report.
 
 ## What stays unchanged
 
@@ -88,7 +97,9 @@ number in any column still refuses.
   `BARE_DIGITS`).
 - `bundle.py`: the loader calls `validate_release` with no input-only key, as
   before; it holds none, because the input-only keys are never exported.
-- No attack size, tolerance, typed field, format or scanner is changed.
+- No attack size, tolerance, typed field or format is changed; the scanners
+  change only as item 6 states (the former shape-only digest exemption of
+  `scan_artefact` and `scan_content` is removed).
 
 ## Tests
 
@@ -117,6 +128,22 @@ refusal against a passing control that differs only in the input-only set:
   the three roles checks an independent oracle: only an input-only key refuses,
   and a listed column admits a short or year-shaped one.
 
+For item 6, in `custodian/tests/test_registers_digest_fields.py`: a licence of
+64 decimal digits in `name_en`, and a withheld or licence number padded to the
+digest shape with hexadecimal letters, in card free text, a nested value, a list
+item, a mapping key, a column name, bytes, nested bytes and an unlisted `sha256`
+column, refuse `registration_egress` (a digest-shaped digit run refuses
+`identifier_digit_run`); the same strings in ordinary manifest fields refuse
+`registration_egress`, and as copied card text `register_content_egress`; every
+named digest field, release and manifest, publishes a valid digest holding an
+input-only key and refuses each malformed value (`digest_field_format`); a
+build whose card name is a piece of the frame digest publishes, and refuses
+when the receipt's `basis_note` repeats it. A Hypothesis generator draws
+digest-shaped strings around a number in every such place, and the property
+above gains two digest-shaped plants. The base's digest case of
+`test_registers.py` now uses two named digest columns; its former
+`fact_lineage` case, a table with no digest column, is scanned and refuses.
+
 The existing plants that expected a released-key refusal are re-pointed to an
 input-only value, each with its released-key case now publishing, in
 `test_registers_typed_scan.py`, `test_registers.py`,
@@ -127,7 +154,8 @@ former released-key value loads.
 
 ## What would change this decision
 
-Scanning a published column against the released registrations again, adding
+Adding a field to `DIGEST_FIELDS` needs a document-03 column or manifest field
+that holds a SHA-256. Scanning a published column against the released registrations again, adding
 the licences to the key slot check, or narrowing the input-only keys needs a
 further decision record and the owner's answer (rule 12).
 

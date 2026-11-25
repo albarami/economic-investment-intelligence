@@ -2755,6 +2755,12 @@ table, typed or free text, nested or a number, and every column name meets only
 the input-only keys (the intake licences and the withheld duplicate
 registrations), never the registrations being released: a value equal to a
 released registration is published.
+Under decision 0119 item 6, a string is exempt from the token and content
+scans only as the value of a named digest field (`contracts.DIGEST_FIELDS`:
+the columns of section 7.3 that hold a SHA-256 and the manifest's frame,
+receipt, receipt-file and table digests), which must be 64 lowercase
+hexadecimal characters or refuses `digest_field_format`; every other string is
+scanned even when it looks like a digest.
 The literal TST-142 wording clash remains recorded in OPEN_ITEMS.md.
 
 Licence numbers are validated at intake but never projected, used as fallback

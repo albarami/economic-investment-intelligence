@@ -189,6 +189,38 @@ FIXED_TEXTS = {
     "report_version": VERSION,
 }
 FORMAT_ONLY_NUMBER = re.compile(r"[0-9]{1,2}|(?:19|20)[0-9]{2}")
+# Decision 0119 item 6: the closed list of digest fields, named as in
+# TYPED_FIELDS. Only these are exempt from the token and content scans, and
+# each holds exactly one SHA-256 (64 lowercase hexadecimal characters) or
+# refuses `digest_field_format`; a digest-shaped string anywhere else is
+# scanned. Release columns of document 03 section 7.3 that hold a SHA-256:
+DIGEST_FIELDS = frozenset(
+    {
+        "source_registry.sha256",
+        "pub_investqa_page.page_sha256",
+        "pub_comtrade_trade.receipt_sha256",
+    }
+    | {
+        f"{table}.sha256"
+        for table in (
+            "pub_completions_ext pub_coverage_ext pub_fdi_stats pub_hotel_ext "
+            "pub_jobseekers pub_price_ext pub_survey_ext pub_talent_ext "
+            "pub_trade_ext pub_utilities_ext"
+        ).split()
+    }
+    # The manifest: `build.py` (frame and receipt digests), the receipt's file
+    # digests (`provenance.py`) and storage's table descriptors.
+    | {
+        "manifest.frame_sha256",
+        "manifest.receipts.receipt_sha256",
+        "manifest.tables.sha256",
+    }
+    | {
+        f"manifest.receipts.receipt.files.{role}.sha256"
+        for roles in ROLES.values()
+        for role in roles
+    }
+)
 
 
 def column_type(name: str) -> str:
