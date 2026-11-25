@@ -55650,3 +55650,42 @@ Second correction to the S2-GLFILL b2 block: the full `custodian/tests` run was
 stopped by the background time limit at about 57%, with no exit code written and
 one failing test (at about 27%) whose name was never printed. The full run has no
 result and must be rerun by the lead.
+
+S2-GLFILL fx2, tests only: two whole-test failures caused by the WorldPop
+registry fill of `de0fc4b5` (2026-11-25, head
+a4b9aa0951df32514e43c8da12d276a2b8508bbc, uncommitted; Linux, locked Python
+3.14.6; no network, no real-cache read, no dependency, pin or baseline change;
+`BASE_ROWS_SHA256` and `BASE_ROW_COUNT` unchanged):
+
+| Step | Command | Exit | Counts |
+|---|---|---|---|
+| Two files, before | `uv run --locked python -m pytest custodian/tests/test_citation_page_not_served.py custodian/tests/test_population_grid.py -p no:cacheprovider -q` | 1 | 1 failed, 53 passed (`test_only_this_row_changes_and_only_by_the_word_and_its_note`, hash mismatch) |
+| Two files, after | same command | 0 | 54 passed |
+| `-p randomly` form of the brief | same command with `-p randomly -p "randomly"` | 4 | refused: `Error importing plugin "randomly": No module named 'randomly'`; dropped as the brief allows |
+| Deadline guard, before | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_test_bootstrap.py' -v` | 1 | 13 tests, 1 failure (`test_file_backed_properties_carry_no_deadline`) |
+| Deadline guard, after | same command | 0 | 13 tests, OK |
+| Dotted form of the brief | `uv run --locked python -m unittest scripts.tests.test_test_bootstrap -v` | 1 before and after | import error `No module named 'runner_support'`, no test ran; the discovery form above is the one that runs the module |
+| Plant a | one WorldPop file row `doi_confirmed: false` in the registry, restored from a copy | 1, 0 after restore | `assert 39 == 40` |
+| Plant a2 | one WorldPop file row `cell_units` to another text | 1 | `assert 39 == 40` |
+| Plant a3 | one WorldPop file row back to both base values | 1 | `assert 39 == 40`; with the count assertion deleted the same plant exits 0, so that assertion is its only guard |
+| Plant a4 | parent row of the source gains `doi_confirmed: true` | 1 | hash mismatch |
+| Guard deletions | count assertion deleted alone, no plant: 0; with plant a: 1 (hash mismatch); restore branch deleted alone: 1 (hash mismatch) | as stated | each restored from a copy |
+| Plant b | `deadline=None` removed from `test_worldpop_any_other_units_text_fails_closed_in_read` | 1, 0 after restore | guard lists that one property |
+| Restore | `cmp` of the registry and both test files against the copies | 0 | byte-identical |
+| Ruff | `uv run --locked ruff check custodian/tests` | 0 | all checks passed |
+| Formatting | `uv run --locked ruff format --check custodian/tests` | 0 | 415 files already formatted |
+| Import boundary | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'` | 0 | 37 tests |
+| Whitespace | `git diff --check` | 0 | no errors |
+
+The source carries 41 registry rows, not 40: one parent row without either
+field and 40 file rows. The restore and its count therefore select the rows of
+that source that carry `people_per_cell` and `True`; the parent row is hashed
+as committed. Changed files: `custodian/tests/test_citation_page_not_served.py`
+(14 added, 0 removed) and `custodian/tests/test_population_grid.py` (1 added,
+1 removed). The whole test was not rerun by this worker. No commit was made.
+
+S2-GLFILL fx2 documentation check: `python3 scripts/check_docs.py` exited 1 with
+92 `local-path` failures, every one under the untracked scratch folder
+`.overnight/` (the lead's input outputs, an earlier plant output and pytest's
+temporary folders); 0 failures name a tracked file. It was not part of the
+brief's proof and must be rerun by the lead on a clean checkout.

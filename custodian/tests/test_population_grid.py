@@ -354,7 +354,7 @@ def test_worldpop_invented_unconfirmed_state_fails_closed_in_read(tmp_path, chan
         read_population(tmp_path, path, replace(spec(), **change))
 
 
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+@settings(deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture])
 @given(units=st.text().filter(lambda text: text != "people_per_cell"))
 @example(units="")
 @example(units="people_per_cell ")

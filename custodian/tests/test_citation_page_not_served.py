@@ -67,6 +67,9 @@ P86_ROW = "prop_sales"
 # S2-P92 reviewed the publisher's revised counts; restore only those two fields
 # to their base values before hashing, as for S2-P86's reviewed note.
 P92_ROW = "trade_logistics/annual-certificates-of-origin-by-type-and-importing-country"
+# S2-GLFILL confirmed cell units and DOI on the 40 file rows of this source
+# (its parent row carries neither field); restore both before hashing.
+GLFILL_SOURCE = "worldpop_qat_agesex"
 P86_BASE_BASIS_NOTE = (
     "Columns are the observed export fields (S2-T08 part B source "
     "review, mismatch 3; "
@@ -219,6 +222,14 @@ def _canonical_rows(rows) -> str:
     ).hexdigest()
 
 
+def _glfill_confirmed(row) -> bool:
+    return (
+        row["source_id"] == GLFILL_SOURCE
+        and row.get("cell_units") == "people_per_cell"
+        and row.get("doi_confirmed") is True
+    )
+
+
 def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     rows = registry.read_yaml(registry.registry_path())["sources"]
     assert len(rows) == BASE_ROW_COUNT
@@ -257,6 +268,7 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
         else item
         for item in rows
     ]
+    assert sum(_glfill_confirmed(row) for row in rows) == 40
     restored = [
         {
             field: value
@@ -274,6 +286,8 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
                 if item["key"] == P92_ROW
                 else dict(item, caveat_keys=[])
                 if item["key"] == CWEB_ROW or item["key"] in ABSENCE_CAVEAT_KEYS
+                else dict(item, cell_units="unconfirmed", doi_confirmed=False)
+                if _glfill_confirmed(item)
                 else item
             ).items()
             if field not in LATER_REVIEWED_FIELDS
