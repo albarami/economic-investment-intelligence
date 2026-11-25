@@ -199,7 +199,7 @@ LIBRARIES: dict[str, tuple[Library, ...]] = {
         ),
         Library(
             "parse5 8 and css-tree 3",
-            (),
+            ("parse5", "css-tree"),
             ("exact pins of the two parser packages of the local-font check",),
         ),
     ),

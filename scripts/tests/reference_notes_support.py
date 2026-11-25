@@ -404,7 +404,7 @@ def assigned_icon_table_line(root: Path) -> int:
 def assigned_pages_p1_line(root: Path) -> int:
     """Return the 1-based line of the assigned section's P1 pages row."""
     needle = "| P1 | https://deck.gl/docs/whats-new | What's New - deck.gl |"
-    return line_of(root, WEB, needle, index=3)
+    return line_of(root, WEB, needle, index=4)
 
 
 WEB_LIB = tables.LIBRARIES[WEB][0].name

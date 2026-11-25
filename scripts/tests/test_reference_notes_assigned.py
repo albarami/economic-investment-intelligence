@@ -53,8 +53,8 @@ Expect = Callable[[Path], list[str]]
 
 def _summary(rows: int, failures: int | str) -> str:
     if failures == "OK":
-        return f"checked 2 files, 6 libraries, {rows} rows: OK"
-    return f"checked 2 files, 6 libraries, {rows} rows: {failures} failure(s)"
+        return f"checked 2 files, 7 libraries, {rows} rows: OK"
+    return f"checked 2 files, 7 libraries, {rows} rows: {failures} failure(s)"
 
 
 def _font_table(root: Path) -> int:
@@ -93,7 +93,7 @@ class NotesAssigned(unittest.TestCase):
         root: Path,
         expect: Expect,
         *,
-        rows: int = 81,
+        rows: int = 88,
         failures: int | str = "OK",
     ) -> None:
         lines = sup.run(root)
@@ -162,7 +162,7 @@ class NotesAssigned(unittest.TestCase):
                         f'unknown section "{ASSIGNED}"',
                     )
                 ],
-                rows=45,
+                rows=52,
                 failures=1,
             )
         with self.subTest("d"):
@@ -279,10 +279,10 @@ class NotesAssigned(unittest.TestCase):
                     )
                 )
                 rows = {
-                    "Pages read": 80,
-                    "Runs": 80,
-                    "Font weights": 75,
-                    "Icon package licence": 79,
+                    "Pages read": 87,
+                    "Runs": 87,
+                    "Font weights": 82,
+                    "Icon package licence": 86,
                 }[sub]
 
                 def expect_rename(r: Path, name: str = sub) -> list[str]:
@@ -367,7 +367,7 @@ class NotesAssigned(unittest.TestCase):
                         'subsection "Font weights" has no table',
                     )
                 ],
-                rows=75,
+                rows=82,
                 failures=1,
             )
         with self.subTest("m"):
@@ -382,7 +382,7 @@ class NotesAssigned(unittest.TestCase):
                         'missing subsection "Runs"',
                     )
                 ],
-                rows=80,
+                rows=87,
                 failures=1,
             )
         with self.subTest("n"):
@@ -496,7 +496,7 @@ class NotesAssigned(unittest.TestCase):
                         '"READ" is not OBSERVED',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -518,7 +518,7 @@ class NotesAssigned(unittest.TestCase):
                         '"observed" is not OBSERVED',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -534,7 +534,7 @@ class NotesAssigned(unittest.TestCase):
                         'F2: OBSERVED source "R9" is not a run id of this section',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -550,7 +550,7 @@ class NotesAssigned(unittest.TestCase):
                         'F2: OBSERVED source "P1" is not a run id of this section',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -566,7 +566,7 @@ class NotesAssigned(unittest.TestCase):
                         '"2099-01-01" is outside 2026-01-01 to 2026-11-12',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -582,7 +582,7 @@ class NotesAssigned(unittest.TestCase):
                         '"2026-13-45" is not a calendar date YYYY-MM-DD',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -605,7 +605,7 @@ class NotesAssigned(unittest.TestCase):
                         '"PACK" is not READ or OBSERVED',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -624,7 +624,7 @@ class NotesAssigned(unittest.TestCase):
                         'C2: READ source "P9" is not a page id of this section',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -643,7 +643,7 @@ class NotesAssigned(unittest.TestCase):
                         'C2: READ source "R1" is not a page id of this section',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -660,7 +660,7 @@ class NotesAssigned(unittest.TestCase):
                         WEB, "quote", sup.line_of(r, WEB, '"two words"'), quote_msg
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -676,7 +676,7 @@ class NotesAssigned(unittest.TestCase):
                         quote_msg,
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -692,7 +692,7 @@ class NotesAssigned(unittest.TestCase):
                         'C1: OBSERVED quote must be "-"',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -708,7 +708,7 @@ class NotesAssigned(unittest.TestCase):
                         'C1: OBSERVED source "P1" is not a run id of this section',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -724,7 +724,7 @@ class NotesAssigned(unittest.TestCase):
                         '"12 November 2026" is not a calendar date YYYY-MM-DD',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -740,7 +740,7 @@ class NotesAssigned(unittest.TestCase):
                         '"X1" is not F and a number',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -756,7 +756,7 @@ class NotesAssigned(unittest.TestCase):
                         f'"F1" repeated (first at line {sup.line_of(r, WEB, "| F1 |")})',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -772,7 +772,7 @@ class NotesAssigned(unittest.TestCase):
                         '"F1" is not C and a number',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -788,7 +788,7 @@ class NotesAssigned(unittest.TestCase):
                         f'"C1" repeated (first at line {sup.line_of(r, WEB, "| C1 |")})',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -808,7 +808,7 @@ class NotesAssigned(unittest.TestCase):
                         "run R2 is cited by no row",
                     )
                 ],
-                82,
+                89,
                 1,
             ),
             (
@@ -829,7 +829,7 @@ class NotesAssigned(unittest.TestCase):
                         "page P2 is cited by no row",
                     )
                 ],
-                82,
+                89,
                 1,
             ),
             (
@@ -846,7 +846,7 @@ class NotesAssigned(unittest.TestCase):
                         WEB, "unused", pages_p1_line(r), "page P1 is cited by no row"
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -862,7 +862,7 @@ class NotesAssigned(unittest.TestCase):
                         f'header is not "{FONT_HDR}"',
                     )
                 ],
-                75,
+                82,
                 1,
             ),
             (
@@ -884,7 +884,7 @@ class NotesAssigned(unittest.TestCase):
                         f'header is not "{ICON_HDR}"',
                     )
                 ],
-                79,
+                86,
                 1,
             ),
             (
@@ -904,7 +904,7 @@ class NotesAssigned(unittest.TestCase):
                         f'header is not "{PAGES_HDR}"',
                     )
                 ],
-                80,
+                87,
                 1,
             ),
             (
@@ -920,7 +920,7 @@ class NotesAssigned(unittest.TestCase):
                         '"see the page" is not an address',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -940,7 +940,7 @@ class NotesAssigned(unittest.TestCase):
                         "https://example.org/x: not on the list of official addresses",
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -960,7 +960,7 @@ class NotesAssigned(unittest.TestCase):
                         "row has 8 cells, expected 9",
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -986,7 +986,7 @@ class NotesAssigned(unittest.TestCase):
                         "row has 9 cells, expected 8",
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -1002,7 +1002,7 @@ class NotesAssigned(unittest.TestCase):
                         '"2099-01-01" is outside 2026-01-01 to 2026-11-12',
                     )
                 ],
-                81,
+                88,
                 1,
             ),
         ]
@@ -1031,42 +1031,42 @@ class NotesAssigned(unittest.TestCase):
                 "rm-f1",
                 lambda r: sup.remove_in_assigned(r, F1),
                 expect_missing("IBM Plex Sans", "400"),
-                80,
+                87,
                 1,
             ),
             (
                 "rm-f2",
                 lambda r: sup.remove_in_assigned(r, F2),
                 expect_missing("IBM Plex Sans", "500"),
-                80,
+                87,
                 1,
             ),
             (
                 "rm-f3",
                 lambda r: sup.remove_in_assigned(r, F3),
                 expect_missing("IBM Plex Sans", "600"),
-                80,
+                87,
                 1,
             ),
             (
                 "rm-f4",
                 lambda r: sup.remove_in_assigned(r, F4),
                 expect_missing("IBM Plex Sans Arabic", "400"),
-                80,
+                87,
                 1,
             ),
             (
                 "rm-f5",
                 lambda r: sup.remove_in_assigned(r, F5),
                 expect_missing("IBM Plex Sans Arabic", "500"),
-                80,
+                87,
                 1,
             ),
             (
                 "rm-f6",
                 lambda r: sup.remove_in_assigned(r, F6),
                 expect_missing("IBM Plex Sans Arabic", "600"),
-                80,
+                87,
                 1,
             ),
             (
@@ -1092,7 +1092,7 @@ class NotesAssigned(unittest.TestCase):
                         "IBM Plex Sans Arabic 600: no OBSERVED row",
                     ),
                 ],
-                78,
+                85,
                 3,
             ),
             (
@@ -1130,7 +1130,7 @@ class NotesAssigned(unittest.TestCase):
                         "IBM Plex Sans Arabic 600: no OBSERVED row",
                     ),
                 ],
-                76,
+                83,
                 5,
             ),
             (
@@ -1177,7 +1177,7 @@ class NotesAssigned(unittest.TestCase):
                         "IBM Plex Sans Arabic 600: no OBSERVED row",
                     ),
                 ],
-                75,
+                82,
                 7,
             ),
             (
@@ -1199,7 +1199,7 @@ class NotesAssigned(unittest.TestCase):
                         'F1: family "IBM Plex Mono" is not a known family',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -1221,7 +1221,7 @@ class NotesAssigned(unittest.TestCase):
                         'F1: family "ibm plex sans" is not a known family',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -1243,7 +1243,7 @@ class NotesAssigned(unittest.TestCase):
                         'F1: weight "700" is not one of 400, 500, 600',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -1265,7 +1265,7 @@ class NotesAssigned(unittest.TestCase):
                         'F1: weight "4" is not one of 400, 500, 600',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -1287,7 +1287,7 @@ class NotesAssigned(unittest.TestCase):
                         '"READ" is not OBSERVED',
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -1301,7 +1301,7 @@ class NotesAssigned(unittest.TestCase):
                         files_fail.format(id="F1", files=""),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1317,7 +1317,7 @@ class NotesAssigned(unittest.TestCase):
                         files_fail.format(id="F1", files="-"),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1333,7 +1333,7 @@ class NotesAssigned(unittest.TestCase):
                     ),
                 ),
                 lambda _r: [],
-                81,
+                88,
                 "OK",
             ),
             (
@@ -1359,7 +1359,7 @@ class NotesAssigned(unittest.TestCase):
                         ),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1385,7 +1385,7 @@ class NotesAssigned(unittest.TestCase):
                         ),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1411,7 +1411,7 @@ class NotesAssigned(unittest.TestCase):
                         ),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1437,7 +1437,7 @@ class NotesAssigned(unittest.TestCase):
                         ),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1463,7 +1463,7 @@ class NotesAssigned(unittest.TestCase):
                         ),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1476,7 +1476,7 @@ class NotesAssigned(unittest.TestCase):
                     F1.replace(FONT_FILES, "ibm-plex-sans-latin-400-normal.woff2"),
                 ),
                 lambda _r: [],
-                81,
+                88,
                 "OK",
             ),
             (
@@ -1489,7 +1489,7 @@ class NotesAssigned(unittest.TestCase):
                     F1.replace(FONT_FILES, "ibm-plex-sans-latin-400-normal.woff"),
                 ),
                 lambda _r: [],
-                81,
+                88,
                 "OK",
             ),
             (
@@ -1505,7 +1505,7 @@ class NotesAssigned(unittest.TestCase):
                         pkg_fail.format(pkg="@fontsource/other 5.3.0"),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1525,7 +1525,7 @@ class NotesAssigned(unittest.TestCase):
                         pkg_fail.format(pkg="@fontsource/ibm-plex-sans-arabic 5.3.0"),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1545,7 +1545,7 @@ class NotesAssigned(unittest.TestCase):
                         pkg_fail.format(pkg="@fontsource/ibm-plex-sans"),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1565,7 +1565,7 @@ class NotesAssigned(unittest.TestCase):
                         pkg_fail.format(pkg="@fontsource/ibm-plex-sans 5.3"),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1585,7 +1585,7 @@ class NotesAssigned(unittest.TestCase):
                         pkg_fail.format(pkg="@fontsource/ibm-plex-sans latest"),
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1598,7 +1598,7 @@ class NotesAssigned(unittest.TestCase):
                     F1.replace(PKG_F1, "@fontsource/ibm-plex-sans 10.20.30"),
                 ),
                 lambda _r: [],
-                81,
+                88,
                 "OK",
             ),
             (
@@ -1613,7 +1613,7 @@ class NotesAssigned(unittest.TestCase):
                     + "| F7 | IBM Plex Sans | latin-ext | 400 | ibm-plex-sans-latin-ext-400-normal.woff2 | OBSERVED | @fontsource/ibm-plex-sans 10.20.30 | 2026-11-12 | R1 |\n",
                 ),
                 lambda _r: [],
-                82,
+                89,
                 "OK",
             ),
         ]
@@ -1647,7 +1647,7 @@ class NotesAssigned(unittest.TestCase):
                         "C1: licence identifier is empty",
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -1669,7 +1669,7 @@ class NotesAssigned(unittest.TestCase):
                         "C1: licence identifier is empty",
                     ),
                 ],
-                81,
+                88,
                 2,
             ),
             (
@@ -1685,7 +1685,7 @@ class NotesAssigned(unittest.TestCase):
                         "C2: licence identifier is empty",
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1705,7 +1705,7 @@ class NotesAssigned(unittest.TestCase):
                         "no OBSERVED row with a licence identifier",
                     )
                 ],
-                81,
+                88,
                 1,
             ),
             (
@@ -1719,7 +1719,7 @@ class NotesAssigned(unittest.TestCase):
                         "no OBSERVED row with a licence identifier",
                     )
                 ],
-                80,
+                87,
                 1,
             ),
             (
@@ -1730,7 +1730,7 @@ class NotesAssigned(unittest.TestCase):
                         WEB, "unused", pages_p1(r), "page P1 is cited by no row"
                     )
                 ],
-                80,
+                87,
                 1,
             ),
             (
@@ -1753,7 +1753,7 @@ class NotesAssigned(unittest.TestCase):
                         "no OBSERVED row with a licence identifier",
                     ),
                 ],
-                79,
+                86,
                 3,
             ),
             (
@@ -1768,7 +1768,7 @@ class NotesAssigned(unittest.TestCase):
                     + "| C3 | icons 2.0.0 | MIT | LICENSE in the package | OBSERVED | R1 | - | 2026-11-12 |\n",
                 ),
                 lambda _r: [],
-                82,
+                89,
                 "OK",
             ),
         ]

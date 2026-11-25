@@ -306,7 +306,7 @@ Same setup and folders as the Runs table of the MapLibre section.
 
 ## parse5 8 and css-tree 3
 
-Used here by the local-font check of `check:hosts:dist`, which reads the built HTML and CSS under browser parsing semantics (TASKS.md S3-T09); the exact pins are the devDependency versions `parse5` 8.1.1 and `css-tree` 3.2.1 of `web/package.json`, tooling pins rather than rows of pins.toml.
+Used here by the local-font check of `check:hosts:dist`, which reads the built HTML and CSS under browser parsing semantics (TASKS.md S3-T09); the exact pins are the devDependency versions `parse5` 8.1.1 and `css-tree` 3.2.1 of `web/package.json`, recorded as the `parse5` and `css-tree` components in `pins.toml`.
 
 ### Pages read
 
@@ -344,7 +344,7 @@ Setup: run inside `web/` against the installed packages; no network.
 
 | Field | Value | Rows in pins.toml | Pack source |
 |---|---|---|---|
-| exact pins of the two parser packages of the local-font check | not yet confirmed | - | TASKS.md S3-T09 |
+| exact pins of the two parser packages of the local-font check | not yet confirmed | parse5, css-tree | TASKS.md S3-T09 |
 
 ## Confirmations assigned to this task
 
