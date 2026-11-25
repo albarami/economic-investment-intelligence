@@ -101,6 +101,7 @@ hotel,other
 housing_or_property_service,other
 industrial_facility_or_service,other
 labor_union,other
+lake,other
 laundry_service,other
 legal_service,other
 library,other
@@ -209,4 +210,6 @@ warehouse_club_store,other
 water_utility_provider,other
 wellness_service,other
 wholesaler,other
+winery,other
 youth_organization,other
+zoo,other
