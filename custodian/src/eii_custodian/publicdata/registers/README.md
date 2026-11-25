@@ -44,8 +44,11 @@ registered address and licence status, and preserves at most one published
 notice and its complete date. Under [decision 0117](../../../../../docs/decisions/0117-financial-centre-event-selection.md)
 (proposed), fully identical repeated events rows collapse (item 1); otherwise the
 row with the later parsed notice date wins, and a dated row wins over an undated
-row, deterministically in either input order (item 2). Different rows with the
-same parsed date, or both undated, refuse `duplicate_registration_key` (item 3).
+row, deterministically in either input order (item 2). If the winning date group,
+or the undated group of a company with no dated row, holds differing rows, that
+company's event and notice date are null instead of refusing the register (item 3).
+`field_absences` counts one `event` / `published_event_conflict` absence per
+company. A conflict on an older date does not block the later row or add a count.
 The geocoded companion contributes coordinates
 and the frame-resolved cell only. Internal order and row keys, inferred building
 names, matched-place labels and match quality never become card facts. A tower
@@ -112,9 +115,9 @@ slots, across current and historical captures, manifests/reports and storage-add
 counts. No duplicate-number list is exported; assembly retains its existing
 lead-pin trust boundary.
 Financial-centre numbers keep their five-digit declaration. Duplicate
-companies and geocoded keys, unresolved events ties under decision 0117 item 3,
-and collisions of `ROW-` identities still refuse as
-`duplicate_registration_key`; duplicate published row keys still refuse as
+companies and geocoded keys and collisions of `ROW-` identities still refuse as
+`duplicate_registration_key`; winning-group event conflicts are counted absences
+under decision 0117 item 3, not refusals. Duplicate published row keys still refuse as
 `duplicate_row_key` when their identities differ. Cross-register ambiguity still
 refuses as `ambiguous_cross_source_key`, with no source prefix added.
 

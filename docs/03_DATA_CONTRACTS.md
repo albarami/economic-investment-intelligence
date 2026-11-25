@@ -2803,9 +2803,9 @@ values, current/historical tables, manifests/reports and storage-added counts.
 Neither the set nor its values is exported. Assembly retains the existing
 lead-pin binding because it cannot re-read the raw inputs.
 Financial-centre keys retain their existing five-digit format. Duplicate
-companies and geocoded keys, unresolved events ties under decision 0117 item 3,
-and colliding `ROW-` identities still refuse as
-`duplicate_registration_key`; duplicate published row keys whose identities
+companies and geocoded keys and colliding `ROW-` identities still refuse as
+`duplicate_registration_key`; winning-group event conflicts are counted absences
+under decision 0117 item 3, not refusals. Duplicate published row keys whose identities
 differ still refuse `duplicate_row_key`. Cross-register ambiguity still refuses
 as `ambiguous_cross_source_key`. The prefixed key is also scanned outside its
 dedicated key slots. This follows the S2-P71 lead brief's row-key ruling for the
@@ -2822,9 +2822,14 @@ source fills `registration_number` from `qfc_number`, `name_en`, `name_ar`,
 Under [decision 0117](decisions/0117-financial-centre-event-selection.md) item 1
 (proposed), fully identical repeated events rows collapse. Otherwise item 2
 selects the later parsed notice date, with a dated row winning over an undated
-row, deterministically and independently of input order. Item 3 refuses different
-rows with the same parsed date, or both undated, as `duplicate_registration_key`.
-Other source-inapplicable columns remain null. Internal order, row keys and
+row, deterministically and independently of input order. Under item 3, differing
+rows in the winning date group, or in the undated group when no dated row exists,
+withhold that company's event and notice date as null rather than refusing the
+projection. The manifest's `field_absences` records the closed field/reason
+`event` / `published_event_conflict`, with a positive count whose unit is
+companies, plus source, capture period and current/snapshot use. A conflict on an
+older date that loses to a later row neither withholds nor counts. Other
+source-inapplicable columns remain null. Internal order, row keys and
 geocoder building/match labels are excluded. Publishing a tower needs a
 confirmed published-card basis; no inferred label substitutes for it.
 

@@ -104,6 +104,7 @@ RECEIPT_VERSION = "register_input_v1"
 ABSENCE_KINDS = frozenset(
     {
         ("fc_register", "notice_expiration_date", "published_non_iso_notice_shape"),
+        ("fc_register", "event", "published_event_conflict"),
         ("biz_register", "registration_number", "published_non_registration_value"),
         ("biz_register", "registration_number", "published_duplicate_registration"),
     }

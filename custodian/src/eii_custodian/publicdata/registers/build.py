@@ -84,6 +84,11 @@ def build(
                     audit.notice_absences,
                 ),
                 (
+                    "event",
+                    "published_event_conflict",
+                    audit.event_conflict_absences,
+                ),
+                (
                     "registration_number",
                     "published_non_registration_value",
                     audit.non_registration_absences,

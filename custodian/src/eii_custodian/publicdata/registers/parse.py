@@ -35,6 +35,7 @@ class InputAudit:
 
     licences: set[str] = field(default_factory=set)
     notice_absences: int = 0  # {events}; never a date estimate
+    event_conflict_absences: int = 0  # {companies}; winning event group withheld
     non_registration_absences: int = 0  # {rows}; never a repaired number
     duplicate_absences: int = 0  # {rows}, not distinct numbers
     duplicate_registrations: set[str] = field(default_factory=set)
@@ -204,24 +205,30 @@ def _event_date(row: Mapping[str, str | None]) -> date | None:
 
 
 def _selected_events(
-    rows: list[dict[str, str | None]],
+    rows: list[dict[str, str | None]], audit: InputAudit
 ) -> list[dict[str, str | None]]:
     by_number: dict[str | None, dict[date | None, dict[str, str | None]]] = {}
+    conflicts: set[tuple[str | None, date | None]] = set()
     for row in rows:
-        notices = by_number.setdefault(row["qfc_number"], {})
+        number = row["qfc_number"]
+        notices = by_number.setdefault(number, {})
         notice = _event_date(row)
         current = notices.get(notice)
         if current is None:
             notices[notice] = row
         elif row != current:
-            refuse("duplicate_registration_key")
-    return [
-        max(
+            conflicts.add((number, notice))
+    selected = []
+    for number, notices in by_number.items():
+        notice, row = max(
             notices.items(),
             key=lambda item: (item[0] is not None, item[0] or date.min),
-        )[1]
-        for notices in by_number.values()
-    ]
+        )
+        if (number, notice) in conflicts:
+            audit.event_conflict_absences += 1
+            continue
+        selected.append(row)
+    return selected
 
 
 def _cell(row: Mapping[str, str | None], frame: Frame) -> int | None:
@@ -263,7 +270,7 @@ def parse(
         return result
     companies = _keyed(parsed["companies"], "qfc_number")
     geocodes = _keyed(parsed["geocoded"], "qfc_number")
-    events = _keyed(_selected_events(parsed["events"]), "qfc_number")
+    events = _keyed(_selected_events(parsed["events"], audit), "qfc_number")
     if companies.keys() != geocodes.keys() or not events.keys() <= companies.keys():
         refuse("companion_keys")
     result = []
