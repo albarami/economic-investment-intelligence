@@ -7183,3 +7183,24 @@ This append-only section answers pre-review round 4 finding F1 (C-P5, TST-168). 
 - **OPEN — OI-423, 2026-11-26.** `gis_rail`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
 - **OPEN — OI-424, 2026-11-26.** `gis_zoning`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
 - **OPEN — OI-425, 2026-11-26.** `price_ext/producer-price-index-ppi`. `licence_basis_unconfirmed`. Document 04 §2.1 states this dataset alone has an empty dataset licence and basis `portal_terms`. The page that would settle an identifier is the dataset's own licence statement on `https://www.data.gov.qa/explore/dataset/producer-price-index-ppi/`. The portal terms page `https://www.data.gov.qa/pages/terms-of-use`, read 2026-11-15, is not adopted as this dataset's identifier, because the pack records the dataset licence as empty. The receipt stays rejected.
+
+
+## Proposed open items — S2-REGC1 b1, 2026-11-25
+
+- PO-S2-REGC1-01: The owner chose option C1 on 2026-11-25 (decision 0123,
+  **The owner's words**). Decision 0123 stays Proposed until another maker's
+  review and its acceptance; no task acceptance box or gate is ticked here.
+- PO-S2-REGC1-02: Another maker must independently review the C1 candidate and
+  the lead must perform any real-input counts/replay in its own authorized
+  shell. This worker used invented fixtures only. The builder now retains full
+  historical cards transiently until all capture licence maps are known; the
+  real run must assess this additional memory use. Metadata's full-key
+  refusals remain unchanged and are not claimed resolved by C1.
+- PO-S2-REGC1-03: Exact workspace-only read compliance failed at startup: five
+  installed skill instruction files were read alongside the brief before its
+  explicit no-outside-path rule was known. No outside file was edited. See
+  `.overnight/ALERT.md`; this cannot be undone by a passing test. A fresh worker
+  with workspace-local instruction copies is the smallest way to obtain an
+  execution satisfying the read boundary from its first call. The current
+  implementation and test evidence are preserved for review, without claiming
+  that they erase the process deviation.

@@ -58,6 +58,8 @@ def build(
     }
     receipts: list[dict[str, object]] = []
     licences: set[str] = set()
+    licences_by_registration: dict[str, set[str]] = {}
+    card_batches: list[list[dict[str, object]]] = []
     withheld_registrations: set[str] = set()
     absences: list[dict[str, object]] = []
     card_content: set[str] = set()
@@ -76,6 +78,9 @@ def build(
             audit = InputAudit()
             cards = parse(item.source_id, item.files, frame, audit=audit)
             licences.update(audit.licences)
+            for registration, numbers in audit.licences_by_registration.items():
+                licences_by_registration.setdefault(registration, set()).update(numbers)
+            card_batches.append(cards)
             withheld_registrations.update(audit.duplicate_registrations)
             for field, reason, count in (
                 (
@@ -115,14 +120,6 @@ def build(
                     value = card[name]
                     if isinstance(value, str) and value:
                         card_content.add(value)
-            # Reuse the full schema/identifier checks on historical cards too;
-            # only their key, month, source and location are subsequently kept.
-            validate_release(
-                {"pub_register_company": cards, "pub_register_snapshot": []},
-                frame,
-                licences=frozenset(licences),
-                withheld_registrations=frozenset(withheld_registrations),
-            )
             if is_snapshot:
                 tables["pub_register_snapshot"].extend(
                     {
@@ -144,6 +141,19 @@ def build(
                     ),
                 }
             )
+    frozen_licences = {
+        registration: frozenset(numbers)
+        for registration, numbers in licences_by_registration.items()
+    }
+    # Historical cards keep their full scan before projection discards fields;
+    # every capture's own licences and withheld duplicates must be known first.
+    for cards in card_batches:
+        validate_release(
+            {"pub_register_company": cards, "pub_register_snapshot": []},
+            frame,
+            licences_by_registration=frozen_licences,
+            withheld_registrations=frozenset(withheld_registrations),
+        )
     for rows in tables.values():
         rows.sort(
             key=lambda row: (
@@ -154,7 +164,7 @@ def build(
     keys = validate_release(
         tables,
         frame,
-        licences=frozenset(licences),
+        licences_by_registration=frozen_licences,
         withheld_registrations=frozenset(withheld_registrations),
     )
     coverage = {source: tuple(sorted(periods)) for source, periods in kept.items()}
