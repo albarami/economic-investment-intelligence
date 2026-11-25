@@ -696,6 +696,31 @@ def test_tracked_configuration_defers_uncommitted_coordinates():
     )
 
 
+def test_tracked_configuration_withholds_a_non_deferred_pending_pin(tmp_path):
+    from eii_custodian.publicdata.method_pin_config import (
+        configuration_pending,
+        load_generation_config,
+    )
+
+    repo = repository_root(Path(__file__))
+    config = load_generation_config(repo)
+    assert "wilson.period" not in S7_DEFERRED_PINS
+    pins = dict(config["pins"])
+    pins["wilson.period"] = {
+        "anchor": pins["wilson.period"]["anchor"],
+        "pending_reason": "OI-283: wilson.period: invented pending setting",
+    }
+    pending = {**config, "pins": pins}
+    assert configuration_pending(pending) is True
+    build = context(tmp_path)
+    build.pin_auto_supply = True
+    build.pin_generation_config = pending
+    assert build.method_pins() == {}
+    assert build.pin_pending_reason == "pin_configuration_pending"
+    assert not (tmp_path / PIN_ARTIFACT_NAME).exists()
+    assert not (tmp_path / PIN_CONFIG_NAME).exists()
+
+
 def test_automatic_rows_are_collected_again_on_the_next_invocation(tmp_path):
     from eii_custodian.publicdata.assembly import AssemblyError
 
