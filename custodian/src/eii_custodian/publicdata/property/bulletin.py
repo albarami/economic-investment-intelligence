@@ -149,8 +149,8 @@ def sales_export_rows(rows: object) -> SalesExport:
     Every row must hold exactly the observed fields. ``usage`` becomes the
     bulletin's usage field, the published square metres stay the floor area,
     square feet stay absent, and no share field or unread field is passed on.
-    Only all-null or exactly whole share triples survive; other rows enter
-    closed coverage counts. No whole rows refuses the source by name.
+    Only all-null or exactly whole share triples survive; other rows, and rows
+    with a null registration date, enter closed coverage counts. No whole rows refuses the source by name.
     """
     if not isinstance(rows, list):
         raise AdditionError("bulletin_rows")
@@ -164,7 +164,13 @@ def sales_export_rows(rows: object) -> SalesExport:
             raise AdditionError("unknown_source_field")
         if expected - set(row):
             raise AdditionError("source_field_missing")
-        reason = _sales_share_reason(row)
+        # The published export holds rows with a null date; they are counted,
+        # never priced (R1, L-1963). Any other date form still refuses later.
+        reason = (
+            "registration_date_missing"
+            if row["registration_date"] is None
+            else _sales_share_reason(row)
+        )
         if reason is not None:
             counts[reason] += 1
             continue
