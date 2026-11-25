@@ -41,7 +41,12 @@ row keys and location counts are validated but never released. The
 financial-centre projection
 maps `qfc_number` to `registration_number`, preserves its published names,
 registered address and licence status, and preserves at most one published
-notice and its complete date. The geocoded companion contributes coordinates
+notice and its complete date. Under [decision 0117](../../../../../docs/decisions/0117-financial-centre-event-selection.md)
+(proposed), fully identical repeated events rows collapse (item 1); otherwise the
+row with the later parsed notice date wins, and a dated row wins over an undated
+row, deterministically in either input order (item 2). Different rows with the
+same parsed date, or both undated, refuse `duplicate_registration_key` (item 3).
+The geocoded companion contributes coordinates
 and the frame-resolved cell only. Internal order and row keys, inferred building
 names, matched-place labels and match quality never become card facts. A tower
 field needs confirmation that it is published on the card before it can be
@@ -107,7 +112,8 @@ slots, across current and historical captures, manifests/reports and storage-add
 counts. No duplicate-number list is exported; assembly retains its existing
 lead-pin trust boundary.
 Financial-centre numbers keep their five-digit declaration. Duplicate
-financial-centre keys and collisions of `ROW-` identities still refuse as
+companies and geocoded keys, unresolved events ties under decision 0117 item 3,
+and collisions of `ROW-` identities still refuse as
 `duplicate_registration_key`; duplicate published row keys still refuse as
 `duplicate_row_key` when their identities differ. Cross-register ambiguity still
 refuses as `ambiguous_cross_source_key`, with no source prefix added.

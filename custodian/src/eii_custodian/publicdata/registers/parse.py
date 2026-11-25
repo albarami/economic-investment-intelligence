@@ -198,6 +198,32 @@ def _keyed(
     return found
 
 
+def _event_date(row: Mapping[str, str | None]) -> date | None:
+    value = row["notice_expiration_date"]
+    return date.fromisoformat(value) if value is not None else None
+
+
+def _selected_events(
+    rows: list[dict[str, str | None]],
+) -> list[dict[str, str | None]]:
+    by_number: dict[str | None, dict[date | None, dict[str, str | None]]] = {}
+    for row in rows:
+        notices = by_number.setdefault(row["qfc_number"], {})
+        notice = _event_date(row)
+        current = notices.get(notice)
+        if current is None:
+            notices[notice] = row
+        elif row != current:
+            refuse("duplicate_registration_key")
+    return [
+        max(
+            notices.items(),
+            key=lambda item: (item[0] is not None, item[0] or date.min),
+        )[1]
+        for notices in by_number.values()
+    ]
+
+
 def _cell(row: Mapping[str, str | None], frame: Frame) -> int | None:
     lon, lat = row["lon"], row["lat"]
     if (lon is None) != (lat is None):
@@ -237,7 +263,7 @@ def parse(
         return result
     companies = _keyed(parsed["companies"], "qfc_number")
     geocodes = _keyed(parsed["geocoded"], "qfc_number")
-    events = _keyed(parsed["events"], "qfc_number")
+    events = _keyed(_selected_events(parsed["events"]), "qfc_number")
     if companies.keys() != geocodes.keys() or not events.keys() <= companies.keys():
         refuse("companion_keys")
     result = []
