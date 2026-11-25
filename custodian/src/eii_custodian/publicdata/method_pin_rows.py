@@ -153,14 +153,14 @@ def collect_pin_rows(
             continue
         lineage: list[dict[str, Any]] = []
         values: dict[str, object]
-        if pin in CONFIGURATION_PINS:
+        if pin in S7_DEFERRED_PINS:
+            values = {}
+        elif pin in CONFIGURATION_PINS:
             values = dict(
                 _values(
                     {key: value for key, value in settings.items() if key != "anchor"}
                 )
             )
-        elif pin in S7_DEFERRED_PINS:
-            values = {}
         elif pin == "c6.release_sha256":
             key = str(settings["source_key"])
             if not any(

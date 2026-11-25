@@ -95,7 +95,7 @@ CONFIGURATION_PINS = frozenset(
         "c7.speed_regime",
     }
 )
-# Decision 0094: the C6 neighbour and C7 shared-reach result pins that the S2
+# Decisions 0094 and proposed 0125: the C6 neighbour and C7 pins that the S2
 # gate accepts pending, each only under its own OI-283 row; the S7 gate still
 # refuses every pending pin by name.
 S7_DEFERRED_PINS = frozenset(
@@ -103,6 +103,7 @@ S7_DEFERRED_PINS = frozenset(
         "c6.expected_clq",
         "c6.expected_p",
         "c6.expected_q",
+        "c7.coordinates",
         "c7.shared_b_given_a",
         "c7.shared_a_given_b",
     }
