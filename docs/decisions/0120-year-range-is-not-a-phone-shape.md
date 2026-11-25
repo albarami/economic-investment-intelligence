@@ -62,6 +62,14 @@ The year-range page of OI-414 is expected to pass on the lead's next real
 rerun. The two e-mail pages remain refused. No evidence flag or acceptance
 box is changed by this proposal.
 
+Residual risk: a real telephone-shaped number whose whole match is two
+four-digit groups, each `19NN` or `20NN`, joined by one ASCII hyphen with
+the second not earlier than the first, is now admitted, not refused. Every
+other telephone shape, including any such pair with a plus sign, a space,
+a parenthesis or a further digit group, still refuses as
+`page_contact_shape`. The release check never claimed to find every
+contact. Here the residual is limited to this single exact shape.
+
 ## What would change this decision
 
 A planted non-year contact admitted by this exception, a changed source
