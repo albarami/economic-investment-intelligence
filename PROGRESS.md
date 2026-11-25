@@ -54379,3 +54379,10 @@ the incorrect initial test column is explained above. The lead's real-input
 replay and different-maker confirmation remain pending. No commit was made.
 
 S2-GREC (2026-11-25): dispositions of the 37 F1 entries of the gate pre-review (43 rows) are appended to OPEN_ITEMS.md, drafted by Claude Opus 5.5 (S2-GREC.b1). The lead routed the two no-fit rows. OI-410 now has a dated count note in Proposed decision 0114 item 2. The rule-3 sentence of `custodian/README.md` is corrected. The follow-up routes name S3-T11. `python3 scripts/check_docs.py` exit 0. Records only; another maker reviews.
+
+S2-GREC fx1 (2026-11-25), correction to the S2-GREC row above, appended: S2-GREC.rv1 (OpenAI Codex) REJECTED `01e5db61` on three record findings, now fixed by the lead.
+1. OI-410 is LEAD-EVIDENCE: the recorded acceptance is owed.
+2. The 0114 note now cites decision 0081 item 4, with the count of 27 in the loaded-module digest, and 0114's Amends field names item 4.
+3. OI-409, S2-FPR b1 and S2-ADDF b1 each have one line.
+
+The section holds 37 dated disposition lines for the F1 entries. The "43 rows" of the row above counted the draft's sub-obligations. `python3 scripts/check_docs.py` exit 0.
