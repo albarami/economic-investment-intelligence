@@ -7112,3 +7112,8 @@ S2-ADDF deterministic test-API correction: the added Parquet verification used
 an unavailable relation method. Its assertion-preserving correction to the
 existing `fetchall()` pattern is recorded in PROGRESS.md; it is not a random
 failure and creates no permission to refresh expected output or a baseline.
+
+## S2-D113 fx1 — carries of decision 0113 (2026-11-25)
+
+- **PO-S2-52 — 2026-11-25: CARRIED OPEN under proposed decision 0113 items 1 and 4, effective only on that record's acceptance.** `custodian/data_tests/test_pinned_methods.py::test_pinned_c2_isic_5610` travels with the unsigned spine; C-03 records its `C2-ISIC-5610:spine_refused` failure exactly as decision 0113 item 4 states, with no skip and no deselection. The item closes only after the signed and audited spine and a subsequent lead-shell K7 run with this test passing; different-maker review of decision 0113 remains pending.
+- **PO-S2-51 REMAINDER — 2026-11-25: NOT VALID as written.** No card data test runs against the frame's `pub_population_municipality` table in this repository; `custodian/data_tests/test_pinned_methods.py::test_pinned_c1` reads pinned `pop_muni` through `c1_replay` and the frame's `population_rows` reader instead, so the frame-table-specific remainder is not valid.
