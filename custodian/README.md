@@ -4,7 +4,7 @@ This folder will hold `eii_custodian`, the offline build plane: public data, the
 
 ## Rules
 
-- This is the only plane in which record-level synthetic data may exist. Every company and person is invented.
+- This is the only plane in which record-level synthetic data may exist. Every person is invented; the companies are the real ones of the public register, and their labour and residence records are synthetic (AGENTS.md rule 3).
 - `eii_custodian` never imports `eii_product` (ARC-06, BE-03).
 - Generators and the release build run inside the sandbox (ARC-09, ARC-10).
 

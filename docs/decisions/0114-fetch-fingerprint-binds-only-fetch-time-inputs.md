@@ -43,7 +43,10 @@ No acquisition timing or real-cache reuse is asserted here.
    Shared data hashes always read fresh bytes, including same-size edits within
    a filesystem timestamp tick; the code-module hash cache is unchanged. Unavailable proof still follows
    decision 0081 item 5: fetch without a reusable fingerprint, never silently
-   reuse and never turn this into a new build gate.
+   reuse and never turn this into a new build gate. Dated note of 2026-11-25
+   (OI-410): after S2-P78 the bound code set counted directly by the review
+   S2-P78.rv1 is 27 module files, which replaces the module count of decision
+   0081 item 2.
 3. **Fetch readers take precedence.** Shared includes the assessment's five
    fetch-shaping review groups: `gis_layer_fields.yaml`, `s2_t29_sources.yaml`,
    `fdi_crosswalks.yaml`, `additions_property_venues.yaml`, and the pair

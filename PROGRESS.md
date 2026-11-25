@@ -54377,3 +54377,5 @@ The return's per-file additions/removals are measured against the starting b1
 snapshot, not the clean base. No unresolved random test failure was observed;
 the incorrect initial test column is explained above. The lead's real-input
 replay and different-maker confirmation remain pending. No commit was made.
+
+S2-GREC (2026-11-25): dispositions of the 37 F1 entries of the gate pre-review (43 rows) are appended to OPEN_ITEMS.md, drafted by Claude Opus 5.5 (S2-GREC.b1). The lead routed the two no-fit rows. OI-410 now has a dated count note in Proposed decision 0114 item 2. The rule-3 sentence of `custodian/README.md` is corrected. The follow-up routes name S3-T11. `python3 scripts/check_docs.py` exit 0. Records only; another maker reviews.
