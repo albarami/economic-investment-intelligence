@@ -23038,9 +23038,9 @@ sources:
     age_code: "00"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/01"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23075,9 +23075,9 @@ sources:
     age_code: "01"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/05"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23112,9 +23112,9 @@ sources:
     age_code: "05"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/10"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23149,9 +23149,9 @@ sources:
     age_code: "10"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/15"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23186,9 +23186,9 @@ sources:
     age_code: "15"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/20"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23223,9 +23223,9 @@ sources:
     age_code: "20"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/25"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23260,9 +23260,9 @@ sources:
     age_code: "25"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/30"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23297,9 +23297,9 @@ sources:
     age_code: "30"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/35"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23334,9 +23334,9 @@ sources:
     age_code: "35"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/40"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23371,9 +23371,9 @@ sources:
     age_code: "40"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/45"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23408,9 +23408,9 @@ sources:
     age_code: "45"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/50"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23445,9 +23445,9 @@ sources:
     age_code: "50"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/55"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23482,9 +23482,9 @@ sources:
     age_code: "55"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/60"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23519,9 +23519,9 @@ sources:
     age_code: "60"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/65"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23556,9 +23556,9 @@ sources:
     age_code: "65"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/70"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23593,9 +23593,9 @@ sources:
     age_code: "70"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/75"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23630,9 +23630,9 @@ sources:
     age_code: "75"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/80"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23667,9 +23667,9 @@ sources:
     age_code: "80"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/85"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23704,9 +23704,9 @@ sources:
     age_code: "85"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/f/90"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23741,9 +23741,9 @@ sources:
     age_code: "90"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/00"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23778,9 +23778,9 @@ sources:
     age_code: "00"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/01"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23815,9 +23815,9 @@ sources:
     age_code: "01"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/05"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23852,9 +23852,9 @@ sources:
     age_code: "05"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/10"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23889,9 +23889,9 @@ sources:
     age_code: "10"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/15"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23926,9 +23926,9 @@ sources:
     age_code: "15"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/20"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -23963,9 +23963,9 @@ sources:
     age_code: "20"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/25"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24000,9 +24000,9 @@ sources:
     age_code: "25"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/30"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24037,9 +24037,9 @@ sources:
     age_code: "30"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/35"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24074,9 +24074,9 @@ sources:
     age_code: "35"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/40"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24111,9 +24111,9 @@ sources:
     age_code: "40"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/45"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24148,9 +24148,9 @@ sources:
     age_code: "45"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/50"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24185,9 +24185,9 @@ sources:
     age_code: "50"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/55"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24222,9 +24222,9 @@ sources:
     age_code: "55"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/60"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24259,9 +24259,9 @@ sources:
     age_code: "60"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/65"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24296,9 +24296,9 @@ sources:
     age_code: "65"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/70"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24333,9 +24333,9 @@ sources:
     age_code: "70"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/75"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24370,9 +24370,9 @@ sources:
     age_code: "75"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/80"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24407,9 +24407,9 @@ sources:
     age_code: "80"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/85"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24444,9 +24444,9 @@ sources:
     age_code: "85"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "worldpop_qat_agesex/2025/m/90"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "worldpop_qat_agesex"
@@ -24481,9 +24481,9 @@ sources:
     age_code: "90"
     release: "R2025A v1"
     year: "2025"
-    cell_units: "unconfirmed"
+    cell_units: "people_per_cell"
     doi: "10.5258/SOTON/WP00841"
-    doi_confirmed: false
+    doi_confirmed: true
   - key: "weather_openmeteo/2024-2025/point"
     refetch: {value: none, reason: frequency_unconfirmed}
     source_id: "weather_openmeteo"

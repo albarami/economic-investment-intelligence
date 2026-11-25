@@ -10,6 +10,8 @@ from custodian.tests.fixtures.grids.invented import (
     population_file,
     store,
 )
+from hypothesis import HealthCheck, example, given, settings
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.fetch.registry import (
     RegistryError,
@@ -268,7 +270,7 @@ def test_worldpop_files_of_one_year_must_share_the_grid(tmp_path):
         build_grids(tmp_path, (first, second), {})
 
 
-def test_worldpop_real_registry_fails_closed(tmp_path):
+def test_worldpop_real_registry_builds_with_confirmed_units_and_doi(tmp_path):
     entries = load_registry()
     rows = [
         item
@@ -298,8 +300,8 @@ def test_worldpop_real_registry_fails_closed(tmp_path):
         "90",
     )
     assert len(rows) == 40
-    assert all(item.doi_confirmed is False for item in rows)
-    assert all(item.cell_units == "unconfirmed" for item in rows)
+    assert all(item.doi_confirmed is True for item in rows)
+    assert all(item.cell_units == "people_per_cell" for item in rows)
     assert all(item.public_splits == ("sex",) for item in rows)
     assert all(item.release == "R2025A v1" for item in rows)
     assert {item.doi for item in rows} == {"10.5258/SOTON/WP00841"}
@@ -319,12 +321,73 @@ def test_worldpop_real_registry_fails_closed(tmp_path):
     assert female.url == hand
     assert female.age_code == "25"
     path = population_file(tmp_path / "qat_f_25_2025_SYN.tif")
-    with pytest.raises(GridError, match="units or DOI unconfirmed"):
-        read_population(tmp_path, path, spec_from_entry(rows[0]))
+    store(tmp_path, female, path.read_bytes())
+    rows = read_population(tmp_path, path, spec_from_entry(female))
+    assert len(rows) == 1
+    assert rows[0]["age_band"] == "25"
+    assert rows[0]["sex"] == "female"
 
 
-def test_worldpop_real_registry_build_reports_unconfirmed(tmp_path, capsys):
+def test_worldpop_real_registry_builds_population_grid_with_confirmed_state(
+    tmp_path, capsys
+):
     entries = load_registry()
+    row = next(item for item in entries if item.key == "worldpop_qat_agesex/2025/f/25")
+    other = next(
+        item for item in entries if item.key == "worldpop_qat_agesex/2025/m/25"
+    )
+    body = population_file(tmp_path / "qat_f_25_2025_SYN.tif").read_bytes()
+    store(tmp_path, row, body)
+    store(tmp_path, other, body)
+    result = build_grids(tmp_path, entries, {})
+    printed = capsys.readouterr().out
+    assert "worldpop_qat_agesex: units or DOI unconfirmed" not in printed
+    assert "worldpop_qat_agesex" not in result.coverage
+    table = result.tables["pub_pop_agesex_grid"]
+    assert len(table) == 2
+    by_sex = {item["sex"]: item for item in table}
+    assert by_sex["female"]["age_band"] == "25"
+    assert by_sex["male"]["age_band"] == "25"
+
+
+@pytest.mark.parametrize(
+    "change",
+    [{"units": "unconfirmed"}, {"doi_confirmed": False}, {"doi": ""}],
+)
+def test_worldpop_invented_unconfirmed_state_fails_closed_in_read(tmp_path, change):
+    path = population_file(tmp_path / "qat_f_25_2025_SYN.tif")
+    with pytest.raises(
+        GridError, match=r"^worldpop_qat_agesex: units or DOI unconfirmed$"
+    ):
+        read_population(tmp_path, path, replace(spec(), **change))
+
+
+@settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+@given(units=st.text().filter(lambda text: text != "people_per_cell"))
+@example(units="")
+@example(units="people_per_cell ")
+@example(units="People_per_cell")
+def test_worldpop_any_other_units_text_fails_closed_in_read(tmp_path, units):
+    path = population_file(tmp_path / "qat_f_25_2025_SYN.tif")
+    with pytest.raises(
+        GridError, match=r"^worldpop_qat_agesex: units or DOI unconfirmed$"
+    ):
+        read_population(tmp_path, path, replace(spec(), units=units))
+
+
+@pytest.mark.parametrize(
+    "change", [{"cell_units": "unconfirmed"}, {"doi_confirmed": False}]
+)
+def test_worldpop_invented_unconfirmed_state_in_build_reports_unconfirmed(
+    tmp_path, capsys, change
+):
+    def mutate(document):
+        for file_row in document["sources"]:
+            if file_row.get("key", "").startswith("worldpop_qat_agesex/2025/"):
+                file_row.update(change)
+
+    path = _mutated(tmp_path, "unconfirmed.yaml", mutate)
+    entries = load_registry(path)
     row = next(item for item in entries if item.key == "worldpop_qat_agesex/2025/f/25")
     other = next(
         item for item in entries if item.key == "worldpop_qat_agesex/2025/m/25"
@@ -337,10 +400,6 @@ def test_worldpop_real_registry_build_reports_unconfirmed(tmp_path, capsys):
     assert result.tables["pub_pop_agesex_grid"] == []
     assert result.coverage["worldpop_qat_agesex"] == "units or DOI unconfirmed"
     assert printed.count("worldpop_qat_agesex: units or DOI unconfirmed") == 1
-    with pytest.raises(GridError, match="units or DOI unconfirmed"):
-        read_population(
-            tmp_path, tmp_path / "qat_f_25_2025_SYN.tif", spec_from_entry(row)
-        )
 
 
 def test_worldpop_real_registry_empty_cache_is_no_cache(tmp_path):

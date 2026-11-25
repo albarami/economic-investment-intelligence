@@ -7359,3 +7359,10 @@ S2-DRAWCLS.b3 — OPEN; owner: the lead. Document 03 **7.3 Columns**, ten-family
 - **S2-AGENCYPROJ.b1f — records correction (L-2319):** all entries under **S2-AGENCYPROJ.b1d — agency projection scope and deferred mappings**, including the sequence/DRAWCLS blocker, are superseded by **S2-AGENCYPROJ.b1e — agency projection and remaining first-use evidence**; its deferred mapping, nullability, FDI and OI-178 items remain as recorded.
 - CLOSED (2026-11-27, S2-FDICONTRACT.b1, owner S2-T12): both OPEN entries beginning "fdi_projects emits fifteen columns" (the document 03 section 7.3 omission, recorded in the S2-DRAWCLS and S2-AGENCYPROJ records) are closed by the fifteen explicit declarations in document 03 section 7.3 and proposed decision 0133. The classification test covers each declaration in exactly one group; no emitted column is cut. Different-maker review and owner acceptance of the proposed decision remain required; this closes the declaration omission only.
 ASSUMPTION S2-MINWAGE.b1a (L-2337 item 2, amended by L-2338 item 2): document 04 section 2.2 and document 07 Open questions and assumptions item 7 clarify three statutory rule rows, one per component (basic, housing, food), under the existing pub_wage_table key; no decision or column changes; independent reviews pending.
+S2-GLFILL b2: the lead's confirmed fills now set every `worldpop_qat_agesex/2025/*`
+row to `people_per_cell` with `doi_confirmed: true`, and give the social slug the
+shared indicators list; the S2-ADDF b1 note that the social indicator labels keep
+their refusal is superseded for the real map. The guards stay proven on invented
+registries and maps only. Still open: the full `custodian/tests` run of this
+change did not finish inside the builder's time limit and must be completed and
+recorded by the lead, and a different maker must review the split.
