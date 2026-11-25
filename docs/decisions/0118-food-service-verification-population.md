@@ -11,15 +11,16 @@
 
 ## Context and evidence
 
-Lead ruling L-1899 item 2 answered a finding of the U3 rv1 review, which was
-rejected with six findings. PUB-52 requires verification of every place in
-food-service categories, but the document 03 sentence narrowed the required
-population to two classes, `restaurant` and `italian_restaurant`. The lead ruled
-one new closed class, `food_service`, that is verified but never counted as a
-restaurant, so PUB-57 counts stay unchanged, and ruled eleven named category
-labels into it. Under rule 46 the amendment is a decision record in the same
-task. This is a lead ruling, not an owner answer; it is Proposed and awaits
-acceptance.
+Lead ruling L-1899 item 2 answered a finding of the U3 rv1 review. PUB-52's
+verification sentence covers every place in food-service categories and every
+prepared-story place. Document 03's `pub_place_verification` paragraph sets the
+required population to the sorted unique kept ids in classes `restaurant`,
+`italian_restaurant` and `food_service` inside any showcase walk polygon, plus
+the explicitly supplied prepared-story ids. The lead ruled one new closed class,
+`food_service`, that is verified but never counted as a restaurant, so PUB-57
+counts stay unchanged, and ruled eleven named category labels into it. Under
+rule 46 the amendment is a new decision record. This is a lead ruling, not an
+owner answer; it is Proposed and awaits acceptance.
 
 ## Decision
 
@@ -41,7 +42,7 @@ The required verification population grows by the places of the eleven labels;
 the places `build_report.json` counts, `required_verification.by_area` and
 `required_verification.total`, follow that population. Places of the new class
 are not restaurants for PUB-57, so restaurant and Italian counts and thresholds
-do not move. A category label outside the closed classes still refuses with
+do not move. A category class outside the closed classes still refuses with
 `unknown_category_class`. Verification is a reviewer task; the record does not
 state any verification result.
 
