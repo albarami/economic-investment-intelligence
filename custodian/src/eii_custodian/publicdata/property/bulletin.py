@@ -130,6 +130,11 @@ class SalesExport:
     blocked: tuple[Coverage, ...]
 
 
+def _name_or_blank(row: Mapping[str, object], field: str) -> str:
+    """A null district name is a blank that the crosswalk counts as unmatched."""
+    return "" if row.get(field) is None else _text(row, field)
+
+
 def quarter_of(value: object) -> str:
     """Return the calendar quarter ``YYYY-Qn`` of a row date, or fail."""
     text = parse_period_value(value, "date")
@@ -247,8 +252,8 @@ def parse_bulletin(
             raise AdditionError("unknown_source_field")
         municipality = _municipality(row, names)
         district = _district(
-            _text(row, "district_name"),
-            _text(row, "sm_lmntq"),
+            _name_or_blank(row, "district_name"),
+            _name_or_blank(row, "sm_lmntq"),
             municipality,
             districts,
             known,
