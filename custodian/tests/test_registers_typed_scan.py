@@ -233,20 +233,45 @@ def test_register_short_number_in_centre_free_text_refuses(
         _release(cards, licences=licences, withheld=withheld)
 
 
+def _withheld_rows(key, **row):
+    """Two commerce rows publishing `key` (withheld at intake) and a third
+    row, keyed 54322, holding `row`."""
+    return [
+        commerce(**PLAIN, registration_number=key),
+        commerce(**PLAIN, row_key="c" * 20, registration_number=key),
+        commerce(**PLAIN, row_key="d" * 20, registration_number="54322", **row),
+    ]
+
+
+@pytest.mark.parametrize(
+    "rows",
+    [
+        [commerce(licence_number="25", name_en="SYN 25")],
+        [commerce(licence_number="25", building_number="25")],
+        # Decision 0119: re-pointed from a released key to a withheld one.
+        _withheld_rows("12", name_ar="SYN 12"),
+        _withheld_rows("12", district_en="SYN 12"),
+    ],
+    ids=["licence_name", "licence_building", "withheld_name", "withheld_text"],
+)
+def test_register_identifier_in_free_text_build_refuses(tmp_path, rows):
+    with pytest.raises(RegisterError, match=r"^registration_egress$"):
+        _build(tmp_path, rows)
+    assert not (tmp_path / "current").exists()
+
+
 @pytest.mark.parametrize(
     "row",
     [
-        dict(licence_number="25", name_en="SYN 25"),
-        dict(licence_number="25", building_number="25"),
         dict(registration_number="12", name_ar="SYN 12"),
         dict(registration_number="12", district_en="SYN 12", **PLAIN),
     ],
-    ids=["licence_name", "licence_building", "key_name", "key_text"],
+    ids=["key_name", "key_text"],
 )
-def test_register_identifier_in_free_text_build_refuses(tmp_path, row):
-    with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _build(tmp_path, [commerce(**row)])
-    assert not (tmp_path / "current").exists()
+def test_register_released_key_in_free_text_build_publishes(tmp_path, row):
+    """Decision 0119: a released registration in free text is published."""
+    _build(tmp_path, [commerce(**row)])
+    assert (tmp_path / "current" / "manifest.json").exists()
 
 
 def test_register_withheld_number_in_free_text_build_refuses(tmp_path):
@@ -259,10 +284,14 @@ def test_register_withheld_number_in_free_text_build_refuses(tmp_path):
         _build(tmp_path, rows)
 
 
-def test_register_key_in_financial_centre_address_refuses(tmp_path):
+def test_register_licence_in_financial_centre_address_refuses(tmp_path):
+    """Decision 0119: re-pointed from the released commerce key 12 (which now
+    builds) to the commerce licence 12."""
     files = inputs("fc_register", rows=[fc(registered_address="SYN Office 12")])
+    row = commerce(registration_number="12")
+    _build(tmp_path / "pass", [row], fc_files=files)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _build(tmp_path, [commerce(registration_number="12")], fc_files=files)
+        _build(tmp_path / "refuse", [{**row, "licence_number": "12"}], fc_files=files)
 
 
 @pytest.mark.parametrize(
@@ -285,31 +314,38 @@ def test_register_typed_name_in_another_table_refuses(column, value):
 # --- Owner condition 3, plant 2: three or more digits refuse in every column
 
 
-@pytest.mark.parametrize(
-    "number,column,value",
-    [
-        ("125", "zone", "125"),
-        ("007", "zone", "007"),
-        ("125", "street_number", "125"),
-        ("4521", "block_en", "4521"),
-        ("125436", "block_ar", "125436"),
-        ("1899", "registration_issue_date", "1899-01-05"),
-        ("2100", "registration_expiry_date", "2100-01-05"),
-        ("1899", "licence_issue_date", "1899-01-05"),
-        ("3000", "licence_expiry_date", "3000-01-05"),
-        ("2126", "tax_classification_year", "2126"),
-    ],
-)
-@pytest.mark.parametrize("role", ["registration", "licence", "withheld"])
+LONG_TYPED = [
+    ("125", "zone", "125"),
+    ("007", "zone", "007"),
+    ("125", "street_number", "125"),
+    ("4521", "block_en", "4521"),
+    ("125436", "block_ar", "125436"),
+    ("1899", "registration_issue_date", "1899-01-05"),
+    ("2100", "registration_expiry_date", "2100-01-05"),
+    ("1899", "licence_issue_date", "1899-01-05"),
+    ("3000", "licence_expiry_date", "3000-01-05"),
+    ("2126", "tax_classification_year", "2126"),
+]
+
+
+@pytest.mark.parametrize("number,column,value", LONG_TYPED)
+@pytest.mark.parametrize("role", ["licence", "withheld"])
 def test_register_long_number_in_typed_column_refuses(role, number, column, value):
-    key = number if role == "registration" else "54321"
-    cards = _cards(registration_number=key, **{column: value})
+    cards = _cards(registration_number="54321", **{column: value})
+    _release(cards)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
         _release(
             cards,
             licences=(number,) if role == "licence" else (),
             withheld=(number,) if role == "withheld" else (),
         )
+
+
+@pytest.mark.parametrize("number,column,value", LONG_TYPED)
+def test_register_long_released_number_in_typed_column_builds(number, column, value):
+    """Decision 0119: the former `registration` role of the test above; a
+    released registration equal to a typed value is published."""
+    _release(_cards(registration_number=number, **{column: value}))
 
 
 @pytest.mark.parametrize("column,value", [("lon", "1.125"), ("lat", "2.1899")])
@@ -325,10 +361,14 @@ def test_register_long_number_in_typed_coordinate_refuses(role, column, value):
         )
 
 
-def test_register_long_registration_build_refuses(tmp_path):
+def test_register_long_licence_build_refuses(tmp_path):
+    """Decision 0119: re-pointed from the released key 125 (which now builds)
+    to the licence 125; the pair differs only in the licence."""
+    row = commerce(registration_number="125", zone="125", **PLAIN)
+    _build(tmp_path / "pass", [row])
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _build(tmp_path, [commerce(registration_number="125", zone="125", **PLAIN)])
-    assert not (tmp_path / "current").exists()
+        _build(tmp_path / "refuse", [{**row, "licence_number": "125"}])
+    assert not (tmp_path / "refuse" / "current").exists()
 
 
 @pytest.mark.parametrize("column", ["zone", "street_number", "block_en", "block_ar"])
@@ -816,21 +856,26 @@ def test_register_identifier_in_receipt_text_refuses(tmp_path, field):
         _build(tmp_path, [commerce(licence_number="25")], **{field: "SYN 25"})
 
 
-# --- Item B: number-typed columns meet published registrations -------------
+# --- Item B: number-typed columns meet input-only keys (decision 0119) ------
+
+NUMBER_COLUMNS = [
+    ("capital_qar", "126", "125"),
+    ("lon", "1.126", "1.125"),
+    ("lat", "2.126", "2.125"),
+]
 
 
-@pytest.mark.parametrize(
-    "column,other,equal",
-    [
-        ("capital_qar", "126", "125"),
-        ("lon", "1.126", "1.125"),
-        ("lat", "2.126", "2.125"),
-    ],
-)
-def test_register_registration_in_number_column_refuses(column, other, equal):
-    _release(_cards(registration_number="125", **{column: other}))
+@pytest.mark.parametrize("column,other,equal", NUMBER_COLUMNS)
+def test_register_licence_in_number_column_refuses(column, other, equal):
+    """Decision 0119: re-pointed from the released key 125 to the licence 125."""
+    _release(_cards(**{column: other}), licences=("125",))
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _release(_cards(registration_number="125", **{column: equal}))
+        _release(_cards(**{column: equal}), licences=("125",))
+
+
+@pytest.mark.parametrize("column,other,equal", NUMBER_COLUMNS)
+def test_register_released_key_in_number_column_builds(column, other, equal):
+    _release(_cards(registration_number="125", **{column: equal}))
 
 
 def _listed(count, registration="125", period="2026-11"):
@@ -848,31 +893,61 @@ def _listed(count, registration="125", period="2026-11"):
     }
 
 
-def test_register_registration_in_employee_count_refuses():
-    validate_release(_listed(126), FRAME)
+def test_register_licence_in_employee_count_refuses():
+    """Decision 0119: re-pointed from the released key 125 to the licence 125."""
+    licences = frozenset({"125"})
+    validate_release(_listed(126, "54321"), FRAME, licences=licences)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(_listed(125), FRAME)
+        validate_release(_listed(125, "54321"), FRAME, licences=licences)
 
 
-@pytest.mark.parametrize("value", [125, 2.125, {"k": [125]}, (1.0, 125)])
-def test_register_registration_in_number_of_other_table_refuses(value):
+def test_register_released_key_in_employee_count_builds():
+    validate_release(_listed(125), FRAME)
+
+
+OTHER_NUMBERS = [125, 2.125, {"k": [125]}, (1.0, 125)]
+
+
+@pytest.mark.parametrize("value", OTHER_NUMBERS)
+def test_register_withheld_in_number_of_other_table_refuses(value):
+    """Decision 0119: re-pointed from the released key 125 to a withheld 125."""
+    tables = {"pub_register_company": _cards(), "pub_register_snapshot": []}
+    withheld = frozenset({"125"})
+    validate_release(
+        {**tables, "source_registry": [{"value": 126}]},
+        FRAME,
+        withheld_registrations=withheld,
+    )
+    with pytest.raises(RegisterError, match=r"^registration_egress$"):
+        validate_release(
+            {**tables, "source_registry": [{"value": value}]},
+            FRAME,
+            withheld_registrations=withheld,
+        )
+
+
+@pytest.mark.parametrize("value", OTHER_NUMBERS)
+def test_register_released_key_in_number_of_other_table_builds(value):
     tables = {
         "pub_register_company": _cards(registration_number="125"),
         "pub_register_snapshot": [],
     }
-    validate_release({**tables, "source_registry": [{"value": 126}]}, FRAME)
-    with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release({**tables, "source_registry": [{"value": value}]}, FRAME)
+    validate_release({**tables, "source_registry": [{"value": value}]}, FRAME)
 
 
-def test_register_short_registration_in_unlisted_number_refuses():
-    tables = {
-        "pub_register_company": _cards(registration_number="12"),
-        "pub_register_snapshot": [],
-    }
-    validate_release({**tables, "pub_place": [{"count": 13}]}, FRAME)
+def test_register_short_withheld_in_unlisted_number_refuses():
+    """Decision 0119: re-pointed from the released key 12 to a withheld 12."""
+    tables = {"pub_register_company": _cards(), "pub_register_snapshot": []}
+    withheld = frozenset({"12"})
+    validate_release(
+        {**tables, "pub_place": [{"count": 13}]}, FRAME, withheld_registrations=withheld
+    )
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release({**tables, "pub_place": [{"count": 12}]}, FRAME)
+        validate_release(
+            {**tables, "pub_place": [{"count": 12}]},
+            FRAME,
+            withheld_registrations=withheld,
+        )
 
 
 @pytest.mark.parametrize(
@@ -897,10 +972,12 @@ def test_register_short_registration_in_employee_count_passes(count):
 
 
 def test_register_employee_count_missing_from_list_is_free_text(monkeypatch):
-    validate_release(_listed(12, "12"), FRAME)
+    """Decision 0119: the short collision is with the licence 12."""
+    licences = frozenset({"12"})
+    validate_release(_listed(12, "54321"), FRAME, licences=licences)
     _drop_from_list(monkeypatch, "register_company_list.employee_count")
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(_listed(12, "12"), FRAME)
+        validate_release(_listed(12, "54321"), FRAME, licences=licences)
 
 
 @given(st.floats(-90, 90), st.floats(-180, 180), st.sampled_from([8, 9]))
@@ -940,31 +1017,39 @@ def test_register_licence_equal_to_cell_key_refuses(table):
         ("54321", "capital_qar", 54321),
     ],
 )
-def test_register_base_collision_values_now_refuse(registration, column, value):
-    """The values the base tests admitted (L-1288) now refuse (owner condition 1)."""
+def test_register_base_collision_values_refuse_input_only(registration, column, value):
+    """The values the base tests admitted (L-1288): decision 0119 publishes
+    them against the released registration and refuses them against the same
+    number as a licence; the pair differs only in the licence set."""
     cards = _cards(registration_number=registration)
-    _release(cards)
     cards[0][column] = value
+    _release(cards)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _release(cards)
+        _release(cards, licences=(registration,))
 
 
 # --- Generators over the input space ---------------------------------------
 
 
 @given(st.from_regex(r"[0-9]{1,6}", fullmatch=True))
-def test_register_registration_in_typed_integer_property(number):
-    cards = _cards(registration_number=number, street_number=number)
+def test_register_licence_in_typed_integer_property(number):
+    """Decision 0119: re-pointed from the released key to the licence; the
+    same number as the released key publishes in every case."""
+    licences = (number,)
+    cards = _cards(street_number=number)
     if _admitted(number):
-        _release(cards)
+        _release(cards, licences=licences)
     else:
         with pytest.raises(RegisterError, match=r"^registration_egress$"):
-            _release(cards)
+            _release(cards, licences=licences)
     cards[0]["street_number"] = "0"
-    _release(cards)
+    _release(cards, licences=licences)
     cards[0]["name_en"] = "SYN " + number
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _release(cards)
+        _release(cards, licences=licences)
+    released = _cards(registration_number=number, street_number=number)
+    released[0]["name_en"] = "SYN " + number
+    _release(released)
 
 
 @given(st.from_regex(r"[0-9]{1,7}", fullmatch=True), st.integers(1, 28))
@@ -988,14 +1073,16 @@ def _collides(number, values):
 
 
 @given(st.from_regex(r"[0-9]{1,6}", fullmatch=True))
-def test_register_registration_in_number_columns_property(number):
-    cards = _cards(registration_number=number, capital_qar=number, lat="2." + number)
+def test_register_licence_in_number_columns_property(number):
+    """Decision 0119: re-pointed from the released key to the licence."""
+    cards = _cards(capital_qar=number, lat="2." + number)
     numbers = (cards[0]["capital_qar"], cards[0]["lat"])
     if _collides(number, numbers) and not _admitted(number):
         with pytest.raises(RegisterError, match=r"^registration_egress$"):
-            _release(cards)
+            _release(cards, licences=(number,))
     else:
-        _release(cards)
+        _release(cards, licences=(number,))
+    _release(_cards(registration_number=number, capital_qar=number, lat="2." + number))
 
 
 @given(st.integers(0, 10**6 - 1), st.sampled_from(["field_absences", "tables"]))
@@ -1209,12 +1296,13 @@ def test_register_period_column_month_property(field, value):
 @pytest.mark.parametrize("field", PERIOD_FIELDS)
 def test_register_period_column_missing_from_list_is_free_text(monkeypatch, field):
     """Owner's a3, plant 4: unlisted, the real-shaped month 2026-11 meets the
-    key 11 by the full scan."""
-    tables = _periods(field, "2026-11", "11")
-    validate_release(tables, FRAME)
+    licence 11 by the full scan (decision 0119: an input-only key)."""
+    tables = _periods(field, "2026-11")
+    licences = frozenset({"11"})
+    validate_release(tables, FRAME, licences=licences)
     _drop_from_list(monkeypatch, field)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(tables, FRAME)
+        validate_release(tables, FRAME, licences=licences)
 
 
 @pytest.mark.parametrize("field", PERIOD_FIELDS)
@@ -1236,56 +1324,83 @@ def test_register_period_year_equal_to_registration_admitted(field):
 
 
 @pytest.mark.parametrize("field", PERIOD_FIELDS)
-def test_register_period_year_outside_year_shape_registration_refuses(field):
+def test_register_period_year_outside_year_shape_withheld_refuses(field):
     """Owner condition 1: the year 2126 is not of the 19xx or 20xx shape, so
-    the period 2126-11 against the registration 2126 refuses."""
+    the period 2126-11 against the withheld 2126 refuses (decision 0119:
+    re-pointed from the registration 2126, which now publishes)."""
     validate_release(_periods(field, "2126-11"), FRAME)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(_periods(field, "2126-11", "2126"), FRAME)
+        validate_release(
+            _periods(field, "2126-11"),
+            FRAME,
+            withheld_registrations=frozenset({"2126"}),
+        )
+    validate_release(_periods(field, "2126-11", "2126"), FRAME)
 
 
 @given(st.sampled_from(PERIOD_FIELDS), st.integers(1000, 9999))
-def test_register_period_year_against_registration_property(field, year):
-    """Independent oracle: a period year equal to the registration is admitted
-    exactly when it is of the 19xx or 20xx shape (owner condition 1)."""
+def test_register_period_year_against_licence_property(field, year):
+    """Independent oracle: a period year equal to a licence is admitted
+    exactly when it is of the 19xx or 20xx shape (owner condition 1); equal
+    to the released registration it is always admitted (decision 0119)."""
     period = f"{year}-12"
-    tables = _periods(field, period, str(year))
+    tables = _periods(field, period)
+    licences = frozenset({str(year)})
     if field == PERIOD_FIELDS[0] and period < "2026-11":
         with pytest.raises(RegisterError, match=r"^snapshot_month$"):
-            validate_release(tables, FRAME)
-    elif str(year)[:2] in ("19", "20"):
-        validate_release(tables, FRAME)
+            validate_release(tables, FRAME, licences=licences)
+        return
+    if str(year)[:2] in ("19", "20"):
+        validate_release(tables, FRAME, licences=licences)
     else:
         with pytest.raises(RegisterError, match=r"^registration_egress$"):
-            validate_release(tables, FRAME)
+            validate_release(tables, FRAME, licences=licences)
+    validate_release(_periods(field, period, str(year)), FRAME)
+
+
+def _role_rows(role, key, **row):
+    """Decision 0119: the input-only roles are a licence and a withheld
+    duplicate registration (the former `registration_number` role)."""
+    if role == "withheld":
+        return _withheld_rows(key, **row)
+    return [commerce(**PLAIN, **{role: key}, **row)]
 
 
 @pytest.mark.parametrize("key", ["1", "11"])
-@pytest.mark.parametrize("role", ["registration_number", "licence_number"])
+@pytest.mark.parametrize("role", ["withheld", "licence_number"])
 def test_register_a3_short_key_builds_and_free_text_refuses(tmp_path, role, key):
     """The receipt version holds the token 1; every period, the snapshot
     table's included, holds 11. Neither stops the build; free text does."""
-    row = commerce(**PLAIN, **{role: key})
-    result = _build(tmp_path / "pass", [row], kept=True)
+    result = _build(tmp_path / "pass", _role_rows(role, key), kept=True)
     assert {r["period"] for r in result.tables["pub_register_snapshot"]} == {"2026-11"}
     assert result.manifest["receipts"][0]["receipt"]["version"] == "register_input_v1"
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _build(tmp_path / "refuse", [{**row, "name_en": "SYN " + key}], kept=True)
+        _build(
+            tmp_path / "refuse", _role_rows(role, key, name_en="SYN " + key), kept=True
+        )
     assert not (tmp_path / "refuse" / "current").exists()
 
 
-@pytest.mark.parametrize("role", ["registration_number", "licence_number"])
+@pytest.mark.parametrize("role", ["withheld", "licence_number"])
 def test_register_a3_key_two_meets_only_the_report_version(tmp_path, role):
     """Round 9 (advisor, report.version): with the report's `version` listed as
     the fixed text v2, a build with the key 2 passes end to end, both versions
     holding v2; a free-text 2 still refuses (PO-S2-P71-12)."""
-    row = commerce(**PLAIN, **{role: "2"})
-    result = _build(tmp_path / "pass", [row], kept=True)
+    result = _build(tmp_path / "pass", _role_rows(role, "2"), kept=True)
     published = tmp_path / "pass" / "current" / "build_report.json"
     assert result.manifest["version"] == "v2"
     assert json.loads(published.read_bytes())["version"] == "v2"
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _build(tmp_path / "refuse", [{**row, "name_en": "SYN 2"}], kept=True)
+        _build(tmp_path / "refuse", _role_rows(role, "2", name_en="SYN 2"), kept=True)
+
+
+@pytest.mark.parametrize("key", ["1", "2", "11"])
+def test_register_a3_short_released_key_in_free_text_builds(tmp_path, key):
+    """Decision 0119: the former `registration_number` role of the two tests
+    above; a released key in free text is published."""
+    row = commerce(**PLAIN, registration_number=key, name_en="SYN " + key)
+    _build(tmp_path, [row], kept=True)
+    assert (tmp_path / "current" / "build_report.json").exists()
 
 
 @pytest.mark.parametrize("role", ["registration_number", "licence_number"])

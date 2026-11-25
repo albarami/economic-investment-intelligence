@@ -2740,14 +2740,21 @@ No category is inferred from observed rows. Null never means a zero or an
 inferred value.
 
 DAT-11 scans every released string column, including address text,
-with only the three registration-key columns exempt from key-membership checks.
+with only the three registration-key columns exempt from the published-column
+scan; each key slot still refuses a withheld duplicate registration.
 Typed numeric Public values (capital, coordinates, counts and cell keys) are not
 identifier strings. The artefact scan is unchanged. This follows the lead's
 L-1288 ruling recorded in the S2-T49 fix-round brief: rule 9 binds the identifiers
 the project generates; it does not prohibit a typed numeric Public capital.
 Under [decision 0105](decisions/0105-register-scan-typed-columns.md) item 4
-(proposed, owner condition 1), a typed number still meets every registration,
-licence and withheld number by the token match, with no prefix or digit-run check.
+(proposed, owner condition 1), a typed number still meets the keys by the token
+match, with no prefix or digit-run check. Under
+[decision 0119](decisions/0119-register-release-scan-meets-input-only-keys.md)
+(proposed, the owner's option B), every published non-key value of a release
+table, typed or free text, nested or a number, and every column name meets only
+the input-only keys (the intake licences and the withheld duplicate
+registrations), never the registrations being released: a value equal to a
+released registration is published.
 The literal TST-142 wording clash remains recorded in OPEN_ITEMS.md.
 
 Licence numbers are validated at intake but never projected, used as fallback
@@ -2765,13 +2772,16 @@ under the owner's a2, under the owner's a3 the manifest's and the receipt's
 `version`, each admitting only its one fixed text, and the `period` columns of
 `pub_register_snapshot` and `register_company_list`, each only a real `YYYY-MM`
 month), each with its written format checked before the scan,
-admits a token equal to a registration, licence or withheld number only when that
+admits a token equal to a key it meets (in a release column a licence or
+withheld number, decision 0119; in a manifest or report field also a published
+registration) only when that
 number has one or two digits or the shape 19xx or 20xx; a longer number still
 refuses `registration_egress`, a value failing its format refuses, and the prefix
-and digit-run checks are unchanged. Every unlisted field is free text, and free
-text (the receipt's text included), the key columns, the other manifest fields
-and the rest of the report keep the full scan; other
-coincidental token matches still refuse. Licence values are never exported to
+and digit-run checks are unchanged. Every unlisted field is free text: free
+text of a release table keeps the full scan against the licence and withheld
+numbers, and the receipt's text, the other manifest fields and the rest of the
+report keep the full scan against those and the published registrations, where
+a coincidental token match still refuses. Licence values are never exported to
 support this check; the assembly consumes only the lead-pinned verified bundle.
 
 For this S2 projection only (DAT-02 and DAT-12), a missing commerce registration
@@ -2807,8 +2817,9 @@ companies and geocoded keys and colliding `ROW-` identities still refuse as
 `duplicate_registration_key`; winning-group event conflicts are counted absences
 under decision 0117 item 3, not refusals. Duplicate published row keys whose identities
 differ still refuse `duplicate_row_key`. Cross-register ambiguity still refuses
-as `ambiguous_cross_source_key`. The prefixed key is also scanned outside its
-dedicated key slots. This follows the S2-P71 lead brief's row-key ruling for the
+as `ambiguous_cross_source_key`. The prefixed key is also scanned in the
+manifest and the report; in another release column it is published, like every
+released registration (decision 0119). This follows the S2-P71 lead brief's row-key ruling for the
 Public projection; decision 0074 item 5's world-feed keying/enrichment remains
 with S4-T02. No world snapshot or closed-category mapping is implemented here.
 

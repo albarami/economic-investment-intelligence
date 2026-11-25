@@ -184,7 +184,8 @@ def scan_content(value: object, content: frozenset[str]) -> None:
 
 def _scan_release_value(value: object, keys: frozenset[str]) -> None:
     """DAT-11 / L-1288: a typed number is no identifier string, so no prefix or
-    digit-run check; its tokens still meet every key (owner condition 1)."""
+    digit-run check; its tokens still meet every key given (owner condition 1),
+    the input-only keys under decision 0119."""
     if value is None or type(value) in (bool, int, float):
         if type(value) in (int, float) and any(
             token in keys for token in _tokens(str(value))
@@ -284,8 +285,9 @@ def validate_release(
         if row["registration_number"] not in current_keys:
             refuse("list_company_missing")
     frozen = frozenset(keys)
-    input_only_keys = licences | withheld_registrations
-    egress_keys = frozen | input_only_keys
+    # Decision 0119 (option B): a published non-key value or column name meets
+    # the input-only keys only, never the registrations being released.
+    egress_keys = licences | withheld_registrations
     # Decision 0105: a listed column admits only a short or year-shaped number.
     typed_keys = _typed_keys(egress_keys)
     banned = {

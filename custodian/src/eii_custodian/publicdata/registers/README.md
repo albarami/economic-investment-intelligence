@@ -57,7 +57,10 @@ added. Source-inapplicable columns are null and cannot be filled by the other
 source's schema. No worker, residence, owner or person column is accepted.
 
 DAT-11 scans every string column, including non-key address strings.
-A string equal to another registration key refuses. Typed capital, coordinates,
+Under decision 0119 (proposed, the owner's option B) a published non-key value
+or column name meets only the input-only keys (intake licences and withheld
+duplicate registrations): a string equal to a licence or withheld number
+refuses, and one equal to a registration being released is published. Typed capital, coordinates,
 counts and cell keys are not identifier strings; artefact scanning is unchanged.
 The 2026-11 floor applies only to kept snapshots. Each snapshot is compared with
 its own source's current capture; current retrieval months may differ and may
@@ -67,8 +70,9 @@ An ephemeral input-licence set extends the same token checks to every non-key
 released field, including numeric values, and manifests/reports including table
 counts added by storage. It is never exported. The dedicated key exemption is
 unchanged: an intake licence equal to a published registration passes because
-no licence field is released. A registration or licence token in a non-key field
-still refuses. Under decision 0105 (proposed), the closed typed-field list
+no licence field is released and the key slot meets withheld numbers only. A
+licence or withheld token in a non-key field still refuses; a released
+registration token there is published (decision 0119). Under decision 0105 (proposed), the closed typed-field list
 `contracts.TYPED_FIELDS` (the five ISO dates, `zone`, `street_number`,
 `block_en`, `block_ar`, `lon`, `lat`, `capital_qar`, the tax year and the yes/no
 tax flag of `pub_register_company`, the list's `employee_count`, and the
@@ -79,13 +83,15 @@ equal to its one fixed text (`contracts.FIXED_TEXTS`), and the `period` columns 
 the snapshot and list tables, each a real `YYYY-MM` month (else
 `snapshot_month`), each format and declared shape checked before the scan: the two
 snapshot coverage fields are lists of months, every other field one value, and
-a container in place of one value refuses) admits a token equal to a
-registration, licence or withheld number only when that number has one or two
+a container in place of one value refuses) admits a token equal to a key it
+meets (a licence or withheld number in a release column; in a manifest or
+report field also a published registration) only when that number has one or two
 digits or the shape 19xx or 20xx. Longer numbers, every unlisted field, the other
 manifest fields (the receipt's text included) and the rest of the report keep
-the full scan; other coincidental token
-matches still refuse. Every number of every release table meets every key by the
-token match (decision 0105 item 4), with no string check.
+the full scan against the keys they meet; other coincidental token
+matches with those keys still refuse. Every number of every release table meets
+the licence and withheld numbers by the token match (decision 0105 item 4 as
+amended by decision 0119), with no string check.
 
 Commerce registrations accept exactly one to six ASCII digits with an optional
 slash followed by one to three ASCII digits (at most ten characters).

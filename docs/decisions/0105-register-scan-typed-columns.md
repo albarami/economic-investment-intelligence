@@ -1,5 +1,7 @@
 # Decision 0105: The register token scan admits short and year-shaped numbers in a closed list of typed columns
 
+Amended 2026-11-25 by [decision 0119](0119-register-release-scan-meets-input-only-keys.md) (Proposed): items 3 and 4, for the release tables, meet published columns against the input-only keys only.
+
 | | |
 |---|---|
 | Status | Accepted 2026-11-23 by the lead (ruling L-1647): every item is the owner's own choice (option (a) with three conditions, "a2 yes" and "a3", 2026-11-23) or the advisor's under the owner's delegation (item 8); built in S2-P71 Part 2 rounds 4 to 9, approved by another maker (`49e4c848`) and merged in train S2-24 |

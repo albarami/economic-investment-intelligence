@@ -705,7 +705,17 @@ def test_person_column_plant_refused(tmp_path: Path, frame) -> None:
     assert "pub_register_company" not in state.tables
 
 
-def test_identifier_egress_plant_refused(tmp_path: Path, frame) -> None:
+@pytest.mark.parametrize(
+    ("value", "reason"),
+    [("SYN-E-7F3K2Q", "identifier_prefix"), ("65432", None)],
+    ids=["prefixed", "released_key"],
+)
+def test_identifier_egress_plant_refused(
+    tmp_path: Path, frame, value: str, reason: str | None
+) -> None:
+    """Decision 0119: the bundle holds no input-only key, so the loader's
+    identifier plant is a prefixed identifier; the financial-centre key
+    65432 in a commerce name, formerly refused, now loads."""
     from eii_custodian.publicdata.additions.storage import write_parquet
     from eii_custodian.publicdata.registers.contracts import (
         CARD_COLUMNS,
@@ -716,7 +726,7 @@ def test_identifier_egress_plant_refused(tmp_path: Path, frame) -> None:
     rows = _rebuild_rows(tmp_path, frame, "pub_register_company")
     for row in rows:
         if row["source_id"] == "biz_register":
-            row["name_en"] = "65432"
+            row["name_en"] = value
     sha = write_parquet(
         tmp_path / BUNDLE / "tables/pub_register_company.parquet",
         [(name, column_type(name)) for name in CARD_COLUMNS],
@@ -730,7 +740,11 @@ def test_identifier_egress_plant_refused(tmp_path: Path, frame) -> None:
                 item["rows"] = len(rows)
 
     _rewrite_manifest(tmp_path, alter)
-    with pytest.raises(RegisterError, match=r"^registration_egress$"):
+    if reason is None:
+        state.register_tables()
+        assert "pub_register_company" in state.tables
+        return
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
         state.register_tables()
 
 
