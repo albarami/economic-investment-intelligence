@@ -76,6 +76,18 @@ def test_distinct_events_on_the_winning_date_are_withheld(notice):
     assert audit.event_conflict_absences == 1
 
 
+@pytest.mark.parametrize("notice", ["2027-01-02", ""], ids=["dated", "undated"])
+def test_conflicting_orphan_group_refuses_companion_keys(notice):
+    control = [event("SYN first", notice), event("SYN second", notice)]
+    audit = InputAudit()
+    assert selected_card(control, audit)["event"] is None
+    assert audit.event_conflict_absences == 1
+
+    orphan = [dict(row, qfc_number="65433") for row in control]
+    with pytest.raises(RegisterError, match=r"^companion_keys$"):
+        parse("fc_register", files_with_events(orphan), FRAME)
+
+
 def test_older_date_conflict_does_not_withhold_the_later_event():
     audit = InputAudit()
     card = selected_card(
@@ -130,6 +142,7 @@ def test_non_event_companion_duplicates_still_refuse(role):
 
 
 EVENT_ROWS = st.tuples(
+    st.sampled_from(["65432", "65433"]),
     st.sampled_from(["SYN alpha", "SYN beta", "SYN gamma"]),
     st.one_of(
         st.none(),
@@ -144,27 +157,47 @@ EVENT_ROWS = st.tuples(
 @settings(max_examples=50, deadline=None)
 def test_event_selection_matches_date_oracle_for_every_row_order(rows, data):
     permutation = data.draw(st.permutations(rows))
-    by_date = {}
-    for text, notice in set(rows):
-        by_date.setdefault(notice, set()).add(text)
-    winning_date = None
-    conflict = False
-    expected = None
-    if by_date:
-        winning_date = max(
-            by_date,
-            key=lambda notice: (
-                notice is not None,
-                date.fromisoformat(notice) if notice is not None else date.min,
-            ),
-        )
-        conflict = len(by_date[winning_date]) > 1
-        if not conflict:
-            expected = next(iter(by_date[winning_date]))
+    expected = {}
+    expected_absences = 0
+    for number in ("65432", "65433"):
+        by_date = {}
+        for row_number, text, notice in set(rows):
+            if row_number == number:
+                by_date.setdefault(notice, set()).add(text)
+        winning_date = None
+        conflict = False
+        selected_text = None
+        if by_date:
+            winning_date = max(
+                by_date,
+                key=lambda notice: (
+                    notice is not None,
+                    date.fromisoformat(notice) if notice is not None else date.min,
+                ),
+            )
+            conflict = len(by_date[winning_date]) > 1
+            if not conflict:
+                selected_text = next(iter(by_date[winning_date]))
+        expected[number] = (selected_text, None if conflict else winning_date)
+        expected_absences += int(conflict)
+
+    files = inputs("fc_register", [fc(), fc("65433", row_key="cccccccccccccccccccc")])
+    files["geocoded"] = csv_bytes(
+        "geocoded",
+        [geocode(), geocode("65433", row_key="cccccccccccccccccccc")],
+    )
     for ordered in (rows, permutation):
-        events = [event(text, notice or "") for text, notice in ordered]
+        events = [
+            dict(event(text, notice or ""), qfc_number=number)
+            for number, text, notice in ordered
+        ]
+        files["events"] = csv_bytes("events", events)
         audit = InputAudit()
-        card = selected_card(events, audit)
-        assert card["event"] == expected
-        assert card["notice_expiration_date"] == (None if conflict else winning_date)
-        assert audit.event_conflict_absences == int(conflict)
+        cards = {
+            card["registration_number"]: card
+            for card in parse("fc_register", files, FRAME, audit=audit)
+        }
+        for number, (selected_text, notice) in expected.items():
+            assert cards[number]["event"] == selected_text
+            assert cards[number]["notice_expiration_date"] == notice
+        assert audit.event_conflict_absences == expected_absences

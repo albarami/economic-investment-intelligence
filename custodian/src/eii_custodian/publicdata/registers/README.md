@@ -121,9 +121,10 @@ under decision 0117 item 3, not refusals. Duplicate published row keys still ref
 `duplicate_row_key` when their identities differ. Cross-register ambiguity still
 refuses as `ambiguous_cross_source_key`, with no source prefix added.
 
-Missing financial-centre keys, duplicate financial-centre keys or row identities, cross-source key ambiguity, unknown
-columns, unconfirmed branch structure and other malformed notice dates refuse with
-named reasons. There is no merge, date repair, inferred cancellation
+Missing financial-centre keys, duplicate financial-centre companies or geocoded keys,
+duplicate row identities, cross-source key ambiguity, unknown columns, unconfirmed
+branch structure and other malformed notice dates refuse with named reasons.
+There is no merge, date repair, inferred cancellation
 date or opening/closure column. A historical company need not be in today's
 card table. Its cell belongs to its own snapshot. Empty kept snapshots and
 missing snapshots are distinct; `Built.snapshot_reason` returns

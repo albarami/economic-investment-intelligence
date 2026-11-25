@@ -270,6 +270,9 @@ def parse(
         return result
     companies = _keyed(parsed["companies"], "qfc_number")
     geocodes = _keyed(parsed["geocoded"], "qfc_number")
+    event_keys = {row["qfc_number"] for row in parsed["events"]}
+    if not event_keys <= companies.keys():
+        refuse("companion_keys")
     events = _keyed(_selected_events(parsed["events"], audit), "qfc_number")
     if companies.keys() != geocodes.keys() or not events.keys() <= companies.keys():
         refuse("companion_keys")
