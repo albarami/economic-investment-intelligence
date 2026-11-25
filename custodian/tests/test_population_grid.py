@@ -331,15 +331,7 @@ def test_worldpop_real_registry_builds_with_confirmed_units_and_doi(tmp_path):
 def test_worldpop_real_registry_builds_population_grid_with_confirmed_state(
     tmp_path, capsys
 ):
-    entries = load_registry()
-    row = next(item for item in entries if item.key == "worldpop_qat_agesex/2025/f/25")
-    other = next(
-        item for item in entries if item.key == "worldpop_qat_agesex/2025/m/25"
-    )
-    body = population_file(tmp_path / "qat_f_25_2025_SYN.tif").read_bytes()
-    store(tmp_path, row, body)
-    store(tmp_path, other, body)
-    result = build_grids(tmp_path, entries, {})
+    result = _build_female_and_male_25(tmp_path, load_registry())
     printed = capsys.readouterr().out
     assert "worldpop_qat_agesex: units or DOI unconfirmed" not in printed
     assert "worldpop_qat_agesex" not in result.coverage
@@ -383,23 +375,24 @@ def test_worldpop_invented_unconfirmed_state_in_build_reports_unconfirmed(
 ):
     def mutate(document):
         for file_row in document["sources"]:
-            if file_row.get("key", "").startswith("worldpop_qat_agesex/2025/"):
+            if file_row.get("key", "") == "worldpop_qat_agesex/2025/f/25":
                 file_row.update(change)
 
     path = _mutated(tmp_path, "unconfirmed.yaml", mutate)
-    entries = load_registry(path)
-    row = next(item for item in entries if item.key == "worldpop_qat_agesex/2025/f/25")
-    other = next(
-        item for item in entries if item.key == "worldpop_qat_agesex/2025/m/25"
-    )
-    body = population_file(tmp_path / "qat_f_25_2025_SYN.tif").read_bytes()
-    store(tmp_path, row, body)
-    store(tmp_path, other, body)
-    result = build_grids(tmp_path, entries, {})
+    result = _build_female_and_male_25(tmp_path, load_registry(path))
     printed = capsys.readouterr().out
-    assert result.tables["pub_pop_agesex_grid"] == []
+    table = result.tables["pub_pop_agesex_grid"]
+    assert [(item["sex"], item["age_band"]) for item in table] == [("male", "25")]
     assert result.coverage["worldpop_qat_agesex"] == "units or DOI unconfirmed"
     assert printed.count("worldpop_qat_agesex: units or DOI unconfirmed") == 1
+
+
+def _build_female_and_male_25(tmp_path, entries):
+    """Store one invented grid body for f/25 and m/25 and build the grids."""
+    body = population_file(tmp_path / "qat_f_25_2025_SYN.tif").read_bytes()
+    for key in ("worldpop_qat_agesex/2025/f/25", "worldpop_qat_agesex/2025/m/25"):
+        store(tmp_path, next(item for item in entries if item.key == key), body)
+    return build_grids(tmp_path, entries, {})
 
 
 def test_worldpop_real_registry_empty_cache_is_no_cache(tmp_path):
