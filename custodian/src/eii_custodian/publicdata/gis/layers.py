@@ -252,24 +252,22 @@ def address_rows(
     for feature in features:
         attributes = _attributes(feature)
         lon, lat = _lon_lat(feature)
+        row: dict[str, object] = {
+            "zone_number": _digits(attributes.get("ZONE_NO")),
+            "street_number": _digits(attributes.get("STREET_NO")),
+            "building_number": _digits(attributes.get("BUILDING_NO")),
+            "building_subtype": _optional_digits(attributes.get("BUILDING_NO_SUBTYPE")),
+            "survey_date": _survey_date(attributes.get("SURVEYED_DATE")),
+            "lon": lon,
+            "lat": lat,
+        }
         if point_cell(float(lon), float(lat), owned) is None:
             # R1: a point outside the frame grid is left out, never refused
-            # (328 of 163,860 live points); the count is written after go-live.
+            # (328 of 163,860 live points), after every field check above;
+            # the count is written after go-live.
             continue
-        rows.append(
-            {
-                "zone_number": _digits(attributes.get("ZONE_NO")),
-                "street_number": _digits(attributes.get("STREET_NO")),
-                "building_number": _digits(attributes.get("BUILDING_NO")),
-                "building_subtype": _optional_digits(
-                    attributes.get("BUILDING_NO_SUBTYPE")
-                ),
-                "survey_date": _survey_date(attributes.get("SURVEYED_DATE")),
-                "lon": lon,
-                "lat": lat,
-                "cell": _cell(lon, lat, owned),
-            }
-        )
+        row["cell"] = _cell(lon, lat, owned)
+        rows.append(row)
     keyed = assign_feature_keys(rows)
     require_release_columns(keyed)
     return keyed
@@ -426,18 +424,18 @@ def landmark_rows(
     for feature in features:
         attributes = _attributes(feature)
         lon, lat = _lon_lat(feature)
+        body = _LandmarkBody(
+            name_en=_required_text(attributes.get("ENAME")),
+            name_ar=_required_text(attributes.get("ANAME")),
+            lon=lon,
+            lat=lat,
+        )
         if point_cell(float(lon), float(lat), owned) is None:
             # R1: a landmark outside the frame grid is left out, never refused
-            # (41 live points); the count is written after go-live.
+            # (41 live points), after its name checks; the count is written
+            # after go-live.
             continue
-        prepared.append(
-            _LandmarkBody(
-                name_en=_required_text(attributes.get("ENAME")),
-                name_ar=_required_text(attributes.get("ANAME")),
-                lon=lon,
-                lat=lat,
-            )
-        )
+        prepared.append(body)
     keyed = _landmark_keys(prepared)
     specifications: list[dict[str, Any]] = []
     points: dict[tuple[str, str], dict[str, Any]] = {}

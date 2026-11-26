@@ -611,3 +611,24 @@ def _square() -> dict[str, object]:
         "rings": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
         "spatialReference": {"wkid": 4326},
     }
+
+
+def test_a_point_outside_the_grid_still_meets_every_field_check() -> None:
+    bad_name = {
+        "attributes": {"ENAME": "SYN FAR", "ANAME": None},
+        "geometry": _point(11.75, 21.5),
+    }
+    bad_zone = json.loads(json.dumps(_load("qars_features.json")[0]))
+    bad_zone["geometry"]["x"] = 11.75
+    bad_zone["geometry"]["y"] = 21.5
+    bad_zone["attributes"]["ZONE_NO"] = "SYN"
+    for build, features in (
+        (landmark_rows, [bad_name]),
+        (address_rows, [bad_zone]),
+    ):
+        try:
+            build(features, _grid(10.25, 20.5))
+        except LayerError:
+            pass
+        else:
+            raise AssertionError("an outside point skipped a field check")
