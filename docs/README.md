@@ -169,6 +169,7 @@
 | [0120](decisions/0120-year-range-is-not-a-phone-shape.md) | Exact ascending ASCII year ranges are excluded from the agency-page telephone shape only; other release checks unchanged | Proposed, 2026-11-25 |
 | [0121](decisions/0121-agency-pages-box-1-covers-pages-that-pass-the-release-check.md) | S2-T39 box 1 covers pages passing the release check; refused pages retain typed records and links; two evidence flags read over stored pages | Proposed, 2026-11-25 |
 | [0125](decisions/0125-c7-coordinates-defer-to-s7.md) | `c7.coordinates` joins the S7-deferred pins; S7-T05 derives, source-checks and pins the coordinates; no value is bound at S2 | Proposed, 2026-11-25 |
+| [0129](decisions/0129-everyday-map-tools-move-to-s3-and-a-grouped-layer-panel.md) | S7-T33, S7-T30 and S7-T31 move to slice S3 with their criteria unchanged; S7-T34 is split and its S3 map-screen phone pass becomes S3-T31; new task S3-T30, a designed grouped layer panel; the five tasks hold no slice S3 gate and close under S7-T06 | Accepted under the owner's standing approval of 2026-11-25 22:06 |
 
 ## Identifiers and change control
 
