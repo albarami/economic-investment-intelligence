@@ -312,11 +312,11 @@ test('prints a Local line for another port', async () => {
   await new Promise((resolve) => {
     reservation.listen(0, '127.0.0.1', resolve);
   });
-  fs.writeFileSync(
-    path.join(dir, 'wrong-port'),
-    String(reservation.address().port),
-  );
   try {
+    fs.writeFileSync(
+      path.join(dir, 'wrong-port'),
+      String(reservation.address().port),
+    );
     const result = run([
       '--root',
       root,
