@@ -22,6 +22,21 @@ from eii_custodian.publicdata.fetch.registry import (
 )
 
 REGISTER_IDS = frozenset({"biz_register", "fc_register"})
+# family_period_bounds writes this shape and no other note for published_label.
+_LABEL_NOTE = re.compile(r"\Adistinct labels (?:0|[1-9][0-9]*)\Z")
+_VARIABLE = frozenset(
+    {
+        "bytes",
+        "retrieved_utc",
+        "source_modified",
+        "row_count",
+        "terms_sha256",
+        "portal_licence",
+        "portal_licence_url",
+        "fetch_url",
+        "fetch_host",
+    }
+)
 FORBIDDEN = frozenset({"traffic_tomtom_flow", "traffic_tomtom_range", "tiles3d_google"})
 # Source identities, not fetch evidence: decisions 0023, 0040, 0046; doc 04 §2.
 TASK_SOURCES = frozenset(
@@ -133,18 +148,48 @@ def table_catalogue(text: str) -> frozenset[str]:
     )
 
 
-def receipt_valid(row: Entry, receipt: Mapping[str, object]) -> bool:
-    """Validate receipt shape/identity against the producer, not a PASS log line.
+def _published_label(row: Entry) -> bool:
+    """True when the registry period rule is the writer's published-label form."""
+    if "form=" not in row.period_field:
+        return False
+    from eii_custodian.publicdata.additions.common import (
+        AdditionError,
+        parse_period_rule,
+    )
 
-    Snapshot bytes/hash verification belongs to the existing readers; this check
-    verifies their supplied receipt and the registry chain, without reading data.
-    """
+    try:
+        return parse_period_rule(row.period_field).form == "published_label"
+    except AdditionError:
+        return False
+
+
+def _publisher_agrees(observed: object, expected: object) -> bool:
+    """The fetch gate's fold: case and space runs, nothing else."""
+    if not isinstance(observed, str) or not isinstance(expected, str):
+        return False
+    from eii_custodian.publicdata.fetch.kinds import _same_publisher
+
+    return _same_publisher(observed, expected)
+
+
+def receipt_disagreement(row: Entry, receipt: Mapping[str, object]) -> str:
+    """Return the closed reason a receipt is not the writer's sidecar, or ''."""
     digest = receipt.get("sha256")
     if row.kind == "citation_only":
         if digest != "CITATION_ONLY":
-            return False
+            return "digest"
     elif not isinstance(digest, str) or re.fullmatch(r"[a-f0-9]{64}", digest) is None:
-        return False
+        return "digest"
+    note = ""
+    periods: tuple[str, str] | None = None
+    if _published_label(row):
+        # The writer stores no bound and the label count. Registry bounds stay
+        # on the row for the period check and are not copied onto the receipt.
+        observed = receipt.get("coverage_note")
+        if not isinstance(observed, str) or _LABEL_NOTE.fullmatch(observed) is None:
+            return "coverage_note"
+        note = observed
+        periods = ("", "")
     stored_row = row
     if (
         row.key == row.source_id
@@ -163,48 +208,48 @@ def receipt_valid(row: Entry, receipt: Mapping[str, object]) -> bool:
         source_modified="",
         row_count=None,
         terms_sha256="",
+        observed_periods=periods,
+        coverage_note=note,
     )
     if not expected.keys() <= receipt.keys():
-        return False
-    variable = {
-        "bytes",
-        "retrieved_utc",
-        "source_modified",
-        "row_count",
-        "terms_sha256",
-        "portal_licence",
-        "portal_licence_url",
-        "fetch_url",
-        "fetch_host",
-    }
-    if any(
-        receipt[key] != value for key, value in expected.items() if key not in variable
-    ):
-        return False
+        return "absent:" + sorted(expected.keys() - receipt.keys())[0]
+    if not _publisher_agrees(receipt.get("publisher"), expected["publisher"]):
+        return "publisher"
+    for key, value in expected.items():
+        if key in _VARIABLE or key == "publisher":
+            continue
+        if receipt[key] != value:
+            return key
     # Ruling L-1001: pending terms fields (words, reading date, basis of use)
     # are records and never exclude a source; only identity, publisher, licence
     # id and fetch address have to be present.
-    if any(
-        not isinstance(receipt.get(key), str) or not str(receipt[key]).strip()
-        for key in (
-            "publisher",
-            "title_en",
-            "licence_id",
-            "fetch_url",
-        )
-    ):
-        return False
+    for key in ("publisher", "title_en", "licence_id", "fetch_url"):
+        if not isinstance(receipt.get(key), str) or not str(receipt[key]).strip():
+            return key
     retrieved = receipt.get("retrieved_utc")
     try:
         if (
             not isinstance(retrieved, str)
             or datetime.fromisoformat(retrieved.replace("Z", "+00:00")).tzinfo is None
         ):
-            return False
+            return "retrieved_utc"
     except ValueError:
-        return False
+        return "retrieved_utc"
     nbytes = receipt.get("bytes")
-    return type(nbytes) is int and nbytes >= 0 and receipt.get("switched_off") is False
+    if type(nbytes) is not int or nbytes < 0:
+        return "bytes"
+    if receipt.get("switched_off") is not False:
+        return "switched_off"
+    return ""
+
+
+def receipt_valid(row: Entry, receipt: Mapping[str, object]) -> bool:
+    """Validate receipt shape/identity against the producer, not a PASS log line.
+
+    Snapshot bytes/hash verification belongs to the existing readers; this check
+    verifies their supplied receipt and the registry chain, without reading data.
+    """
+    return receipt_disagreement(row, receipt) == ""
 
 
 def in_use(row: Entry, receipts: Mapping[str, Mapping[str, object]]) -> bool:
