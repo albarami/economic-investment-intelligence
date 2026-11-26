@@ -7305,3 +7305,10 @@ Five classifications stay `unsure`: `16d3af9f` (missing per-batch ownership opti
 
 - S2-OUTFIX.b1 / S2-T08: D1 empty-additions attribution repaired locally, pending different-maker review and the real full audit. Of the admitted 87 output-table rows, B 7 and C 2 remain outside scope; D2 2 is BLOCKED because `places.integrate._place_from_registry` excludes the root listing key from row inputs. Both places declarations and the verification producer remain unchanged; the lead must reconcile the root listing versus component lineage before declaring both edges. The separate 65 receipt rows are untouched.
 - S2-OUTFIX2.b1 / S2-T08 update to the preceding D2 item (2026-11-27): the root listing's release-membership/size/ETag evidence and the component's row-input role are reconciled for both places tables. Both declarations now include `pub_place_verification`; the producer and exact-set check are unchanged. Invented consumer evidence is red before the change and green after; a third undeclared table still fails. Local D2 repair is ready for different-maker review; live audit closure remains pending. Next resume must refetch `places_ovt` and `places_ovt/part-00014`; unrelated entries retain their fingerprints. See PROGRESS.md, **S2-OUTFIX2.b1 — places verification declarations (2026-11-27)**. Earlier evidence is retained; B/C, D1 and the separate receipt findings are not reclassified.
+
+## Proposed open item — S2-REGSHORT.b2
+
+PO-S2-REGSHORT-02: Under proposed decision 0132, a card text with four or more
+letters or digits inside an approved metadata word still refuses, fails closed
+and goes to review; it is never absorbed. Different-maker review and lead
+real-register replay remain owed. No gate or acceptance box is marked.

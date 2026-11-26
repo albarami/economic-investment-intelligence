@@ -282,3 +282,5 @@ lead's manifest pin. Raw register files are never retained in the cache, so the
 reader cannot re-derive a receipt from file bytes; a stale receipt list
 repacked under a fresh pin passes all checks. Reviewing and pinning the
 manifest is therefore the sole control over the receipt-to-table binding.
+
+Under proposed decision 0132, card content with at least four alphanumeric characters keeps substring matching, one to three uses consecutive whole Unicode word tokens including underscores, and punctuation-only text requires exact equality; longer-text collisions still fail closed for review.

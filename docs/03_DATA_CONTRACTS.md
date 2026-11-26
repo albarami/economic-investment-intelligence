@@ -2742,6 +2742,8 @@ again by the full output guard only when extracted.
 
 ## Register file projections (S2-T49)
 
+Proposed [decision 0132](decisions/0132-short-register-card-text-meets-the-content-scan-as-whole-tokens.md) retains substring matching for card text with at least four alphanumeric characters, uses consecutive whole Unicode word tokens (underscore included) for one to three, and exact equality for punctuation-only text; longer-text collisions still fail closed for review.
+
 Proposed [decision 0124](decisions/0124-register-fixed-metadata-fields-meet-exact-checks.md)
 amends the metadata-scan statements below for its closed list only: exact file
 byte lengths and table row counts are recomputed from the actual inputs; approved
