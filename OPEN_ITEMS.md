@@ -7296,3 +7296,10 @@ The task handoff `R1_PORT_TABLE.md` compares main `86e9f86589926dd52869137f84e92
 Five classifications stay `unsure`: `16d3af9f` (missing per-batch ownership optimization, no demonstrated gate timeout), `1aa70ec9` and `fdd59ea6` (mixed merge trees), `55eb0f17` and `d574fdef` (mixed S3 release trains). The lead must decompose differing files and establish any S2 dependency; do not cherry-pick whole trains on this evidence. The four supplied ports remain verified at `b71edf65e8268cc70ff793ed50d487b0fb2f0175`, with independent different-maker review and the full S2 gate still pending. No criterion is ticked by this record.
 
 - **IMPLEMENTED, REVIEW PENDING — S2-CSVCMT.b1 random failure from S2-ABSCAV.b1, 2026-11-26.** The old shared CSV reader removed a physical continuation beginning with `#` inside a quoted use-key value, so the discovered `"\n#"` input raised `use_map_field_empty` instead of `use_map_use_key`. Quote-parity filtering now skips comments only at record boundaries; the property retains its original strategy and exact reason assertion and pins that input with `@example`. Both modes match the old reader on every committed CSV; EOF behavior and strict reasons remain unchanged. Reverting only the fix with corrected tests exits 1 (6 failed / 68 passed); restored focused tests pass (74), and the required broad selection passes (1683 passed / 15160 deselected, seed 6227, exit 0). Header, width and syntax guard deletions each fail their exact-reason case. This implementation and planted proof address the parser cause; the lead's different-maker review remains pending. See PROGRESS.md, S2-CSVCMT.b1; no green rerun alone is used as closure.
+
+## Proposed open item — S2-REGSHORT.b2
+
+PO-S2-REGSHORT-02: Under proposed decision 0132, a card text with four or more
+letters or digits inside an approved metadata word still refuses, fails closed
+and goes to review; it is never absorbed. Different-maker review and lead
+real-register replay remain owed. No gate or acceptance box is marked.

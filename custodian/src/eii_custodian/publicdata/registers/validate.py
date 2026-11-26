@@ -263,11 +263,46 @@ def _metadata_item_path(path: str) -> str:
     return "" if rule is not None and rule[0] != "schema_keys" else path
 
 
+@dataclass(frozen=True)
+class CardContent:
+    """Decision 0132: prepare card matching once, before metadata traversal."""
+
+    long: frozenset[str]
+    short: frozenset[tuple[str, ...]]
+    exact: frozenset[str]
+
+    @classmethod
+    def prepare(cls, content: frozenset[str]) -> CardContent:
+        long, short, exact = set(), set(), set()
+        for text in content:
+            count = sum(char.isalnum() for char in text)
+            if count >= 4:
+                long.add(text)
+            elif count:
+                short.add(tuple(re.findall(r"\w+", text)))
+            else:
+                exact.add(text)
+        return cls(frozenset(long), frozenset(short), frozenset(exact))
+
+
+def _content_match(value: str, content: CardContent) -> bool:
+    if any(text in value for text in content.long):
+        return True
+    if value in content.exact:
+        return True
+    tokens = tuple(re.findall(r"\w+", value))
+    return any(
+        tokens[start : start + len(text)] == text
+        for text in content.short
+        for start in range(len(tokens) - len(text) + 1)
+    )
+
+
 def _schema_key(
     path: str,
     key: object,
     keys: frozenset[str],
-    content: frozenset[str],
+    content: frozenset[str] | CardContent,
     *,
     closed: bool = True,
 ) -> bool:
@@ -289,7 +324,7 @@ def scan_metadata(
     path: str,
     *,
     inputs: MetadataInputs | None = None,
-    content: frozenset[str] = frozenset(),
+    content: frozenset[str] | CardContent = frozenset(),
     _scope: Mapping[str, object] | None = None,
 ) -> None:
     """Scan a manifest or report as an artefact; a listed field is typed.
@@ -346,7 +381,7 @@ def scan_metadata(
 
 def scan_content(
     value: object,
-    content: frozenset[str],
+    content: frozenset[str] | CardContent,
     path: str = "",
     *,
     inputs: MetadataInputs | None = None,
@@ -358,6 +393,8 @@ def scan_content(
     digests share its exemptions. Run `scan_metadata` with bound inputs first
     to enforce mismatches. With no path every string is scanned.
     """
+    if not isinstance(content, CardContent):
+        content = CardContent.prepare(content)
     scope = _metadata_scope(path, value, _scope or {})
     if _metadata_verdict(value, path, inputs, scope) == "":
         return
@@ -369,7 +406,7 @@ def scan_content(
         except UnicodeError:
             refuse("artefact_encoding")
     elif isinstance(value, str):
-        if any(text in value for text in content):
+        if _content_match(value, content):
             refuse("register_content_egress")
     elif isinstance(value, Mapping):
         for key, item in value.items():
