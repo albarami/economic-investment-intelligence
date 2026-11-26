@@ -30,7 +30,7 @@ sources:
     - &id010
       host: www.qcb.gov.qa
       sha256: c8025f9fc65fdfc95b3ca8cc7867b9a587b5277973957917463fc813d0b625a9
-      file: '[LEAD: approved DER filename]'
+      file: digicert_g2_2020_ca1.der
       security_review: PENDING
     evidence: .overnight/IN/EVIDENCE-shapes.md O1.a per-sheet layouts, headers, formulas and period labels; O1.b
       File.ServerRelativeUrl and string Length; .overnight/IN/EVIDENCE-items-1-2.md item 1.1 exact URLs; .overnight/IN/EVIDENCE-shapes.md
@@ -712,7 +712,7 @@ sources:
     - &id009
       host: monaqasat.mof.gov.qa
       sha256: c8025f9fc65fdfc95b3ca8cc7867b9a587b5277973957917463fc813d0b625a9
-      file: '[LEAD: approved DER filename]'
+      file: digicert_g2_2020_ca1.der
       security_review: PENDING
     evidence: .overnight/IN/EVIDENCE-shapes.md O5 (Arabic headers, sibling CompanyData-N bound by href N, certificate
       sections, total and last nav); L-897 item 3; CR pair meaning NOT FOUND; .overnight/IN/EVIDENCE-shapes.md O10
@@ -808,12 +808,12 @@ sources:
     - &id011
       host: www.edu.gov.qa
       sha256: c8025f9fc65fdfc95b3ca8cc7867b9a587b5277973957917463fc813d0b625a9
-      file: '[LEAD: approved DER filename]'
+      file: digicert_g2_2020_ca1.der
       security_review: PENDING
     - &id012
       host: myschools.edu.gov.qa
       sha256: c8025f9fc65fdfc95b3ca8cc7867b9a587b5277973957917463fc813d0b625a9
-      file: '[LEAD: approved DER filename]'
+      file: digicert_g2_2020_ca1.der
       security_review: PENDING
     evidence: .overnight/IN/EVIDENCE-shapes.md O6 metadata/field table; L1 feature and geometry paths; L-892 item
       3 exact seventeen fields; L-897 item 2 closed where/order/maxRecordCount paging; .overnight/IN/EVIDENCE-shapes.md

@@ -5555,8 +5555,10 @@ evidence; no live fetch or acceptance is claimed.
 - O8: L-900 applies the existing documents: snapshot retrieval-date `as_of`
   always required; optional publisher date separate; observed periods or two
   nulls. This implementation claims no decision-record amendment.
-- O9: the five exact-host pin hashes are supplied; DER filenames and bytes,
-  independent security approval and the lead Sectigo recheck remain pending.
+- O9: the five exact-host pin hashes are supplied; the four active records name
+  `digicert_g2_2020_ca1.der` in each source intake. Their bytes in the lead
+  intakes and independent security approval remain pending (all four PENDING).
+  The retired `icv.qa` record is unchanged; the lead Sectigo recheck remains pending.
 - O10: second-round O10 words and check date are recorded. The education policy
   PDF is unread; ICV reuse wording and GIS terms were not found in the saved
   pages. No open licence or terms receipt hash is invented.

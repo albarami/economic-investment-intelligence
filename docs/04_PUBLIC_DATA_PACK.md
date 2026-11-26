@@ -745,9 +745,11 @@ hosts remain active: `www.qcb.gov.qa`, `monaqasat.mof.gov.qa`,
 legacy pin, an initial request or redirect to these hosts refuses with
 `certificate_chain_incomplete` before constructing an opener or redirected
 request. The stream and attempt openers refuse these hosts unconditionally.
-DER filenames and independent security approval for each of the four active
-records remain pending. The fifth, `icv.qa`, record is retired from active pin
-selection and stays PENDING; reviving it needs a new ruling and issuer check.
+The four active records name `digicert_g2_2020_ca1.der` in each source
+intake (`intake/insurance_tables/`, `intake/monaqasat_classified/` and
+`intake/schools_private_directory/`). The bytes in those lead intakes and
+independent security approval remain pending; all four records stay PENDING.
+The fifth, `icv.qa`, record is retired from active pin selection and stays PENDING; reviving it needs a new ruling and issuer check.
 Initial, redirected and terms requests each select their own verifying context;
 an unpinned full-chain host receives fresh ordinary trust. Each of these contexts, pinned or not, and the
 tender context offer ALPN `http/1.1`, as the standard library's own HTTPS context does (S2-P77). A page pin must belong
