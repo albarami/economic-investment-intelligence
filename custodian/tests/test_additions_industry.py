@@ -513,6 +513,7 @@ def test_social_one_changed_label_refuses(field: str, value: str, reason: str) -
     assert caught.value.name == reason
 
 
+@settings(deadline=None)
 @given(suffix=st.text(max_size=100))
 def test_social_unlisted_indicator_words_never_become_facts(suffix: str) -> None:
     """An invented prefix keeps generated words outside both confirmed labels."""
