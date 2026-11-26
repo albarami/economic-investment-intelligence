@@ -1281,3 +1281,24 @@ permissions, default-off/offline controls, attribution, non-storage and plants b
 anything. No adapter or switch is installed now. The keyed imagery provider under decision
 0023 item 7, BE-135 and BE-136 is unchanged. Full acceptance criteria are in TASKS.md,
 S2-T51 and S3-T29; this placement adds no pre-go-live dependency.
+
+## Public register collection follow-up — decision 0131
+
+[Decision 0131](decisions/0131-the-public-company-register-and-its-remaining-gaps.md)
+requires M1 review, then register staging, then the full S2 audit. The first
+release built after staging and every later release carries the companies.
+S2-T36 and S2-T49 retain their existing work; no release check or review is waived.
+
+- S2-T52: queued, background lane; advisor collection of establishments absent
+  from public map points under the owner's 13 November note. The build reads
+  only what lands in the private register folder. Full criteria: TASKS.md S2-T52.
+- S6-T21: queued; the empty branches field remains pending under OI-142.
+- S7-T10: queued; openings and closures by date and monthly re-collection remain
+  pending. OI-141 is answered: the advisor seat keeps the monthly snapshots;
+  the next is due 2026-12-13.
+
+None of these three collection gaps holds the S2 gate. S2-T51's background
+imagery acquisition is scheduled for 2026-11-27 in the lead's shell once its
+pending different-maker confirmation is in; it has not run. S6-T40's build is
+scheduled for 2026-11-28 on seats S2 and S3 cannot use; status stays queued.
+These are Qatar scheduled starts, not completed runs (decision 0131 item 5).

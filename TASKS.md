@@ -928,6 +928,16 @@ Open question to settle in your plan with options: where the archive persists so
 - Fix round f1: lens A and B corrections follow ruling L-1303's recorded-gap treatment, with machine-global locking, closed Public-chain receipts, narrower sandbox selection, independent integrity/candidate plants and a proposed live file-count measurement. Evidence: PROGRESS.md, **S2-T51 f1 review corrections — 2026-11-20**. Different-maker confirmation and the lead's operation remain pending.
 - Requirements: [decision 0079](docs/decisions/0079-dated-gis-snapshot-and-structured-address-search.md) items 1 to 6; OI-311; document 04 PUB-105; document 13 OPS-65.
 
+- Scheduled start (2026-11-26, [decision 0131](docs/decisions/0131-the-public-company-register-and-its-remaining-gaps.md) item 5): background imagery acquisition under decision 0079 is scheduled to start on 2026-11-27 (Qatar) in the lead’s shell once its pending different-maker confirmation is in. It has not run.
+
+### S2-T52 — Establishments not drawn as public map points
+- Goal: Collect establishments that the public map does not draw as points, under [decision 0131](docs/decisions/0131-the-public-company-register-and-its-remaining-gaps.md) item 3(a), without dropping them from the register.
+- Acceptance criteria: [ ] the advisor collects the missing establishments under the owner’s note of 13 November, slowly from public pages as a visitor’s browser receives them and without sign-in; [ ] collection lands only in the private register folder, and the build reads only what lands there under the unchanged permitted read conditions; [ ] counts remain beside the files outside the repository, with no register value, count, company name or private file or folder name copied into repository documents, briefs or fixtures; [ ] the existing register staging work consumes the collection under its normal reviewed checks, with invented stand-ins only in tests; [ ] the collection status and remaining gaps are recorded without claiming completion before collection.
+- Scope: advisor-owned background collection of establishments absent from map points and handoff to the existing register build; no worker collection and no parallel register reader. This task does not hold the S2 gate.
+- Depends: decision 0131 item 3(a); the owner’s 13 November collection conditions; S2-T49 for build consumption.
+- Requirements: decision 0131 items 1, 3 and 4; decisions 0022 and 0074; CLAUDE.md rules 3 and 11. Release checks and different-maker review remain required.
+- Delivery: documents and advisor collection in the background lane; senior governance editor and strict reviewer personas for this plan record; status queued.
+
 ### S2-T10 — Review follow-up for slice S2
 - Carry accounting under [decision 0098](docs/decisions/0098-s2-sources-follow-their-first-field-reader.md) items 3–8: the exact 38 non-path boxes in **Box carry ledger**, and only the source-level later constituents of item 5, are excluded from this task’s blanket dependency and criteria 3 and 4 while pending. Each keeps its full original text, tests, existing open-item identities, accountable seat, consumer and blocking start check; no box is ticked or item closed by a carry. The accident carry must settle before S3-T12#11 starts and before the S3 gate. Every unresolved U1–U8 or N1–N9 aspect in **Unresolved path holds** remains on the path. The original three tender carries keep decision 0084 item 6; S2-T44#1 keeps decision 0085 item 2’s condition. No other item leaves this task.
 - Exclusion under decision 0079 item 3: S2-T51's background acquisition and its completion are outside this task's blanket dependency; no slice gate waits for them.
@@ -1653,6 +1663,8 @@ These coarse tasks are refined at the slice S5 gate without weakening their crit
 - Depends: S6-T11, S6-T20.
 - Requirements: MTH-01, MTH-45, MTH-57, MTH-64, MTH-65, MTH-107, FE-110, PRV-41, PRV-65, MTH-114, MTH-115, BE-133, DAT-166, FE-151, DES-213.
 - Delivery: hard; personas Methods; status queued.
+- Pending collection follow-up (2026-11-26, [decision 0131](docs/decisions/0131-the-public-company-register-and-its-remaining-gaps.md) item 3): the branches field is empty (OI-142). The advisor collects the missing branches under the owner’s 13 November note; the build reads only the permitted handoff. This gap does not hold the S2 gate; the task stays queued.
+
 ### S6-T22 — Criterion-based success score (card C42)
 - Goal: Build a criterion-based score with the ranking requirements of rule 25, never a probability of venture success.
 - Acceptance criteria: [ ] editable criteria and weights, arithmetic fixtures and rank-stability sentence pass; [ ] generated inputs use the same code; [ ] missing evidence and prohibited claims fail; [ ] fitted placeholders must pass real-data re-fit/re-backtest at go-live.
@@ -1712,6 +1724,8 @@ These coarse tasks are refined at the slice S5 gate without weakening their crit
 - Depends: S2-T01, S2-T27, S6-T10, S6-T12, S6-T04.
 - Requirements: [decision 0070](docs/decisions/0070-the-decision-pack-of-the-value-studies.md) item B2; AGENTS.md rules 3, 5, 7, 8, 16 to 25 and 37; S7-T01's own-rent and no-prefill criteria remain.
 - Delivery: hard; personas Data, Methods and Frontend; status queued.
+
+- Scheduled start (2026-11-26, [decision 0131](docs/decisions/0131-the-public-company-register-and-its-remaining-gaps.md) item 5): the build is scheduled to start on 2026-11-28 (Qatar) on seats that S2 and S3 cannot use. This is a scheduled start, not a completed run; status stays queued.
 
 ### S6-T05 — Location-choice gate
 - Goal: Prove no-model behaviour, complete source chains, performance and bilingual layouts end to end for the whole location choice.
@@ -1934,6 +1948,8 @@ These coarse tasks are refined at the slice S6 gate without weakening their crit
 - Amendment ([decision 0047](docs/decisions/0047-eiis-own-decision-backlog-and-acceptance-targets.md) item A7): [ ] with dated permits/completions, validated imagery, property deals, register arrivals and zone utility load, tested code compares the user's visible opening-date scenarios while keeping every signal on its own geography and period; an unvalidated feed shows missing evidence, and a planted invented absorption rate, imagery-derived completion date, utility-capacity approval or open-now verdict fails.
 - Requirements: BRF-14, BRF-16, MTH-18, MTH-19, MTH-20, MTH-37, BRF-62, MTH-84, MTH-85, MTH-86, MTH-87, PUB-94, AI-113, FE-113, DAT-164, BE-140, DES-172, TST-214.
 - Delivery: hard; personas Methods; status queued.
+- Pending collection follow-up (2026-11-26, [decision 0131](docs/decisions/0131-the-public-company-register-and-its-remaining-gaps.md) item 3): collect openings and closures by date and re-collect monthly so two snapshots exist, under decision 0023 item 12. The advisor seat keeps the snapshots; the next is due 2026-12-13 (OI-141). Collection follows the owner’s 13 November note; this gap does not hold the S2 gate. Status stays queued; no collection completion is claimed.
+
 ### S7-T11 — Serving the region (journey D7)
 - Decision 0040 named sub-step — **exports and mirror evidence**: [ ] Render Comtrade/BACI exports and partners, product concentration, origin dependence, temporal change and S2-T26 mirror gaps beside portal imports and certificates/vessels, each with its source and period. Never average sources or treat certificates as export values. Additional input dependencies: S2-T23, S2-T24, S2-T26. Existing scope extends only to this source wiring; all original acceptance criteria, gates and reviews remain.
 - Goal: Show travel times by hour from an area to the ports, the airport, the free zones and the land routes, complementary firms, the import context and imports against local production (former Later item L3).

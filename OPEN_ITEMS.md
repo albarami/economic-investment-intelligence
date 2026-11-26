@@ -1243,6 +1243,8 @@
 - OPTIONS: **Recommendation:** the owner keeps them, or names who does, since he holds the register files outside the repository: once a month, a copy of each file beside it, under the naming that the first task reading them fixes. A month that is missed stays `NO_DATA` on the snapshot route and is never filled in.
 - NEEDED BY: 2026-11, the first month to be kept; then S5-T10 and S7-T10, which read the snapshot route, and the "what changed this month" card of item 13 if its task is named.
 
+- ANSWERED 2026-11-26 ([decision 0131](docs/decisions/0131-the-public-company-register-and-its-remaining-gaps.md) item 3): the advisor seat keeps the monthly register snapshots; the next is due 2026-12-13. Openings and closures by date and monthly re-collection remain pending with S7-T10; this gap does not hold the S2 gate. Earlier text above is retained as history.
+
 ## OI-142 — The register file's fields for groups, the address type and the dates
 
 - ID: OI-142
@@ -1252,6 +1254,8 @@
 - DONE SO FAR: Documents 03 and 05 state each rule and its fallback, and document 06 states the employer group (PRV-07); the dominance rules and their planted tests run on these groups unchanged. Tests and continuous integration use the invented stand-in register.
 - OPTIONS: **Recommendation:** confirm the fields when the file is first read, without committing the file, a field value or a path, and record only which fields exist.
 - NEEDED BY: task S4-T02 (the register and employment world), whose amendment applies these rules.
+
+- UPDATE 2026-11-26 ([decision 0131](docs/decisions/0131-the-public-company-register-and-its-remaining-gaps.md) item 3): the branches field is empty and remains a pending collection gap for S6-T21, collected by the advisor under the owner’s 13 November note. This gap does not hold the S2 gate; no field value or collection completion is claimed.
 
 ## OI-143 — The look's task S3-T15 is not in TASKS.md
 

@@ -169,6 +169,7 @@
 | [0120](decisions/0120-year-range-is-not-a-phone-shape.md) | Exact ascending ASCII year ranges are excluded from the agency-page telephone shape only; other release checks unchanged | Proposed, 2026-11-25 |
 | [0121](decisions/0121-agency-pages-box-1-covers-pages-that-pass-the-release-check.md) | S2-T39 box 1 covers pages passing the release check; refused pages retain typed records and links; two evidence flags read over stored pages | Proposed, 2026-11-25 |
 | [0125](decisions/0125-c7-coordinates-defer-to-s7.md) | `c7.coordinates` joins the S7-deferred pins; S7-T05 derives, source-checks and pins the coordinates; no value is bound at S2 | Proposed, 2026-11-25 |
+| [0131](decisions/0131-the-public-company-register-and-its-remaining-gaps.md) | Public real company register retained in releases; three collection gaps assigned outside the S2 gate; scheduled imagery and rent starts | Accepted by the owner, 2026-11-26 |
 
 ## Identifiers and change control
 
