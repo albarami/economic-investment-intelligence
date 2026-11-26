@@ -1485,3 +1485,40 @@ def _map_count(values: dict[str, object], name: str) -> int | None:
     if isinstance(value, int) and not isinstance(value, bool):
         return value
     raise AssertionError(name)
+
+
+@pytest.mark.parametrize(
+    "number,withheld",
+    [
+        ("185295.10", False),
+        ("185295.100", True),
+    ],
+)
+def test_hotel_string_trailing_zero_scale(
+    number: str, withheld: bool, tmp_path: Path
+) -> None:
+    parsed = _parse(_hotel(), [_hotel_cell(number)], tmp_path)
+    if withheld:
+        assert parsed.rows == ()
+        assert parsed.coverage == (Coverage("value_scale_exceeds_column", 1),)
+    else:
+        assert parsed.rows[0]["value"] == Decimal(number)
+        assert parsed.coverage == ()
+
+
+def test_hotel_non_decimal_column_refuses(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    columns, keys = build._CATALOGUE["pub_visitor_markets"]
+    monkeypatch.setitem(
+        build._CATALOGUE,
+        "pub_visitor_markets",
+        (
+            tuple(
+                (name, "INTEGER" if name == "value" else kind) for name, kind in columns
+            ),
+            keys,
+        ),
+    )
+    with pytest.raises(AdditionError, match=r"^value_out_of_column$"):
+        _parse(_hotel(), [_hotel_cell("185295.10")], tmp_path)

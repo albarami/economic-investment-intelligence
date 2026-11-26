@@ -15,7 +15,7 @@ from typing import cast
 
 import yaml
 
-from eii_custodian.publicdata.additions.build import _CATALOGUE
+from eii_custodian.publicdata.additions.build import _CATALOGUE, _DECIMAL
 from eii_custodian.publicdata.additions.common import (
     FIELD_UNCONFIRMED,
     METHOD_VERSION,
@@ -429,7 +429,10 @@ def _hotel(
     if number is None:
         return None
     column = dict(_CATALOGUE[_TABLES["hotel"]][0])["value"]
-    scale = int(column.removesuffix(")").split(",")[1])
+    match = _DECIMAL.fullmatch(column)
+    if match is None:
+        raise AdditionError("value_out_of_column")
+    scale = int(match.group(2))
     # The source's decimal places must fit the declared column without rounding.
     if cast(int, Decimal(number).as_tuple().exponent) < -scale:
         _add(counts, "value_scale_exceeds_column")

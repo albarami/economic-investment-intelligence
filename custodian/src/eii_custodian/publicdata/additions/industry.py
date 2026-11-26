@@ -373,6 +373,7 @@ def _certificates(
     regions = _string_set(review.get("regions_not_countries"))
     counts: dict[str, int] = {}
     rows: list[dict[str, object]] = []
+    labels: list[str] = []
     for source in raw:
         _own_fields(source, allowed)
         period = parse_period_value(source.get("year"), "year_text")
@@ -402,6 +403,7 @@ def _certificates(
         if _country_withheld(label, withheld, counts):
             continue
         country = _country(label, walk)
+        labels.append(label)
         rows.append(
             _attach(
                 entry,
@@ -419,18 +421,25 @@ def _certificates(
                 "parse_logistics",
             )
         )
-    rows = _combine_certificates(rows, counts)
+    rows = _combine_certificates(rows, labels, counts)
     return _finish(entry, raw, "pub_trade_logistics", rows, counts, (), _MFG_KEY)
 
 
 def _combine_certificates(
-    rows: list[dict[str, object]], counts: dict[str, int]
+    rows: list[dict[str, object]], labels: list[str], counts: dict[str, int]
 ) -> list[dict[str, object]]:
-    """Sum integral certificate counts only within the full contract key."""
+    """Merge distinct published country labels within the full contract key."""
     combined: dict[tuple[object, ...], dict[str, object]] = {}
     totals: dict[tuple[object, ...], int] = {}
-    for row in rows:
+    seen: set[tuple[tuple[object, ...], str]] = set()
+    duplicates: list[dict[str, object]] = []
+    for row, label in zip(rows, labels, strict=True):
         key = tuple(row[field] for field in _MFG_KEY)
+        if (key, label) in seen:
+            # Keep repeats for the existing duplicate-key refusal in _finish.
+            duplicates.append(row)
+            continue
+        seen.add((key, label))
         if key in combined:
             _add(counts, "country_labels_merged")
         else:
@@ -439,7 +448,7 @@ def _combine_certificates(
         totals[key] = totals.get(key, 0) + int(cast(Decimal, row["value"]))
     for key, row in combined.items():
         row["value"] = Decimal(totals[key])
-    return list(combined.values())
+    return [*combined.values(), *duplicates]
 
 
 def _country_withheld(
