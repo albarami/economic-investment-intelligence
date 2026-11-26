@@ -2,6 +2,7 @@
 
 import csv
 import json
+from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Any
 
@@ -10,11 +11,21 @@ from .checks import FrameError, safe_key
 DISTRICT_CROSSWALK_HEADER = ("name", "municipality_code", "district_keys", "basis")
 
 
+def _record_lines(lines: Iterable[str]) -> Iterator[str]:
+    """Skip comments only outside quoted fields; doubled quotes keep parity."""
+    quoted = False
+    for line in lines:
+        if not quoted and line.startswith("#"):
+            continue
+        quoted ^= bool(line.count('"') % 2)
+        yield line
+
+
 def read_csv(
     path: Path, *, header: tuple[str, ...] | None = None
 ) -> list[dict[str, str]]:
     with path.open(encoding="utf-8", newline="") as handle:
-        lines = (line for line in handle if not line.startswith("#"))
+        lines = _record_lines(handle)
         if header is None:
             return list(csv.DictReader(lines))
         reader = csv.reader(lines, strict=True)
