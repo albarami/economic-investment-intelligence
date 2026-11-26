@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import http from 'node:http';
+import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { after, test as declareTest } from 'node:test';
@@ -58,7 +59,7 @@ const FAKE_SERVER = [
   '  server.listen(port, host, () => {',
   '    const bound = server.address().port;',
   "    if (mode !== 'no-local') {",
-  "      const shown = mode === 'wrong-port' ? bound + 1 : bound;",
+  "      const shown = mode === 'wrong-port' ? Number(fs.readFileSync(path.join(here, 'wrong-port'), 'utf8')) : bound;",
   '      process.stdout.write(`  Local:   http://127.0.0.1:${shown}/\\n`);',
   '    }',
   "    if (mode === 'network') {",
@@ -305,18 +306,30 @@ test('answers but prints no Local line', () => {
   assertFail(result, 'FAIL timeout: no accepted answer');
 });
 
-test('prints a Local line for another port', () => {
+test('prints a Local line for another port', async () => {
   const { root, dir, bin } = prepare('wrong-port');
-  const result = run([
-    '--root',
-    root,
-    '--vite-bin',
-    bin,
-    '--timeout-ms',
-    String(SHORT_TIMEOUT_MS),
-  ]);
-  remember(dir);
-  assertFail(result, 'FAIL timeout: no accepted answer');
+  const reservation = net.createServer();
+  await new Promise((resolve) => {
+    reservation.listen(0, '127.0.0.1', resolve);
+  });
+  fs.writeFileSync(
+    path.join(dir, 'wrong-port'),
+    String(reservation.address().port),
+  );
+  try {
+    const result = run([
+      '--root',
+      root,
+      '--vite-bin',
+      bin,
+      '--timeout-ms',
+      String(SHORT_TIMEOUT_MS),
+    ]);
+    remember(dir);
+    assertFail(result, 'FAIL timeout: no accepted answer');
+  } finally {
+    await new Promise((resolve) => reservation.close(resolve));
+  }
 });
 
 test('network announced', () => {
