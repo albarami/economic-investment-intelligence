@@ -71,6 +71,7 @@ def parse_dcool(
     """Unpivot sector columns through the reviewed municipality names."""
     built: list[CoolingRow] = []
     seen: set[tuple[str, str, str, str]] = set()
+    statuses: dict[str, object] = {}
     name_rows = [dict(row) for row in names]
     for row in rows:
         if any("consumption" in key for key in row):
@@ -84,6 +85,12 @@ def parse_dcool(
         if not isinstance(municipality, str):
             raise CoolingError("unmapped_municipality")
         indicator = _status_indicator(row["project_status"])
+        # R1-DSTAT.rv1 F1: the key is not injective; one indicator, one status.
+        if (
+            statuses.setdefault(indicator, row["project_status"])
+            != row["project_status"]
+        ):
+            raise CoolingError("project_status")
         try:
             code = municipality_key(municipality, name_rows)
         except FrameError as exc:

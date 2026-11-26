@@ -181,3 +181,32 @@ def test_a_missing_sector_field_and_a_duplicate_around_a_null_still_fail() -> No
     with pytest.raises(CoolingError) as repeated:
         parse_dcool((_row(), _row(industrial=None), _row()), _names())
     assert repeated.value.reason == "duplicate_key"
+
+
+@pytest.mark.parametrize(
+    ("first", "second"),
+    [("A/B", "A-B"), ("Operation Project", "operation project"), ("X", " X ")],
+)
+def test_two_statuses_of_one_indicator_refuse(first: str, second: str) -> None:
+    """R1-DSTAT.rv1 F1: the status key is not injective; a collision refuses."""
+    empty = dict.fromkeys(
+        (
+            "other",
+            "real_estate_development",
+            "sport",
+            "culture",
+            "health",
+            "transport",
+            "education",
+            "hotels",
+            "commercial",
+            "district_cooling_service_supply",
+        )
+    )
+    rows = (
+        _row(project_status=first, **empty),
+        _row(project_status=second, **{**empty, "industrial": None, "health": 6}),
+    )
+    with pytest.raises(CoolingError) as wrong:
+        parse_dcool(rows, _names())
+    assert wrong.value.reason == "project_status"
