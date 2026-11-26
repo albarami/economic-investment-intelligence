@@ -134,3 +134,50 @@ def test_each_published_status_is_its_own_capacity_indicator() -> None:
         with pytest.raises(CoolingError) as bad:
             parse_dcool((_row(project_status=status),), _names())
         assert bad.value.reason == "project_status"
+
+
+@pytest.mark.parametrize(
+    ("raw", "kept"),
+    [(None, None), (0, Decimal("0")), (7, Decimal("7"))],
+)
+def test_only_an_empty_ordinary_cell_is_no_row(raw: object, kept: object) -> None:
+    rows = parse_dcool((_row(industrial=raw),), _names())
+    values = [row.value for row in rows if row.sector_key == "industrial"]
+    assert values == ([] if kept is None else [kept])
+
+
+@pytest.mark.parametrize("raw", ["7", True, False, 1.5, [], {}])
+def test_an_ordinary_cell_of_another_type_fails(raw: object) -> None:
+    with pytest.raises(CoolingError) as wrong:
+        parse_dcool((_row(industrial=raw),), _names())
+    assert wrong.value.reason == "sector_type"
+
+
+@pytest.mark.parametrize(
+    ("raw", "reason"), [(5, "culture_type"), ("x", "culture_type")]
+)
+def test_culture_keeps_its_digit_text_rule(raw: object, reason: str) -> None:
+    assert [
+        row.value
+        for row in parse_dcool((_row(culture=None),), _names())
+        if row.sector_key == "culture"
+    ] == []
+    assert [
+        row.value
+        for row in parse_dcool((_row(culture="0"),), _names())
+        if row.sector_key == "culture"
+    ] == [Decimal("0")]
+    with pytest.raises(CoolingError) as wrong:
+        parse_dcool((_row(culture=raw),), _names())
+    assert wrong.value.reason == reason
+
+
+def test_a_missing_sector_field_and_a_duplicate_around_a_null_still_fail() -> None:
+    row = _row()
+    del row["industrial"]
+    with pytest.raises(CoolingError) as missing:
+        parse_dcool((row,), _names())
+    assert missing.value.reason == "unexpected_column"
+    with pytest.raises(CoolingError) as repeated:
+        parse_dcool((_row(), _row(industrial=None), _row()), _names())
+    assert repeated.value.reason == "duplicate_key"
