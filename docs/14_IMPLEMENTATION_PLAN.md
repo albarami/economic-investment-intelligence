@@ -1297,6 +1297,10 @@ S2-T36 and S2-T49 retain their existing work; no release check or review is waiv
   pending. OI-141 is answered: the advisor seat keeps the monthly snapshots;
   the next is due 2026-12-13.
 
+For all three: the advisor collects under the owner's 13 November note; if
+the advisor's seat cannot, the advisor tells the owner and the owner's designated
+alternate advisor seat collects; the lead does not collect.
+
 None of these three collection gaps holds the S2 gate. S2-T51's background
 imagery acquisition is scheduled for 2026-11-27 in the lead's shell once its
 pending different-maker confirmation is in; it has not run. S6-T40's build is
