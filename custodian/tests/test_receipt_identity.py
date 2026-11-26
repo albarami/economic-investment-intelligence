@@ -112,3 +112,18 @@ def test_label_note_accepts_only_the_writer_shape(note: str):
         assert reason == ""
     else:
         assert reason == "coverage_note"
+
+
+def test_one_renamed_column_is_refused():
+    row = entry(columns=(("years", "integer"), ("value", "number")))
+    evidence = receipt(row)
+    assert c.receipt_disagreement(row, evidence) == ""
+    evidence["columns"][0]["name"] = "year"
+    assert c.receipt_disagreement(row, evidence) == "columns"
+
+
+def test_published_label_rejects_a_last_bound_taken_from_the_registry():
+    row = _label_row()
+    evidence = _label_receipt(row)
+    evidence["period_last"] = "Q3-2025"
+    assert c.receipt_disagreement(row, evidence) == "period_last"
