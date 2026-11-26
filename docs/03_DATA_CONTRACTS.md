@@ -1660,6 +1660,7 @@ fixture proves each refusal. The caveat keys are the fixed sentences of
 | `forecast_backtest_range` | every fact of a forecast (DAT-158) |
 | `estimate_on_simulated_inputs` | the three cases of a site estimate while an input is Simulated or Synthetic (DAT-161); a required backend origin marker under decision 0035 item 3, with no audience label and nothing rendered by the template writer |
 | `scenario_not_forecast` | every fact of a scenario (DAT-162) |
+| `company_web_lead_shell_only` | the `NO_DATA` coverage row for registered `company_web` when no selection or receipt is supplied to the ordinary completeness audit: opt-in, lead-shell only, not selected by ordinary build-public (decision 0076 item 2); no company-web release table is produced |
 | `tender_fetch_own_run` | the `NO_DATA` coverage row for registered `tenders_pub` while its separate archive is not yet pinned and assembled (decision 0084 item 2); no `pub_tender` row may be emitted |
 | `base_rate_not_your_chance` | every fact of a base rate (DAT-159) |
 | `present_by_pay_band_assumed` | the figure of people present by pay band (DAT-160) |
@@ -2702,6 +2703,13 @@ with the contribution. S4-T05 supplies other contributions and its configured ed
 distance; this task introduces no new collision threshold or normaliser.
 
 ### S2-T48 tooling fields (decision 0076)
+
+The ordinary completeness audit includes the registered `company_web` metadata
+without adding it to acquisition or snapshot selection. With no selection or
+receipt supplied, it records `NO_DATA`, reason `company_web_not_selected` and
+caveat `company_web_lead_shell_only`, under decision 0076 item 2. Existing selected
+or receipted evidence keeps its receipt and output checks; absence cannot credit
+an output or replace an invalid receipt.
 
 Company-web candidates remain outside product and release tables. The closed fields
 are name, address, website and activity; each binds the full-page and declared-fragment
