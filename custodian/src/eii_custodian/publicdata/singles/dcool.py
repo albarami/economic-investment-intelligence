@@ -87,6 +87,10 @@ def parse_dcool(
         except FrameError as exc:
             raise CoolingError("unmapped_municipality") from exc
         for sector in _SECTORS:
+            if row[sector] is None:
+                # R1: the portal leaves a sector cell empty when it publishes
+                # no capacity; an empty cell is no row, never a zero.
+                continue
             value = _sector_value(sector, row[sector])
             key = (code, sector, year.strip())
             if key in seen:

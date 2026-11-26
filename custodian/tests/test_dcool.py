@@ -102,3 +102,12 @@ def test_culture_integer_and_unmapped_municipality_fail() -> None:
             _names(),
         )
     assert duplicate.value.reason == "duplicate_key"
+
+
+def test_an_empty_sector_cell_is_no_row_and_a_text_cell_still_fails() -> None:
+    rows = parse_dcool((_row(industrial=None, culture=None),), _names())
+    assert {row.sector_key for row in rows}.isdisjoint({"industrial", "culture"})
+    assert "other" in {row.sector_key for row in rows}
+    with pytest.raises(CoolingError) as text_sector:
+        parse_dcool((_row(industrial="2"),), _names())
+    assert text_sector.value.reason == "sector_type"
