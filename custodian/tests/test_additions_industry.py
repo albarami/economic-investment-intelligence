@@ -429,34 +429,101 @@ def test_section_letters_of_the_one_bulletin_are_closed() -> None:
     assert caught.value.name == "activity_code_unlisted"
 
 
-def test_social_keeps_code_45_and_stops_while_indicator_labels_are_unconfirmed() -> (
-    None
-):
-    """Code 45 stays on this slug. Indicator words the inventory does not give stop the build."""
+def test_social_keeps_code_45_and_refuses_unlisted_activity() -> None:
+    """The confirmed bulletin retains its own closed activity codes."""
+    parsed = parse_establishment_size(
+        _entry("est_size_act", SOCIAL), [_social("45")], RECEIPT, _map(), {}
+    )
+    assert parsed.rows[0]["activity_key"] == "45"
+    with pytest.raises(AdditionError) as unlisted:
+        parse_establishment_size(
+            _entry("est_size_act", SOCIAL), [_social("99")], RECEIPT, _map(), {}
+        )
+    assert unlisted.value.name == "activity_code_unlisted"
+
+
+def test_unconfirmed_indicator_labels_still_refuse_an_invented_bulletin() -> None:
+    """Confirming one source does not bypass the pending-label guard."""
     loaded = _map()
     slugs = loaded["slugs"]
     assert isinstance(slugs, dict)
-    social = slugs[SOCIAL]
-    assert isinstance(social, dict)
-    assert "45" in social["activity_codes"]
-    with pytest.raises(AdditionError) as unlisted:
+    slug = "SYN-unconfirmed-size-bulletin"
+    slugs[slug] = {**slugs[SOCIAL], "indicators": "to_be_confirmed"}
+    entry = replace(
+        _entry("est_size_act", SOCIAL), slug=slug, key=f"est_size_act/{slug}"
+    )
+    with pytest.raises(AdditionError) as caught:
+        parse_establishment_size(entry, [_social("45")], RECEIPT, loaded, {})
+    assert caught.value.name == "indicator_labels_unconfirmed"
+
+
+@pytest.mark.parametrize(
+    ("label", "arabic", "indicator"),
+    [
+        ("Employees", "مشتغلون", "employees"),
+        ("Establishments", "منشآت", "establishments"),
+    ],
+)
+@pytest.mark.parametrize(
+    ("size", "size_ar"),
+    [
+        (S2_LARGE, S2_LARGE_AR),
+        ("Establishments with Less than 10 Employees", "المنشآت أقل من 10 مشتغلين"),
+    ],
+)
+def test_social_confirmed_labels_parse_with_lineage(
+    label: str, arabic: str, indicator: str, size: str, size_ar: str
+) -> None:
+    """Invented integer cells use the exact keys and closed labels supplied in IN."""
+    row = _social("45")
+    row.update(indicator=label, lbyn=arabic, establishment_size=size, hjm_lmnsh=size_ar)
+    entry = _entry("est_size_act", SOCIAL)
+    parsed = parse_establishment_size(entry, [row], RECEIPT, _map(), {})
+    assert parsed.rows == (
+        {
+            "table_code": SOCIAL,
+            "activity_key": "45",
+            "size_class": size,
+            "period": "2018",
+            "indicator": indicator,
+            "value": Decimal("1.00"),
+            "unit": "to_be_confirmed",
+            **_lineage(entry.key, entry.publisher, EST_METHOD),
+        },
+    )
+    assert parsed.coverage == ()
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "reason"),
+    [
+        ("indicator", "SYN-unknown", "unknown_indicator"),
+        ("lbyn", "", "arabic_twin_missing"),
+        ("hjm_lmnsh", "المنشآت أقل من 10 مشتغلين", "arabic_twin_mismatch"),
+    ],
+)
+def test_social_one_changed_label_refuses(field: str, value: str, reason: str) -> None:
+    """Each negative changes one field of an otherwise valid source-shaped row."""
+    row = _social("45")
+    row[field] = value
+    with pytest.raises(AdditionError) as caught:
         parse_establishment_size(
-            _entry("est_size_act", SOCIAL),
-            [_social("99")],
-            RECEIPT,
-            loaded,
-            {},
+            _entry("est_size_act", SOCIAL), [row], RECEIPT, _map(), {}
         )
-    assert unlisted.value.name == "activity_code_unlisted"
-    with pytest.raises(AdditionError) as labels:
+    assert caught.value.name == reason
+
+
+@settings(deadline=None)
+@given(suffix=st.text(max_size=100))
+def test_social_unlisted_indicator_words_never_become_facts(suffix: str) -> None:
+    """An invented prefix keeps generated words outside both confirmed labels."""
+    row = _social("45")
+    row["indicator"] = "SYN-" + suffix
+    with pytest.raises(AdditionError) as caught:
         parse_establishment_size(
-            _entry("est_size_act", SOCIAL),
-            [_social("45")],
-            RECEIPT,
-            loaded,
-            {},
+            _entry("est_size_act", SOCIAL), [row], RECEIPT, _map(), {}
         )
-    assert labels.value.name == "indicator_labels_unconfirmed"
+    assert caught.value.name == "unknown_indicator"
 
 
 def test_business_services_has_no_size_class_and_all_is_not_filled() -> None:
@@ -1009,8 +1076,8 @@ def test_an_unpublished_certificate_type_is_omitted() -> None:
 
 
 def test_arabic_country_spelling_is_not_a_second_key() -> None:
-    """Two Arabic spellings of one English label are one country, so the key repeats."""
-    with pytest.raises(AdditionError) as caught:
+    """A repeated published country remains a duplicate despite Arabic spelling."""
+    with pytest.raises(AdditionError, match=r"^duplicate_key$"):
         parse_logistics(
             _entry("trade_logistics", CERTIFICATES),
             [
@@ -1026,7 +1093,6 @@ def test_arabic_country_spelling_is_not_a_second_key() -> None:
             _with_countries(WALK),
             {},
         )
-    assert caught.value.name == "duplicate_key"
 
 
 def test_previous_port_regions_are_not_written_as_iso_countries() -> None:
@@ -1812,7 +1878,7 @@ def _social(code: str) -> dict[str, object]:
         "establishment_size": S2_LARGE,
         "hjm_lmnsh": S2_LARGE_AR,
         "indicator": "Employees",
-        "lbyn": "SYN-IND",
+        "lbyn": "مشتغلون",
         "value": 1,
     }
 
@@ -1963,6 +2029,8 @@ _CERTIFICATE_ALIASES = {
 
 def _published_establishment(slug: str) -> dict[str, object]:
     # Source names are independently pinned above, not derived from the review map.
+    if slug == SOCIAL:
+        return _social("45")
     spec = _map()["slugs"][slug]
     row = {
         "year": "2018",
@@ -1979,8 +2047,6 @@ def _published_establishment(slug: str) -> dict[str, object]:
         row["activity_code"] = "4911"
     if slug == TRANSPORT:
         row["item_type"] = "Employee"
-    if slug == SOCIAL:
-        row["activity_code"] = "45"
     if "size_field" in spec:
         row[spec["size_field"]] = spec["size_classes"][0]
         row[spec["size_ar"]] = spec.get("size_pairs", {}).get(
@@ -1999,10 +2065,6 @@ def test_published_activity_name_columns_are_declared_but_not_released(
 ) -> None:
     row = _published_establishment(slug)
     entry = _entry("est_size_act", slug)
-    if slug == SOCIAL:
-        with pytest.raises(AdditionError, match="indicator_labels_unconfirmed"):
-            parse_establishment_size(entry, [row], RECEIPT, _map(), {})
-        return
     parsed = parse_establishment_size(entry, [row], RECEIPT, _map(), {})
     if slug == BUSINESS:
         assert parsed.rows == ()
@@ -2077,7 +2139,7 @@ def test_published_certificate_spelling_has_one_canonical_series(
         == f"certificate_type={canonical}|importing_country=SLL"
     )
     row["type_of_certificate"] = canonical
-    with pytest.raises(AdditionError, match="duplicate_key"):
+    with pytest.raises(AdditionError, match=r"^duplicate_key$"):
         parse_logistics(
             entry,
             [_certificate("SYN Land", alias, 1), row],
@@ -2135,13 +2197,14 @@ def test_alias_table_hostile_leaf_mutations_refuse(bad: object) -> None:
 
 
 @pytest.mark.parametrize("bad", (None, 7, [7], {}))
-def test_withheld_country_list_is_closed_text(bad: object) -> None:
+@pytest.mark.parametrize("slug", (CERTIFICATES, PREVIOUS, HAMAD))
+def test_withheld_country_list_is_closed_text(bad: object, slug: str) -> None:
     spec = _with_countries(WALK)
     spec["country_labels_withheld"] = bad
     with pytest.raises(AdditionError, match="field_map_unreadable"):
         parse_logistics(
-            _entry("trade_logistics", CERTIFICATES),
-            [_certificate("SYN Land", "Certificates of Origin", 1)],
+            _entry("trade_logistics", slug),
+            [_logistics_row(slug)],
             RECEIPT,
             spec,
             {},
@@ -2317,3 +2380,208 @@ def test_withheld_label_count_is_exact_and_lookup_is_not_normalized(
     row["importing_country"] = label + " "
     with pytest.raises(AdditionError, match="country_unreviewed"):
         parse_logistics(_LABEL_ENTRIES[CERTIFICATES], [row], RECEIPT, spec, {})
+
+
+def test_certificate_country_aliases_sum_exactly() -> None:
+    raw = [
+        _certificate(label, "Certificates of Origin", count)
+        for label, count in zip(
+            ("Cape Verde", "Cape Verde Islands"),
+            (9999999999999999, 1),
+            strict=True,
+        )
+    ]
+    with localcontext(Context(prec=3, rounding=ROUND_DOWN)):
+        parsed = parse_logistics(_LABEL_ENTRIES[CERTIFICATES], raw, RECEIPT, _map(), {})
+    assert len(parsed.rows) == 1
+    assert parsed.rows[0]["value"] == Decimal("10000000000000000")
+    assert parsed.coverage == (Coverage("country_labels_merged", 1),)
+    assert parsed.rows[0]["sha256"] == RECEIPT["sha256"]
+    assert parsed.rows[0]["method"] == LOG_METHOD
+    require_lineage(parsed.rows[0])
+
+
+@settings(deadline=None)
+@given(
+    cells=st.lists(
+        st.tuples(
+            st.sampled_from(
+                ("Cape Verde", "Cape Verde Islands", "SYN Land", "NOT STATED")
+            ),
+            st.sampled_from(("2020", "2021")),
+            st.sampled_from(("Certificates of Origin", "Arab Certificate of Origin")),
+            st.integers(min_value=-(10**40), max_value=10**40),
+        ),
+        min_size=1,
+        max_size=20,
+    )
+)
+@example(cells=[("Cape Verde", "2020", "Certificates of Origin", 0)])
+@example(cells=[("NOT STATED", "2020", "Certificates of Origin", 1)])
+@example(
+    cells=[
+        ("Cape Verde", "2020", "Certificates of Origin", 1),
+        ("Cape Verde Islands", "2020", "Certificates of Origin", 2),
+        ("Cape Verde", "2021", "Certificates of Origin", 3),
+        ("Cape Verde", "2020", "Arab Certificate of Origin", 4),
+        ("SYN Land", "2020", "Certificates of Origin", 5),
+    ]
+)
+def test_certificate_consolidation_preserves_keys_and_total(
+    cells: list[tuple[str, str, str, int]],
+) -> None:
+    review = _map()
+    review["country_crosswalk"].append(WALK[0])
+    raw = [
+        {**_certificate(label, kind, count), "year": year}
+        for label, year, kind, count in cells
+    ]
+    entry = _LABEL_ENTRIES[CERTIFICATES]
+    published_keys = [
+        (label, year, kind) for label, year, kind, _ in cells if label != "NOT STATED"
+    ]
+    if len(set(published_keys)) != len(published_keys):
+        for ordered in (raw, raw[::-1]):
+            with pytest.raises(AdditionError, match=r"^duplicate_key$"):
+                parse_logistics(entry, ordered, RECEIPT, review, {})
+        return
+    forward = parse_logistics(entry, raw, RECEIPT, review, {})
+    backward = parse_logistics(entry, raw[::-1], RECEIPT, review, {})
+    expected: dict[tuple[str, str, str], int] = {}
+    for label, year, kind, count in cells:
+        if label == "NOT STATED":
+            continue
+        key = (year, kind, "SLL" if label == "SYN Land" else "CPV")
+        expected[key] = expected.get(key, 0) + count
+    assert len(forward.rows) == len(expected)
+    actual = {
+        (row["period"], row["breakdown_key"], row["indicator"]): row["value"]
+        for row in forward.rows
+    }
+    assert len(actual) == len(forward.rows)
+    assert sum(int(row["value"]) for row in forward.rows) == sum(expected.values())
+    assert all(
+        actual[
+            (
+                year,
+                f"certificate_type={kind}|importing_country={country}",
+                "certificates",
+            )
+        ]
+        == count
+        for (year, kind, country), count in expected.items()
+    )
+    assert actual == {
+        (row["period"], row["breakdown_key"], row["indicator"]): row["value"]
+        for row in backward.rows
+    }
+    kept = sum(label != "NOT STATED" for label, _, _, _ in cells)
+    assert _coverage(forward, "country_labels_merged") == kept - len(expected)
+
+
+def test_fractional_certificate_count_still_refuses() -> None:
+    row = _certificate("Cape Verde", "Certificates of Origin", 1)
+    row["number_of_issued_certificates"] = 1.5
+    with pytest.raises(AdditionError, match=r"^measure_not_integral$"):
+        parse_logistics(_LABEL_ENTRIES[CERTIFICATES], [row], RECEIPT, _map(), {})
+
+
+@pytest.mark.parametrize("slug", (CERTIFICATES, PREVIOUS, HAMAD))
+@pytest.mark.parametrize("label", ("NOT STATED", "SYN Unreviewed"))
+def test_logistics_country_withholding_is_shared_and_exact(
+    slug: str, label: str
+) -> None:
+    row = _logistics_row(slug)
+    field = {
+        CERTIFICATES: "importing_country",
+        PREVIOUS: "country_of_previous_port",
+        HAMAD: "country_of_registration",
+    }[slug]
+    row[field] = label
+    entry = _entry("trade_logistics", slug)
+    if label == "SYN Unreviewed":
+        with pytest.raises(AdditionError, match=r"^country_unreviewed$"):
+            parse_logistics(entry, [row], RECEIPT, _with_countries(WALK), {})
+    else:
+        parsed = parse_logistics(entry, [row], RECEIPT, _with_countries(WALK), {})
+        assert parsed.rows == ()
+        assert parsed.coverage == (Coverage("country_label_withheld", 1),)
+
+
+@pytest.mark.parametrize("slug", (PREVIOUS, HAMAD))
+def test_other_logistics_readers_keep_duplicate_refusal(slug: str) -> None:
+    row = _logistics_row(slug)
+    with pytest.raises(AdditionError, match=r"^duplicate_key$"):
+        parse_logistics(
+            _entry("trade_logistics", slug),
+            [row, row],
+            RECEIPT,
+            _with_countries(WALK),
+            {},
+        )
+
+
+def _logistics_row(slug: str) -> dict[str, object]:
+    if slug == CERTIFICATES:
+        return _certificate("SYN Land", "Certificates of Origin", 1)
+    if slug == PREVIOUS:
+        return _previous("SYN Land", "Bulk", "Net Tonnage", 1)
+    return _hamad(oil_tankers=1)
+
+
+@pytest.mark.parametrize("slug", (CERTIFICATES, PREVIOUS, HAMAD))
+@pytest.mark.parametrize("bad", ({"toString": None}, 7, None, []))
+def test_logistics_hostile_payload_leaves(slug: str, bad: object) -> None:
+    baseline = _logistics_row(slug)
+    entry = _entry("trade_logistics", slug)
+    review = _with_countries(WALK)
+    for field, original in baseline.items():
+        row = {**baseline, field: bad}
+        if not isinstance(original, str):
+            if bad is None:
+                parsed = parse_logistics(entry, [row], RECEIPT, review, {})
+                assert parsed.coverage == (Coverage("measure_missing", 1),)
+            elif bad == 7:
+                parsed = parse_logistics(entry, [row], RECEIPT, review, {})
+                assert Decimal("7") in [item["value"] for item in parsed.rows]
+            else:
+                with pytest.raises(AdditionError, match=r"^measure_unparsed$"):
+                    parse_logistics(entry, [row], RECEIPT, review, {})
+            continue
+        reason = "measure_unparsed"
+        if field == "year":
+            reason = "period_form"
+        elif original == "SYN-AR":
+            reason = "arabic_twin_missing"
+        with pytest.raises(AdditionError, match=f"^{reason}$"):
+            parse_logistics(entry, [row], RECEIPT, review, {})
+
+
+def test_empty_certificate_source_still_refuses() -> None:
+    with pytest.raises(AdditionError, match=r"^period_absent$"):
+        parse_logistics(_LABEL_ENTRIES[CERTIFICATES], [], RECEIPT, _map(), {})
+
+
+@pytest.mark.parametrize(
+    "labels",
+    [
+        ("Cape Verde", "Cape Verde"),
+        ("Cape Verde", "Cape Verde Islands", "Cape Verde"),
+    ],
+)
+def test_same_published_certificate_country_refuses(labels: tuple[str, ...]) -> None:
+    raw = [_certificate(label, "Certificates of Origin", 1) for label in labels]
+    with pytest.raises(AdditionError, match=r"^duplicate_key$"):
+        parse_logistics(_LABEL_ENTRIES[CERTIFICATES], raw, RECEIPT, _map(), {})
+
+
+@pytest.mark.parametrize("slug", (PREVIOUS, HAMAD))
+def test_region_precedes_withheld_country(slug: str) -> None:
+    review = _with_countries(WALK)
+    review["regions_not_countries"] = ["SYN Land"]
+    review["country_labels_withheld"] = ["SYN Land"]
+    parsed = parse_logistics(
+        _entry("trade_logistics", slug), [_logistics_row(slug)], RECEIPT, review, {}
+    )
+    assert parsed.rows == ()
+    assert parsed.coverage == (Coverage("region_not_country", 1),)

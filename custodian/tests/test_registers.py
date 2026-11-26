@@ -17,7 +17,11 @@ import h3
 from eii_custodian.publicdata.fetch.kinds import prepare
 from eii_custodian.publicdata.fetch.registry import load_registry, nightly_blocked
 from eii_custodian.publicdata.registers.build import build
-from eii_custodian.publicdata.registers.contracts import SCHEMAS, RegisterError
+from eii_custodian.publicdata.registers.contracts import (
+    APPROVED_RECEIPT_WORDING,
+    SCHEMAS,
+    RegisterError,
+)
 from eii_custodian.publicdata.registers.intake import from_environment
 from eii_custodian.publicdata.registers.parse import parse
 from eii_custodian.publicdata.registers.provenance import Capture, Frame, receipt_for
@@ -134,14 +138,14 @@ def capture(source="biz_register", period="2026-11", files=None):
         source,
         period,
         files,
-        publisher="SYN invented publisher",
-        dataset="SYN register capture",
+        publisher=APPROVED_RECEIPT_WORDING[source]["publisher"],
+        dataset=APPROVED_RECEIPT_WORDING[source]["dataset"],
         retrieved_utc=period + "-20T00:00:00Z",
         licence_id="pending",
         licence_basis="owner_decision",
         terms_words="terms to be read",
         terms_read_on="pending",
-        basis_note="decision 0026; local use",
+        basis_note=APPROVED_RECEIPT_WORDING[source]["basis_note"],
     )
     return Capture(source, period, files, receipt)
 
@@ -482,7 +486,7 @@ def test_identifier_allowed_in_each_key_only(tmp_path, frame, table):
     ("table", "column", "value"),
     [
         ("pub_place", "registration_number", "54321"),
-        # Decision 0119: the default commerce licence, an input-only key.
+        # Decision 0123: a withheld duplicate still meets an unkeyed row.
         ("pub_place", "name_en", "SYN copied 97003"),
         ("unknown_table", "name", "SYN anything"),
         ("pub_register_company", "name_en", "SYN-E-hidden"),
@@ -520,7 +524,7 @@ def test_release_schema_and_identifier_egress_plants(
         ("pub_register_company", "residence"): "release_schema",
     }[table, column]
     with pytest.raises(RegisterError, match="^" + reason + "$"):
-        validate_release(tables, frame, licences=frozenset({"97003"}))
+        validate_release(tables, frame, withheld_registrations=frozenset({"97003"}))
 
 
 @pytest.mark.parametrize(
@@ -539,8 +543,7 @@ def test_release_schema_and_identifier_egress_plants(
     ],
 )
 def test_release_value_artefact_plants(tmp_path, frame, value, reason):
-    """Decision 0119: the key plants hold the commerce licence 97003, an
-    input-only key; the released key 54321 in the same shapes publishes."""
+    """Decision 0123: a withheld key meets every unkeyed row and shape."""
     result = build(
         tmp_path, "public_only", frame, (capture(), capture("fc_register")), ()
     )
@@ -548,7 +551,7 @@ def test_release_value_artefact_plants(tmp_path, frame, value, reason):
         validate_release(
             {**result.tables, "source_registry": [{"value": value}]},
             frame,
-            licences=frozenset({"97003"}),
+            withheld_registrations=frozenset({"97003"}),
         )
 
 
@@ -703,14 +706,14 @@ def test_numeric_capital_storage_range_and_small_coordinate(frame):
 @pytest.mark.parametrize(
     ("source", "column", "value", "reason"),
     [
-        # Decision 0119: the commerce licence 97003, an input-only key, in a
-        # card column of each source; the released keys publish (None).
+        # Decision 0123: an own licence refuses; another company's licence
+        # and released keys publish (None).
         ("biz_register", "name_en", "97003", "registration_egress"),
         (
             "fc_register",
             "registered_address",
             "Office 97003, SYN tower",
-            "registration_egress",
+            None,
         ),
         ("biz_register", "name_en", "65432", None),
         ("fc_register", "registered_address", "Office 54321, SYN tower", None),

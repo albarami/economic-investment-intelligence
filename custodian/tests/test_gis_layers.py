@@ -164,6 +164,20 @@ def test_land_price_period_is_exactly_one_year_of_the_service_name() -> None:
             land_price_rows([feature], name, as_of=_INVENTED_AS_OF)
 
 
+def test_address_outside_the_grid_is_left_out_and_early_survey_date_is_blank() -> None:
+    inside = _load("qars_features.json")[0]
+    outside = json.loads(json.dumps(inside))
+    outside["geometry"]["x"] = 11.75
+    outside["geometry"]["y"] = 21.5
+    early = json.loads(json.dumps(inside))
+    early["attributes"]["SURVEYED_DATE"] = -55813363200000
+    early["attributes"]["BUILDING_NO"] = 4
+    rows = address_rows([inside, outside, early], _grid(10.25, 20.5))
+    assert [row["building_number"] for row in rows] == ["3", "4"]
+    assert rows[0]["survey_date"] == "2020-01-15"
+    assert rows[1]["survey_date"] is None
+
+
 def test_address_and_parcel_drop_pin_and_keep_published_dates() -> None:
     grid = _grid(10.25, 20.5)
     address = address_rows([_load("qars_features.json")[0]], grid)
@@ -395,6 +409,19 @@ def test_poi_category_stays_null_and_landmarks_use_reviewed_points() -> None:
     assert "EMAIL" not in landmarks[0]
 
 
+def test_landmark_outside_the_grid_is_left_out() -> None:
+    inside = {
+        "attributes": {"ENAME": "SYN MARK", "ANAME": "معلم تجريبي"},
+        "geometry": _point(10.25, 20.5),
+    }
+    outside = {
+        "attributes": {"ENAME": "SYN FAR", "ANAME": "معلم بعيد"},
+        "geometry": _point(11.75, 21.5),
+    }
+    rows = landmark_rows([inside, outside], _grid(10.25, 20.5))
+    assert [row["name_en"] for row in rows] == ["SYN MARK"]
+
+
 def test_landmark_keys_are_content_based() -> None:
     """J24: the same landmarks in another order give the same lm- keys."""
     souq = {
@@ -584,3 +611,54 @@ def _square() -> dict[str, object]:
         "rings": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
         "spatialReference": {"wkid": 4326},
     }
+
+
+_MISSING = object()
+
+
+def _outside(build: str, field: str, value: object) -> dict[str, object]:
+    if build == "landmark":
+        attributes: dict[str, object] = {"ENAME": "SYN FAR", "ANAME": "معلم بعيد"}
+        feature: dict[str, object] = {
+            "attributes": attributes,
+            "geometry": _point(11.75, 21.5),
+        }
+    else:
+        feature = json.loads(json.dumps(_load("qars_features.json")[0]))
+        feature["geometry"]["x"] = 11.75
+        feature["geometry"]["y"] = 21.5
+        attributes = feature["attributes"]
+    if value is _MISSING:
+        attributes.pop(field, None)
+    else:
+        attributes[field] = value
+    return feature
+
+
+def test_a_point_outside_the_grid_still_meets_every_field_check() -> None:
+    cases: list[tuple[str, str, object, str]] = [
+        (build, field, value, "text")
+        for build, field in (("landmark", "ENAME"), ("landmark", "ANAME"))
+        for value in (_MISSING, None, "", 7)
+    ]
+    cases += [
+        ("address", field, value, "number")
+        for field in ("ZONE_NO", "STREET_NO", "BUILDING_NO")
+        for value in (_MISSING, None, "12", True, 1.5)
+    ]
+    cases += [
+        ("address", "BUILDING_NO_SUBTYPE", value, "number")
+        for value in ("1", True, 1.5)
+    ]
+    cases += [("address", "SURVEYED_DATE", value, "date") for value in ("2020", True)]
+    for build, field, value, reason in cases:
+        rows = landmark_rows if build == "landmark" else address_rows
+        try:
+            rows([_outside(build, field, value)], _grid(10.25, 20.5))
+        except LayerError as error:
+            assert str(error) == reason, (build, field, value, str(error))
+        else:
+            raise AssertionError(f"outside {build} kept a bad {field}: {value!r}")
+    for build in ("landmark", "address"):
+        rows = landmark_rows if build == "landmark" else address_rows
+        assert rows([_outside(build, "SYN_UNUSED", None)], _grid(10.25, 20.5)) == []

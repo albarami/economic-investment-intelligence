@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 from custodian.tests.repository_root import repository_root
-from hypothesis import given, settings
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.additions.common import AdditionError
@@ -246,6 +246,7 @@ def test_built_mapping_has_neither_land_nor_a_published_unit_type(
         )
     )
 )
+@example("\n#")
 def test_use_keys_outside_the_closed_vocabulary_refuse(value: str) -> None:
     with TemporaryDirectory() as folder:
         path = Path(folder) / "use.csv"

@@ -39,6 +39,7 @@ _FIELDS = (
     "geo_shape",
 )
 _DIGITS = re.compile(r"\A[0-9]+\Z")
+_NOT_KEY = re.compile(r"[^a-z0-9]+")
 _INDICATOR = "capacity"
 _UNIT = "TR"
 
@@ -69,7 +70,8 @@ def parse_dcool(
 ) -> tuple[CoolingRow, ...]:
     """Unpivot sector columns through the reviewed municipality names."""
     built: list[CoolingRow] = []
-    seen: set[tuple[str, str, str]] = set()
+    seen: set[tuple[str, str, str, str]] = set()
+    statuses: dict[str, object] = {}
     name_rows = [dict(row) for row in names]
     for row in rows:
         if any("consumption" in key for key in row):
@@ -82,13 +84,24 @@ def parse_dcool(
             raise CoolingError("year")
         if not isinstance(municipality, str):
             raise CoolingError("unmapped_municipality")
+        indicator = _status_indicator(row["project_status"])
+        # R1-DSTAT.rv1 F1: the key is not injective; one indicator, one status.
+        if (
+            statuses.setdefault(indicator, row["project_status"])
+            != row["project_status"]
+        ):
+            raise CoolingError("project_status")
         try:
             code = municipality_key(municipality, name_rows)
         except FrameError as exc:
             raise CoolingError("unmapped_municipality") from exc
         for sector in _SECTORS:
+            if row[sector] is None:
+                # R1: the portal leaves a sector cell empty when it publishes
+                # no capacity; an empty cell is no row, never a zero.
+                continue
             value = _sector_value(sector, row[sector])
-            key = (code, sector, year.strip())
+            key = (code, sector, year.strip(), indicator)
             if key in seen:
                 raise CoolingError("duplicate_key")
             seen.add(key)
@@ -97,12 +110,22 @@ def parse_dcool(
                     municipality_code=code,
                     sector_key=sector,
                     period=year.strip(),
-                    indicator=_INDICATOR,
+                    indicator=indicator,
                     value=value,
                     unit=_UNIT,
                 )
             )
     return tuple(built)
+
+
+def _status_indicator(raw: object) -> str:
+    """R1: the export is by status; each published status is its own capacity."""
+    if not isinstance(raw, str):
+        raise CoolingError("project_status")
+    key = _NOT_KEY.sub("_", raw.strip().lower()).strip("_")
+    if key == "":
+        raise CoolingError("project_status")
+    return f"{_INDICATOR}_{key}"
 
 
 def _sector_value(sector: str, raw: object) -> Decimal:

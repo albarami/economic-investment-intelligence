@@ -1,1 +1,764 @@
 source_category_id,place_category_key,mapping_version,review_status,reviewer_role,review_date,rationale
+4bf58dd8d48988d124941735,corporate_or_business_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office — Office fits corporate or business office.
+4bf58dd8d48988d16d941735,cafe,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Dining and Drinking > Cafe, Coffee, and Tea House > Café — Café fits cafe."
+4bf58dd8d48988d1e0931735,coffee_shop,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Dining and Drinking > Cafe, Coffee, and Tea House > Coffee Shop — Coffee Shop fits coffee shop."
+4bf58dd8d48988d110951735,personal_or_beauty_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Hair Salon — Health and Beauty Service fits personal or beauty service.
+4d4b7105d754a06374d81259,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1f9931735,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Road — Road fits travel and transportation.
+52f2ab2ebcbc57f1066b8b44,automotive_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Automotive Service > Automotive Repair Shop — Automotive Service fits automotive service.
+4bf58dd8d48988d1f7931735,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Plane — Plane fits travel and transportation; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d115941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d16e941735,fast_food_restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Fast Food Restaurant — Fast Food Restaurant fits fast food restaurant.
+4bf58dd8d48988d10f941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Indian Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1fa931735,hotel,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Hotel — Hotel fits hotel.
+4bf58dd8d48988d10a951735,bank_or_credit_union,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Financial Service > Banking and Finance > Bank — Bank fits bank or credit union.
+4bf58dd8d48988d103951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Clothing Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d138941735,muslim_place_of_worship,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Spiritual Center > Mosque — Mosque fits muslim place of worship.
+4bf58dd8d48988d16c941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Burger Joint — Restaurant fits restaurant.
+4bf58dd8d48988d16a941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bakery — Bakery fits casual eatery.
+4bf58dd8d48988d128941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Cafeteria — Cafeteria fits casual eatery.
+4bf58dd8d48988d142941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d104941735,health_care,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Medical Center — Medical Center fits health care.
+4bf58dd8d48988d1d0941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Dessert Shop — Dessert Shop fits casual eatery.
+4bf58dd8d48988d1e4941735,campground,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Campground — Campground fits campground.
+4bf58dd8d48988d196941735,hospital,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Hospital — Hospital fits hospital.
+4bf58dd8d48988d126941735,community_and_government,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building — Government Building fits community and government; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d1f0931735,air_transport_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Airport Gate — Airport Gate fits air transport facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d113951735,gas_station,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Fuel Station — Fuel Station fits gas station.
+4bf58dd8d48988d176941735,gym,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Gym — Gym fits gym.
+4bf58dd8d48988d1e2941735,beach,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Beach — Beach fits beach.
+4eb1bea83b7b6f98df247e06,industrial_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Factory — Factory fits industrial facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d174941735,corporate_or_business_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Coworking Space — Office fits corporate or business office.
+4bf58dd8d48988d122951735,electronics_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Computers and Electronics Retail > Electronics Store — Computers and Electronics Retail fits electronics store.
+4bf58dd8d48988d1f8941735,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Furniture and Home Store — Furniture and Home Store fits hardware home and garden store.
+4bf58dd8d48988d111951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Jewelry Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d104951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Boutique — Boutique fits fashion and apparel store.
+4bf58dd8d48988d118951735,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Grocery Store — Food and Beverage Retail fits food and beverage store.
+4d954b0ea243a5684a65b473,convenience_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Convenience Store — Convenience Store fits convenience store.
+4bf58dd8d48988d1ed941735,wellness_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Spa — Spa fits wellness service.
+4bf58dd8d48988d10f951735,pharmacy_and_drug_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Pharmacy — Pharmacy fits pharmacy and drug store.
+4bf58dd8d48988d175941735,fitness_studio,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio — Gym and Studio fits fitness studio.
+4bf58dd8d48988d14e941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > American Restaurant — Restaurant fits restaurant.
+4f04af1f2fb6e1c99f3db0bb,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Turkish Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d110941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Italian Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d15b941735,farm,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Farm — Farm fits farm.
+4bf58dd8d48988d1f6941735,department_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Department Store — Department Store fits department store.
+4bf58dd8d48988d1c9941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Dessert Shop > Ice Cream Parlor — Dessert Shop fits casual eatery.
+4bf58dd8d48988d10c951735,personal_care_and_beauty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Cosmetics Store — Cosmetics Store fits personal care and beauty store.
+4bf58dd8d48988d1ca941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Pizzeria — Restaurant fits restaurant.
+4f04aa0c2fb6e1c99f3db0b8,personal_or_beauty_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Nail Salon — Health and Beauty Service fits personal or beauty service.
+4bf58dd8d48988d1fd941735,shopping_mall,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Shopping Mall — Shopping Mall fits shopping mall.
+4bf58dd8d48988d13b941735,education,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education — Education fits education.
+4bf58dd8d48988d1ff941735,shopping,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Miscellaneous Store — Miscellaneous Store fits shopping.
+4bf58dd8d48988d107951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Shoe Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d108951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Women's Store — Fashion Retail fits fashion and apparel store.
+4d4ae6fc7a7b7dea34424761,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Fried Chicken Joint — Restaurant fits restaurant.
+5032891291d4c4b30a586d68,senior_living_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Assisted Living — Assisted Living fits senior living facility.
+54541900498ea6ccd0202697,personal_or_beauty_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service — Health and Beauty Service fits personal or beauty service.
+4bf58dd8d48988d15e941735,swimming_pool,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Water Sports > Swimming > Swimming Pool — Swimming Pool fits swimming pool.
+4d4b7105d754a06379d81259,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation — Travel and Transportation fits travel and transportation.
+4bf58dd8d48988d112941735,smoothie_juice_bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Juice Bar — Juice Bar fits smoothie juice bar.
+4bf58dd8d48988d121941735,lounge,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Lounge — Lounge fits lounge.
+4d4b7104d754a06370d81259,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment — Arts and Entertainment fits arts and entertainment.
+4bf58dd8d48988d1dc931735,non_alcoholic_beverage_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Dining and Drinking > Cafe, Coffee, and Tea House > Tea Room — Tea Room fits non alcoholic beverage venue."
+52f2ab2ebcbc57f1066b8b46,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Supermarket — Food and Beverage Retail fits food and beverage store.
+56aa371be4b08b9a8d573517,corporate_or_business_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Business Center — Business Center fits corporate or business office.
+4bf58dd8d48988d178941735,dental_clinic,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Dentist — Dentist fits dental clinic.
+4bf58dd8d48988d1c5941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Sandwich Spot — Restaurant fits restaurant.
+4f04afc02fb6e1c99f3db0bc,electronics_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Computers and Electronics Retail > Mobile Phone Store — Computers and Electronics Retail fits electronics store.
+50be8ee891d4fa8dcc7199a7,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Market — Market fits market.
+4bf58dd8d48988d171941735,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Event Space — Event Space fits event venue.
+4bf58dd8d48988d12c951735,embassy,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > Embassy or Consulate — Embassy or Consulate fits embassy.
+4bf58dd8d48988d116941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar — Bar fits bar.
+4bf58dd8d48988d177941735,medical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Physician > Doctor's Office — Doctor's Office fits medical service.
+4bf58dd8d48988d163941735,park,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Park — Park fits park.
+4bf58dd8d48988d1fc941735,laundry_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Laundry Service — Laundry Service fits laundry service.
+4bf58dd8d48988d1ce941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Seafood Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1f2941735,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Sporting Goods Retail — Sporting Goods Retail fits sporting goods store.
+4bf58dd8d48988d143941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Breakfast Spot — Breakfast Spot fits casual eatery.
+5032781d91d4c4b30a586d5b,personal_or_beauty_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Tailor — Tailor fits personal or beauty service.
+4bf58dd8d48988d102951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Fashion Accessories Store — Fashion Retail fits fashion and apparel store.
+4f2a25ac4b909258e854f55f,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > States and Municipalities > Neighborhood — Neighborhood fits geographic entities.
+4bf58dd8d48988d119941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Hookah Bar — Bar fits bar.
+4f4528bc4b90abdf24c9de85,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation — Sports and Recreation fits sports and recreation.
+4eb1c1623b7b52c0e1adc2ec,auto_dealer,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Automotive Retail > Car Dealership — Car Dealership fits auto dealer.
+4bf58dd8d48988d128951735,flowers_and_gifts_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Gift Store — Gift Store fits flowers and gifts store.
+4bf58dd8d48988d11b951735,flowers_and_gifts_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Flower Store — Flower Store fits flowers and gifts store.
+52f2ab2ebcbc57f1066b8b4c,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Road > Intersection — Intersection fits travel and transportation.
+4c38df4de52ce0d596b336e1,parking,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Parking — Parking fits parking.
+4eb1bd1c3b7b55596b4a748f,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Filipino Restaurant — Restaurant fits restaurant.
+5744ccdfe4b0c0459246b4be,financial_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Financial Service > Currency Exchange — Financial Service fits financial service.
+52f2ab2ebcbc57f1066b8b23,personal_care_and_beauty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Perfume Store — Perfume Store fits personal care and beauty store.
+4bf58dd8d48988d1a0941735,place_of_learning,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Classroom — College Classroom fits place of learning; refit after review S2-FSQMAP2.rv1 (L-2165).
+4f04ae1f2fb6e1c99f3db0ba,automotive_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Automotive Service > Car Wash and Detail — Automotive Service fits automotive service.
+4bf58dd8d48988d198941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Academic Building — College Academic Building fits campus building.
+4f04b08c2fb6e1c99f3db0bd,travel_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Travel Agency — Travel Agency fits travel service.
+4bf58dd8d48988d17f941735,movie_theater,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Movie Theater — Movie Theater fits movie theater.
+5bae9231bedf3950379f89e4,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant > Shawarma Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1df931735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > BBQ Joint — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b31,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Chocolate Store — Food and Beverage Retail fits food and beverage store.
+4bf58dd8d48988d147941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Diner — Restaurant fits restaurant.
+4bf58dd8d48988d1ab941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > Student Center — Student Center fits campus building.
+4bf58dd8d48988d194941735,emergency_department,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Emergency Service > Emergency Room — Emergency Room fits emergency department.
+52f2ab2ebcbc57f1066b8b56,atm,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Financial Service > Banking and Finance > ATM — ATM fits atm.
+4bf58dd8d48988d1c0941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Mediterranean Restaurant — Restaurant fits restaurant.
+5453de49498eade8af355881,b2b_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Business Service — Business Service fits b2b service.
+4bf58dd8d48988d13d941735,high_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Primary and Secondary School > High School — High School fits high school.
+5454144b498ec1f095bff2f2,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Construction Supplies Store — Construction Supplies Store fits hardware home and garden store.
+4bf58dd8d48988d10b941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Falafel Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d106951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Men's Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d11f941735,dance_club,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Night Club — Night Club fits dance club.
+4bf58dd8d48988d145941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Chinese Restaurant — Restaurant fits restaurant.
+4d954afda243a5684865b473,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Eyecare Store — Eyecare Store fits specialty store.
+4bf58dd8d48988d112951735,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Hardware Store — Hardware Store fits hardware home and garden store.
+4bf58dd8d48988d1e2931735,art_gallery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Art Gallery — Art Gallery fits art gallery.
+4bf58dd8d48988d114951735,books_music_and_video_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Bookstore — Bookstore fits books music and video store.
+58daa1558bbb0b01f18ec1cd,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant > Lebanese Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1f4941735,design_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Design Studio — Design Studio fits design service.
+4bf58dd8d48988d10c941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > French Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d127941735,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Meeting Room — Meeting Room fits event venue; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d125941735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Tech Startup — No key fits: Tech Startup specifies a business rather than an office and establishes no service or B2B clientele. Category withheld; place kept under L-2159 and L-2165.
+4bf58dd8d48988d1ef941735,rental_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Rental Car Location — Rental Car Location fits rental service.
+4bf58dd8d48988d105951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Children's Clothing Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d1c7941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Snack Place — Snack Place fits casual eatery.
+4bf58dd8d48988d127951735,arts_crafts_and_hobby_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Arts and Crafts Store — Arts and Crafts Store fits arts crafts and hobby store.
+4bf58dd8d48988d1f3941735,toys_and_games_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Toy Store — Toy Store fits toys and games store.
+4bf58dd8d48988d1cc941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Steakhouse — Restaurant fits restaurant.
+4bf58dd8d48988d1df941735,bridge,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Bridge — Bridge fits bridge.
+4bf58dd8d48988d117951735,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Candy Store — Food and Beverage Retail fits food and beverage store.
+50aa9e094b90af0d42d5de0d,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > States and Municipalities > City — City fits geographic entities.
+4bf58dd8d48988d111941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Japanese Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1e7941735,playground,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Park > Playground — Playground fits playground.
+4d4b7105d754a06372d81259,college_university,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University — College and University fits college university.
+4bf58dd8d48988d1ff931735,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Convention Center — Convention Center fits event venue.
+4bf58dd8d48988d12f951735,resort,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Resort — Resort fits resort.
+4bf58dd8d48988d1ae941735,college_university,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > University — University fits college university.
+52e81612bcbc57f1066b7a3d,media_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Advertising Agency — Advertising Agency fits media service.
+4bf58dd8d48988d12e941735,police_station,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > Law Enforcement and Public Safety > Police Station — Police Station fits police station.
+4bf58dd8d48988d1cb941735,food_truck_stand,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Food Truck — Food Truck fits food truck stand.
+4bf58dd8d48988d1e1931735,arcade,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Arcade — Arcade fits arcade.
+50328a8e91d4c4b30a586d6c,civic_organization,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Organization > Non-Profit Organization — Non-Profit Organization fits civic organization.
+4bf58dd8d48988d120951735,food_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Food Court — Food Court fits food court.
+4bf58dd8d48988d1fd931735,public_transit_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Metro Station — Metro Station fits public transit facility or service.
+503288ae91d4c4b30a586d67,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Afghan Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1f9941735,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail — Food and Beverage Retail fits food and beverage store.
+4bf58dd8d48988d1e0941735,marina,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Harbor or Marina — Harbor or Marina fits marina.
+4bf58dd8d48988d1eb931735,air_transport_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Airport Terminal — Airport Terminal fits air transport facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4cce455aebf7b749d5e191f5,sport_field,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Soccer > Soccer Field — Soccer Field fits sport field.
+4bf58dd8d48988d1ed931735,airport,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport — Airport fits airport.
+5283c7b4e4b094cb91ec88d7,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Kebab Restaurant — Restaurant fits restaurant.
+4f4533804b9074f6e4fb0105,elementary_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Primary and Secondary School > Elementary School — Elementary School fits elementary school.
+4bf58dd8d48988d15a941735,garden,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Garden — Garden fits garden.
+4bf58dd8d48988d100941735,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Convention Center > Conference Room — Conference Room fits event venue.
+54135bf5e4b08f3d2429dfde,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Indian Restaurant > South Indian Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d12b951735,public_transit_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transportation Service > Public Transportation > Bus Line — Bus Line fits public transit facility or service.
+52e81612bcbc57f1066b79f8,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Pakistani Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b79f7,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant > Persian Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b36,technical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Technology Business > IT Service — IT Service fits technical service.
+4bf58dd8d48988d132941735,christian_place_of_worship,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Spiritual Center > Church — Church fits christian place of worship.
+4eb1bc533b7b2c5b1d4306cb,lounge,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Airport Lounge — Airport Lounge fits lounge.
+4bf58dd8d48988d1bc941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Dessert Shop > Cupcake Shop — Dessert Shop fits casual eatery.
+4bf58dd8d48988d148941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Donut Shop — Donut Shop fits casual eatery.
+4e52adeebd41615f56317744,military_site,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > Military > Military Base — Military Base fits military site.
+4bf58dd8d48988d12d951735,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Boat or Ferry — Travel and Transportation fits travel and transportation.
+4bf58dd8d48988d149941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Thai Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1d5941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Hotel Bar — Bar fits bar.
+5032764e91d4c4b30a586d5a,corporate_or_business_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Campaign Office — Office fits corporate or business office.
+56aa371be4b08b9a8d57352f,air_transport_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Airport Service — Airport Service fits air transport facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d1c8941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > African Restaurant — Restaurant fits restaurant.
+5744ccdfe4b0c0459246b4e2,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Dessert Shop > Pastry Shop — Dessert Shop fits casual eatery.
+4e39a956bd410d7aed40cbc3,sport_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Racquet Sports > Tennis > Tennis Court — Tennis Court fits sport court.
+4f4533814b9074f6e4fb0107,preschool,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Nursery School — Nursery School fits preschool.
+4eb1bdde3b7b55596b4a7490,media_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Photography Service > Photography Lab — Photography Service fits media service.
+4bf58dd8d48988d115951735,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Sporting Goods Retail > Bicycle Store — Sporting Goods Retail fits sporting goods store.
+4bf58dd8d48988d1b2941735,gym,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Gym — College Gym fits gym.
+4bf58dd8d48988d1d3941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Vegan and Vegetarian Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d197941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Administrative Building — College Administrative Building fits campus building.
+52e81612bcbc57f1066b7a2e,sport_or_recreation_club,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Sports Club — Sports Club fits sport or recreation club.
+52f2ab2ebcbc57f1066b8b2e,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Watch Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d172941735,shipping_or_delivery_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > Post Office — Post Office fits shipping or delivery service.
+63be6904847c3692a84b9b3d,financial_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Financial Service — Financial Service fits financial service.
+63be6904847c3692a84b9b6b,legal_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Legal Service — Legal Service fits legal service.
+4bf58dd8d48988d11a951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Bridal Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d109951735,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Lingerie Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d132951735,swimming_pool,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Hotel > Hotel Pool — Hotel Pool fits swimming pool.
+52f2ab2ebcbc57f1066b8b32,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Baby Store — Baby Store fits specialty store.
+4bf58dd8d48988d1c1941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Mexican Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1d2941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Japanese Restaurant > Sushi Restaurant — Restaurant fits restaurant.
+4f4533814b9074f6e4fb0106,middle_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Primary and Secondary School > Middle School — Middle School fits middle school.
+4bf58dd8d48988d100951735,animal_and_pet_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Pet Supplies Store — Pet Supplies Store fits animal and pet store.
+4bf58dd8d48988d131941735,place_of_worship,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Spiritual Center — Spiritual Center fits place of worship.
+4d4b7105d754a06375d81259,professional_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services — Business and Professional Services fits professional service.
+4bf58dd8d48988d123951735,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Smoke Shop — Smoke Shop fits specialty store.
+63be6904847c3692a84b9bb6,non_alcoholic_beverage_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Dining and Drinking > Cafe, Coffee, and Tea House — Cafe, Coffee, and Tea House fits non alcoholic beverage venue."
+5665c7b9498e7d8a4f2c0f06,cafe,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Corporate Coffee Shop — Corporate Coffee Shop fits cafe.
+4bf58dd8d48988d1f4931735,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Race Track — Race Track fits sport or fitness facility.
+52e81612bcbc57f1066b7a36,storage_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Warehouse — Warehouse fits storage facility.
+4f4531b14b9074f6e4fb0103,diagnostics_imaging_or_lab_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Medical Lab — Medical Lab fits diagnostics imaging or lab service.
+52e81612bcbc57f1066b79ff,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Halal Restaurant — Restaurant fits restaurant.
+56aa371be4b08b9a8d573532,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Exhibit — Exhibit fits arts and entertainment.
+4bf58dd8d48988d12d941735,monument,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Monument — Monument fits monument.
+4bf58dd8d48988d1e5931735,music_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue > Music Venue — Music Venue fits music venue.
+4d954b16a243a5684b65b473,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Rest Area — Rest Area fits travel and transportation.
+4bf58dd8d48988d11d941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Sports Bar — Bar fits bar.
+4bf58dd8d48988d1f7941735,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Flea Market — Flea Market fits market.
+4bf58dd8d48988d12a941735,government_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > Capitol Building — Capitol Building fits government office.
+4bf58dd8d48988d1fe931735,public_transit_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Bus Station — Bus Station fits public transit facility or service.
+5744ccdfe4b0c0459246b4b5,playground,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Indoor Play Area — Indoor Play Area fits playground.
+52e81612bcbc57f1066b79f4,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Buffet — Restaurant fits restaurant.
+5665ef1d498ec706735f0e59,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Corporate Amenity — No key fits: Corporate Amenity specifies neither an office nor an amenity subtype. Category withheld; place kept under L-2159 and L-2165.
+5bae9231bedf3950379f89e1,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant > Egyptian Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b7a46,place_of_learning,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Private School — Private School fits place of learning.
+4bf58dd8d48988d173941735,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Auditorium — Auditorium fits event venue.
+554a5e17498efabeda6cc559,media_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Photography Service > Photography Studio — Photography Service fits media service.
+4d954af4a243a5684765b473,animal_or_pet_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Veterinarian — Veterinarian fits animal or pet service.
+52e81612bcbc57f1066b7a34,community_center,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Community Center — Community Center fits community center.
+5e18993feee47d000759b256,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Coffee Roaster — Food and Beverage Retail fits food and beverage store.
+4deefb944765f83613cdba6e,historic_site,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Historic and Protected Site — Historic and Protected Site fits historic site.
+5032885091d4c4b30a586d66,real_estate_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Real Estate Service > Real Estate Agency — Real Estate Service fits real estate service.
+52f2ab2ebcbc57f1066b8b1c,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Fruit and Vegetable Store — Food and Beverage Retail fits food and beverage store.
+50aaa4314b90af0d42d5de10,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Island — Island fits geographic entities.
+52e81612bcbc57f1066b7a00,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Comfort Food Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1e1941735,sport_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Basketball > Basketball Court — Basketball Court fits sport court.
+4f04b25d2fb6e1c99f3db0c0,lounge,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Travel Lounge — Travel Lounge fits lounge.
+52f2ab2ebcbc57f1066b8b4f,public_transit_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Bus Stop — Bus Stop fits public transit facility or service.
+50aa9e744b90af0d42d5de0e,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Health Food Store — Food and Beverage Retail fits food and beverage store.
+52e81612bcbc57f1066b7a10,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Community and Government > Summer Camp — No key fits: Summer Camp establishes neither camping grounds nor a sport or recreation club or government function. Category withheld; place kept under L-2159 and L-2165.
+4bf58dd8d48988d182941735,amusement_park,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Amusement Park — Amusement Park fits amusement park.
+4def73e84765ae376e57713a,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Portuguese Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1a3941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Residence Hall — College Residence Hall fits campus building.
+54541b70498ea6ccd0204bff,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transportation Service — Transportation Service fits travel and transportation.
+4bf58dd8d48988d159941735,recreational_trail_or_path,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Hiking Trail — Hiking Trail fits recreational trail or path.
+4bf58dd8d48988d1fc931735,public_transit_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Light Rail Station — Light Rail Station fits public transit facility or service.
+4bf58dd8d48988d12f941735,library,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Library — Library fits library.
+4bf58dd8d48988d164941735,public_plaza,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Plaza — Plaza fits public plaza.
+52f2ab2ebcbc57f1066b8b1f,b2b_transportation_and_storage_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Business and Professional Services > Shipping, Freight, and Material Transportation Service — Shipping, Freight, and Material Transportation Service fits b2b transportation and storage service."
+4bf58dd8d48988d10b951735,toys_and_games_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Computers and Electronics Retail > Video Games Store — Video Games Store fits toys and games store.
+4bf58dd8d48988d1f8931735,bed_and_breakfast,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Bed and Breakfast — Bed and Breakfast fits bed and breakfast.
+4bf58dd8d48988d157941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > American Restaurant > New American Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b3c,wellness_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Massage Clinic — Massage Clinic fits wellness service.
+52e81612bcbc57f1066b79f2,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Creperie — Creperie fits casual eatery.
+52e81612bcbc57f1066b7a0c,non_alcoholic_beverage_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Dining and Drinking > Cafe, Coffee, and Tea House > Bubble Tea Shop — Bubble Tea Shop fits non alcoholic beverage venue."
+512e7cae91d4cbb4e5efe0af,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Dessert Shop > Frozen Yogurt Shop — Dessert Shop fits casual eatery.
+4e52d2d203646f7c19daa8ae,animal_or_pet_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Animal Shelter — Animal Shelter fits animal or pet service.
+50aaa49e4b90af0d42d5de11,castle,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Castle — Castle fits castle.
+56aa371be4b08b9a8d5734d7,industrial_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Industrial Estate — Industrial Estate fits industrial facility or service.
+4bf58dd8d48988d181941735,museum,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Museum — Museum fits museum.
+4bf58dd8d48988d11d951735,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Butcher — Food and Beverage Retail fits food and beverage store.
+52e81612bcbc57f1066b7a32,cultural_center,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Cultural Center — Cultural Center fits cultural center.
+52e81612bcbc57f1066b7a35,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Community and Government > Organization > Club House — No key fits: Club House specifies a building without establishing sport or recreation or community-center functions. Category withheld; place kept under L-2159 and L-2165.
+5109983191d435c0d71c2bb1,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Amusement Park > Attraction — No key fits: Attraction specifies neither a whole amusement park nor an animal attraction; parent membership alone is insufficient. Category withheld; place kept under L-2159 and L-2165.
+4deefc054765f83613cdba6f,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Indonesian Restaurant — Restaurant fits restaurant.
+5413605de4b0ae91d18581a9,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Sri Lankan Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d146941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Deli — Restaurant fits restaurant.
+4bf58dd8d48988d121951735,office_supply_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Office Supply Store — Office Supply Store fits office supply store.
+52e81612bcbc57f1066b7a26,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Recreation Center — Recreation Center fits sport or fitness facility.
+54135bf5e4b08f3d2429dfdf,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Indian Chinese Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d113941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Korean Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1fa941735,farmers_market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Farmers Market — Farmers Market fits farmers market.
+4bf58dd8d48988d1e4931735,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Bowling Alley — Bowling Alley fits sports and recreation.
+4eb1bdf03b7b55596b4a7491,electronics_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Computers and Electronics Retail > Camera Store — Computers and Electronics Retail fits electronics store.
+4bf58dd8d48988d137941735,theatre_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue > Theater — Theater fits theatre venue.
+4bf58dd8d48988d1e3931735,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Pool Hall — Pool Hall fits sports and recreation.
+4bf58dd8d48988d1e3941735,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Surf Spot — Surf Spot fits sports and recreation.
+4fceea171983d5d06c3e9823,aquarium,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Aquarium — Aquarium fits aquarium.
+52f2ab2ebcbc57f1066b8b4b,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Border Crossing — Border Crossing fits travel and transportation.
+4bf58dd8d48988d1fe941735,books_music_and_video_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Music Store — Music Store fits books music and video store.
+56aa371be4b08b9a8d57350b,food_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Food Stand — Food Stand fits food service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d1e6941735,golf_course,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Golf > Golf Course — Golf Course fits golf course.
+4bf58dd8d48988d18e941735,comedy_club,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Comedy Club — Comedy Club fits comedy club.
+4bf58dd8d48988d1af941735,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Auditorium — College Auditorium fits event venue.
+5744ccdfe4b0c0459246b4dc,shopping,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Shopping Plaza — Shopping Plaza fits shopping.
+52f2ab2ebcbc57f1066b8b29,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Luggage Store — Luggage Store fits fashion and apparel store.
+4bf58dd8d48988d179941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bagel Shop — Bagel Shop fits casual eatery.
+4bf58dd8d48988d1a7941735,library,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Library — College Library fits library.
+4bf58dd8d48988d1a2941735,college_university,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > Community College — Community College fits college university.
+4bf58dd8d48988d10e941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Greek Restaurant — Restaurant fits restaurant.
+54f4ba06498e2cf5561da814,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Corporate Cafeteria — Corporate Cafeteria fits casual eatery.
+63be6904847c3692a84b9b86,real_estate_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Real Estate Service > Property Management Office — Real Estate Service fits real estate service.
+56aa371be4b08b9a8d5734cf,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Ballroom — Ballroom fits event venue.
+52f2ab2ebcbc57f1066b8b28,printing_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Print Store — Print Store fits printing service.
+4bf58dd8d48988d188941735,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Stadium > Soccer Stadium — Stadium fits stadium arena.
+4bf58dd8d48988d11e941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Cocktail Bar — Bar fits bar.
+54135bf5e4b08f3d2429dfdd,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Indian Restaurant > North Indian Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b1d,laundry_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Dry Cleaner — Dry Cleaner fits laundry service.
+5032792091d4c4b30a586d5c,music_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue > Concert Hall — Concert Hall fits music venue.
+63be6904847c3692a84b9be6,vehicle_parts_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Automotive Retail > Car Parts and Accessories — Car Parts and Accessories fits vehicle parts store.
+4e74f6cabd41c4836eac4c31,pier,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Pier — Pier fits pier.
+55077a22498e5e9248869ba2,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Cruise — Cruise fits travel and transportation; refit after review S2-FSQMAP2.rv1 (L-2165).
+4edd64a0c7ddd24ca188df1a,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Fish and Chips Shop — Restaurant fits restaurant.
+4bf58dd8d48988d17e941735,movie_theater,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Movie Theater > Indie Movie Theater — Movie Theater fits movie theater.
+4bf58dd8d48988d184941735,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Stadium — Stadium fits stadium arena.
+52f2ab2ebcbc57f1066b8b2b,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Leather Goods Store — Leather Goods Store fits fashion and apparel store.
+5bae9231bedf3950379f89ea,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant > Yemeni Restaurant — Restaurant fits restaurant.
+56aa371be4b08b9a8d573538,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Theme Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1a5941735,place_of_learning,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Lab — College Lab fits place of learning; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d1a6941735,college_university,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > Law School — Law School fits college university.
+4bf58dd8d48988d1c3941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Moroccan Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d116951735,second_hand_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Antique Store — Antique Store fits second hand store.
+4bf58dd8d48988d101941735,fitness_studio,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Martial Arts Dojo — Martial Arts Dojo fits fitness studio.
+52e81612bcbc57f1066b79f1,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Bistro — Restaurant fits restaurant.
+4bf58dd8d48988d1d1941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Noodle Restaurant — Restaurant fits restaurant.
+4eb1d4d54b900d56c88a45fc,mountain,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Mountain — Mountain fits mountain.
+5032833091d4c4b30a586d60,vehicle_dealer,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Automotive Retail > Motorcycle Dealership — Motorcycle Dealership fits vehicle dealer.
+4bf58dd8d48988d11b941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Pub — Bar fits bar.
+4bf58dd8d48988d1e5941735,dog_park,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Park > Dog Park — Dog Park fits dog park.
+52e816a6bcbc57f1066b7a54,shopping,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Warehouse or Wholesale Store — Warehouse or Wholesale Store fits shopping.
+52f2ab2ebcbc57f1066b8b26,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Textiles Store — Textiles Store fits specialty store; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d12b941735,courthouse,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > Courthouse — Courthouse fits courthouse.
+52f2ab2ebcbc57f1066b8b3f,attorney_or_law_firm,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Legal Service > Law Office — Law Office fits attorney or law firm.
+4bf58dd8d48988d102941735,fitness_studio,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Yoga Studio — Yoga Studio fits fitness studio.
+5454152e498ef71e2b9132c6,event_or_party_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Event Service — Event Service fits event or party service.
+4bf58dd8d48988d18f941735,museum,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Museum > Art Museum — Museum fits museum.
+4bf58dd8d48988d1fb941735,arts_crafts_and_hobby_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Hobby Store — Hobby Store fits arts crafts and hobby store.
+5032897c91d4c4b30a586d69,animal_or_pet_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Pet Service — Pet Service fits animal or pet service.
+52e81612bcbc57f1066b7a0d,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Beach Bar — Bar fits bar.
+4bf58dd8d48988d117941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Beer Garden — Bar fits bar.
+530e33ccbcbc57f1066bbff9,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > States and Municipalities > Village — Village fits geographic entities.
+56aa371be4b08b9a8d5734db,theatre_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue > Amphitheater — Amphitheater fits theatre venue.
+507c8c4091d498d9fc8c67a9,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Public Art — Public Art fits arts and entertainment.
+4bf58dd8d48988d1ad941735,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Trade School — Trade School fits specialty school.
+4d4b7105d754a06378d81259,shopping,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail — Retail fits shopping.
+56aa371be4b08b9a8d57353e,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Port — Port fits travel and transportation.
+4eb1c0253b7b52c0e1adc2e9,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Garden Center — Garden Center fits hardware home and garden store.
+52f2ab2ebcbc57f1066b8b41,smoothie_juice_bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Smoothie Shop — Smoothie Shop fits smoothie juice bar.
+4bf58dd8d48988d1b1941735,books_music_and_video_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Bookstore — College Bookstore fits books music and video store.
+4bf58dd8d48988d152941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant > Arepa Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b35,discount_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Outlet Store — Outlet Store fits discount store.
+55888a5a498e782e3303b43a,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Furniture and Home Store > Lighting Store — Furniture and Home Store fits hardware home and garden store.
+56aa371ae4b08b9a8d5734ba,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Mexican Restaurant > Tex-Mex Restaurant — Restaurant fits restaurant.
+530e33ccbcbc57f1066bbff3,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > States and Municipalities > Town — Town fits geographic entities.
+4bf58dd8d48988d101951735,second_hand_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Vintage and Thrift Store — Vintage and Thrift Store fits second hand store.
+56aa371be4b08b9a8d57356a,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Outdoor Event Space — Outdoor Event Space fits event venue.
+4bf58dd8d48988d1ee931735,lodging,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Hostel — Hostel fits lodging.
+4bf58dd8d48988d1fb931735,lodging,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Motel — Motel fits lodging.
+56aa371be4b08b9a8d573544,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Bay — Bay fits geographic entities.
+4bf58dd8d48988d1f5941735,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Gourmet Store — Food and Beverage Retail fits food and beverage store.
+4bf58dd8d48988d18d941735,arcade,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Gaming Cafe — Gaming Cafe fits arcade.
+52f2ab2ebcbc57f1066b8b47,gym,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Boxing Gym — Boxing Gym fits gym.
+4bf58dd8d48988d120941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Karaoke Bar — Bar fits bar.
+52e81612bcbc57f1066b7a31,television_station,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > TV Station — TV Station fits television station.
+52f2ab2ebcbc57f1066b8b27,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Furniture and Home Store > Mattress Store — Furniture and Home Store fits hardware home and garden store.
+4bf58dd8d48988d1bd941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Salad Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b42,superstore,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Big Box Store — Big Box Store fits superstore.
+4bf58dd8d48988d193941735,amusement_park,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Water Park — Water Park fits amusement park.
+56aa371ce4b08b9a8d573570,educational_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Adult Education — Adult Education fits educational service.
+4bf58dd8d48988d105941735,swimming_pool,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Gym Pool — Gym Pool fits swimming pool.
+5744ccdfe4b0c0459246b4cd,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Supplement Store — Supplement Store fits specialty store.
+4bf58dd8d48988d129941735,government_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > City Hall — City Hall fits government office.
+52f2ab2ebcbc57f1066b8b2f,technical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Repair Service — Repair Service fits technical service.
+4bf58dd8d48988d169941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Australian Restaurant — Restaurant fits restaurant.
+4f4530164b9074f6e4fb00ff,travel_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Tourist Information and Service — Tourist Information and Service fits travel service.
+4bf58dd8d48988d150941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Spanish Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b49,personal_or_beauty_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Barbershop — Health and Beauty Service fits personal or beauty service.
+60a674555c7917283bad6839,ticket_office_or_booth,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Airport Ticket Counter — Airport Ticket Counter fits ticket office or booth.
+4eb1daf44b900d56c88a4600,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Fair — Fair fits event venue; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d1e9931735,music_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue > Music Venue > Rock Club — Music Venue fits music venue.
+4bf58dd8d48988d12c941735,fire_station,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > Law Enforcement and Public Safety > Fire Station — Fire Station fits fire station.
+4bf58dd8d48988d10e951735,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Fish Market — Food and Beverage Retail fits food and beverage store.
+52e81612bcbc57f1066b7a22,garden,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Botanical Garden — Botanical Garden fits garden.
+4bf58dd8d48988d156941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Malay Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d109941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Eastern European Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b2b,automotive_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Automotive Service — Automotive Service fits automotive service.
+52e81612bcbc57f1066b7a37,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Distribution Center — No key fits: Distribution Center specifies a facility without establishing B2B service provision or storage use. Category withheld; place kept under L-2159 and L-2165.
+56aa371be4b08b9a8d573550,food_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Food and Beverage Service — Food and Beverage Service fits food service.
+52f2ab2ebcbc57f1066b8b21,office_supply_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Stationery Store — Stationery Store fits office supply store.
+545419b1498ea6ccd0202f58,home_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Home Service — Home Service fits home service.
+4bf58dd8d48988d1b0941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > Fraternity House — Fraternity House fits campus building.
+52e81612bcbc57f1066b7a45,preschool,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Preschool — Preschool fits preschool.
+4e39a891bd410d7aed40cbc2,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Stadium > Tennis Stadium — Stadium fits stadium arena.
+4bf58dd8d48988d190941735,museum,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Museum > History Museum — Museum fits museum.
+4bf58dd8d48988d1a1941735,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Cafeteria — College Cafeteria fits casual eatery.
+4bf58dd8d48988d1f2931735,performing_arts_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue — Performing Arts Venue fits performing arts venue.
+5032856091d4c4b30a586d63,radio_station,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Radio Station — Radio Station fits radio station.
+52e81612bcbc57f1066b7a13,nature_reserve,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Nature Preserve — Nature Preserve fits nature reserve.
+4bf58dd8d48988d1f0941735,cafe,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Internet Cafe — Internet Cafe fits cafe.
+4f4532974b9074f6e4fb0104,family_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Child Care Service > Daycare — Daycare fits family service.
+52e81612bcbc57f1066b7a33,sport_or_recreation_club,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Social Club — Social Club fits sport or recreation club.
+4bf58dd8d48988d129951735,train_station,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Rail Station — Rail Station fits train station.
+522e32fae4b09b556e370f19,vision_or_eye_care_clinic,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Optometrist — Optometrist fits vision or eye care clinic.
+4bf58dd8d48988d19e941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Engineering Building — College Engineering Building fits campus building.
+52e81612bcbc57f1066b7a41,place_of_worship,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Spiritual Center > Prayer Room — Prayer Room fits place of worship.
+63be6904847c3692a84b9be3,shopping,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Automotive Retail — Retail fits shopping.
+52f2ab2ebcbc57f1066b8b16,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Sporting Goods Retail > Fishing Store — Sporting Goods Retail fits sporting goods store.
+4bf58dd8d48988d16b941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant > South American Restaurant > Brazilian Restaurant — Restaurant fits restaurant.
+54135bf5e4b08f3d2429dfe2,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Indian Restaurant > Chaat Place — Restaurant fits restaurant.
+4bf58dd8d48988d16f941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Hot Dog Joint — Restaurant fits restaurant.
+589ddde98ae3635c072819ee,shopping,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Duty-free Store — Duty-free Store fits shopping.
+5744ccdfe4b0c0459246b4e5,air_transport_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Baggage Claim — Baggage Claim fits air transport facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d161941735,lake,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Lake — Lake fits lake.
+52e81612bcbc57f1066b7a0f,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Fishing Area — Fishing Area fits sports and recreation.
+56aa371be4b08b9a8d5734e1,private_lodging,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Vacation Rental — Vacation Rental fits private lodging.
+58daa1548bbb0b01f18ec1a9,industrial_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Power Plant — Power Plant fits industrial facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+52e81612bcbc57f1066b7a0a,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Dessert Shop > Pie Shop — Dessert Shop fits casual eatery.
+5283c7b4e4b094cb91ec88d8,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Turkish Restaurant > Doner Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1b3941735,college_university,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > Medical School — Medical School fits college university.
+56aa371be4b08b9a8d5734ff,reproductive_perinatal_and_womens_care,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Maternity Clinic — Maternity Clinic fits reproductive perinatal and womens care.
+52dea92d3cf9994f4e043dbb,discount_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Discount Store — Discount Store fits discount store.
+4bf58dd8d48988d1d4941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Speakeasy — Bar fits bar.
+58daa1558bbb0b01f18ec1b4,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Furniture and Home Store > Kitchen Supply Store — Furniture and Home Store fits hardware home and garden store.
+52f2ab2ebcbc57f1066b8b39,technical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Shoe Repair Service — Shoe Repair Service fits technical service; refit after review S2-FSQMAP2.rv1 (L-2165).
+55a59bace4b013909087cb24,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Japanese Restaurant > Ramen Restaurant — Restaurant fits restaurant.
+4d1cf8421a97d635ce361c31,personal_or_beauty_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Tanning Salon — Health and Beauty Service fits personal or beauty service.
+4bf58dd8d48988d126951735,books_music_and_video_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Video Store — Video Store fits books music and video store.
+52e81612bcbc57f1066b79ee,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Public Art > Street Art — Public Art fits arts and entertainment.
+4bf58dd8d48988d1a9941735,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Rec Center — College Rec Center fits sport or fitness facility.
+52af3a7c3cf9994f4e043bed,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Chinese Restaurant > Cantonese Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b1b,flowers_and_gifts_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Souvenir Store — Souvenir Store fits flowers and gifts store.
+4bf58dd8d48988d107941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant > South American Restaurant > Argentinian Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b57,professional_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Employment Agency — Employment Agency fits professional service.
+52f2ab2ebcbc57f1066b8b17,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Costume Store — Costume Store fits fashion and apparel store.
+4bf58dd8d48988d130951735,taxi_or_ride_share_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transportation Service > Taxi — Taxi fits taxi or ride share service.
+4f04b1572fb6e1c99f3db0bf,storage_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Storage Facility — Storage Facility fits storage facility.
+52e81612bcbc57f1066b7a23,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Forest — Forest fits geographic entities.
+56aa371be4b08b9a8d57355e,recreational_trail_or_path,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Bike Trail — Bike Trail fits recreational trail or path.
+50327c8591d4c4b30a586d5d,industrial_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Brewery — Brewery fits industrial facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+56aa371be4b08b9a8d5734de,movie_theater,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Movie Theater > Drive-in Theater — Movie Theater fits movie theater.
+5032829591d4c4b30a586d5e,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Paintball Field — Paintball Field fits sport or fitness facility.
+5bae9231bedf3950379f89da,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant > Syrian Restaurant — Restaurant fits restaurant.
+58daa1558bbb0b01f18ec1fd,animal_attraction,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Zoo > Zoo Exhibit — Zoo Exhibit fits animal attraction.
+4f04b10d2fb6e1c99f3db0be,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Music School — Music School fits specialty school.
+52e81612bcbc57f1066b79ed,sculpture_statue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Public Art > Outdoor Sculpture — Outdoor Sculpture fits sculpture statue.
+52f2ab2ebcbc57f1066b8b48,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gymnastics > Gymnastics Center — Gymnastics Center fits sport or fitness facility.
+58daa1558bbb0b01f18ec1d6,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Art Studio — Art Studio fits arts and entertainment.
+56aa371be4b08b9a8d5734c5,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Wedding Hall — Wedding Hall fits event venue.
+4bf58dd8d48988d106941735,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Running and Track > Track — Track fits sport or fitness facility; refit after review S2-FSQMAP2.rv1 (L-2165).
+52e81612bcbc57f1066b7a48,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Language School — Language School fits specialty school.
+4bf58dd8d48988d14c941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Wings Joint — Restaurant fits restaurant.
+4bf58dd8d48988d19b941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Science Building — College Science Building fits campus building.
+4bf58dd8d48988d153941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Mexican Restaurant > Burrito Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b7a21,national_park,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Park > National Park — National Park fits national park.
+4bf58dd8d48988d122941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Whisky Bar — Bar fits bar.
+4e4c9077bd41f78e849722f9,rental_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Bike Rental — Bike Rental fits rental service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d17b941735,zoo,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Zoo — Zoo fits zoo.
+4bf58dd8d48988d118941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Dive Bar — Bar fits bar.
+52e81612bcbc57f1066b7a02,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Belgian Restaurant — Restaurant fits restaurant.
+56aa371be4b08b9a8d573554,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Entertainment Service — Entertainment Service fits arts and entertainment; refit after review S2-FSQMAP2.rv1 (L-2165).
+63be6904847c3692a84b9b60,home_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Professional Cleaning Service — Professional Cleaning Service fits home service.
+52f2ab2ebcbc57f1066b8b2c,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Herbs and Spices Store — Food and Beverage Retail fits food and beverage store.
+5744ccdfe4b0c0459246b4d6,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Research Laboratory — No key fits: Research Laboratory establishes neither an institute organization nor B2B service provision or medical diagnostics. Category withheld; place kept under L-2159 and L-2165.
+4bf58dd8d48988d134941735,fitness_studio,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Dance Studio — Dance Studio fits fitness studio.
+63be6904847c3692a84b9b91,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Technology Business > Software Company — No key fits: Software Company establishes neither B2B clientele nor service provision or an office. Category withheld; place kept under L-2159 and L-2165.
+5f2c43a65b4c177b9a6dcc62,specialized_medical_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Blood Bank — Blood Bank fits specialized medical facility.
+4eb1d4dd4b900d56c88a45fd,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > River — River fits geographic entities.
+4bf58dd8d48988d141941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > Sorority House — Sorority House fits campus building.
+4bf58dd8d48988d1be941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant — Restaurant fits restaurant.
+4f4534884b9074f6e4fb0174,family_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Funeral Home — Funeral Home fits family service.
+4bf58dd8d48988d14f941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Southern Food Restaurant — Restaurant fits restaurant.
+56aa371be4b08b9a8d573523,media_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Film Studio — Film Studio fits media service.
+4bf58dd8d48988d151941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Mexican Restaurant > Taco Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b51,public_transit_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Tram Station — Tram Station fits public transit facility or service.
+53e510b7498ebcb1801b55d4,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Night Market — Night Market fits market.
+4bf58dd8d48988d155941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Gastropub — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b2a,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Furniture and Home Store > Carpet Store — Furniture and Home Store fits hardware home and garden store.
+63be6904847c3692a84b9c29,airport,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > International Airport — International Airport fits airport.
+5f2c224bb6d05514c70440a3,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Rooftop Bar — Bar fits bar.
+53fca564498e1a175f32528b,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Taxi Stand — Taxi Stand fits travel and transportation; refit after review S2-FSQMAP2.rv1 (L-2165).
+56aa371be4b08b9a8d5734c3,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Waterfront — Waterfront fits geographic entities.
+4bf58dd8d48988d1f1941735,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Board Store — Board Store fits sporting goods store.
+52e81612bcbc57f1066b7a12,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Dive Spot — Dive Spot fits sports and recreation.
+52f2ab2ebcbc57f1066b8b22,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Outdoor Supply Store — Outdoor Supply Store fits sporting goods store.
+63be6904847c3692a84b9bec,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail — Fashion Retail fits fashion and apparel store.
+63be6904847c3692a84b9b94,professional_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Translation Service — Translation Service fits professional service.
+5e8f501a03c7a9000c1e2e88,auto_dealer,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Automotive Retail > Car Dealership > Used Car Dealership — Car Dealership fits auto dealer.
+63be6904847c3692a84b9b90,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Technology Business — No key fits: Technology Business establishes neither B2B clientele nor service provision. Category withheld; place kept under L-2159 and L-2165.
+52f2ab2ebcbc57f1066b8b45,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Grocery Store > Organic Grocery — Food and Beverage Retail fits food and beverage store.
+4bf58dd8d48988d158941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Swiss Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b32,corporate_or_business_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Business and Strategy Consulting Office — Office fits corporate or business office.
+56aa371be4b08b9a8d57351d,specialized_health_care,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Rehabilitation Center — Rehabilitation Center fits specialized health care.
+56aa371be4b08b9a8d573526,emergency_or_urgent_care_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Urgent Care Center — Urgent Care Center fits emergency or urgent care facility.
+4f4530a74b9074f6e4fb0100,lodging,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Boarding House — Boarding House fits lodging.
+52e81612bcbc57f1066b7a25,public_plaza,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Pedestrian Plaza — Pedestrian Plaza fits public plaza.
+4bf58dd8d48988d10a941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > African Restaurant > Ethiopian Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d19f941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Technology Building — College Technology Building fits campus building.
+4bf58dd8d48988d199941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Arts Building — College Arts Building fits campus building.
+52e81612bcbc57f1066b79e7,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Circus — Circus fits arts and entertainment.
+52f2ab2ebcbc57f1066b8b37,media_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Recording Studio — Recording Studio fits media service.
+4bf58dd8d48988d19c941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Math Building — College Math Building fits campus building.
+5f2c407c5b4c177b9a6dc536,casual_eatery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Dessert Shop > Gelato Shop — Dessert Shop fits casual eatery.
+4bf58dd8d48988d1cd941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant > South American Restaurant — Restaurant fits restaurant.
+5e8f50bd03c7a9000c1e2fbc,auto_dealer,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Automotive Retail > Car Dealership > New Car Dealership — Car Dealership fits auto dealer.
+52e81612bcbc57f1066b7a49,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Flight School — Flight School fits specialty school.
+5744ccdfe4b0c0459246b4af,physical_medicine_and_rehabilitation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Physical Therapy Clinic — Physical Therapy Clinic fits physical medicine and rehabilitation.
+4bf58dd8d48988d1b4941735,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Stadium — College Stadium fits stadium arena.
+5032872391d4c4b30a586d64,vehicle_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Electric Vehicle Charging Station — Electric Vehicle Charging Station fits vehicle service.
+63be6904847c3692a84b9b68,supplier_or_distributor,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Industrial Equipment Supplier — Industrial Equipment Supplier fits supplier or distributor; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d18a941735,sport_field,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Cricket Ground — Cricket Ground fits sport field.
+52f2ab2ebcbc57f1066b8b1a,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Sporting Goods Retail > Dive Store — Sporting Goods Retail fits sporting goods store.
+58daa1558bbb0b01f18ec1ca,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Dairy Store — Food and Beverage Retail fits food and beverage store.
+4eb1bf013b7b6f98df247e07,sport_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Volleyball Court — Volleyball Court fits sport court.
+5310b8e5bcbc57f1066bcbf1,community_and_government,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Prison — Community and Government fits community and government.
+52e81612bcbc57f1066b7a05,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > English Restaurant — Restaurant fits restaurant.
+50aaa5234b90af0d42d5de12,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Sporting Goods Retail > Hunting Supply Store — Sporting Goods Retail fits sporting goods store.
+63be6904847c3692a84b9bbe,health_care,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Healthcare Clinic — Healthcare Clinic fits health care; refit after review S2-FSQMAP2.rv1 (L-2165).
+52e81612bcbc57f1066b7a42,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Driving School — Driving School fits specialty school.
+4bf58dd8d48988d14a941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Vietnamese Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1f5931735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Chinese Restaurant > Dim Sum Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b92,design_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Technology Business > Website Designer — Website Designer fits design service.
+4bf58dd8d48988d1ac941735,theatre_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Theater — College Theater fits theatre venue.
+52e81612bcbc57f1066b79ef,dance_club,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Country Dance Club — Country Dance Club fits dance club.
+4bf58dd8d48988d12a951735,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Train — Train fits travel and transportation; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d11e951735,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Cheese Store — Food and Beverage Retail fits food and beverage store.
+4bf58dd8d48988d10d951735,books_music_and_video_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Record Store — Record Store fits books music and video store.
+56aa371be4b08b9a8d57354a,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Mobility Store — Mobility Store fits specialty store.
+4bf58dd8d48988d1e8941735,sport_field,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Baseball > Baseball Field — Baseball Field fits sport field.
+4bf58dd8d48988d14b941735,winery,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Winery — Winery fits winery.
+4bf58dd8d48988d189941735,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Stadium > Football Stadium — Stadium fits stadium arena.
+58daa1558bbb0b01f18ec203,gym,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Outdoor Gym — Outdoor Gym fits gym.
+4eb1d5724b900d56c88a45fe,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Mongolian Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b7a11,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gun Range — Gun Range fits sport or fitness facility.
+4bf58dd8d48988d1e7931735,music_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue > Music Venue > Jazz and Blues Venue — Music Venue fits music venue.
+5744ccdfe4b0c0459246b4c1,rental_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Boat Rental — Boat Rental fits rental service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d186941735,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Liquor Store — Food and Beverage Retail fits food and beverage store.
+52f2ab2ebcbc57f1066b8b1e,home_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Locksmith — Locksmith fits home service.
+4bf58dd8d48988d1ec931735,public_transit_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Airport Tram Station — Airport Tram Station fits public transit facility or service.
+4f4531504b9074f6e4fb0102,rail_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Platform — Platform fits rail facility or service.
+58daa1558bbb0b01f18ec1f1,financial_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Insurance Agency — Insurance Agency fits financial service.
+59d79d6b2e268052fa2a3332,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Automotive Retail > Motorsports Store — Motorsports Store fits sporting goods store.
+56aa371be4b08b9a8d573562,canal,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Canal — Canal fits canal.
+5744ccdfe4b0c0459246b4e8,storage_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Baggage Locker — Baggage Locker fits storage facility.
+4bf58dd8d48988d1e9941735,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Snow Sports > Ski Resort and Area — Ski Resort and Area fits sport or fitness facility.
+63be6904847c3692a84b9b70,manufacturer,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Manufacturer — Manufacturer fits manufacturer.
+4cae28ecbf23941eb1190695,community_and_government,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Polling Place — Polling Place fits community and government.
+4bf58dd8d48988d166941735,garden,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Sculpture Garden — Sculpture Garden fits garden.
+52f2ab2ebcbc57f1066b8b19,sporting_goods_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Sporting Goods Retail > Gun Store — Sporting Goods Retail fits sporting goods store.
+52e81612bcbc57f1066b7a38,government_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Town Hall — Town Hall fits government office.
+52e81612bcbc57f1066b7a2b,sport_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Racquet Sports > Badminton Court — Badminton Court fits sport court.
+4bf58dd8d48988d19a941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Communications Building — College Communications Building fits campus building.
+63be6904847c3692a84b9b76,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Office > Office Building — No key fits: Office Building specifies a building rather than an individual business office and no general office-building key is available. Category withheld; place kept under L-2159 and L-2165.
+4bf58dd8d48988d1ba941735,sport_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Basketball Court — College Basketball Court fits sport court.
+63be6904847c3692a84b9b8f,security_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Security and Safety — Security and Safety fits security service.
+63be6904847c3692a84b9b8e,media_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Search Engine Marketing and Optimization Service — Search Engine Marketing and Optimization Service fits media service.
+63be6904847c3692a84b9b3a,technical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Engineer — Engineer fits technical service.
+63be6904847c3692a84b9bb1,social_or_community_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Public and Social Service — Public and Social Service fits social or community service.
+52f2ab2ebcbc57f1066b8b3d,shopping,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Pop-Up Store — Pop-Up Store fits shopping.
+63be6904847c3692a84b9bea,electronics_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Computers and Electronics Retail — Computers and Electronics Retail fits electronics store.
+5032850891d4c4b30a586d62,bank_or_credit_union,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Financial Service > Banking and Finance > Credit Union — Credit Union fits bank or credit union.
+52e81612bcbc57f1066b79ec,dance_club,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Salsa Club — Salsa Club fits dance club.
+5bae9231bedf3950379f89e7,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant > Iraqi Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b24,arts_crafts_and_hobby_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Framing Store — Framing Store fits arts crafts and hobby store.
+530e33ccbcbc57f1066bbfe4,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > States and Municipalities — States and Municipalities fits geographic entities.
+4bf58dd8d48988d136941735,theatre_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue > Opera House — Opera House fits theatre venue.
+4bf58dd8d48988d10d941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > German Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b79e6,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Laser Tag Center — Laser Tag Center fits arts and entertainment.
+63be6904847c3692a84b9bb4,public_utility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Utility Company — Utility Company fits public utility.
+63be6904847c3692a84b9ba1,education,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Primary and Secondary School — Primary and Secondary School fits education.
+4bf58dd8d48988d1ea941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Apres Ski Bar — Bar fits bar.
+5f2c2b7db6d05514c7044837,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Armenian Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b59,design_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Interior Designer — Interior Designer fits design service.
+58daa1558bbb0b01f18ec1d0,medical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Nutritionist — Nutritionist fits medical service.
+4bf58dd8d48988d154941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Caribbean Restaurant > Cuban Restaurant — Restaurant fits restaurant.
+5744ccdfe4b0c0459246b4b2,fitness_studio,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Pilates Studio — Pilates Studio fits fitness studio.
+4eb1bfa43b7b52c0e1adc2e8,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant > South American Restaurant > Peruvian Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d191941735,museum,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Museum > Science Museum — Museum fits museum.
+4bf58dd8d48988d144941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Caribbean Restaurant — Restaurant fits restaurant.
+5f2c42335b4c177b9a6dc927,air_transport_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Airfield — Airfield fits air transport facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+56aa371be4b08b9a8d573520,travel_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Tourist Information and Service > Tour Provider — Tour Provider fits travel service.
+58daa1558bbb0b01f18ec1b9,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Skydiving Center > Skydiving Drop Zone — Skydiving Drop Zone fits sport or fitness facility.
+4bf58dd8d48988d123941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Wine Bar — Bar fits bar.
+5f2c3f6b5b4c177b9a6dc388,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Korean Restaurant > Korean BBQ Restaurant — Restaurant fits restaurant.
+56aa371ce4b08b9a8d57356e,air_transport_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Heliport — Heliport fits air transport facility or service.
+56aa371ce4b08b9a8d57356c,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Beer Bar — Bar fits bar.
+4bf58dd8d48988d17a941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Cajun and Creole Restaurant — Restaurant fits restaurant.
+5bae9231bedf3950379f89d0,park,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Park > State or Provincial Park — Park fits park.
+4bf58dd8d48988d1db931735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Spanish Restaurant > Tapas Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b7f,media_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Business and Professional Services > Print, TV, Radio and Outdoor Advertising Service — Print, TV, Radio and Outdoor Advertising Service fits media service."
+52f2ab2ebcbc57f1066b8b53,campground,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > RV Park — RV Park fits campground.
+530e33ccbcbc57f1066bbff7,geographic_entities,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > States and Municipalities > Country — Country fits geographic entities.
+56aa371be4b08b9a8d573552,rental_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Rental Service — Rental Service fits rental service.
+52f2ab2ebcbc57f1066b8b43,psychic_advising,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Psychic and Astrologer — Psychic and Astrologer fits psychic advising.
+5744ccdfe4b0c0459246b4df,shopping_mall,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Outlet Mall — Outlet Mall fits shopping mall.
+52e81612bcbc57f1066b7a47,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Religious School — Religious School fits specialty school.
+63be6904847c3692a84b9b79,animal_or_pet_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Pet Service > Pet Grooming Service — Pet Service fits animal or pet service.
+5744ccdfe4b0c0459246b4ca,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Middle Eastern Restaurant > Kurdish Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b7a09,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Fondue Restaurant — Restaurant fits restaurant.
+5f2c2834b6d05514c704451e,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Escape Room — Escape Room fits arts and entertainment.
+5293a7563cf9994f4e043a44,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Russian Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b7a3a,physical_medicine_and_rehabilitation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Chiropractor — Chiropractor fits physical medicine and rehabilitation.
+4bf58dd8d48988d18c941735,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Stadium > Baseball Stadium — Stadium fits stadium arena.
+63be6904847c3692a84b9c06,sport_or_recreation_club,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Football > Football Club — Football Club fits sport or recreation club.
+5f2c41945b4c177b9a6dc7d6,food_and_beverage_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Food and Beverage Retail > Imported Food Store — Food and Beverage Retail fits food and beverage store.
+4bf58dd8d48988d135941735,theatre_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Performing Arts Venue > Indie Theater — Indie Theater fits theatre venue.
+4bf58dd8d48988d1de931735,personal_or_beauty_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Tattoo Parlor — Health and Beauty Service fits personal or beauty service.
+63be6904847c3692a84b9bf1,hardware_home_and_garden_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Furniture and Home Store > Home Appliance Store — Furniture and Home Store fits hardware home and garden store.
+58daa1558bbb0b01f18ec1f7,health_care,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Hospital > Hospital Unit — Hospital Unit fits health care; refit after review S2-FSQMAP2.rv1 (L-2165).
+52e81612bcbc57f1066b7a44,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Water Sports > Swimming > Swim School — Swim School fits specialty school.
+52e81612bcbc57f1066b7a27,wellness_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Bath House — Bath House fits wellness service.
+63be6904847c3692a84b9b4b,personal_or_beauty_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Health and Beauty Service > Skin Care Clinic — Skin Care Clinic fits personal or beauty service.
+4f4531084b9074f6e4fb0101,industrial_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Recycling Facility — Recycling Facility fits industrial facility or service.
+58daa1558bbb0b01f18ec1ee,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Eastern European Restaurant > Bosnian Restaurant — Restaurant fits restaurant.
+58daa1558bbb0b01f18ec206,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Medical Supply Store — Medical Supply Store fits specialty store.
+63be6904847c3692a84b9b72,media_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Media Agency — Media Agency fits media service.
+52f2ab2ebcbc57f1066b8b50,public_transit_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Cable Car — Cable Car fits public transit facility or service.
+4bf58dd8d48988d1b6941735,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Track — College Track fits sport or fitness facility; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d1b7941735,sport_field,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Soccer Field — College Soccer Field fits sport field.
+56aa371be4b08b9a8d573508,cafe,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Dining and Drinking > Cafe, Coffee, and Tea House > Pet Café — Pet Café fits cafe."
+63be6904847c3692a84b9ba0,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Computer Training School — Computer Training School fits specialty school.
+63be6904847c3692a84b9ba2,government_department,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Building > Government Department — Government Department fits government department.
+4bf58dd8d48988d1e8931735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Piano Bar — Bar fits bar.
+52f2ab2ebcbc57f1066b8b18,books_music_and_video_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Comic Book Store — Comic Book Store fits books music and video store.
+52e81612bcbc57f1066b79ea,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Go Kart Track — Go Kart Track fits sport or fitness facility.
+63be6904847c3692a84b9b36,building_or_construction_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Construction — Construction fits building or construction service.
+4f04ad622fb6e1c99f3db0b9,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Newsstand — Newsstand fits specialty store; refit after review S2-FSQMAP2.rv1 (L-2165).
+4bf58dd8d48988d167941735,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Skating > Skate Park — Skate Park fits sport or fitness facility.
+52e81612bcbc57f1066b7a03,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Cambodian Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9c07,sport_field,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Football > Football Field — Football Field fits sport field.
+4eb1d80a4b900d56c88a45ff,place_of_worship,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Spiritual Center > Shrine — Shrine fits place of worship.
+4bf58dd8d48988d1b8941735,sport_field,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Football Field — College Football Field fits sport field.
+63be6904847c3692a84b9b2c,automotive_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Automotive Service > Motorcycle Repair Shop — Automotive Service fits automotive service.
+63be6904847c3692a84b9ba9,government_office,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Housing Authority — Housing Authority fits government office.
+52e81612bcbc57f1066b7a2f,sport_field,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Bowling Green — Bowling Green fits sport field.
+5267e446e4b0ec79466e48c4,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Adult Store — Adult Store fits specialty store.
+57558b36e4b065ecebd306dd,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Truck Stop — Truck Stop fits travel and transportation.
+4bf58dd8d48988d14d941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Spanish Restaurant > Paella Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1dd931735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Soup Spot — Restaurant fits restaurant.
+52e81612bcbc57f1066b79f9,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Modern European Restaurant — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b49,fitness_studio,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Cycle Studio — Cycle Studio fits fitness studio.
+5bae9231bedf3950379f89d4,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Hawaiian Restaurant > Poke Restaurant — Restaurant fits restaurant.
+58daa1558bbb0b01f18ec1b2,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Research Station — No key fits: Research Station establishes neither an institute organization nor B2B or medical service provision. Category withheld; place kept under L-2159 and L-2165.
+4bf58dd8d48988d168941735,skating_rink,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Skating > Skating Rink — Skating Rink fits skating rink.
+52e81612bcbc57f1066b7a30,beach,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Nudist Beach — Nudist Beach fits beach.
+4bf58dd8d48988d108941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Dumpling Restaurant — Restaurant fits restaurant.
+4bf58dd8d48988d1ec941735,lodging,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Snow Sports > Ski Chalet — Ski Chalet fits lodging.
+52939a8c3cf9994f4e043a35,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant > Empanada Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b5c,home_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Mover — Mover fits home service; refit after review S2-FSQMAP2.rv1 (L-2165).
+5f2c1c31b6d05514c704334c,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant > South American Restaurant > Peruvian Restaurant > Peruvian Roast Chicken Joint — Restaurant fits restaurant.
+52f2ab2ebcbc57f1066b8b4e,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Toll Plaza — Toll Plaza fits travel and transportation.
+63be6904847c3692a84b9b6f,professional_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Management Consultant — Management Consultant fits professional service.
+4c2cd86ed066bed06c3c5209,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Gluten-Free Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b5e,home_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Pest Control Service — Pest Control Service fits home service.
+52e81612bcbc57f1066b7a3c,complementary_and_alternative_medicine,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Alternative Medicine Clinic — Alternative Medicine Clinic fits complementary and alternative medicine.
+5293a7d53cf9994f4e043a45,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Caucasian Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b55,building_or_construction_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > General Contractor — General Contractor fits building or construction service.
+63be6904847c3692a84b9b29,technical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Audiovisual Service — Audiovisual Service fits technical service.
+5f2c430e5b4c177b9a6dcabd,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Singaporean Restaurant — Restaurant fits restaurant.
+5bae9231bedf3950379f89cb,lodging,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Lodging > Inn — Inn fits lodging.
+58daa1558bbb0b01f18ec1ae,wellness_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Sauna — Sauna fits wellness service.
+52f2ae52bcbc57f1066b8b81,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Czech Restaurant — Restaurant fits restaurant.
+52af3b773cf9994f4e043c03,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Chinese Restaurant > Szechuan Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b2f,automotive_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Automotive Service > Tire Repair Shop — Automotive Service fits automotive service.
+5642206c498e4bfca532186c,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Memorial Site — No key fits: Memorial Site establishes neither a monument object nor historical status and no generic memorial-site key is available. Category withheld; place kept under L-2159 and L-2165.
+50328a4b91d4c4b30a586d6b,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Rock Climbing Spot — Rock Climbing Spot fits sports and recreation.
+63be6904847c3692a84b9b39,supplier_or_distributor,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Electrical Equipment Supplier — Electrical Equipment Supplier fits supplier or distributor.
+58daa1558bbb0b01f18ec1ac,environmental_or_ecological_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Waste Management Service — Waste Management Service fits environmental or ecological service; refit after review S2-FSQMAP2.rv1 (L-2165).
+5e179ee74ae8e90006e9a746,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Bangladeshi Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9bbf,health_care,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Home Health Care Service — Home Health Care Service fits health care.
+63be6904847c3692a84b9b51,building_or_construction_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Doors and Windows Contractor — Doors and Windows Contractor fits building or construction service.
+4bf58dd8d48988d11c941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Sake Bar — Bar fits bar.
+4bf58dd8d48988d18b941735,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Stadium > Basketball Stadium — Stadium fits stadium arena.
+63be6904847c3692a84b9b35,technical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Computer Repair Service — Computer Repair Service fits technical service.
+55a59bace4b013909087cb30,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Japanese Restaurant > Japanese Curry Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b84,real_estate_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Real Estate Service > Building and Land Surveyor — Real Estate Service fits real estate service.
+63be6904847c3692a84b9b56,building_or_construction_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,"Business and Professional Services > Home Improvement Service > Heating, Ventilating and Air Conditioning Contractor — Heating, Ventilating and Air Conditioning Contractor fits building or construction service."
+52e81612bcbc57f1066b7a2d,sport_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Racquet Sports > Squash Court — Squash Court fits sport court.
+63be6904847c3692a84b9b85,real_estate_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Real Estate Service > Commercial Real Estate Developer — Real Estate Service fits real estate service.
+52e81612bcbc57f1066b7a39,behavioral_or_mental_health_clinic,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Mental Health Service > Mental Health Clinic — Mental Health Clinic fits behavioral or mental health clinic.
+52f2ab2ebcbc57f1066b8b40,gaming_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Betting Shop — Betting Shop fits gaming venue; refit after review S2-FSQMAP2.rv1 (L-2165).
+63be6904847c3692a84b9b9b,behavioral_or_mental_health_clinic,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Addiction Treatment Center — Addiction Treatment Center fits behavioral or mental health clinic.
+4bf58dd8d48988d19d941735,campus_building,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College History Building — College History Building fits campus building.
+52e81612bcbc57f1066b7a2c,sport_field,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Rugby > Rugby Pitch — Rugby Pitch fits sport field.
+63be6904847c3692a84b9c21,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Water Sports > Surfing — Water Sports fits sports and recreation.
+63be6904847c3692a84b9c18,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Skydiving Center — Skydiving Center fits sport or fitness facility.
+58daa1558bbb0b01f18ec1d3,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Chinese Restaurant > Cha Chaan Teng — Restaurant fits restaurant.
+56aa371be4b08b9a8d5734c7,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Poutine Restaurant — Restaurant fits restaurant.
+57558b36e4b065ecebd306b0,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > French Restaurant > Brasserie — Restaurant fits restaurant.
+63be6904847c3692a84b9c1d,recreational_equipment_rental,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Water Sports > Canoe and Kayak Rental — Canoe and Kayak Rental fits recreational equipment rental.
+63be6904847c3692a84b9b54,supplier_or_distributor,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Garage Door Supplier — Garage Door Supplier fits supplier or distributor.
+63be6904847c3692a84b9c04,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Equestrian Facility — Equestrian Facility fits sport or fitness facility.
+52f2ab2ebcbc57f1066b8b2d,financial_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Financial Service > Check Cashing Service — Financial Service fits financial service.
+52e81612bcbc57f1066b7a3b,complementary_and_alternative_medicine,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Acupuncture Clinic — Acupuncture Clinic fits complementary and alternative medicine.
+4bf58dd8d48988d1eb941735,lodging,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Snow Sports > Ski Lodge — Ski Lodge fits lodging.
+5745c2e4498e11e7bccabdbd,pharmacy_and_drug_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Drugstore — Drugstore fits pharmacy and drug store.
+52e81612bcbc57f1066b79f3,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Greek Restaurant > Souvlaki Shop — Restaurant fits restaurant.
+5fabfc8099ce226e27fe6b0d,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Boat Launch — Boat Launch fits travel and transportation.
+5744ccdfe4b0c0459246b4d0,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Dutch Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b79e9,skating_rink,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Roller Rink — Roller Rink fits skating rink.
+56aa371be4b08b9a8d57353b,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Canal Lock — Canal Lock fits travel and transportation; refit after review S2-FSQMAP2.rv1 (L-2165).
+63be6904847c3692a84b9ba7,professional_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Government Lobbyist — Government Lobbyist fits professional service.
+4bf58dd8d48988d192941735,planetarium,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Planetarium — Planetarium fits planetarium.
+4e39a9cebd410d7aed40cbc4,sport_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Tennis Court — College Tennis Court fits sport court.
+5294c7523cf9994f4e043a62,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Latin American Restaurant > South American Restaurant > Brazilian Restaurant > Acai House — Restaurant fits restaurant.
+56aa371be4b08b9a8d57354d,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Tiki Bar — Bar fits bar.
+56aa371be4b08b9a8d57352c,skating_rink,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Hockey > Hockey Rink — Hockey Rink fits skating rink.
+52e81612bcbc57f1066b79eb,golf_course,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Mini Golf Course — Mini Golf Course fits golf course.
+63be6904847c3692a84b9b27,professional_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Appraiser — Appraiser fits professional service.
+4bf58dd8d48988d185941735,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Stadium > Hockey Stadium — Stadium fits stadium arena.
+52e81612bcbc57f1066b7a06,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Irish Pub — Bar fits bar.
+63be6904847c3692a84b9b5f,home_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Plumber — Plumber fits home service.
+56aa371be4b08b9a8d573568,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Burmese Restaurant — Restaurant fits restaurant.
+52e81612bcbc57f1066b7a04,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Polish Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b9f,specialty_school,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > Art School — Art School fits specialty school.
+63be6904847c3692a84b9b69,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Laboratory — No key fits: Laboratory establishes neither medical diagnostics nor an institute organization or B2B service provision. Category withheld; place kept under L-2159 and L-2165.
+52e81612bcbc57f1066b79fb,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Himalayan Restaurant — Restaurant fits restaurant.
+503289d391d4c4b30a586d6a,gym,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Gym and Studio > Climbing Gym — Climbing Gym fits gym.
+52af3add3cf9994f4e043bf5,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Asian Restaurant > Chinese Restaurant > Hong Kong Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b23,dance_club,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Dance Hall — Dance Hall fits dance club.
+52e81612bcbc57f1066b7a01,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Austrian Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9bed,fashion_and_apparel_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Fashion Retail > Sunglasses Store — Fashion Retail fits fashion and apparel store.
+4bf58dd8d48988d1ef931735,food_court,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Transport Hub > Airport > Airport Food Court — Airport Food Court fits food court.
+63be6904847c3692a84b9bf4,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Party Supply Store — Party Supply Store fits specialty store.
+56aa371be4b08b9a8d573505,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Floating Market — Floating Market fits market.
+63be6904847c3692a84b9be5,vehicle_dealer,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Automotive Retail > Car Dealership > RV and Motorhome Dealership — RV and Motorhome Dealership fits vehicle dealer.
+63be6904847c3692a84b9bc5,health_care,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Health and Medicine > Other Healthcare Professional — Other Healthcare Professional fits health care.
+63be6904847c3692a84b9b80,b2b_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Promotional Item Service — Promotional Item Service fits b2b service.
+63be6904847c3692a84b9b3e,financial_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Financial Service > Accounting and Bookkeeping Service — Financial Service fits financial service.
+52f2ab2ebcbc57f1066b8b33,laundry_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Laundromat — Laundromat fits laundry service.
+63be6904847c3692a84b9b52,home_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Electrician — Electrician fits home service.
+4bf58dd8d48988d1d8941735,bar,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Bar > Gay Bar — Bar fits bar.
+63be6904847c3692a84b9c1c,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Water Sports — Water Sports fits sports and recreation.
+54135bf5e4b08f3d2429dfe4,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Indian Restaurant > Indian Sweet Shop — Restaurant fits restaurant.
+4bf58dd8d48988d17c941735,gaming_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Casino — Casino fits gaming venue.
+63be6904847c3692a84b9b2a,technical_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Automation and Control System — Automation and Control System fits technical service.
+5bae9231bedf3950379f89c9,place_of_worship,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Spiritual Center > Sikh Temple — Sikh Temple fits place of worship.
+58daa1558bbb0b01f18ec1b0,sport_or_fitness_facility,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Golf > Golf Driving Range — Golf Driving Range fits sport or fitness facility.
+5f2c1e0db6d05514c70436d4,automotive_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Automotive Service > Vehicle Inspection Station — Automotive Service fits automotive service.
+52f2ab2ebcbc57f1066b8b34,second_hand_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Pawn Shop — Pawn Shop fits second hand store.
+5744ccdfe4b0c0459246b4ac,christian_place_of_worship,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Spiritual Center > Kingdom Hall — Kingdom Hall fits christian place of worship.
+4bf58dd8d48988d13a941735,place_of_worship,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Spiritual Center > Temple — Temple fits place of worship.
+52e81612bcbc57f1066b79fc,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Jewish Restaurant > Kosher Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9c0f,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Sports and Recreation > Racquet Sports — Racquet Sports fits sports and recreation.
+63be6904847c3692a84b9bf3,specialty_store,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Retail > Packaging Supply Store — Packaging Supply Store fits specialty store.
+63be6904847c3692a84b9b5d,home_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Home Improvement Service > Painter — Painter fits home service.
+56aa371be4b08b9a8d573556,stadium_arena,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Arts and Entertainment > Stadium > Rugby Stadium — Stadium fits stadium arena.
+5744ccdde4b0c0459246b4a3,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Scottish Restaurant — Restaurant fits restaurant.
+63be6904847c3692a84b9b67,b2b_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Business and Professional Services > Import and Export Service — Import and Export Service fits b2b service.
+4bf58dd8d48988d1bf941735,restaurant,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Restaurant > Mac and Cheese Joint — Restaurant fits restaurant.
+4e0e22f5a56208c4ea9a85a0,industrial_facility_or_service,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Dining and Drinking > Distillery — Distillery fits industrial facility or service; refit after review S2-FSQMAP2.rv1 (L-2165).
+4d954b06a243a5684965b473,apartment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Residential Building > Apartment or Condo — L-2159 assigns apartment to this source label.
+4bf58dd8d48988d130941735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Structure — No key fits: Unspecified structure does not establish a geographic feature or heritage site. Category withheld; place kept under L-2159.
+4f2a210c4b9023bd5841ed28,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Community and Government > Housing Development — No key fits: Development is not a service and no dwelling subtype is given. Category withheld; place kept under L-2159.
+4bf58dd8d48988d162941735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Other Great Outdoors — No key fits: Unspecified outdoor location gives neither feature type nor park status. Category withheld; place kept under L-2159.
+5267e4d9e4b0ec79466e48c7,festival_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Entertainment Event > Festival — L-2159 assigns festival_venue to this source label.
+4bf58dd8d48988d15f941735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Field — No key fits: No sporting or agricultural use stated. Category withheld; place kept under L-2159.
+5267e4d9e4b0ec79466e48c8,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Other Event — L-2159 assigns event_venue to this source label.
+4eb1baf03b7b2c5b1d4306ca,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Stable — No key fits: Neither agricultural nor equestrian sport use stated. Category withheld; place kept under L-2159.
+5267e4d9e4b0ec79466e48c9,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Convention — L-2159 assigns event_venue to this source label.
+5267e4d9e4b0ec79466e48c6,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Conference — L-2159 assigns event_venue to this source label.
+4f2a23984b9023bd5841ed2c,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Travel and Transportation > Moving Target — L-2159 assigns travel_and_transportation to this source label.
+5267e4d8e4b0ec79466e48c5,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Marketplace > Street Fair — L-2159 assigns market to this source label.
+52e81612bcbc57f1066b7a14,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,"Landmarks and Outdoors > Palace — No key fits: No fortification, heritage designation or current office use stated. Category withheld; place kept under L-2159."
+4bf58dd8d48988d165941735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Scenic Lookout — No key fits: Viewing point is not necessarily a geographic feature or public plaza. Category withheld; place kept under L-2159.
+5bae9231bedf3950379f89c5,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Entertainment Event > Sporting Event — L-2159 assigns sports_and_recreation to this source label.
+4e67e38e036454776db1fb3a,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Community and Government > Residential Building — No key fits: Residential building is not a property service; subtype unspecified. Category withheld; place kept under L-2159.
+5267e4d9e4b0ec79466e48d1,festival_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Entertainment Event > Music Festival — L-2159 assigns festival_venue to this source label.
+53e0feef498e5aac066fd8a9,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Marketplace > Street Food Gathering — L-2159 assigns market to this source label.
+4bf58dd8d48988d15c941735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Community and Government > Cemetery — No key fits: Neither heritage status nor worship use is given. Category withheld; place kept under L-2159.
+52f2ab2ebcbc57f1066b8b4a,travel_and_transportation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Tunnel — L-2159 assigns travel_and_transportation to this source label.
+52741d85e4b0d5d1e3c6a6d9,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Entertainment Event > Parade — L-2159 assigns arts_and_entertainment to this source label.
+4fbc1be21983fc883593e321,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Well — No key fits: Not a provider; built extraction point has no matching feature key. Category withheld; place kept under L-2159.
+4bf58dd8d48988d15d941735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Lighthouse — No key fits: Heritage status unspecified; no matching navigation structure key. Category withheld; place kept under L-2159.
+4d4b7105d754a06377d81259,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors — No key fits: Root combines built landmarks and natural outdoors; none covers the full meaning. Category withheld; place kept under L-2159.
+4bf58dd8d48988d1aa941735,college_university,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Community and Government > Education > College and University > College Quad — L-2159 assigns college_university to this source label.
+52f2ab2ebcbc57f1066b8b55,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Community and Government > Trailer Park — No key fits: Residential trailer park is not necessarily visitor lodging. Category withheld; place kept under L-2159.
+52e81612bcbc57f1066b7a28,sports_and_recreation,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Bathing Area — L-2159 assigns sports_and_recreation to this source label.
+52e81612bcbc57f1066b7a24,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Tree — No key fits: Individual tree is not a garden or geographic entity category. Category withheld; place kept under L-2159.
+4bf58dd8d48988d160941735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Hot Spring — No key fits: Natural spring is neither lake nor supplied wellness service. Category withheld; place kept under L-2159.
+63be6904847c3692a84b9bb7,arts_and_entertainment,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Entertainment Event — L-2159 assigns arts_and_entertainment to this source label.
+56aa371be4b08b9a8d573547,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Fountain — No key fits: Neither sculpture nor plaza specified. Category withheld; place kept under L-2159.
+4bf58dd8d48988d133951735,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Landmarks and Outdoors > Roof Deck — No key fits: Neither public access nor event use stated. Category withheld; place kept under L-2159.
+52f2ab2ebcbc57f1066b8b3b,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Marketplace > Christmas Market — L-2159 assigns market to this source label.
+52f2ab2ebcbc57f1066b8b54,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Marketplace > Stoop Sale — L-2159 assigns market to this source label.
+63be6904847c3692a84b9bb8,market,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Marketplace — L-2159 assigns market to this source label.
+5bae9231bedf3950379f89c3,event_venue,fsq-map-1,approved,geospatial taxonomy curator,2026-11-26,Event > Marketplace > Trade Fair — L-2159 assigns event_venue to this source label.
+5744ccdfe4b0c0459246b4d9,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Community and Government > Observatory — No key fits: Observatory is not a planetarium and research institution status is unspecified. Category withheld; place kept under L-2159.
+58daa1558bbb0b01f18ec1fa,,fsq-map-1,withheld,geospatial taxonomy curator,2026-11-26,Event > Line — No key fits: Queue is not a venue or transport facility. Category withheld; place kept under L-2159.

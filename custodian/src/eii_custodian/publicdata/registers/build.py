@@ -20,7 +20,7 @@ from .contracts import (
 )
 from .parse import InputAudit, parse
 from .provenance import Capture, Frame, digest, month, validate_capture
-from .validate import scan_content, scan_metadata, validate_release
+from .validate import MetadataInputs, scan_content, scan_metadata, validate_release
 
 
 @dataclass(frozen=True, repr=False)
@@ -58,6 +58,8 @@ def build(
     }
     receipts: list[dict[str, object]] = []
     licences: set[str] = set()
+    licences_by_registration: dict[str, set[str]] = {}
+    card_batches: list[list[dict[str, object]]] = []
     withheld_registrations: set[str] = set()
     absences: list[dict[str, object]] = []
     card_content: set[str] = set()
@@ -76,6 +78,9 @@ def build(
             audit = InputAudit()
             cards = parse(item.source_id, item.files, frame, audit=audit)
             licences.update(audit.licences)
+            for registration, numbers in audit.licences_by_registration.items():
+                licences_by_registration.setdefault(registration, set()).update(numbers)
+            card_batches.append(cards)
             withheld_registrations.update(audit.duplicate_registrations)
             for field, reason, count in (
                 (
@@ -115,14 +120,6 @@ def build(
                     value = card[name]
                     if isinstance(value, str) and value:
                         card_content.add(value)
-            # Reuse the full schema/identifier checks on historical cards too;
-            # only their key, month, source and location are subsequently kept.
-            validate_release(
-                {"pub_register_company": cards, "pub_register_snapshot": []},
-                frame,
-                licences=frozenset(licences),
-                withheld_registrations=frozenset(withheld_registrations),
-            )
             if is_snapshot:
                 tables["pub_register_snapshot"].extend(
                     {
@@ -144,6 +141,19 @@ def build(
                     ),
                 }
             )
+    frozen_licences = {
+        registration: frozenset(numbers)
+        for registration, numbers in licences_by_registration.items()
+    }
+    # Historical cards keep their full scan before projection discards fields;
+    # every capture's own licences and withheld duplicates must be known first.
+    for cards in card_batches:
+        validate_release(
+            {"pub_register_company": cards, "pub_register_snapshot": []},
+            frame,
+            licences_by_registration=frozen_licences,
+            withheld_registrations=frozenset(withheld_registrations),
+        )
     for rows in tables.values():
         rows.sort(
             key=lambda row: (
@@ -154,7 +164,7 @@ def build(
     keys = validate_release(
         tables,
         frame,
-        licences=frozenset(licences),
+        licences_by_registration=frozen_licences,
         withheld_registrations=frozenset(withheld_registrations),
     )
     coverage = {source: tuple(sorted(periods)) for source, periods in kept.items()}
@@ -176,20 +186,20 @@ def build(
         "missing_snapshot_reason": "snapshot_not_kept",
     }
     egress = keys | frozenset(licences) | frozenset(withheld_registrations)
+    metadata_inputs = MetadataInputs(current, snapshots, tables)
+    content = frozenset(card_content)
     for name, artefact in (("manifest", manifest), ("report", report)):
-        scan_metadata(artefact, egress, name)
-        scan_content(artefact, frozenset(card_content), name)
+        scan_metadata(artefact, egress, name, inputs=metadata_inputs, content=content)
+        scan_content(artefact, content, name, inputs=metadata_inputs)
     # Storage appends these table descriptors; their counts also cross egress.
     # Its remaining addition is the digest field `manifest.tables.sha256`.
+    table_metadata = {
+        "tables": [{"name": name, "rows": len(rows)} for name, rows in tables.items()]
+    }
     scan_metadata(
-        {
-            "tables": [
-                {"name": name, "rows": len(rows)} for name, rows in tables.items()
-            ]
-        },
-        egress,
-        "manifest",
+        table_metadata, egress, "manifest", inputs=metadata_inputs, content=content
     )
+    scan_content(table_metadata, content, "manifest", inputs=metadata_inputs)
     specs = {
         "pub_register_company": CARD_COLUMNS,
         "pub_register_snapshot": SNAPSHOT_COLUMNS,

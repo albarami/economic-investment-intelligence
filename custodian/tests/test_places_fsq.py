@@ -62,7 +62,6 @@ from eii_custodian.publicdata.places_fsq.select import FRAME_BOX, select_partiti
 
 _PACKAGE = repository_root(Path(__file__)) / "custodian"
 _RELEASE = "2025-01-10"
-_MAPPING = _PACKAGE / "publicdata" / "review" / "places_fsq_categories.csv"
 _POLICY = _PACKAGE / "publicdata" / "review" / "places_fsq_policy.yaml"
 _README = (
     f'{COPYRIGHT_LINE}\nLicensed under the {LICENCE_NAME} (the "License").\n'
@@ -441,9 +440,10 @@ def test_duplicate_keeps_the_main_place_and_hides_the_copy(tmp_path: Path) -> No
 def test_category_mapping_is_reviewed_and_unmapped_is_refused(
     tmp_path: Path,
 ) -> None:
-    """The committed file is a header. An unmapped identifier refuses assembly."""
-    assert load_mapping(_MAPPING, frozenset()) == ()
-    header = _MAPPING.read_text(encoding="utf-8").strip()
+    """An empty fixture loads; an unmapped invented identifier refuses assembly."""
+    empty = _mapping(tmp_path / "header_only.csv", [])
+    assert load_mapping(empty, frozenset()) == ()
+    header = empty.read_text(encoding="utf-8").strip()
     assert header == ",".join(MAPPING_COLUMNS)
     approved = _mapping(
         tmp_path / "approved.csv",

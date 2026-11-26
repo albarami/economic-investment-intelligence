@@ -57,13 +57,22 @@ added. Source-inapplicable columns are null and cannot be filled by the other
 source's schema. No worker, residence, owner or person column is accepted.
 
 DAT-11 scans every string column, including non-key address strings.
-Under decision 0119 (proposed, the owner's option B) a published non-key value
-or column name meets only the input-only keys (intake licences and withheld
-duplicate registrations): a string equal to a licence or withheld number
-refuses, and one equal to a registration being released is published. Typed capital, coordinates,
-counts and cell keys are not identifier strings; artefact scanning is unchanged
-except that, under decision 0119 item 6, a string is exempt from the token and
-content scans only as the value of a named digest field (`contracts.DIGEST_FIELDS`:
+Under proposed decision 0123 (option C1, awaiting the owner's choice), every
+published non-key value and column name meets that row's own company's licence
+numbers plus every withheld duplicate registration. A row without an entry in
+the licence map meets only the withheld duplicates. The closed typed-column
+rule applies to that same per-row set. A coincidental match with another
+company's licence is published; a released registration is still published.
+The ephemeral map is built beside the intake licence set, keyed by the released
+registration or existing `ROW-` identity, and unioned across current and historical
+captures before their full cards are scanned. Neither map nor licence value is
+exported. Key slots, the returned released-key set, metadata key sets and the bundle
+loader's no-input-only-key call remain unchanged; so does decision 0119 item 6.
+Typed capital, coordinates,
+counts and cell keys are not identifier strings. Artefact token rules are retained,
+with the fixed metadata exemptions below. Under decision 0119 item 6, a
+digest-shaped string is exempt from the token and
+content scans as the value of a named digest field (`contracts.DIGEST_FIELDS`:
 the document-03 release columns that hold a SHA-256 and the manifest's frame,
 receipt, receipt-file and table digests), which must be 64 lowercase
 hexadecimal characters or refuses `digest_field_format`; every other string is
@@ -72,11 +81,11 @@ The 2026-11 floor applies only to kept snapshots. Each snapshot is compared with
 its own source's current capture; current retrieval months may differ and may
 predate the keeper floor.
 
-An ephemeral input-licence set extends the same token checks to every non-key
-released field, including numeric values, and manifests/reports including table
-counts added by storage. It is never exported. The dedicated key exemption is
+The ephemeral per-company licence map protects non-key released fields,
+including numeric values. The complete intake licence set still protects
+manifests/reports, with decision 0124's exact-field exemptions below. Neither is exported. The dedicated key exemption is
 unchanged: an intake licence equal to a published registration passes because
-no licence field is released and the key slot meets withheld numbers only. A
+no licence field is released and the key slot meets withheld numbers only. An own-company
 licence or withheld token in a non-key field still refuses; a released
 registration token there is published (decision 0119). Under decision 0105 (proposed), the closed typed-field list
 `contracts.TYPED_FIELDS` (the five ISO dates, `zone`, `street_number`,
@@ -90,14 +99,15 @@ the snapshot and list tables, each a real `YYYY-MM` month (else
 `snapshot_month`), each format and declared shape checked before the scan: the two
 snapshot coverage fields are lists of months, every other field one value, and
 a container in place of one value refuses) admits a token equal to a key it
-meets (a licence or withheld number in a release column; in a manifest or
+meets (an own-company licence or withheld number in a release column; in a manifest or
 report field also a published registration) only when that number has one or two
 digits or the shape 19xx or 20xx. Longer numbers, every unlisted field, the other
-manifest fields (the receipt's text included) and the rest of the report keep
+manifest fields and the rest of the report, except the fixed metadata listed
+below, keep
 the full scan against the keys they meet; other coincidental token
 matches with those keys still refuse. Every number of every release table meets
-the licence and withheld numbers by the token match (decision 0105 item 4 as
-amended by decision 0119), with no string check.
+its own-company licences and all withheld numbers by the token match (decision
+0105 item 4 as amended by decisions 0119 and proposed 0123), with no string check.
 
 Commerce registrations accept exactly one to six ASCII digits with an optional
 slash followed by one to three ASCII digits (at most ten characters).
@@ -123,8 +133,8 @@ holds the `ROW-` identity, never the withheld source value; no new column is add
 
 Withheld duplicate numbers stay only in the ephemeral audit set. The egress scan
 refuses them in every released field, including typed numbers and dedicated key
-slots, across current and historical captures, manifests/reports and storage-added
-counts. No duplicate-number list is exported; assembly retains its existing
+slots, across current and historical captures and non-exempt manifests/reports and
+storage-added counts; an exactly recomputed count is exempt under decision 0124. No duplicate-number list is exported; assembly retains its existing
 lead-pin trust boundary.
 Financial-centre numbers keep their five-digit declaration. Duplicate
 companies and geocoded keys and collisions of `ROW-` identities still refuse as
@@ -153,6 +163,36 @@ reason or name, a status that is not a decision) refuses as
 status or date is invented. The bundle reader checks the closed absence metadata
 against its capture receipts and retains both metadata fields in assembly evidence.
 Old v1 bundles must be rebuilt and pinned again; no compatibility fallback exists.
+
+## Fixed metadata checks (decision 0124, proposed)
+
+The single closed table `contracts.FIXED_METADATA` lists receipt file byte
+counts, table row counts, approved publisher/dataset/basis-note text, the
+absence field/reason sets, report status/snapshot reason, and the card/snapshot
+schema mapping keys. The source-specific receipt wording is the lead's approved
+intake wording, never registry placeholders. `terms_words` is exempt only when
+it equals the closed approved set; other supplied terms retain the full scans
+and do not receive a new mismatch refusal.
+
+`build` supplies actual captures and table rows through `MetadataInputs` to the
+existing scanners. Byte counts are recomputed from file bytes; row counts from
+the actual table rows. Exact matches alone bypass token and content scans.
+Altered fields meet both old scans first; if they pass, they refuse
+`metadata_count_mismatch`, `metadata_fixed_text_mismatch`, or, for a closed
+schema key, `metadata_key_not_schema`. Old scan reasons remain authoritative.
+An invalid list or tuple in a fixed scalar field cannot inherit that scalar
+exemption for its items; schema row lists keep their schema binding.
+Unknown keys in the lower-level release-row scanner still receive its full
+scan. Schema-key exemptions never apply to their values or another mapping.
+Without independent bundle inputs the raw scanner never exempts a count; it
+retains its old typed scan. The bound build calls enforce the exact checks.
+
+This amends decision 0105 item 5 only for exactly recomputed counts. All other
+fields keep their scans, including unlisted metadata and every released card
+value. Digest and typed-format rules, per-company licence checks, bundle pins
+and receipt-to-table trust are retained. The decision record lists the three
+permitted existing test migrations and their matching altered/unlisted
+negatives. Different-maker approval is required before admission.
 
 ## Sibling intake protocol
 

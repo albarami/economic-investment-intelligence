@@ -11,6 +11,7 @@ import re
 from collections.abc import Mapping
 from decimal import ROUND_HALF_UP, Context, Decimal, localcontext
 from pathlib import Path
+from typing import cast
 
 import yaml
 
@@ -372,6 +373,7 @@ def _certificates(
     regions = _string_set(review.get("regions_not_countries"))
     counts: dict[str, int] = {}
     rows: list[dict[str, object]] = []
+    labels: list[str] = []
     for source in raw:
         _own_fields(source, allowed)
         period = parse_period_value(source.get("year"), "year_text")
@@ -398,10 +400,10 @@ def _certificates(
         if label in regions:
             _add(counts, "region_not_country")
             continue
-        if label in withheld:
-            _add(counts, "country_label_withheld")
+        if _country_withheld(label, withheld, counts):
             continue
         country = _country(label, walk)
+        labels.append(label)
         rows.append(
             _attach(
                 entry,
@@ -419,7 +421,43 @@ def _certificates(
                 "parse_logistics",
             )
         )
+    rows = _combine_certificates(rows, labels, counts)
     return _finish(entry, raw, "pub_trade_logistics", rows, counts, (), _MFG_KEY)
+
+
+def _combine_certificates(
+    rows: list[dict[str, object]], labels: list[str], counts: dict[str, int]
+) -> list[dict[str, object]]:
+    """Merge distinct published country labels within the full contract key."""
+    combined: dict[tuple[object, ...], dict[str, object]] = {}
+    totals: dict[tuple[object, ...], int] = {}
+    seen: set[tuple[tuple[object, ...], str]] = set()
+    duplicates: list[dict[str, object]] = []
+    for row, label in zip(rows, labels, strict=True):
+        key = tuple(row[field] for field in _MFG_KEY)
+        if (key, label) in seen:
+            # Keep repeats for the existing duplicate-key refusal in _finish.
+            duplicates.append(row)
+            continue
+        seen.add((key, label))
+        if key in combined:
+            _add(counts, "country_labels_merged")
+        else:
+            combined[key] = row
+        # {certificates}: Python integers keep the sum independent of Decimal context.
+        totals[key] = totals.get(key, 0) + int(cast(Decimal, row["value"]))
+    for key, row in combined.items():
+        row["value"] = Decimal(totals[key])
+    return [*combined.values(), *duplicates]
+
+
+def _country_withheld(
+    label: str, withheld: frozenset[str], counts: dict[str, int]
+) -> bool:
+    if label in withheld:
+        _add(counts, "country_label_withheld")
+        return True
+    return False
 
 
 def _vessels(
@@ -432,6 +470,7 @@ def _vessels(
 ) -> FamilyParse:
     allowed = _string_set(spec.get("fields"))
     regions = _string_set(review.get("regions_not_countries"))
+    withheld = _string_set(review.get("country_labels_withheld"))
     vessels = _string_set(review.get("vessel_types"))
     counts: dict[str, int] = {}
     rows: list[dict[str, object]] = []
@@ -453,6 +492,8 @@ def _vessels(
             continue
         if label in regions:
             _add(counts, "region_not_country")
+            continue
+        if _country_withheld(label, withheld, counts):
             continue
         country = _country(label, walk)
         rows.append(
@@ -490,6 +531,7 @@ def _wide(
     allowed = _string_set(spec.get("fields"))
     columns = tuple(sorted(_string_set(spec.get("columns"))))
     regions = _string_set(review.get("regions_not_countries"))
+    withheld = _string_set(review.get("country_labels_withheld"))
     counts: dict[str, int] = {}
     rows: list[dict[str, object]] = []
     for source in raw:
@@ -498,6 +540,8 @@ def _wide(
         label = _text(source, _name(spec, "country_field"))
         if label in regions:
             _add(counts, "region_not_country")
+            continue
+        if _country_withheld(label, withheld, counts):
             continue
         country = _country(label, walk)
         indicator = _mapped(

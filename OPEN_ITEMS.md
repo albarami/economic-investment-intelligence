@@ -1879,6 +1879,9 @@
 - DONE SO FAR: The loader, its refusals and the count of unmapped places are built and approved. The first confirmation: "reviewed rows remain the lead's."
 - OPTIONS: **Recommendation:** the lead enters the rows after the live fetch shows which source categories occur in the fetched files, each row with its mapping version, review status, reviewer role, review date and rationale, and no value edited by hand in a place's record. A source category is an identifier and a label of the publisher's own category list; the registry row records the licence the copy states with basis `dataset`, and item 5 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) stays the rule for the commit of the rows.
 - NEEDED BY: the slice S2 gate; before S3-T12 shows a product category for a place of this source.
+- UPDATE 2026-11-26 (S2-FSQMAP.b2): 725 rows filled from the lead-supplied publisher label paths; 38 identifiers have no unambiguous fitting target and are listed with their nearest considered keys and reasons in the worker handoff `OUT/UNFIT.csv`. This is a partial build, pending the lead's ruling on those identifiers, different-maker review and the real-cache load; S2-T15 criterion 7 remains open. Row status `approved` is the brief's review convention, not a claim that independent review has happened.
+
+- UPDATE 2026-11-26 (S2-FSQMAP.b3): 763 rows, 744 approved, 19 withheld under L-2159; withheld categories keep their places and supply no product key. Different-maker review and the lead's real-cache load remain pending; S2-T15 criterion 7 stays open.
 
 ## OI-199 — The terms of the copy of `places_fsq` are recorded as "terms to be read"
 
@@ -7173,3 +7176,120 @@ This append-only section answers pre-review round 4 finding F1 (C-P5, TST-168). 
 - **OPEN, LEAD-EVIDENCE — OI-379, 2026-11-25.** The one fact owed is the command, head, seed, exit, counts and outcome of the S2-T44 measurement round that was running when decision 0085 was filed. No new round is requested.
 - **SUPERSEDED — reconciliation-table row PO-S2-48 ("CARRIED — GATE HOLD"), 2026-11-25.** The row is not edited. It is superseded by the closure of the C8 producer and replay obligation. S2-P48 is merged by PR 121 as `c4e8660`. The lead's real-cache replay of `custodian/data_tests/test_pinned_methods.py` passed (10 passed, exit 0, at `a3eed2d2`), and two different makers returned APPROVED (**PO-S2-48**, RECORD of 2026-11-22). Decision 0089 is Accepted. See **Slice S2 gate record — round 7 dispositions**. The S2-T10 amendment box of decision 0064 item 43 also names PO-S2-36, PO-S2-44 and PO-S2-59; it is not ticked by this line.
 - **SUPERSEDED — reconciliation-table row OI-131 ("CARRIED — GATE HOLD"), 2026-11-25.** The row is not edited. It is superseded by "**CLOSED — OI-131 (F4/S4), 2026-11-22**" in the round-6 gate record: S2-P49 is merged by PR 120 as `0b3e59d304`, with `custodian/tests/test_s2_t10_split_contract.py::test_registry_splits_match_the_recorded_columns` and a different-maker APPROVED. Final-head Public-split evidence remains a separate gate entry.
+- **OPEN — OI-416, 2026-11-26.** `gis_address`. `licence_basis_unconfirmed`. Document 04 §2.1 records `terms to be read` (checked 2026-11-15) and basis `owner_decision`, decision 0026. Decision 0026 item 3 names that basis and no licence identifier. The registry `terms_url` is empty. The page that would settle an identifier is the national GIS centre's own terms page, which that section still marks unread. The receipt stays rejected.
+- **OPEN — OI-417, 2026-11-26.** `gis_context`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
+- **OPEN — OI-418, 2026-11-26.** `gis_land_price`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
+- **OPEN — OI-419, 2026-11-26.** `gis_landmarks`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
+- **OPEN — OI-420, 2026-11-26.** `gis_parcels`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
+- **OPEN — OI-421, 2026-11-26.** `gis_phcc`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
+- **OPEN — OI-422, 2026-11-26.** `gis_poi_comm`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
+- **OPEN — OI-423, 2026-11-26.** `gis_rail`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
+- **OPEN — OI-424, 2026-11-26.** `gis_zoning`. `licence_basis_unconfirmed`. Same unread national GIS centre terms page as OI-416. Document 04 §2.1 and decision 0026 item 3 state no licence identifier. The receipt stays rejected.
+- **OPEN — OI-425, 2026-11-26.** `price_ext/producer-price-index-ppi`. `licence_basis_unconfirmed`. Document 04 §2.1 states this dataset alone has an empty dataset licence and basis `portal_terms`. The page that would settle an identifier is the dataset's own licence statement on `https://www.data.gov.qa/explore/dataset/producer-price-index-ppi/`. The portal terms page `https://www.data.gov.qa/pages/terms-of-use`, read 2026-11-15, is not adopted as this dataset's identifier, because the pack records the dataset licence as empty. The receipt stays rejected.
+
+
+## Proposed open items — S2-REGC1 b1, 2026-11-25
+
+- PO-S2-REGC1-01: The owner chose option C1 on 2026-11-25 (decision 0123,
+  **The owner's words**). Decision 0123 stays Proposed until another maker's
+  review and its acceptance; no task acceptance box or gate is ticked here.
+- PO-S2-REGC1-02: Another maker must independently review the C1 candidate and
+  the lead must perform any real-input counts/replay in its own authorized
+  shell. This worker used invented fixtures only. The builder now retains full
+  historical cards transiently until all capture licence maps are known; the
+  real run must assess this additional memory use. Metadata's full-key
+  refusals remain unchanged and are not claimed resolved by C1.
+- PO-S2-REGC1-03: Exact workspace-only read compliance failed at startup: five
+  installed skill instruction files were read alongside the brief before its
+  explicit no-outside-path rule was known. No outside file was edited. See
+  `.overnight/ALERT.md`; this cannot be undone by a passing test. A fresh worker
+  with workspace-local instruction copies is the smallest way to obtain an
+  execution satisfying the read boundary from its first call. The current
+  implementation and test evidence are preserved for review, without claiming
+  that they erase the process deviation.
+
+
+## Proposed open items — S2-REGM1 b1, 2026-11-26
+
+- PO-S2-REGM1-01: The M1 brief requires `metadata_fixed_text_mismatch` on
+  changed listed labels, while forbidding changes to existing expected reasons.
+  Existing exact-reason tests require `registration_egress` on receipt
+  publisher/dataset/basis_note and `register_content_egress` on copied card
+  content in dataset/basis_note. The lead must authorize migration of these
+  affected cases to the new reason, retaining equivalent unlisted-field
+  regressions. No reason has been changed by this worker.
+- PO-S2-REGM1-02: Supply the trusted approved wording for publisher, dataset,
+  basis_note and terms_words per register source, and specify fixture binding.
+  The committed registry publishers are `Lead receipt required` placeholders
+  refused by `provenance.validate_receipt`; receipts currently supply
+  attribution and read terms. Deriving approved values from the receipt being
+  checked would be self-approval. No real file was read and no value invented.
+- PO-S2-REGM1-03: After the corrected brief and implementation, obtain the
+  required job-bound read-only approval from another maker on the exact
+  candidate before it joins. This worker cannot substitute self-review for
+  that approval. No M1 implementation or acceptance is claimed.
+
+## Proposed open items — S2-REGM1 b2
+
+The supplied L-2139 amendment answers both b1 questions under **Proposed open
+items — S2-REGM1 b1**: trusted receipt wording is supplied and mismatches meet
+the existing scans before new mismatch reasons; supplied terms remain records.
+This resolution does not erase the b1 history or claim implementation.
+
+A further brief decision is required before S2-T49's M1 implementation:
+`test_register_storage_manifest_count_keeps_egress_scan` requires the correct
+company-table row count of an invented bundle to refuse against its intake
+licence, while M1 requires that exact count to be exempt. The Never/D clauses
+forbid changing the existing reason, plant or count. Baseline exit 0 and the
+one-seam exact-count probe exit 1 prove the contradictory expectation; see
+PROGRESS.md **S2-REGM1 b2 — additional exact-count test conflict**.
+Smallest resolution: an explicit bounded amendment allowing this particular
+existing case to become a positive exact-count control, with a separate
+one-input altered-count refusal plant. No check is changed under this open item;
+independent maker review and every other gate remain required.
+
+## S2-REGM1 b3 — bounded resolutions and admission still owed
+
+- L-2141 F1 to F5 in the S2-REGM1.b3 brief resolves b2's exact-count
+  blocker: the old 125-row refusal becomes an exact-count passing control,
+  with an altered count still refusing. L-2139's b1 resolutions remain in
+  force. Earlier b1/b2 records above are unchanged.
+- The inventory's 30 exact-field-family assertions were classified; the full
+  register run identified two more exact-count migrations allowed by F3.
+  Proposed decision 0124, **Plants and permitted test migrations**, records
+  all three and their matching negatives. No other expected reason changes.
+- Different-maker read-only review on the exact candidate remains owed before
+  admission (PO-S2-REGM1-03). This worker's self-review is not that approval.
+  The lead's real-register replay, freeze/release checks and S2 gate remain
+  separate obligations. No real register or public cache was read here.
+- Git index writes are refused by this workspace's read-only metadata mount
+  (actual `git add -N` exit 128). Under L-2077 this is a patch handoff, not a
+  build blocker: the lead must apply and commit the exact patch, then obtain
+  the different-maker review. No push or merge is attempted here.
+
+- PO-S2-REGM1-04 — OPEN, b3 runtime verification: the final corrected full
+  custodian command did not complete in this job's window and was interrupted
+  with exit 130. Targeted evidence is 2772 register and 80 fixed-metadata tests
+  passing; it cannot substitute for the required whole suite. Run the exact
+  whole command on the base and final patch with enough runtime, record both
+  full counts/exits, then obtain the different-maker review. No further owner
+  change to count/label policy is requested and no gate is waived.
+
+## Proposed open items — S2-REGM1 b4
+
+- PO-S2-REGM1-b4-01: the required unchanged documentation check scans untracked
+  `.overnight/tmp/` job-runtime files, including preparation logs, generated
+  absolute symlinks and an invalid-encoding negative-test fixture. Exit 1,
+  290 failures; see PROGRESS.md **S2-REGM1 b4 — rejected-review test coverage continuation**.
+  Lead: verify the patch in a clean checkout and record the unchanged checker
+  result. No exclusion or baseline change is proposed. Different-maker review
+  remains pending before admission; no S2-T49 box is ticked.
+
+
+## S2-R1PORT.b2 follow-up classification — 2026-11-26
+
+The task handoff `R1_PORT_TABLE.md` compares main `86e9f86589926dd52869137f84e923f52b276720` with the R1 custodian commits by file content. Ten further commits are classified `port_needed` for the full S2 parser paths, listed only as the brief requires: `6ea15029`, `5bef1839`, `848ac5f2`, `6f582acc`, `d953217e`, `0b09efe8`, `656a302c`, `6467f68e`, `922b3502`, `e72c8184`. Gate necessity is inferred from the S2 call paths, not a new real-cache run; their prerequisite chains and independent review remain required before porting. They do not establish closure of any diagnostic refusal.
+
+Five classifications stay `unsure`: `16d3af9f` (missing per-batch ownership optimization, no demonstrated gate timeout), `1aa70ec9` and `fdd59ea6` (mixed merge trees), `55eb0f17` and `d574fdef` (mixed S3 release trains). The lead must decompose differing files and establish any S2 dependency; do not cherry-pick whole trains on this evidence. The four supplied ports remain verified at `b71edf65e8268cc70ff793ed50d487b0fb2f0175`, with independent different-maker review and the full S2 gate still pending. No criterion is ticked by this record.
+
+- **IMPLEMENTED, REVIEW PENDING — S2-CSVCMT.b1 random failure from S2-ABSCAV.b1, 2026-11-26.** The old shared CSV reader removed a physical continuation beginning with `#` inside a quoted use-key value, so the discovered `"\n#"` input raised `use_map_field_empty` instead of `use_map_use_key`. Quote-parity filtering now skips comments only at record boundaries; the property retains its original strategy and exact reason assertion and pins that input with `@example`. Both modes match the old reader on every committed CSV; EOF behavior and strict reasons remain unchanged. Reverting only the fix with corrected tests exits 1 (6 failed / 68 passed); restored focused tests pass (74), and the required broad selection passes (1683 passed / 15160 deselected, seed 6227, exit 0). Header, width and syntax guard deletions each fail their exact-reason case. This implementation and planted proof address the parser cause; the lead's different-maker review remains pending. See PROGRESS.md, S2-CSVCMT.b1; no green rerun alone is used as closure.

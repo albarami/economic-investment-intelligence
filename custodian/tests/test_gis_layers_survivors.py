@@ -88,6 +88,25 @@ def test_feature_keys_exclude_previous_key_and_number_duplicates() -> None:
     assert rows[0]["feature_key"] == "invented-old"
 
 
+def test_land_price_unpublished_and_range_uses_give_no_row() -> None:
+    attributes = {
+        "DIST_NO": 3,
+        "District_No": 3,
+        "ResidentialPrices": "300",
+        "ResidentialCityCenter": None,
+        "ResidentialPriceFlats": "900-700",
+        "ResidentialPriceVillas": None,
+        "CommercialPrices": "1,200",
+    }
+    rows = subject.land_price_rows(
+        [{"attributes": attributes}], "Invented2026", as_of="2026-11-17"
+    )
+    assert [(row["use_category"], str(row["guide_price"])) for row in rows] == [
+        ("ResidentialPrices", "300.00"),
+        ("CommercialPrices", "1200.00"),
+    ]
+
+
 def test_land_price_refusal_keeps_field_name() -> None:
     _refusal(
         lambda: subject.land_price_rows(

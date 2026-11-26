@@ -404,6 +404,26 @@ def test_a_district_outside_the_reviewed_crosswalk_fails(tmp_path: Path) -> None
     assert _blocked(parsed, "unmatched_district") == 1
 
 
+def test_a_null_district_name_is_counted_unmatched_not_refused(tmp_path: Path) -> None:
+    """R1: a live row with no district name is a blocked row, never a refusal."""
+    parsed = _parse([_resi(district_name=None, sm_lmntq=None)], tmp_path)
+    assert parsed.deals == ()
+    assert _blocked(parsed, "unmatched_district") == 1
+
+
+def test_a_non_text_district_name_still_refuses(tmp_path: Path) -> None:
+    with pytest.raises(AdditionError, match="measure_unparsed"):
+        _parse([_resi(district_name=7)], tmp_path)
+
+
+@pytest.mark.parametrize("field", ["district_name", "sm_lmntq"])
+def test_an_absent_district_field_still_refuses(tmp_path: Path, field: str) -> None:
+    row = _resi()
+    del row[field]
+    with pytest.raises(AdditionError, match="measure_unparsed"):
+        _parse([row], tmp_path)
+
+
 def test_two_matching_languages_must_name_the_same_district(tmp_path: Path) -> None:
     _frame(tmp_path)
     path = tmp_path / "district_crosswalk.csv"

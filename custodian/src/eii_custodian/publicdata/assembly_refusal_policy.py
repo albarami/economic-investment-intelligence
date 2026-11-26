@@ -169,7 +169,7 @@ NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
         ),
         CoolingError: frozenset(
             """
-        consumption culture_type duplicate_key sector_type unexpected_column
+        consumption culture_type duplicate_key project_status sector_type unexpected_column
         unmapped_municipality year
     """.split()
         ),

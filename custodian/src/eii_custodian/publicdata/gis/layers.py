@@ -8,10 +8,11 @@ fails closed; this module does not project.
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import ROUND_HALF_EVEN, Decimal
@@ -36,6 +37,7 @@ _MONEY = Decimal("0.01")
 _COORD = Decimal("0.000001")
 _MILLIS = 1000
 _PRICE = re.compile(r"^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$")
+_PRICE_RANGE = re.compile(r"^\d+-\d+$")
 _PRICE_FIELDS = (
     "ResidentialPrices",
     "ResidentialCityCenter",
@@ -221,6 +223,14 @@ def land_price_rows(
         attributes = _attributes(feature)
         district = _district_key(attributes)
         for field in _PRICE_FIELDS:
+            served = attributes.get(field)
+            if field in attributes and (
+                served is None
+                or (isinstance(served, str) and _PRICE_RANGE.fullmatch(served))
+            ):
+                # R1: a use with no published price, or a published range
+                # (not a single guide price), gives no row; counts after go-live.
+                continue
             row = {
                 "district_key": district,
                 "period": period,
@@ -238,24 +248,27 @@ def address_rows(
     features: list[dict[str, object]], grid: list[dict[str, object]]
 ) -> list[dict[str, object]]:
     """Address points. PIN stays out of the release."""
+    owned = _lazy_owned(grid)
     rows: list[dict[str, object]] = []
     for feature in features:
         attributes = _attributes(feature)
         lon, lat = _lon_lat(feature)
-        rows.append(
-            {
-                "zone_number": _digits(attributes.get("ZONE_NO")),
-                "street_number": _digits(attributes.get("STREET_NO")),
-                "building_number": _digits(attributes.get("BUILDING_NO")),
-                "building_subtype": _optional_digits(
-                    attributes.get("BUILDING_NO_SUBTYPE")
-                ),
-                "survey_date": _calendar_date(attributes.get("SURVEYED_DATE")),
-                "lon": lon,
-                "lat": lat,
-                "cell": _cell(lon, lat, grid),
-            }
-        )
+        row: dict[str, object] = {
+            "zone_number": _digits(attributes.get("ZONE_NO")),
+            "street_number": _digits(attributes.get("STREET_NO")),
+            "building_number": _digits(attributes.get("BUILDING_NO")),
+            "building_subtype": _optional_digits(attributes.get("BUILDING_NO_SUBTYPE")),
+            "survey_date": _survey_date(attributes.get("SURVEYED_DATE")),
+            "lon": lon,
+            "lat": lat,
+        }
+        if point_cell(float(lon), float(lat), owned()) is None:
+            # R1: a point outside the frame grid is left out, never refused
+            # (328 of 163,860 live points), after every field check above;
+            # the count is written after go-live.
+            continue
+        row["cell"] = _cell(lon, lat, owned)
+        rows.append(row)
     keyed = assign_feature_keys(rows)
     require_release_columns(keyed)
     return keyed
@@ -270,7 +283,7 @@ def parcel_rows(features: list[dict[str, object]]) -> list[dict[str, object]]:
             {
                 "area_m2": _money(attributes.get("SHAPE.AREA")),
                 "start_date": _calendar_date(attributes.get("STARTDATE")),
-                "end_date": _calendar_date(attributes.get("ENDDATE")),
+                "end_date": _survey_date(attributes.get("ENDDATE")),
                 "geometry": geometry_wkb(_geometry(feature), "polygon"),
             }
         )
@@ -299,6 +312,10 @@ def zoning_rows(layers: list[dict[str, object]]) -> list[dict[str, object]]:
                 height = None
                 setbacks = None
                 code = attributes.get("ZONING")
+            if code is None and ("ZONING_COD" if detailed else "ZONING") in attributes:
+                # R1: a feature served with a null zoning code (1 of 190,289) is
+                # left out, never filled from another feature.
+                continue
             if not isinstance(code, str):
                 raise LayerError("zoning_code")
             rows.append(
@@ -379,6 +396,7 @@ def poi_rows(
     features: list[dict[str, object]], grid: list[dict[str, object]]
 ) -> list[dict[str, object]]:
     """Commercial points. The layer publishes no category."""
+    owned = _lazy_owned(grid)
     rows: list[dict[str, object]] = []
     for feature in features:
         attributes = _attributes(feature)
@@ -390,7 +408,7 @@ def poi_rows(
                 "category": None,
                 "lon": lon,
                 "lat": lat,
-                "cell": _cell(lon, lat, grid),
+                "cell": _cell(lon, lat, owned),
             }
         )
     keyed = assign_feature_keys(rows)
@@ -407,17 +425,22 @@ def landmark_rows(
     name and point, never the input order.
     """
     prepared: list[_LandmarkBody] = []
+    owned = _lazy_owned(grid)
     for feature in features:
         attributes = _attributes(feature)
         lon, lat = _lon_lat(feature)
-        prepared.append(
-            _LandmarkBody(
-                name_en=_required_text(attributes.get("ENAME")),
-                name_ar=_required_text(attributes.get("ANAME")),
-                lon=lon,
-                lat=lat,
-            )
+        body = _LandmarkBody(
+            name_en=_required_text(attributes.get("ENAME")),
+            name_ar=_required_text(attributes.get("ANAME")),
+            lon=lon,
+            lat=lat,
         )
+        if point_cell(float(lon), float(lat), owned()) is None:
+            # R1: a landmark outside the frame grid is left out, never refused
+            # (41 live points), after its name checks; the count is written
+            # after go-live.
+            continue
+        prepared.append(body)
     keyed = _landmark_keys(prepared)
     specifications: list[dict[str, Any]] = []
     points: dict[tuple[str, str], dict[str, Any]] = {}
@@ -438,7 +461,10 @@ def landmark_rows(
             "lon": float(body.lon),
             "lat": float(body.lat),
         }
-    rows = reviewed_points(specifications, points, _frame_grid(grid))
+    frame_grid = _frame_grid(grid)
+    if not specifications:
+        return []
+    rows = reviewed_points(specifications, points, frame_grid, stored=owned())
     require_release_columns(rows)
     return rows
 
@@ -640,6 +666,15 @@ def _calendar_date(value: object) -> str | None:
     return datetime.fromtimestamp(value // _MILLIS, UTC).date().isoformat()
 
 
+def _survey_date(value: object) -> str | None:
+    # A served date before 1970 is an impossible entry (one address row carries
+    # year 201; 63 parcel end dates carry the 1900-01-01 placeholder); it is left
+    # blank instead of refusing the whole layer. A parcel START date stays strict.
+    if isinstance(value, int) and not isinstance(value, bool) and value < 0:
+        return None
+    return _calendar_date(value)
+
+
 def _digits(value: object) -> str:
     if isinstance(value, bool) or not isinstance(value, int):
         raise LayerError("number")
@@ -683,8 +718,19 @@ def _coordinate(value: object) -> Decimal:
     return Decimal(str(value)).quantize(_COORD, rounding=ROUND_HALF_EVEN)
 
 
-def _cell(lon: Decimal, lat: Decimal, grid: list[dict[str, object]]) -> int:
-    found = point_cell(float(lon), float(lat), ownership_index(_frame_grid(grid)))
+def _lazy_owned(grid: list[dict[str, object]]) -> Callable[[], frozenset[int]]:
+    """Build the ownership index at the first point lookup, then reuse it.
+
+    Once per layer, not once per point (R1: 164k address points against 72k
+    cells was about 35 minutes of rebuilding). A batch with no point never
+    builds it, and a grid refusal comes at the first lookup, where it came
+    before, so results and refusal order are unchanged.
+    """
+    return functools.cache(lambda: ownership_index(_frame_grid(grid)))
+
+
+def _cell(lon: Decimal, lat: Decimal, owned: Callable[[], frozenset[int]]) -> int:
+    found = point_cell(float(lon), float(lat), owned())
     if found is None:
         raise LayerError("cell")
     return found

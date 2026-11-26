@@ -203,3 +203,11 @@ inputs refuse. Decision 0089 names the two pairs; DAT-128's audit
 selectors are unchanged. The lead's real-cache replay passed and the decision
 was accepted under L-1443; PO-S2-48 closes on merge. Fixtures prove no real
 census value or completed release.
+
+## Shared CSV comments
+
+`crosswalk.read_csv` skips a physical line beginning with `#` only outside an
+open quoted field, tracking quote parity and preserving doubled quotes. Both
+reader forms preserve quoted continuations. The `header=` form retains strict
+header, row-width and CSV-syntax refusals; the default reader remains permissive
+for an unterminated field at end of file.

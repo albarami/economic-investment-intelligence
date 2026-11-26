@@ -1,8 +1,7 @@
 """Decision 0119 (option B): published non-key values meet input-only keys only.
 
-A published column other than a registration-key column is scanned against the
-intake licences and the withheld duplicate registrations, never against the
-registration numbers being released. The key slot keeps its own check against
+Proposed decision 0123 narrows intake licences to each row's own company;
+withheld duplicates still meet every row, and released registrations do not. The key slot keeps its own check against
 withheld registrations only. Every value here is invented; no run of exactly
 eight or eleven digits is used.
 """
@@ -122,7 +121,10 @@ def _scan(tables, licences=(), withheld=()):
     return validate_release(
         tables,
         FRAME,
-        licences=frozenset(licences),
+        licences_by_registration={
+            row["registration_number"]: frozenset(licences)
+            for row in tables["pub_register_company"]
+        },
         withheld_registrations=frozenset(withheld),
     )
 
@@ -160,11 +162,15 @@ def test_register_released_key_in_published_column_builds(source, column):
 
 @pytest.mark.parametrize("plant", PLACE.values(), ids=PLACE.keys())
 @pytest.mark.parametrize("role", ["licence", "withheld"])
-def test_register_input_only_key_in_other_table_refuses(plant, role):
+def test_register_input_only_key_in_unkeyed_table_follows_c1(plant, role):
     tables = {**_tables(None, None), "pub_place": [plant]}
     _scan(tables)
-    with pytest.raises(RegisterError, match=r"^registration_egress$"):
+    if role == "licence":
+        # No registration on this row: no own-company licences (decision 0123).
         _scan(tables, **_input_only(role))
+    else:
+        with pytest.raises(RegisterError, match=r"^registration_egress$"):
+            _scan(tables, **_input_only(role))
 
 
 @pytest.mark.parametrize("plant", PLACE.values(), ids=PLACE.keys())
@@ -296,9 +302,9 @@ _PLANTS = {
 
 
 def _oracle_refuses(role, table, column, number):
-    """Independent reading of decision 0119 with decision 0105 item 2: only an
-    input-only key refuses; a listed column admits a short or year-shaped one."""
-    if role == "released":
+    """Decisions 0119 and proposed 0123: a keyed row meets its own licences,
+    an unkeyed row only withheld keys; typed short/year admission is unchanged."""
+    if role == "released" or (role == "licence" and table == "pub_place"):
         return False
     listed = f"{table}.{column}" in TYPED_FIELDS
     short = len(number) <= 2 or (len(number) == 4 and number[:2] in {"19", "20"})

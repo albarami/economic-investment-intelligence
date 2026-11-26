@@ -5,6 +5,9 @@ Selection uses coordinate statistics against the frame, never the geographic bbo
 The parser preserves source fields; display eligibility, duplicates and category
 mapping follow the reviewed policy. Fetch checks every selected file against the
 summary before storing any receipt or manifest.
+A reviewed `withheld` category row has an empty target key and a rationale: the
+place is kept, while that category is omitted; an identifier with no reviewed row
+still refuses with `category_unmapped`.
 Receipt validation and summary selection share the same release-path check:
 every complete ISO date appearing anywhere in the path must equal the approved
 release. Repeated equal dates and undated names remain valid; a different date

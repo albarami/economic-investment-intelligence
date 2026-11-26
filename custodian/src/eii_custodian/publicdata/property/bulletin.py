@@ -130,6 +130,11 @@ class SalesExport:
     blocked: tuple[Coverage, ...]
 
 
+def _name_or_blank(row: Mapping[str, object], field: str) -> str:
+    """A null district name is a blank that the crosswalk counts as unmatched."""
+    return "" if field in row and row[field] is None else _text(row, field)
+
+
 def quarter_of(value: object) -> str:
     """Return the calendar quarter ``YYYY-Qn`` of a row date, or fail."""
     text = parse_period_value(value, "date")
@@ -149,8 +154,8 @@ def sales_export_rows(rows: object) -> SalesExport:
     Every row must hold exactly the observed fields. ``usage`` becomes the
     bulletin's usage field, the published square metres stay the floor area,
     square feet stay absent, and no share field or unread field is passed on.
-    Only all-null or exactly whole share triples survive; other rows enter
-    closed coverage counts. No whole rows refuses the source by name.
+    Only all-null or exactly whole share triples survive; other rows, and rows
+    with a null registration date, enter closed coverage counts. No whole rows refuses the source by name.
     """
     if not isinstance(rows, list):
         raise AdditionError("bulletin_rows")
@@ -164,7 +169,13 @@ def sales_export_rows(rows: object) -> SalesExport:
             raise AdditionError("unknown_source_field")
         if expected - set(row):
             raise AdditionError("source_field_missing")
-        reason = _sales_share_reason(row)
+        # The published export holds rows with a null date; they are counted,
+        # never priced (R1, L-1963). Any other date form still refuses later.
+        reason = (
+            "registration_date_missing"
+            if row["registration_date"] is None
+            else _sales_share_reason(row)
+        )
         if reason is not None:
             counts[reason] += 1
             continue
@@ -241,8 +252,8 @@ def parse_bulletin(
             raise AdditionError("unknown_source_field")
         municipality = _municipality(row, names)
         district = _district(
-            _text(row, "district_name"),
-            _text(row, "sm_lmntq"),
+            _name_or_blank(row, "district_name"),
+            _name_or_blank(row, "sm_lmntq"),
             municipality,
             districts,
             known,

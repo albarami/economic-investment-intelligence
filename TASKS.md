@@ -628,6 +628,11 @@ independent code review. The separate Arabic-name reader gap remains OI-256.
 - Offline evidence 2026-11-22 (S2-P56 round 4): the refusal inventory now uses a Python literal permitted by the unchanged fixture guard; exact payload and expanded-case equality preserve every row and reason. The joined places and registry-driven building loops are confirmed with individual observer-deletion plants. PROGRESS.md records the local evidence; independent maker approval remains pending, with no acceptance box ticked.
 - Evidence update (2026-11-22, S2-P64, task S2-T49): `Production.register_tables` joins `PHASES`, `INVENTORY` and `adapters` after `frame`, consuming only a lead-staged, pin-verified `register_bundle/` plus `register_bundle_pin.json`; it re-verifies manifest, receipts, table bytes and released rows against the run's frame, credits keys `biz_register` and `fc_register/file` to both register tables, and feeds the figure draw and source completeness. No live register run, box tick or gate is claimed.
 - Evidence update (2026-11-22, S2-P63, owning tasks S2-T08/S2-T09): the production assembly gains the `method_pins` phase between `busyness` and `final_audit`; it persists `assembly/s2_t09_pin_artifact.json` and `assembly/s2_t09_pin_generation_config.json` from the recorded generation configuration and the producer results bound to the build, refuses an incomplete pin set, an unknown pin and a half-written pair, and removes both outputs before any source read of a new run. No live input is bound yet (OI-283), so while S2-T08 part B has not bound the inputs the phase stays pending (round 3, ruling L-1494): it writes no pair and no artifact, records its closed pending reason `pin_inputs_missing` in the build report's S2-T09 confirmation row, and the live run continues to `final_audit`, `draw` and `reports`, so their defects are found; `require_complete` still refuses the pending build (`assembly_gate_pending`), a stale pair of an earlier run is removed before any source read and never credited, and the command reports the phase's own closed reason `pin_output_pair_unwritten` for a failed pair write and the gate's `assembly_gate_pending` for the pending state instead of the generic `assembly_build_refused`. No slice-gate approval is claimed.
+- Evidence update (2026-11-26, S2-CWEB.b1): ordinary completeness accounts for registered `company_web` as `NO_DATA`, reason `company_web_not_selected`, caveat `company_web_lead_shell_only`, under decision 0076 item 2 and document 03 **S2-T48 tooling fields (decision 0076)**. Acquisition remains opt-in and lead-shell only. Tracked-input reds, 11 fixed regression cases and nine isolated guard-deletion proofs are recorded in PROGRESS.md **S2-CWEB.b1 — account for opt-in company-web metadata (2026-11-26)**. Final full verification and independent review remain pending; no acceptance box or slice gate is ticked.
+
+- Verification update (S2-CWEB.b1): final focused suite 459 passed, seed 76, exit 0; all nine guard deletions red with byte-identical restorations; lint, format and mypy exit 0. The final whole custodian run remains pending, so the implementation is not marked complete.
+
+- Evidence update (2026-11-26, S2-RCPT.b1): `receipt_valid` follows the published-label writer (null bounds and `distinct labels N`) and the fetch publisher fold. Of the 66 rejected receipts, 15 then validate and 51 stay rejected: 41 for recapture (40 WorldPop file descriptors and one males column name) and 10 open licence identifiers (OI-416 to OI-425). No acceptance box is ticked. The full custodian suite remains owed to the lead's train whole test.
 ### S2-T09 — Method-card pins from the public build
 - Goal: After the reviewer has checked them against the source, write the values listed by MTH-03 into the method cards. Invent no value.
 - Acceptance criteria: [ ] `./eii build-public` produces the unpinned inputs listed by MTH-03, including the riyal medians of the property-price method card; [ ] the reviewer checks each against its source before it is written; [ ] only checked values are written into the method cards; [ ] a value the source check cannot pin stays unpinned and is recorded in OPEN_ITEMS.md. (re-opened: train S2-11 records audit; NEEDED: S2-T09#4: Run the source check of boxes 1 to 3, then add a test_method_card_pins.py test requiring every non-empty unpinned_reason row of s2_t09_source_checks.yaml to name its pin under an OPEN item of OPEN_ITEMS.md, with a copy missing one pin refused.)
@@ -1909,6 +1914,8 @@ These coarse tasks are refined at the slice S6 gate without weakening their crit
 - Delivery: hard; personas Methods; status queued.
 ### S7-T07 — Customer finder (journey D3)
 - Decision 0040 named sub-step — **held size and population questions**: [ ] Wire est_size_act, sec_hr_size, pop_muni_age, pop_muni_age_sex, students_muni and confirmed hotel_ext to their source-grain context classes; no public re-banding, protected join or school-capacity inference. Additional input dependencies: S2-T19. Existing scope extends only to this source wiring; all original acceptance criteria, gates and reviews remain.
+- S2-ADDSOC.b1 blocked evidence (2026-11-26): the lead-supplied social-services shape matches the existing indicator and bilingual size labels, but the full before-change custodian suite did not finish within the available verification window; the confirmation remains unapplied. The industry baseline passed; see PROGRESS.md, **S2-ADDSOC.b1 — social-services label confirmation blocked by verification time**. Prepared tests and the one-line map change are an unverified proposal only; no criterion is ticked.
+- S2-ADDSOC.b2 evidence (2026-11-26), superseding b1's unapplied state only: confirmed the social-services indicator map against the supplied source shape; industry and requested dependent-family tests, static checks and five isolated guard-deletion/restoration proofs passed as recorded in PROGRESS.md, **S2-ADDSOC.b2 — social-services indicator labels confirmed**. Unit and guards unchanged. Different-maker review and the lead's full custodian/train test remain owed; no criterion is ticked.
 - Goal: Return a targeted territory and a prospect list of register companies by sector and size band, with their card fields and employee counts ([decision 0022](docs/decisions/0022-real-register-companies-with-a-synthetic-world.md)), and Public customer segments.
 - Acceptance criteria: [ ] the territory is a drawn or travel-time area or a set of areas ranked in slice S6; [ ] the prospect list is the output of tested code over visible criteria, with its rank-stability sentence, and no order uses, or breaks a tie by, a company's wages or another unreleased labour or residence value; [ ] each listed company shows only the fields the register publishes for it, person names excluded, and its employee count from `register_company_list` (PRV-125), never its wages, wage bill or another labour or residence detail, and a planted wage on a card or in a list fails; [ ] no estimate, share or score is attached to a listed company; [ ] Public customer segments stay on the source's geography, and a segment split by sex or nationality is never apportioned to a drawn area or joined to synthetic records (the sum of whole grid cells over an area, S3-T14, is display only and is never a segment or a criterion of this list); [ ] showing a register company's card and its employee count is not a lookup, no owner or individual can be looked up, and the finder offers no search by company name; [ ] the answer comes through the journey's declarative playbook and the template writer, with no model call.
 - Scope: customer-finder tool, playbook, components and tests.
@@ -2524,3 +2531,62 @@ The following S7-T09 dependency row is retained verbatim from the S2-TSKIP and S
 ```
 
 The S2-TSKIP status line is historical: S2-TSEP now tests the pinned pick-up in the separate lane. Its earlier `own_run_pickup_unbuilt` refusal applied only before that join. No S2-T13 or S2-T19 acceptance box is ticked by these offline tests.
+
+
+## S2-T49 evidence update — S2-REGM1 b1 (2026-11-26)
+
+BLOCKED before implementation under the task brief's L-1705 stop rule: M1's
+new exact-mismatch reasons conflict with existing required egress reasons that
+the same brief forbids changing; the committed register publisher rows are
+placeholders rejected by receipt validation, not approved fixed wording.
+The unchanged-code register baseline passed (2691 passed, exit 0), and nine
+targeted existing cases confirm the conflicting contracts (exit 0).
+See PROGRESS.md **S2-REGM1 b1 — M1 build stopped on incompatible acceptance
+requirements** and OPEN_ITEMS.md **Proposed open items — S2-REGM1 b1**.
+No acceptance box, implementation, independent approval or gate is claimed.
+
+## S2-T49 evidence update — S2-REGM1 b2 (2026-11-26)
+
+L-2139 resolves b1's wording and mismatch-order questions, but b2 is BLOCKED
+under L-1705 on another unchanged test. The correct-count expectation in
+`test_register_storage_manifest_count_keeps_egress_scan` requires a scan
+refusal that M1's exact-count exemption forbids; changing that reason, plant
+or count is prohibited by the brief. The original case passes (exit 0);
+a temporary one-seam exact-count exemption makes that same unchanged case
+fail `DID NOT RAISE RegisterError` (exit 1). The register baseline remains
+2691 passed (exit 0). See PROGRESS.md **S2-REGM1 b2 — additional exact-count
+test conflict** and OPEN_ITEMS.md **Proposed open items — S2-REGM1 b2**.
+No implementation, review approval, acceptance box or gate is claimed.
+
+## S2-T49 evidence update — S2-REGM1 b3 (2026-11-26)
+
+L-2139 and L-2141 resolve the earlier M1 brief conflicts. The implementation
+extends the existing register scanners with the closed exact-field table of
+proposed [decision 0124](docs/decisions/0124-register-fixed-metadata-fields-meet-exact-checks.md).
+Exact byte lengths and table row counts are recomputed from the actual inputs;
+approved labels and schema keys match their code-owned authority. Altered
+fields still meet both old scans before a new mismatch refusal; other supplied
+terms and every unlisted field retain their scans. Three existing exact-count
+outcomes migrate under L-2141 F1 to F4, with matching negatives; no other
+expected reason changes. Guard-deletion and suite evidence is appended in
+PROGRESS.md **S2-REGM1 b3 — exact fixed metadata checks**. Different-maker
+review, lead real-register replay and every gate remain owed; no box is ticked.
+
+S2-T49 b3 closing evidence: the final scalar-container correction passes 2772
+register tests and 80 focused metadata cases; all five final guard deletions
+run red and restore by cmp. Whole-custodian verification remains BLOCKED by
+the job window (fresh final command interrupted, exit 130), so this evidence
+marks no acceptance box and authorizes no admission. See PROGRESS.md **B3
+final verification boundary** and OPEN_ITEMS.md PO-S2-REGM1-04.
+
+
+## S2-T49 evidence update — S2-REGM1 b4 (2026-11-26)
+
+Test-only continuation under L-2152 covers the three receipt labels with an
+invented company absent from and present in cards, all four file-byte counts
+altered to an intake licence, both prohibited digit-run lengths, and byte-exact
+Unicode wording using a monkeypatched invented source label. Real approved
+wording is checked for NFC form. The row-count licence plant is retained.
+Production code and acceptance boxes are unchanged; different-maker review,
+real-file evidence and the S2 gate remain pending. See PROGRESS.md
+**S2-REGM1 b4 — rejected-review test coverage continuation**.

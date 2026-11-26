@@ -60,6 +60,12 @@ P86_BASIS_NOTE = (
     "and counted per row, never priced; share-field meaning remains "
     "unconfirmed."
 )
+# S2-CWEB (decision 0076, reviewed in S2-CWEB.rv) added one caveat key to the
+# company-web row after this pin was taken. That row's caveat keys must equal
+# the reviewed value exactly, and the base value is restored before hashing,
+# as for S2-P86 and S2-P92, so no other byte of any row may change.
+CWEB_ROW = "company_web"
+CWEB_CAVEAT_KEYS = ["company_web_lead_shell_only"]
 BASE_BASIS_NOTE = (
     "Document 04 S2-P53 landmark hand-list placement and citation snapshots; "
     "decision 0093 item 3. Publisher's restriction recorded as a record; "
@@ -202,6 +208,9 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     assert len(p92) == 1
     assert p92[0]["row_count_min"] == 1142
     assert p92[0]["row_count_max"] == 1142
+    cweb = [row for row in rows if row["key"] == CWEB_ROW]
+    assert len(cweb) == 1
+    assert cweb[0]["caveat_keys"] == CWEB_CAVEAT_KEYS
     restored = [
         {
             field: value
@@ -212,6 +221,8 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
                 if item["key"] == P86_ROW
                 else dict(item, row_count_min=1162, row_count_max=1162)
                 if item["key"] == P92_ROW
+                else dict(item, caveat_keys=[])
+                if item["key"] == CWEB_ROW
                 else item
             ).items()
             if field not in LATER_REVIEWED_FIELDS

@@ -289,9 +289,23 @@ def test_every_export_leaf_handles_hostile_values(fixture, field, hostile) -> No
     assert len(result.rows) + sum(c.count for c in result.blocked) == 2
     assert {c.reason for c in result.blocked} <= {
         "partial_share_deal",
+        "registration_date_missing",
         "share_fields_inconsistent",
     }
     assert all(not set(SALES_SHARE_FIELDS) & kept.keys() for kept in result.rows)
+
+
+def test_a_row_without_a_registration_date_is_counted_not_refused() -> None:
+    """R1: the published export holds rows whose date is null (L-1963)."""
+    result = sales_export_rows([_export(), _export(registration_date=None)])
+    assert len(result.rows) == 1
+    assert [(c.reason, c.count) for c in result.blocked] == [
+        ("registration_date_missing", 1)
+    ]
+    with pytest.raises(AdditionError, match=r"^no_whole_property_deals$"):
+        sales_export_rows([_export(registration_date=None)])
+    # Any other malformed date still refuses the source by name later.
+    assert sales_export_rows([_export(registration_date=7)]).rows
 
 
 @pytest.mark.parametrize(

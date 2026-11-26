@@ -72,7 +72,9 @@ def _release(cards, *, licences=(), withheld=()):
     validate_release(
         {"pub_register_company": cards, "pub_register_snapshot": []},
         FRAME,
-        licences=frozenset(licences),
+        licences_by_registration={
+            card["registration_number"]: frozenset(licences) for card in cards
+        },
         withheld_registrations=frozenset(withheld),
     )
 
@@ -284,14 +286,12 @@ def test_register_withheld_number_in_free_text_build_refuses(tmp_path):
         _build(tmp_path, rows)
 
 
-def test_register_licence_in_financial_centre_address_refuses(tmp_path):
-    """Decision 0119: re-pointed from the released commerce key 12 (which now
-    builds) to the commerce licence 12."""
+def test_register_other_company_licence_in_financial_centre_address_builds(tmp_path):
+    """Decision 0123: the commerce licence is not the centre's own licence."""
     files = inputs("fc_register", rows=[fc(registered_address="SYN Office 12")])
     row = commerce(registration_number="12")
     _build(tmp_path / "pass", [row], fc_files=files)
-    with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        _build(tmp_path / "refuse", [{**row, "licence_number": "12"}], fc_files=files)
+    _build(tmp_path / "other", [{**row, "licence_number": "12"}], fc_files=files)
 
 
 @pytest.mark.parametrize(
@@ -307,7 +307,7 @@ def test_register_typed_name_in_another_table_refuses(column, value):
                 "source_registry": [{column: value}],
             },
             FRAME,
-            licences=frozenset({"25"}),
+            withheld_registrations=frozenset({"25"}),
         )
 
 
@@ -817,9 +817,7 @@ def test_register_long_key_in_manifest_receipt_time_build_refuses(tmp_path, role
     assert not (tmp_path / "refuse" / "current").exists()
 
 
-def test_register_short_key_in_table_counts_builds_and_unlisted_refuses(
-    tmp_path, monkeypatch
-):
+def test_register_exact_table_count_survives_typed_list_removal(tmp_path, monkeypatch):
     # One card per source gives the storage-added count 2, also the token of the
     # unlisted `version` "v2"; three commerce cards give the count 4 instead.
     rows = [
@@ -839,6 +837,22 @@ def test_register_short_key_in_table_counts_builds_and_unlisted_refuses(
     ]
     _build(tmp_path / "pass", rows)
     _drop_from_list(monkeypatch, "manifest.tables.rows")
+    # Decision 0124 / L-2141 F3: the separate exact-count list still validates it.
+    result = _build(tmp_path / "exact", rows)
+    company = next(
+        t for t in result.manifest["tables"] if t["name"] == "pub_register_company"
+    )
+    assert company["rows"] == len(result.tables["pub_register_company"]) == 4
+    # Matching negative: removing its exact-count authority makes it unlisted.
+    monkeypatch.setattr(
+        validate,
+        "FIXED_METADATA",
+        {
+            path: rule
+            for path, rule in contracts.FIXED_METADATA.items()
+            if path != "manifest.tables.rows"
+        },
+    )
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
         _build(tmp_path / "refuse", rows)
 
@@ -896,9 +910,13 @@ def _listed(count, registration="125", period="2026-11"):
 def test_register_licence_in_employee_count_refuses():
     """Decision 0119: re-pointed from the released key 125 to the licence 125."""
     licences = frozenset({"125"})
-    validate_release(_listed(126, "54321"), FRAME, licences=licences)
+    validate_release(
+        _listed(126, "54321"), FRAME, licences_by_registration={"54321": licences}
+    )
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(_listed(125, "54321"), FRAME, licences=licences)
+        validate_release(
+            _listed(125, "54321"), FRAME, licences_by_registration={"54321": licences}
+        )
 
 
 def test_register_released_key_in_employee_count_builds():
@@ -974,10 +992,14 @@ def test_register_short_registration_in_employee_count_passes(count):
 def test_register_employee_count_missing_from_list_is_free_text(monkeypatch):
     """Decision 0119: the short collision is with the licence 12."""
     licences = frozenset({"12"})
-    validate_release(_listed(12, "54321"), FRAME, licences=licences)
+    validate_release(
+        _listed(12, "54321"), FRAME, licences_by_registration={"54321": licences}
+    )
     _drop_from_list(monkeypatch, "register_company_list.employee_count")
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(_listed(12, "54321"), FRAME, licences=licences)
+        validate_release(
+            _listed(12, "54321"), FRAME, licences_by_registration={"54321": licences}
+        )
 
 
 @given(st.floats(-90, 90), st.floats(-180, 180), st.sampled_from([8, 9]))
@@ -1005,9 +1027,13 @@ def test_register_licence_equal_to_cell_key_refuses(table):
     if table == "pub_register_company":
         snapshot = []
     tables = {"pub_register_company": cards, "pub_register_snapshot": snapshot}
-    validate_release(tables, frame, licences=frozenset({str(cell + 1)}))
+    validate_release(
+        tables, frame, licences_by_registration={"54321": frozenset({str(cell + 1)})}
+    )
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(tables, frame, licences=frozenset({str(cell)}))
+        validate_release(
+            tables, frame, licences_by_registration={"54321": frozenset({str(cell)})}
+        )
 
 
 @pytest.mark.parametrize(
@@ -1299,10 +1325,10 @@ def test_register_period_column_missing_from_list_is_free_text(monkeypatch, fiel
     licence 11 by the full scan (decision 0119: an input-only key)."""
     tables = _periods(field, "2026-11")
     licences = frozenset({"11"})
-    validate_release(tables, FRAME, licences=licences)
+    validate_release(tables, FRAME, licences_by_registration={"54321": licences})
     _drop_from_list(monkeypatch, field)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(tables, FRAME, licences=licences)
+        validate_release(tables, FRAME, licences_by_registration={"54321": licences})
 
 
 @pytest.mark.parametrize("field", PERIOD_FIELDS)
@@ -1312,7 +1338,9 @@ def test_register_period_column_long_key_refuses(field):
     validate_release(_periods(field, "2126-11"), FRAME)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
         validate_release(
-            _periods(field, "2126-11"), FRAME, licences=frozenset({"2126"})
+            _periods(field, "2126-11"),
+            FRAME,
+            licences_by_registration={"54321": frozenset({"2126"})},
         )
 
 
@@ -1348,13 +1376,17 @@ def test_register_period_year_against_licence_property(field, year):
     licences = frozenset({str(year)})
     if field == PERIOD_FIELDS[0] and period < "2026-11":
         with pytest.raises(RegisterError, match=r"^snapshot_month$"):
-            validate_release(tables, FRAME, licences=licences)
+            validate_release(
+                tables, FRAME, licences_by_registration={"54321": licences}
+            )
         return
     if str(year)[:2] in ("19", "20"):
-        validate_release(tables, FRAME, licences=licences)
+        validate_release(tables, FRAME, licences_by_registration={"54321": licences})
     else:
         with pytest.raises(RegisterError, match=r"^registration_egress$"):
-            validate_release(tables, FRAME, licences=licences)
+            validate_release(
+                tables, FRAME, licences_by_registration={"54321": licences}
+            )
     validate_release(_periods(field, period, str(year)), FRAME)
 
 

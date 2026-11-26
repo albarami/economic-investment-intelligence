@@ -361,7 +361,7 @@ def gather_audit(build: Production) -> dict[str, Any]:
     from .confirm_s2_t13 import load_confirmation
     from .fetch.forecast_series import load_forecast_series
     from .fetch.page_records import selected_page
-    from .fetch.registry import read_yaml, registry_path
+    from .fetch.registry import load_registry, read_yaml, registry_path
     from .gate_report import (
         ConfirmationEvidence,
         confirmations,
@@ -383,11 +383,27 @@ def gather_audit(build: Production) -> dict[str, Any]:
         **PACK_IDENTITIES,
         **{key: PACK_IDENTITIES.get(key, ()) for key in required},
     }
+    # Decision 0076 item 2: the fetch inventory excludes company web;
+    # completeness still accounts for its registered metadata, without selection.
+    completeness_entries = build.entries
+    if not any(e.source_id == "company_web" for e in completeness_entries):
+        completeness_entries += tuple(
+            e for e in load_registry() if e.kind == "company_web"
+        )
     absences = {
         e.key: c.Absence(e.skip_reason, e.caveat_keys[0])
         for e in build.entries
         if e.skip_reason and e.caveat_keys
     }
+    for e in completeness_entries:
+        if (
+            e.kind == "company_web"
+            and e.key not in build.selected
+            and e.key not in build.receipts
+        ):
+            absences[e.key] = c.Absence(
+                "company_web_not_selected", "company_web_lead_shell_only"
+            )
     from .confirm_s2_t13 import own_run_pending
     from .fetch.own_run import OWN_RUN_CAVEAT, OWN_RUN_REASON
 
@@ -407,7 +423,7 @@ def gather_audit(build: Production) -> dict[str, Any]:
     )
     # Merely fetching a raw source never credits a release output.
     complete = c.check(
-        entries=build.entries,
+        entries=completeness_entries,
         pack=pack,
         inventory=inventory,
         catalogue=catalogue,

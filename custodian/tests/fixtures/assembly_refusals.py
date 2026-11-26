@@ -1594,11 +1594,12 @@ INVENTORY_CASES = [
         "stage": "gis_property_singles",
     },
     {
-        "anchor": "singles/dcool.py:parse_dcool, _sector_value",
+        "anchor": "singles/dcool.py:parse_dcool, _sector_value, _status_indicator",
         "plants": [
             ["CoolingError", "consumption", "consumption"],
             ["CoolingError", "culture_type", "culture_type"],
             ["CoolingError", "duplicate_key", "duplicate_key"],
+            ["CoolingError", "project_status", "project_status"],
             ["CoolingError", "sector_type", "sector_type"],
             ["CoolingError", "unexpected_column", "unexpected_column"],
             ["CoolingError", "unmapped_municipality", "unmapped_municipality"],

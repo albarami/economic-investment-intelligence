@@ -1660,6 +1660,7 @@ fixture proves each refusal. The caveat keys are the fixed sentences of
 | `forecast_backtest_range` | every fact of a forecast (DAT-158) |
 | `estimate_on_simulated_inputs` | the three cases of a site estimate while an input is Simulated or Synthetic (DAT-161); a required backend origin marker under decision 0035 item 3, with no audience label and nothing rendered by the template writer |
 | `scenario_not_forecast` | every fact of a scenario (DAT-162) |
+| `company_web_lead_shell_only` | the `NO_DATA` coverage row for registered `company_web` when no selection or receipt is supplied to the ordinary completeness audit: opt-in, lead-shell only, not selected by ordinary build-public (decision 0076 item 2); no company-web release table is produced |
 | `tender_fetch_own_run` | the `NO_DATA` coverage row for registered `tenders_pub` while its separate archive is not yet pinned and assembled (decision 0084 item 2); no `pub_tender` row may be emitted |
 | `base_rate_not_your_chance` | every fact of a base rate (DAT-159) |
 | `present_by_pay_band_assumed` | the figure of people present by pay band (DAT-160) |
@@ -2703,6 +2704,13 @@ distance; this task introduces no new collision threshold or normaliser.
 
 ### S2-T48 tooling fields (decision 0076)
 
+The ordinary completeness audit includes the registered `company_web` metadata
+without adding it to acquisition or snapshot selection. With no selection or
+receipt supplied, it records `NO_DATA`, reason `company_web_not_selected` and
+caveat `company_web_lead_shell_only`, under decision 0076 item 2. Existing selected
+or receipted evidence keeps its receipt and output checks; absence cannot credit
+an output or replace an invalid receipt.
+
 Company-web candidates remain outside product and release tables. The closed fields
 are name, address, website and activity; each binds the full-page and declared-fragment
 hashes, source address, retrieval UTC, publisher, local-use basis, parser version and
@@ -2722,6 +2730,17 @@ without a search, page or candidate; valid register trading words are checked
 again by the full output guard only when extracted.
 
 ## Register file projections (S2-T49)
+
+Proposed [decision 0124](decisions/0124-register-fixed-metadata-fields-meet-exact-checks.md)
+amends the metadata-scan statements below for its closed list only: exact file
+byte lengths and table row counts are recomputed from the actual inputs; approved
+receipt/absence/report labels and schema column-name keys are checked exactly.
+Exact matches are exempt from token and content scans; alterations meet the old
+scans first, then refuse with a closed metadata mismatch reason if those pass.
+Other supplied terms remain scanned records, not fixed text. Every unlisted
+field and release value retains its existing scan. Decision 0105 item 5 is
+amended for exact recomputed counts only; its original record is preserved.
+Different-maker review remains required before admission.
 
 This schema records the lead's column/type/format metadata, not a source value.
 OPEN (S2-T49): the published-card basis of the tower is confirmed by the lead in
@@ -2772,13 +2791,17 @@ L-1288 ruling recorded in the S2-T49 fix-round brief: rule 9 binds the identifie
 the project generates; it does not prohibit a typed numeric Public capital.
 Under [decision 0105](decisions/0105-register-scan-typed-columns.md) item 4
 (proposed, owner condition 1), a typed number still meets the keys by the token
-match, with no prefix or digit-run check. Under
-[decision 0119](decisions/0119-register-release-scan-meets-input-only-keys.md)
-(proposed, the owner's option B), every published non-key value of a release
-table, typed or free text, nested or a number, and every column name meets only
-the input-only keys (the intake licences and the withheld duplicate
-registrations), never the registrations being released: a value equal to a
-released registration is published.
+match, with no prefix or digit-run check. Under proposed decision 0123 (option C1, awaiting the owner's choice), every
+published non-key value and column name meets that row's own company's licence
+numbers plus every withheld duplicate registration. A row without an entry in
+the licence map meets only the withheld duplicates. The closed typed-column
+rule applies to that same per-row set. A coincidental match with another
+company's licence is published; a released registration is still published.
+The ephemeral map is built beside the intake licence set, keyed by the released
+registration or existing `ROW-` identity, and unioned across current and historical
+captures before their full cards are scanned. Neither map nor licence value is
+exported. Key slots, the returned released-key set, metadata scans and the bundle
+loader's no-input-only-key call remain unchanged; so does decision 0119 item 6.
 Under decision 0119 item 6, a string is exempt from the token and content
 scans only as the value of a named digest field (`contracts.DIGEST_FIELDS`:
 the columns of section 7.3 that hold a SHA-256 and the manifest's frame,
@@ -2788,9 +2811,10 @@ scanned even when it looks like a digest.
 The literal TST-142 wording clash remains recorded in OPEN_ITEMS.md.
 
 Licence numbers are validated at intake but never projected, used as fallback
-keys or written to metadata. An ephemeral set of their input lexemes extends
-the token scan over non-key released fields, including typed numeric values,
-and over complete manifests and reports, including storage-appended table counts.
+keys or written to metadata. The ephemeral per-company licence map protects
+non-key released fields, including typed numeric values. The complete intake
+licence set still protects manifests and reports, including storage-appended
+table counts.
 The existing dedicated registration-key exemption stays unchanged: an intake
 licence equal to a published registration does not remove that registration.
 A licence column in another release table refuses. Under
@@ -2802,14 +2826,14 @@ under the owner's a2, under the owner's a3 the manifest's and the receipt's
 `version`, each admitting only its one fixed text, and the `period` columns of
 `pub_register_snapshot` and `register_company_list`, each only a real `YYYY-MM`
 month), each with its written format checked before the scan,
-admits a token equal to a key it meets (in a release column a licence or
-withheld number, decision 0119; in a manifest or report field also a published
+admits a token equal to a key it meets (in a release column an own-company licence or
+withheld number, proposed decision 0123; in a manifest or report field also a published
 registration) only when that
 number has one or two digits or the shape 19xx or 20xx; a longer number still
 refuses `registration_egress`, a value failing its format refuses, and the prefix
 and digit-run checks are unchanged. Every unlisted field is free text: free
-text of a release table keeps the full scan against the licence and withheld
-numbers, and the receipt's text, the other manifest fields and the rest of the
+text of a release table keeps the full scan against its own-company licences
+and all withheld numbers, and the receipt's text, the other manifest fields and the rest of the
 report keep the full scan against those and the published registrations, where
 a coincidental token match still refuses. Licence values are never exported to
 support this check; the assembly consumes only the lead-pinned verified bundle.
