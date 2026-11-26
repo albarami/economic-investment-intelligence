@@ -7281,3 +7281,10 @@ independent maker review and every other gate remain required.
   Lead: verify the patch in a clean checkout and record the unchanged checker
   result. No exclusion or baseline change is proposed. Different-maker review
   remains pending before admission; no S2-T49 box is ticked.
+
+
+## S2-R1PORT.b2 follow-up classification — 2026-11-26
+
+The task handoff `R1_PORT_TABLE.md` compares main `86e9f86589926dd52869137f84e923f52b276720` with the R1 custodian commits by file content. Ten further commits are classified `port_needed` for the full S2 parser paths, listed only as the brief requires: `6ea15029`, `5bef1839`, `848ac5f2`, `6f582acc`, `d953217e`, `0b09efe8`, `656a302c`, `6467f68e`, `922b3502`, `e72c8184`. Gate necessity is inferred from the S2 call paths, not a new real-cache run; their prerequisite chains and independent review remain required before porting. They do not establish closure of any diagnostic refusal.
+
+Five classifications stay `unsure`: `16d3af9f` (missing per-batch ownership optimization, no demonstrated gate timeout), `1aa70ec9` and `fdd59ea6` (mixed merge trees), `55eb0f17` and `d574fdef` (mixed S3 release trains). The lead must decompose differing files and establish any S2 dependency; do not cherry-pick whole trains on this evidence. The four supplied ports remain verified at `b71edf65e8268cc70ff793ed50d487b0fb2f0175`, with independent different-maker review and the full S2 gate still pending. No criterion is ticked by this record.
