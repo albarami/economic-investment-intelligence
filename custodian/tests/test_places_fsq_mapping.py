@@ -60,8 +60,8 @@ def test_places_fsq_committed_mapping_loads_with_main_place_keys() -> None:
         for row in rows
     )
     assert len(mapping) == 763
-    assert sum(row.review_status == "approved" for row in mapping) == 744
-    assert sum(row.review_status == "withheld" for row in mapping) == 19
+    assert sum(row.review_status == "approved" for row in mapping) == 731
+    assert sum(row.review_status == "withheld" for row in mapping) == 32
     identifiers = [row.source_category_id for row in mapping]
     assert len(identifiers) == len(set(identifiers)), "mapping_identifiers_repeat"
     assert len(mapping) == len(rows)
