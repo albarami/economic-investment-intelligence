@@ -1027,7 +1027,7 @@ sources:
     public_splits: ["nationality"]
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: ["accident_partition_bound_unconfirmed"]
     # Lead metadata reading, 2026-11-16 (L-701).
     columns:
       - {name: "accident_year", type: "string"}
@@ -5493,7 +5493,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: ["pub_place_fsq"]
-    caveat_keys: []
+    caveat_keys: ["places_fsq_fetcher_owned_by_s2_t15"]
     columns: []
     row_count_min: null
     row_count_max: null
@@ -5549,7 +5549,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: ["weather_fetcher_owned_by_s2_t14"]
     columns: []
     row_count_min: null
     row_count_max: null
@@ -5655,7 +5655,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: ["gazetteer"]
-    caveat_keys: []
+    caveat_keys: ["bldg_ovt_part_not_required"]
     columns: []
     row_count_min: null
     row_count_max: null
@@ -25628,7 +25628,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [gis_schema_unconfirmed]
     columns: []
     reconciliation: none
     skip_reason: schema_unconfirmed
@@ -25697,7 +25697,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [gis_schema_unconfirmed]
     columns: []
     reconciliation: none
     skip_reason: schema_unconfirmed
@@ -28807,7 +28807,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: sheet
       type: string
@@ -28849,7 +28849,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: title
       type: string
@@ -28891,7 +28891,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [qncc_schema_evidence_pending]
     columns:
     - name: id
       type: string
@@ -28933,7 +28933,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [tawteen_anonymous_access_not_approved]
     columns: []
     row_count_min: null
     row_count_max: null
@@ -28963,7 +28963,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: label
       type: string
@@ -29003,7 +29003,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: م
       type: integer
@@ -29050,7 +29050,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: objectid
       type: integer
@@ -29154,7 +29154,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: ["cdse_provider_contract_pending"]
     columns: []
     reconciliation: "none"
     skip_reason: "provider_contract_pending"
@@ -29182,7 +29182,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: ["fc_activation_review_pending"]
     columns:
       - {name: qfc_number, type: string}
       - {name: company_name, type: string}
@@ -29633,7 +29633,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [citation_page_not_served]
     columns: []
     row_count_min: null
     row_count_max: null
