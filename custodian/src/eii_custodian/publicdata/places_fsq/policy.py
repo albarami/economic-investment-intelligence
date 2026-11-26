@@ -29,6 +29,7 @@ MAPPING_COLUMNS = (
     "rationale",
 )
 _APPROVED = "approved"
+_WITHHELD = "withheld"
 
 
 @dataclass(frozen=True)
@@ -148,7 +149,7 @@ def product_categories(
     identifiers = category_ids.split(";")
     if any(item not in by_id for item in identifiers):
         raise PlacesFsqError("category_unmapped")
-    return ";".join(by_id[item] for item in identifiers)
+    return ";".join(by_id[item] for item in identifiers if by_id[item]) or None
 
 
 def _first_link(row: ParsedRow, places: Sequence[PlaceStandIn]) -> DuplicateLink | None:
@@ -230,11 +231,20 @@ def _mapping_row(
     item: dict[str, str | None], known_keys: frozenset[str]
 ) -> CategoryMapping:
     values = {key: (item.get(key) or "").strip() for key in MAPPING_COLUMNS}
-    if any(value == "" for value in values.values()):
+    withheld = values["review_status"] == _WITHHELD
+    if withheld and values["place_category_key"] != "":
+        raise PlacesFsqError("mapping_withheld_target")
+    if withheld and values["rationale"] == "":
+        raise PlacesFsqError("mapping_withheld_rationale")
+    if any(
+        value == ""
+        for key, value in values.items()
+        if not (withheld and key == "place_category_key")
+    ):
         raise PlacesFsqError("mapping_unsigned")
-    if values["review_status"] != _APPROVED:
+    if values["review_status"] not in {_APPROVED, _WITHHELD}:
         raise PlacesFsqError("mapping_unsigned")
-    if values["place_category_key"] not in known_keys:
+    if not withheld and values["place_category_key"] not in known_keys:
         raise PlacesFsqError("mapping_unknown_target")
     return CategoryMapping(
         source_category_id=values["source_category_id"],

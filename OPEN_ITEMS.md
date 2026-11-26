@@ -1881,6 +1881,8 @@
 - NEEDED BY: the slice S2 gate; before S3-T12 shows a product category for a place of this source.
 - UPDATE 2026-11-26 (S2-FSQMAP.b2): 725 rows filled from the lead-supplied publisher label paths; 38 identifiers have no unambiguous fitting target and are listed with their nearest considered keys and reasons in the worker handoff `OUT/UNFIT.csv`. This is a partial build, pending the lead's ruling on those identifiers, different-maker review and the real-cache load; S2-T15 criterion 7 remains open. Row status `approved` is the brief's review convention, not a claim that independent review has happened.
 
+- UPDATE 2026-11-26 (S2-FSQMAP.b3): 763 rows, 744 approved, 19 withheld under L-2159; withheld categories keep their places and supply no product key. Different-maker review and the lead's real-cache load remain pending; S2-T15 criterion 7 stays open.
+
 ## OI-199 — The terms of the copy of `places_fsq` are recorded as "terms to be read"
 
 - ID: OI-199

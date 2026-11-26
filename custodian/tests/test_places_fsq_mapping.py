@@ -51,7 +51,17 @@ def test_places_fsq_committed_mapping_loads_with_main_place_keys() -> None:
         assert tuple(reader.fieldnames or ()) == MAPPING_COLUMNS
         rows = list(reader)
     assert all(set(row) == set(MAPPING_COLUMNS) for row in rows)
-    assert all(all(row[column].strip() for column in MAPPING_COLUMNS) for row in rows)
+    assert all(
+        all(
+            row[column].strip()
+            for column in MAPPING_COLUMNS
+            if column != "place_category_key"
+        )
+        for row in rows
+    )
+    assert len(mapping) == 763
+    assert sum(row.review_status == "approved" for row in mapping) == 744
+    assert sum(row.review_status == "withheld" for row in mapping) == 19
     identifiers = [row.source_category_id for row in mapping]
     assert len(identifiers) == len(set(identifiers)), "mapping_identifiers_repeat"
     assert len(mapping) == len(rows)
@@ -137,3 +147,77 @@ def test_places_fsq_mapping_invented_identifiers_round_trip(
     )
     with pytest.raises(PlacesFsqError, match=r"^category_unmapped$"):
         product_categories(";".join([*identifiers, "SYN-NOT-MAPPED"]), mapping)
+
+
+_WITHHELD = {**_INVENTED, "review_status": "withheld", "place_category_key": ""}
+
+
+def test_places_fsq_withheld_loads_and_has_no_product_key(tmp_path: Path) -> None:
+    mapping = load_mapping(_write(tmp_path / "mapping.csv", [_WITHHELD]), frozenset())
+    assert mapping[0].review_status == "withheld"
+    assert mapping[0].place_category_key == ""
+    assert product_categories(_WITHHELD["source_category_id"], mapping) is None
+    with pytest.raises(PlacesFsqError, match=r"^category_unmapped$"):
+        product_categories("SYN-UNKNOWN", mapping)
+
+
+@pytest.mark.parametrize(
+    ("column", "value", "reason"),
+    [
+        ("place_category_key", "restaurant", "mapping_withheld_target"),
+        ("rationale", "", "mapping_withheld_rationale"),
+        ("review_status", "withheled", "mapping_unsigned"),
+        *[
+            (column, "", "mapping_unsigned")
+            for column in MAPPING_COLUMNS
+            if column not in {"place_category_key", "rationale"}
+        ],
+    ],
+)
+def test_places_fsq_withheld_refuses_changed_cell(
+    tmp_path: Path, column: str, value: str, reason: str
+) -> None:
+    row = {**_WITHHELD, column: value}
+    with pytest.raises(PlacesFsqError, match=f"^{reason}$"):
+        load_mapping(_write(tmp_path / "mapping.csv", [row]), frozenset({"restaurant"}))
+
+
+@pytest.mark.parametrize("other", [_WITHHELD, _INVENTED])
+def test_places_fsq_withheld_identifier_cannot_repeat(
+    tmp_path: Path, other: dict[str, str]
+) -> None:
+    with pytest.raises(PlacesFsqError, match=r"^mapping_conflict$"):
+        load_mapping(
+            _write(tmp_path / "mapping.csv", [_WITHHELD, other]),
+            frozenset({"restaurant"}),
+        )
+
+
+@given(st.lists(st.booleans(), min_size=1, max_size=20))
+@example([True, False, True, False])
+@example([False])
+def test_places_fsq_withheld_preserves_approved_order(approved: list[bool]) -> None:
+    rows = [
+        {
+            **(_INVENTED if keep else _WITHHELD),
+            "source_category_id": "SYN-CATEGORY-" + "A" * (index + 1),
+            "place_category_key": ("cafe" if index % 2 else "restaurant")
+            if keep
+            else "",
+        }
+        for index, keep in enumerate(approved)
+    ]
+    with TemporaryDirectory() as folder:
+        mapping = load_mapping(
+            _write(Path(folder) / "mapping.csv", rows),
+            frozenset({"restaurant", "cafe"}),
+        )
+    result = product_categories(
+        ";".join(row["source_category_id"] for row in rows), mapping
+    )
+    expected = [
+        row["place_category_key"]
+        for row, keep in zip(rows, approved, strict=True)
+        if keep
+    ]
+    assert result == (";".join(expected) if expected else None)
