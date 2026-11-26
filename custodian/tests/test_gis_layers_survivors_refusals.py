@@ -104,6 +104,18 @@ def test_row_refusals(call: Callable[[], object], message: str) -> None:
     _refusal(call, message)
 
 
+def test_zoning_feature_with_a_null_code_is_left_out() -> None:
+    layer = {
+        "layer_name": "Zoning",
+        "features": [
+            {"attributes": {"ZONING": None}, "geometry": _square()},
+            {"attributes": {"ZONING": "SYN-A"}, "geometry": _square()},
+        ],
+    }
+    rows = subject.zoning_rows([layer])
+    assert [row["zoning_code"] for row in rows] == ["SYN-A"]
+
+
 def test_parcel_end_date_before_1970_is_blank() -> None:
     feature = {
         "attributes": {

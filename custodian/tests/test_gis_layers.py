@@ -613,22 +613,52 @@ def _square() -> dict[str, object]:
     }
 
 
+_MISSING = object()
+
+
+def _outside(build: str, field: str, value: object) -> dict[str, object]:
+    if build == "landmark":
+        attributes: dict[str, object] = {"ENAME": "SYN FAR", "ANAME": "معلم بعيد"}
+        feature: dict[str, object] = {
+            "attributes": attributes,
+            "geometry": _point(11.75, 21.5),
+        }
+    else:
+        feature = json.loads(json.dumps(_load("qars_features.json")[0]))
+        feature["geometry"]["x"] = 11.75
+        feature["geometry"]["y"] = 21.5
+        attributes = feature["attributes"]
+    if value is _MISSING:
+        attributes.pop(field, None)
+    else:
+        attributes[field] = value
+    return feature
+
+
 def test_a_point_outside_the_grid_still_meets_every_field_check() -> None:
-    bad_name = {
-        "attributes": {"ENAME": "SYN FAR", "ANAME": None},
-        "geometry": _point(11.75, 21.5),
-    }
-    bad_zone = json.loads(json.dumps(_load("qars_features.json")[0]))
-    bad_zone["geometry"]["x"] = 11.75
-    bad_zone["geometry"]["y"] = 21.5
-    bad_zone["attributes"]["ZONE_NO"] = "SYN"
-    for build, features in (
-        (landmark_rows, [bad_name]),
-        (address_rows, [bad_zone]),
-    ):
+    cases: list[tuple[str, str, object, str]] = [
+        (build, field, value, "text")
+        for build, field in (("landmark", "ENAME"), ("landmark", "ANAME"))
+        for value in (_MISSING, None, "", 7)
+    ]
+    cases += [
+        ("address", field, value, "number")
+        for field in ("ZONE_NO", "STREET_NO", "BUILDING_NO")
+        for value in (_MISSING, None, "12", True, 1.5)
+    ]
+    cases += [
+        ("address", "BUILDING_NO_SUBTYPE", value, "number")
+        for value in ("1", True, 1.5)
+    ]
+    cases += [("address", "SURVEYED_DATE", value, "date") for value in ("2020", True)]
+    for build, field, value, reason in cases:
+        rows = landmark_rows if build == "landmark" else address_rows
         try:
-            build(features, _grid(10.25, 20.5))
-        except LayerError:
-            pass
+            rows([_outside(build, field, value)], _grid(10.25, 20.5))
+        except LayerError as error:
+            assert str(error) == reason, (build, field, value, str(error))
         else:
-            raise AssertionError("an outside point skipped a field check")
+            raise AssertionError(f"outside {build} kept a bad {field}: {value!r}")
+    for build in ("landmark", "address"):
+        rows = landmark_rows if build == "landmark" else address_rows
+        assert rows([_outside(build, "SYN_UNUSED", None)], _grid(10.25, 20.5)) == []

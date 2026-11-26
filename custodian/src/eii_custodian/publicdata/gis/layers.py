@@ -311,6 +311,10 @@ def zoning_rows(layers: list[dict[str, object]]) -> list[dict[str, object]]:
                 height = None
                 setbacks = None
                 code = attributes.get("ZONING")
+            if code is None and ("ZONING_COD" if detailed else "ZONING") in attributes:
+                # R1: a feature served with a null zoning code (1 of 190,289) is
+                # left out, never filled from another feature.
+                continue
             if not isinstance(code, str):
                 raise LayerError("zoning_code")
             rows.append(
