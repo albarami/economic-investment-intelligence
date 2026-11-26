@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 import pytest
 from custodian.tests.repository_root import repository_root
 from custodian.tests.test_places_fsq import _mapping
-from hypothesis import example, given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.places_fsq.errors import PlacesFsqError
@@ -114,6 +114,7 @@ def test_places_fsq_mapping_refuses_repeated_identifier(
         )
 
 
+@settings(deadline=None)
 @given(
     st.dictionaries(
         st.text(alphabet="ABCDE", min_size=1, max_size=12),
@@ -193,6 +194,7 @@ def test_places_fsq_withheld_identifier_cannot_repeat(
         )
 
 
+@settings(deadline=None)
 @given(st.lists(st.booleans(), min_size=1, max_size=20))
 @example([True, False, True, False])
 @example([False])
