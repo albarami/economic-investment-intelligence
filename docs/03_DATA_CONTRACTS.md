@@ -772,6 +772,15 @@ that table. No method card or screen reads these tables until document 07 names 
 Types follow section 1.2; a column without a stated type is `string`. Every Public table also has
 `source_id` (N), which joins `source_registry`. "Cnt" means a treated, rounded `int` primitive.
 
+Proposed [decision 0122](decisions/0122-additions-read-the-published-shapes.md)
+items 1 to 3 keeps the seven establishment bulletins' declared activity-name
+columns in their source snapshots only; the release contract has no name slot.
+Only manufacturing uses six decimal places, with finer nonzero digits refused
+rather than rounded. Certificate types resolve through a closed alias map before
+duplicate-key validation. Listed regions produce `region_not_country`; other
+reviewed, withheld country labels produce `country_label_withheld` and no row.
+Unknown country labels still refuse `country_unreviewed`.
+
 | Table | Columns |
 |---|---|
 | `grid_cell` | `cell` cell; `resolution` int (8 or 9: the cell's own resolution under section 1.1; a reader takes it from here, never from `in_greater_doha` or the municipality); `parent_r7` cell; `in_greater_doha` bool (of the cell's centre: true when the centre lies inside the five whole municipalities of the frame's review file, S2-T02; section 1.1); `zone_code` string; `district_key` string (Y: null only when the cell centre is in a reviewed district-free zone, that is, when the row's `zone_code` is listed in `zones_without_districts.csv`; the reason is then `zone_without_district`, and the build report counts these nulls, which meets DAT-07); `municipality_code` string; `geometry` geometry (a resolution-9 cell's hexagon; for a resolution-8 cell, the union of the hexagons of its seven resolution-9 children, traced from the indexes, never its own hexagon) |
@@ -830,7 +839,7 @@ Types follow section 1.2; a column without a stated type is `string`. Every Publ
 | `pub_venue_visits` | `venue_key` (the key of the committed, reviewed venue crosswalk, PUB-89; full-match `venue:[a-z0-9_]+:[1-9][0-9]{0,5}`, with no bare digit run of exactly eight or eleven digits; refusals `venue_key_form` and `venue_key_digit_run`); `venue_kind` (`museum_or_exhibition`, `health_centre`); `name_en` string; `name_ar` string (Y: null when no public Arabic name exists); `region` string (Y: the health region as published; null for museums and exhibitions); `place_id` (Y: the `pub_place` record that the crosswalk links; null otherwise, and the venue then has no map point); `period` (`YYYY-MM` for museums and exhibitions, `YYYY` for health centres); `indicator` (`visitors`, `patient_visits`); `value` int; `unit` (`visits`) |
 | `pub_building_permits` | `municipality_code`; `period` (`YYYY` or `YYYY-MM`, as published); `document_type` (`building_permit`, `completion_certificate`); `permit_type` (published key, or `all`); `building_type` (published key, or `all`); `document_count` int |
 | `pub_establishment_size` | `table_code` (names the survey bulletin, so the size classes of different bulletins are never mixed: one code for each bulletin of `est_size_act`, and one for the hotels and restaurants size table `sec_hr_size`, whose rows give restaurants (ISIC 561) and the other hotel and restaurant activities by size class, as C24 needs); `activity_key` (published activity, with its ISIC Rev.4 code where the bulletin gives one); `size_class` (as that bulletin publishes it); `period` (`YYYY`); `indicator` (`establishments`, `employees`, `compensation`; no survey benchmark is shown by cards C33 or C35 under [decision 0026](decisions/0026-public-sources-used-in-full-locally.md) item 12); `value` decimal(18,2); `unit` |
-| `pub_manufacturing` | `table_code` (one per source dataset, because field names differ between industries); `period` (`YYYY`); `breakdown_key` (canonical `dimension=value` pairs, for example licence type or product, or `ALL`); `indicator` (lower snake case, through a committed field map); `value` decimal(18,4); `unit` (as published; investment in `qar_million` is cumulative licensed investment, and licence-type rows are not plants) |
+| `pub_manufacturing` | `table_code` (one per source dataset, because field names differ between industries); `period` (`YYYY`); `breakdown_key` (canonical `dimension=value` pairs, for example licence type or product, or `ALL`); `indicator` (lower snake case, through a committed field map); `value` decimal(18,6); `unit` (as published; investment in `qar_million` is cumulative licensed investment, and licence-type rows are not plants) |
 | `pub_trade_wr` | `trade_type` (published key); `period` (`YYYY`); `indicator` (purchases, sales or stocks, lower snake case through a committed field map); `value` decimal(18,2); `unit`; context only, never a forecast |
 | `pub_population_age` | `municipality_code`; `period` (`YYYY`); `age_group` (published key); `indicator` (`residents`); `value` decimal(18,4); `unit` (`persons`) |
 | `pub_hotels_municipality` | `municipality_code`; `period` (`YYYY`); `facility_type` (published key, for example hotels and hotel apartments); `facility_count` int (facilities, not rooms or guests) |
@@ -886,8 +895,10 @@ frame boundary (`landmark_member_outside`), a repeated archive district key
 or the frame boundary does not cover (`landmark_point_outside`) each refuse
 the build.
 For `pub_place_verification` (PUB-52), the required population is the sorted unique
-kept food-service ids (`restaurant` or `italian_restaurant`) inside any showcase walk
-polygon, plus the explicitly supplied prepared-story ids (empty pending OI-397).
+kept food-service ids (`restaurant`, `italian_restaurant` or `food_service`) inside
+any showcase walk polygon, plus the explicitly supplied prepared-story ids (empty
+pending OI-397). The `food_service` class covers food or beverage service places
+outside the PUB-57 restaurant count classes; see proposed decision 0118 items 1 and 2.
 The places `build_report.json` adds only `required_verification.by_area` counts keyed
 by area `place_key`, and the deduplicated `required_verification.total`, not the ids.
 Counts refer to kept records before the verification-dependent display selection;
@@ -2738,14 +2749,27 @@ No category is inferred from observed rows. Null never means a zero or an
 inferred value.
 
 DAT-11 scans every released string column, including address text,
-with only the three registration-key columns exempt from key-membership checks.
+with only the three registration-key columns exempt from the published-column
+scan; each key slot still refuses a withheld duplicate registration.
 Typed numeric Public values (capital, coordinates, counts and cell keys) are not
 identifier strings. The artefact scan is unchanged. This follows the lead's
 L-1288 ruling recorded in the S2-T49 fix-round brief: rule 9 binds the identifiers
 the project generates; it does not prohibit a typed numeric Public capital.
 Under [decision 0105](decisions/0105-register-scan-typed-columns.md) item 4
-(proposed, owner condition 1), a typed number still meets every registration,
-licence and withheld number by the token match, with no prefix or digit-run check.
+(proposed, owner condition 1), a typed number still meets the keys by the token
+match, with no prefix or digit-run check. Under
+[decision 0119](decisions/0119-register-release-scan-meets-input-only-keys.md)
+(proposed, the owner's option B), every published non-key value of a release
+table, typed or free text, nested or a number, and every column name meets only
+the input-only keys (the intake licences and the withheld duplicate
+registrations), never the registrations being released: a value equal to a
+released registration is published.
+Under decision 0119 item 6, a string is exempt from the token and content
+scans only as the value of a named digest field (`contracts.DIGEST_FIELDS`:
+the columns of section 7.3 that hold a SHA-256 and the manifest's frame,
+receipt, receipt-file and table digests), which must be 64 lowercase
+hexadecimal characters or refuses `digest_field_format`; every other string is
+scanned even when it looks like a digest.
 The literal TST-142 wording clash remains recorded in OPEN_ITEMS.md.
 
 Licence numbers are validated at intake but never projected, used as fallback
@@ -2763,13 +2787,16 @@ under the owner's a2, under the owner's a3 the manifest's and the receipt's
 `version`, each admitting only its one fixed text, and the `period` columns of
 `pub_register_snapshot` and `register_company_list`, each only a real `YYYY-MM`
 month), each with its written format checked before the scan,
-admits a token equal to a registration, licence or withheld number only when that
+admits a token equal to a key it meets (in a release column a licence or
+withheld number, decision 0119; in a manifest or report field also a published
+registration) only when that
 number has one or two digits or the shape 19xx or 20xx; a longer number still
 refuses `registration_egress`, a value failing its format refuses, and the prefix
-and digit-run checks are unchanged. Every unlisted field is free text, and free
-text (the receipt's text included), the key columns, the other manifest fields
-and the rest of the report keep the full scan; other
-coincidental token matches still refuse. Licence values are never exported to
+and digit-run checks are unchanged. Every unlisted field is free text: free
+text of a release table keeps the full scan against the licence and withheld
+numbers, and the receipt's text, the other manifest fields and the rest of the
+report keep the full scan against those and the published registrations, where
+a coincidental token match still refuses. Licence values are never exported to
 support this check; the assembly consumes only the lead-pinned verified bundle.
 
 For this S2 projection only (DAT-02 and DAT-12), a missing commerce registration
@@ -2801,11 +2828,13 @@ values, current/historical tables, manifests/reports and storage-added counts.
 Neither the set nor its values is exported. Assembly retains the existing
 lead-pin binding because it cannot re-read the raw inputs.
 Financial-centre keys retain their existing five-digit format. Duplicate
-financial-centre keys and colliding `ROW-` identities still refuse as
-`duplicate_registration_key`; duplicate published row keys whose identities
+companies and geocoded keys and colliding `ROW-` identities still refuse as
+`duplicate_registration_key`; winning-group event conflicts are counted absences
+under decision 0117 item 3, not refusals. Duplicate published row keys whose identities
 differ still refuse `duplicate_row_key`. Cross-register ambiguity still refuses
-as `ambiguous_cross_source_key`. The prefixed key is also scanned outside its
-dedicated key slots. This follows the S2-P71 lead brief's row-key ruling for the
+as `ambiguous_cross_source_key`. The prefixed key is also scanned in the
+manifest and the report; in another release column it is published, like every
+released registration (decision 0119). This follows the S2-P71 lead brief's row-key ruling for the
 Public projection; decision 0074 item 5's world-feed keying/enrichment remains
 with S4-T02. No world snapshot or closed-category mapping is implemented here.
 
@@ -2816,7 +2845,17 @@ Its input-only `nationality_group`, `nationality_group_ar` and
 source fills `registration_number` from `qfc_number`, `name_en`, `name_ar`,
 `licence_status`, `registered_address`, the optional `event` and
 `notice_expiration_date`, and the geocoded `lon`, `lat` and `registered_cell`.
-Other source-inapplicable columns remain null. Internal order, row keys and
+Under [decision 0117](decisions/0117-financial-centre-event-selection.md) item 1
+(proposed), fully identical repeated events rows collapse. Otherwise item 2
+selects the later parsed notice date, with a dated row winning over an undated
+row, deterministically and independently of input order. Under item 3, differing
+rows in the winning date group, or in the undated group when no dated row exists,
+withhold that company's event and notice date as null rather than refusing the
+projection. The manifest's `field_absences` records the closed field/reason
+`event` / `published_event_conflict`, with a positive count whose unit is
+companies, plus source, capture period and current/snapshot use. A conflict on an
+older date that loses to a later row neither withholds nor counts. Other
+source-inapplicable columns remain null. Internal order, row keys and
 geocoder building/match labels are excluded. Publishing a tower needs a
 confirmed published-card basis; no inferred label substitutes for it.
 

@@ -98,7 +98,7 @@ _ADDED = (
     (
         "pub_manufacturing",
         ("table_code", "period", "breakdown_key", "indicator"),
-        (("value", "DECIMAL(18,4)"), ("unit", "VARCHAR")),
+        (("value", "DECIMAL(18,6)"), ("unit", "VARCHAR")),
     ),
     (
         "pub_trade_wr",

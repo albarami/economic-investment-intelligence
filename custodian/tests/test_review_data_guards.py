@@ -198,6 +198,18 @@ def _place(key: str, kind: str) -> PubPlace:
     )
 
 
+@pytest.mark.parametrize("included", [False, True])
+@pytest.mark.parametrize("mapped", [False, True])
+def test_places_food_service_required_population(included: bool, mapped: bool) -> None:
+    """Food service is required exactly inside the walk, with either class route."""
+    place = _place("SYN-FOOD", "food_service")
+    classes = {place.category: "food_service"} if mapped else {}
+    inside = frozenset({place.place_id}) if included else frozenset()
+    assert build.required_verification((place,), inside, classes, story_ids=()) == (
+        (place.place_id,) if included else ()
+    )
+
+
 def test_required_population() -> None:
     places = (
         _place("SYN-IN", "restaurant"),
@@ -217,7 +229,9 @@ def test_required_population() -> None:
 @given(
     st.lists(
         st.tuples(
-            st.sampled_from(["restaurant", "italian_restaurant", "other"]),
+            st.sampled_from(
+                ["restaurant", "italian_restaurant", "food_service", "other"]
+            ),
             st.booleans(),
         ),
         max_size=20,

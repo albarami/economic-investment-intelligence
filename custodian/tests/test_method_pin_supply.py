@@ -296,10 +296,10 @@ def expected_rows(build, config):
     result = []
     for pin in sorted(config["pins"]):
         refs = []
-        if pin in CONFIGURATION_PINS:
-            values = {"value": config["pins"][pin]["value"]}
-        elif pin in S7_DEFERRED_PINS:
+        if pin in S7_DEFERRED_PINS:
             values = {}
+        elif pin in CONFIGURATION_PINS:
+            values = {"value": config["pins"][pin]["value"]}
         elif pin.startswith("c5."):
             values = {
                 LINE: {
@@ -650,7 +650,7 @@ def test_tracked_configuration_binds_c5_treatment_separately_from_window():
         assert "pending_reason" not in settings
 
 
-def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
+def test_tracked_configuration_defers_uncommitted_coordinates():
     from eii_custodian.publicdata.method_pin_config import (
         configuration_pending,
         load_generation_config,
@@ -658,14 +658,8 @@ def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
 
     repo = repository_root(Path(__file__))
     config = load_generation_config(repo)
-    build = context(tmp_path)
-    build.pin_auto_supply = True
-    build.pin_generation_config = config
-    assert build.method_pins() == {}
-    assert build.pin_pending_reason == "pin_configuration_pending"
-    assert not (tmp_path / PIN_ARTIFACT_NAME).exists()
     pending_reasons = {
-        "c7.coordinates": "OI-283: c7.coordinates: landmark keys await ruling (L5c section 6)",
+        "c7.coordinates": "OI-283: c7.coordinates: no committed coordinate values; derive and pin by S7-T05 (decision 0125)",
         **{
             pin: "OI-283: " + pin + ": computed by S6-T10"
             for pin in ("c6.expected_clq", "c6.expected_p", "c6.expected_q")
@@ -680,7 +674,7 @@ def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
         for pin, settings in config["pins"].items()
         if "pending_reason" in settings
     } == pending_reasons
-    assert configuration_pending(config) is True
+    assert configuration_pending(config) is False
     for pending_pin in pending_reasons.keys() - S7_DEFERRED_PINS:
         assert (
             configuration_pending(
@@ -700,6 +694,31 @@ def test_tracked_configuration_withholds_missing_pack_choices(tmp_path):
         )
         is False
     )
+
+
+def test_tracked_configuration_withholds_a_non_deferred_pending_pin(tmp_path):
+    from eii_custodian.publicdata.method_pin_config import (
+        configuration_pending,
+        load_generation_config,
+    )
+
+    repo = repository_root(Path(__file__))
+    config = load_generation_config(repo)
+    assert "wilson.period" not in S7_DEFERRED_PINS
+    pins = dict(config["pins"])
+    pins["wilson.period"] = {
+        "anchor": pins["wilson.period"]["anchor"],
+        "pending_reason": "OI-283: wilson.period: invented pending setting",
+    }
+    pending = {**config, "pins": pins}
+    assert configuration_pending(pending) is True
+    build = context(tmp_path)
+    build.pin_auto_supply = True
+    build.pin_generation_config = pending
+    assert build.method_pins() == {}
+    assert build.pin_pending_reason == "pin_configuration_pending"
+    assert not (tmp_path / PIN_ARTIFACT_NAME).exists()
+    assert not (tmp_path / PIN_CONFIG_NAME).exists()
 
 
 def test_automatic_rows_are_collected_again_on_the_next_invocation(tmp_path):

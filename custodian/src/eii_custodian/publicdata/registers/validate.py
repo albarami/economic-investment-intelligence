@@ -9,6 +9,7 @@ from eii_custodian.publicdata.fetch.snapshots import SnapshotError, utc
 
 from .contracts import (
     BARE_DIGITS,
+    DIGEST_FIELDS,
     FIXED_TEXTS,
     FORMAT_ONLY_NUMBER,
     NUMERIC_COLUMNS,
@@ -52,6 +53,22 @@ graph_edge fact_lineage source_registry rules_version suppression_reason surviva
 )
 _DIGIT_TOKEN = re.compile(r"[0-9]+(?:/[0-9]+)?")
 _ROW_TOKEN = re.compile(ROW_KEY.pattern.removesuffix(r"\Z"))
+_DIGEST = re.compile(r"[a-f0-9]{64}")
+
+
+def _digest_field(path: str, value: object) -> bool:
+    """Decision 0119 item 6: true for a named digest field, whose value must be
+    one SHA-256 and is then exempt from the scans; false for any other field."""
+    if path not in DIGEST_FIELDS:
+        return False
+    if type(value) is not str or _DIGEST.fullmatch(value) is None:
+        refuse("digest_field_format")
+    return True
+
+
+def _child(path: str, key: object) -> str:
+    """The path below a mapping key; a key holding a dot ends the path."""
+    return f"{path}.{key}" if path and "." not in str(key) else ""
 
 
 def _tokens(value: str) -> Iterator[str]:
@@ -72,8 +89,9 @@ def _text(value: str, keys: frozenset[str]) -> None:
 def scan_artefact(value: object, keys: frozenset[str]) -> None:
     """Refuse source keys in a report, manifest, model payload, log or bundle.
 
-    A validated full SHA-256 is a digest, not a copied registration token.
-    Mapping keys are scanned as well as values; no diagnostic echoes a match.
+    Every string is scanned, even one shaped like a digest; only a caller that
+    knows a named digest field (`_digest_field`) skips it. Mapping keys are
+    scanned as well as values; no diagnostic echoes a match.
     """
     if isinstance(value, bytes):
         try:
@@ -81,8 +99,7 @@ def scan_artefact(value: object, keys: frozenset[str]) -> None:
         except UnicodeError:
             refuse("artefact_encoding")
     elif isinstance(value, str):
-        if re.fullmatch(r"[a-f0-9]{64}", value) is None:
-            _text(value, keys)
+        _text(value, keys)
     elif isinstance(value, Mapping):
         for key, item in value.items():
             scan_artefact(key, keys)
@@ -143,17 +160,18 @@ def scan_metadata(value: object, keys: frozenset[str], path: str) -> None:
     `path` is the artefact and the mapping keys down to `value`; list positions
     are not part of it, and a key holding a dot ends typing below it. A listed
     field's shape and format are checked, never skipped, then it meets
-    `_typed_keys`.
+    `_typed_keys`. A named digest field is checked and not scanned.
     """
     kind = TYPED_FIELDS.get(path)
+    if _digest_field(path, value):
+        return
     if kind is not None:
         _typed_value(path, kind, value)
         scan_artefact(value, _typed_keys(keys))
     elif isinstance(value, Mapping):
         for key, item in value.items():
             scan_artefact(key, keys)
-            typed = path and "." not in str(key)
-            scan_metadata(item, keys, f"{path}.{key}" if typed else "")
+            scan_metadata(item, keys, _child(path, key))
     elif isinstance(value, list | tuple):
         for item in value:
             scan_metadata(item, keys, path)
@@ -161,30 +179,35 @@ def scan_metadata(value: object, keys: frozenset[str], path: str) -> None:
         scan_artefact(value, keys)
 
 
-def scan_content(value: object, content: frozenset[str]) -> None:
-    """Card names and published addresses belong in tables, never metadata."""
+def scan_content(value: object, content: frozenset[str], path: str = "") -> None:
+    """Card names and published addresses belong in tables, never metadata.
+
+    `path` names the field as in `scan_metadata`; only a named digest field is
+    skipped, so with no path every string is scanned.
+    """
+    if _digest_field(path, value):
+        return
     if isinstance(value, bytes):
         try:
             scan_content(value.decode("utf-8"), content)
         except UnicodeError:
             refuse("artefact_encoding")
     elif isinstance(value, str):
-        if re.fullmatch(r"[a-f0-9]{64}", value) is None and any(
-            text in value for text in content
-        ):
+        if any(text in value for text in content):
             refuse("register_content_egress")
     elif isinstance(value, Mapping):
         for key, item in value.items():
             scan_content(key, content)
-            scan_content(item, content)
+            scan_content(item, content, _child(path, key))
     elif isinstance(value, list | tuple):
         for item in value:
-            scan_content(item, content)
+            scan_content(item, content, path)
 
 
 def _scan_release_value(value: object, keys: frozenset[str]) -> None:
     """DAT-11 / L-1288: a typed number is no identifier string, so no prefix or
-    digit-run check; its tokens still meet every key (owner condition 1)."""
+    digit-run check; its tokens still meet every key given (owner condition 1),
+    the input-only keys under decision 0119."""
     if value is None or type(value) in (bool, int, float):
         if type(value) in (int, float) and any(
             token in keys for token in _tokens(str(value))
@@ -284,8 +307,9 @@ def validate_release(
         if row["registration_number"] not in current_keys:
             refuse("list_company_missing")
     frozen = frozenset(keys)
-    input_only_keys = licences | withheld_registrations
-    egress_keys = frozen | input_only_keys
+    # Decision 0119 (option B): a published non-key value or column name meets
+    # the input-only keys only, never the registrations being released.
+    egress_keys = licences | withheld_registrations
     # Decision 0105: a listed column admits only a short or year-shaped number.
     typed_keys = _typed_keys(egress_keys)
     banned = {
@@ -306,6 +330,8 @@ def validate_release(
                     refuse("release_identifier_column")
                 scan_artefact(column, egress_keys)
                 if column == "registration_number" and table in TABLE_COLUMNS:
+                    continue
+                if _digest_field(f"{table}.{column}", value):
                     continue
                 # DAT-11 scans every column; numbers meet keys but no string
                 # check. A listed column's format was checked in the loop above.

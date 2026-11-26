@@ -482,7 +482,8 @@ def test_identifier_allowed_in_each_key_only(tmp_path, frame, table):
     ("table", "column", "value"),
     [
         ("pub_place", "registration_number", "54321"),
-        ("pub_place", "name_en", "SYN copied 54321"),
+        # Decision 0119: the default commerce licence, an input-only key.
+        ("pub_place", "name_en", "SYN copied 97003"),
         ("unknown_table", "name", "SYN anything"),
         ("pub_register_company", "name_en", "SYN-E-hidden"),
         ("pub_register_company", "name_en", "9" * 8),
@@ -519,17 +520,17 @@ def test_release_schema_and_identifier_egress_plants(
         ("pub_register_company", "residence"): "release_schema",
     }[table, column]
     with pytest.raises(RegisterError, match="^" + reason + "$"):
-        validate_release(tables, frame)
+        validate_release(tables, frame, licences=frozenset({"97003"}))
 
 
 @pytest.mark.parametrize(
     ("value", "reason"),
     [
-        pytest.param(["54321"], "registration_egress", id="key_in_list"),
-        pytest.param({"k": "54321"}, "registration_egress", id="key_in_mapping"),
-        pytest.param(b"54321", "registration_egress", id="key_as_bytes"),
-        pytest.param({"54321": None}, "registration_egress", id="mapping_key"),
-        pytest.param({"k": ([b"54321"],)}, "registration_egress", id="nested_bytes"),
+        pytest.param(["97003"], "registration_egress", id="key_in_list"),
+        pytest.param({"k": "97003"}, "registration_egress", id="key_in_mapping"),
+        pytest.param(b"97003", "registration_egress", id="key_as_bytes"),
+        pytest.param({"97003": None}, "registration_egress", id="mapping_key"),
+        pytest.param({"k": ([b"97003"],)}, "registration_egress", id="nested_bytes"),
         pytest.param(["SYN-E-7F3K2Q"], "identifier_prefix", id="prefix_in_list"),
         pytest.param(Decimal("1.5"), "artefact_type", id="decimal"),
         pytest.param(date(2026, 11, 1), "artefact_type", id="date"),
@@ -538,16 +539,36 @@ def test_release_schema_and_identifier_egress_plants(
     ],
 )
 def test_release_value_artefact_plants(tmp_path, frame, value, reason):
+    """Decision 0119: the key plants hold the commerce licence 97003, an
+    input-only key; the released key 54321 in the same shapes publishes."""
     result = build(
         tmp_path, "public_only", frame, (capture(), capture("fc_register")), ()
     )
     with pytest.raises(RegisterError, match="^" + reason + "$"):
         validate_release(
-            {**result.tables, "source_registry": [{"value": value}]}, frame
+            {**result.tables, "source_registry": [{"value": value}]},
+            frame,
+            licences=frozenset({"97003"}),
         )
 
 
-@pytest.mark.parametrize("table", ["source_registry", "fact_lineage"])
+@pytest.mark.parametrize(
+    "value",
+    [["54321"], {"k": "54321"}, b"54321", {"54321": None}, {"k": ([b"54321"],)}],
+    ids=["key_in_list", "key_in_mapping", "key_as_bytes", "mapping_key", "nested"],
+)
+def test_release_value_released_key_publishes(tmp_path, frame, value):
+    result = build(
+        tmp_path, "public_only", frame, (capture(), capture("fc_register")), ()
+    )
+    tables = {**result.tables, "pub_place": [{"name_en": "SYN copied 54321"}]}
+    validate_release({**tables, "source_registry": [{"value": value}]}, frame)
+
+
+# Decision 0119 item 6: two named digest columns; `fact_lineage` has no
+# `sha256` column, so a digest-shaped string there is scanned (see
+# test_registers_digest_fields.py).
+@pytest.mark.parametrize("table", ["source_registry", "pub_price_ext"])
 @pytest.mark.parametrize(
     "digest",
     [
@@ -682,13 +703,17 @@ def test_numeric_capital_storage_range_and_small_coordinate(frame):
 @pytest.mark.parametrize(
     ("source", "column", "value", "reason"),
     [
-        ("biz_register", "name_en", "65432", "registration_egress"),
+        # Decision 0119: the commerce licence 97003, an input-only key, in a
+        # card column of each source; the released keys publish (None).
+        ("biz_register", "name_en", "97003", "registration_egress"),
         (
             "fc_register",
             "registered_address",
-            "Office 54321, SYN tower",
+            "Office 97003, SYN tower",
             "registration_egress",
         ),
+        ("biz_register", "name_en", "65432", None),
+        ("fc_register", "registered_address", "Office 54321, SYN tower", None),
         (
             "fc_register",
             "registered_address",
@@ -713,6 +738,10 @@ def test_every_string_card_column_keeps_dat11_scan(
         centre = capture(
             "fc_register", files=inputs("fc_register", [fc(**{column: value})])
         )
+    if reason is None:
+        build(tmp_path, "public_only", frame, (company, centre), ())
+        assert (tmp_path / "current" / "manifest.json").exists()
+        return
     with pytest.raises(RegisterError, match="^" + reason + "$"):
         build(tmp_path, "public_only", frame, (company, centre), ())
     assert not (tmp_path / "current").exists()

@@ -53,11 +53,12 @@ pass.
    its final rows reconcile the allow-list to the freshly signed and audited
    spine, so it settles on the same condition as the two boxes. The full
    criterion texts, tests, plants, bounds and the decision-0075 audit
-   obligations of both boxes are unchanged and travel with the carry; OI-203
-   and the other open rows that name the unsigned spine stay open and travel
-   by their existing identities — their slice-S2 gate hold is carried with
-   the boxes under TST-280, and nothing closes or renumbers an item by the
-   move.
+   obligations of both boxes are unchanged and travel with the carry. OI-203
+   and PO-S2-52 stay open and travel by their existing identities, with
+   `custodian/data_tests/test_pinned_methods.py::test_pinned_c2_isic_5610`
+   carried with the spine; the other open rows that name the unsigned spine
+   do the same — their slice-S2 gate hold is carried with the boxes under
+   TST-280, and nothing closes or renumbers an item by the move.
 
 2. **Nothing is dropped.** The review pipeline keeps running at full
    priority in the rule-44 order — prepare, triage, sign, draw, audit,
@@ -97,6 +98,21 @@ pass.
    admitted — its criterion holds either way — so the carry's blocking point
    is the slice S3 gate record, not S3-T03's start.
 
+   While the spine is unsigned, the C-03 gate record lists PO-S2-52 as
+   carried open and, beside an otherwise-green K7 run, records exactly:
+   `K7: exit 1; otherwise green (every other K7 test passed); FAILED
+   custodian/data_tests/test_pinned_methods.py::test_pinned_c2_isic_5610 -
+   Failed: C2-ISIC-5610:spine_refused; no skip, no deselection`. The failed
+   test and exit 1 are shown, never a green K7 claim; the test still runs
+   and fails closed until the spine is signed.
+
+   The two spine boxes and PO-S2-52 leave the carry only after the spine is
+   signed and audited under item 2 and a subsequent lead-shell K7 run of
+   `uv run --locked python -m pytest custodian/data_tests -vv -p
+   no:cacheprovider` exits 0 with `test_pinned_c2_isic_5610` passing.
+   PO-S2-52 closes on that recorded evidence. The allow-list's final-row
+   condition above is separate and unchanged.
+
 5. **The documents this change touches are updated in the same change.**
    TASKS.md S2-T04 gains two carry lines, marked proposed and effective on
    this record's acceptance; the decisions index of docs/README.md gains
@@ -130,6 +146,13 @@ pass.
 - Document 04 section 6 (the spine build assignment) and PUB-38 (the
   allow-list obligation); PUB-33 and decision 0075 items 2 to 4 (the
   sign-off rule the carry keeps).
+- OPEN_ITEMS.md PO-S2-52, **U10 UPDATE** and **U10 ROUND-3 UPDATE**: the
+  class data test is built and never skipped, and the item stays open for
+  the lead's real-cache replay on the signed spine.
+  `custodian/data_tests/test_pinned_methods.py::test_pinned_c2_isic_5610`
+  calls the shared closed-case boundary; `custodian/data_tests/cache.py`
+  `closed_reason` maps `SpineError` to `spine_refused`, and `closed_case`
+  emits `C2-ISIC-5610:spine_refused` as the test failure.
 
 ## Consequences
 

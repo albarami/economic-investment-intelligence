@@ -217,7 +217,7 @@ pins:
     source_lineage: []
     settings_sha256: null
     values: {}
-    unpinned_reason: "awaiting the live public build of S2-T08 part B"
+    unpinned_reason: "OI-283: c7.coordinates: no committed coordinate values; derive and pin by S7-T05 (decision 0125)"
   - pin_id: c7.modes
     card_anchor: c7
     builder_maker: OpenAI

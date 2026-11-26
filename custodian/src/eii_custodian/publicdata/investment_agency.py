@@ -642,6 +642,10 @@ def extract_page(
     if re.search(r"[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}", page_text) or any(
         7 <= sum(unicodedata.category(char) == "Nd" for char in match) <= 15
         for match in re.findall(r"\+?\d+(?:[ ()-]\d+)*", page_text)
+        if not (
+            re.fullmatch(r"(?:19|20)[0-9]{2}-(?:19|20)[0-9]{2}", match)
+            and match[:4] <= match[5:]
+        )
     ):
         return page_refusal("page_contact_shape", page_url)
     if re.search(r"SYN-[A-Z]-|CANARY", page_text, re.IGNORECASE):

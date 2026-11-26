@@ -38,7 +38,7 @@ _EST_KEY = ("table_code", "activity_key", "size_class", "period", "indicator")
 _MFG_KEY = ("table_code", "period", "breakdown_key", "indicator")
 _TRADE_KEY = ("trade_type", "period", "indicator")
 _SCALE_ESTABLISHMENT = 2
-_SCALE_MANUFACTURING = 4
+_SCALE_MANUFACTURING = 6
 _SCALE_LOGISTICS = 2
 _TWO_DIGITS = re.compile(r"^\d{2}$")
 _FOUR_DIGITS = re.compile(r"^\d{4}$")
@@ -368,6 +368,7 @@ def _certificates(
     allowed = _string_set(spec.get("fields"))
     unpublished = _string_set(review.get("certificate_types_unpublished"))
     kinds = _string_set(review.get("certificate_types"))
+    withheld = _string_set(review.get("country_labels_withheld"))
     regions = _string_set(review.get("regions_not_countries"))
     counts: dict[str, int] = {}
     rows: list[dict[str, object]] = []
@@ -388,10 +389,17 @@ def _certificates(
         if kind in unpublished:
             _add(counts, "certificate_type_unpublished")
             continue
+        if kind not in kinds:
+            kind = _mapped(
+                kind, review.get("certificate_type_aliases"), "unknown_certificate_type"
+            )
         kind = require_closed(kind, kinds, "unknown_certificate_type")
         label = _text(source, _name(spec, "country_field"))
         if label in regions:
             _add(counts, "region_not_country")
+            continue
+        if label in withheld:
+            _add(counts, "country_label_withheld")
             continue
         country = _country(label, walk)
         rows.append(

@@ -41,7 +41,15 @@ row keys and location counts are validated but never released. The
 financial-centre projection
 maps `qfc_number` to `registration_number`, preserves its published names,
 registered address and licence status, and preserves at most one published
-notice and its complete date. The geocoded companion contributes coordinates
+notice and its complete date. Under [decision 0117](../../../../../docs/decisions/0117-financial-centre-event-selection.md)
+(proposed), fully identical repeated events rows collapse (item 1); otherwise the
+row with the later parsed notice date wins, and a dated row wins over an undated
+row, deterministically in either input order (item 2). If the winning date group,
+or the undated group of a company with no dated row, holds differing rows, that
+company's event and notice date are null instead of refusing the register (item 3).
+`field_absences` counts one `event` / `published_event_conflict` absence per
+company. A conflict on an older date does not block the later row or add a count.
+The geocoded companion contributes coordinates
 and the frame-resolved cell only. Internal order and row keys, inferred building
 names, matched-place labels and match quality never become card facts. A tower
 field needs confirmation that it is published on the card before it can be
@@ -49,8 +57,17 @@ added. Source-inapplicable columns are null and cannot be filled by the other
 source's schema. No worker, residence, owner or person column is accepted.
 
 DAT-11 scans every string column, including non-key address strings.
-A string equal to another registration key refuses. Typed capital, coordinates,
-counts and cell keys are not identifier strings; artefact scanning is unchanged.
+Under decision 0119 (proposed, the owner's option B) a published non-key value
+or column name meets only the input-only keys (intake licences and withheld
+duplicate registrations): a string equal to a licence or withheld number
+refuses, and one equal to a registration being released is published. Typed capital, coordinates,
+counts and cell keys are not identifier strings; artefact scanning is unchanged
+except that, under decision 0119 item 6, a string is exempt from the token and
+content scans only as the value of a named digest field (`contracts.DIGEST_FIELDS`:
+the document-03 release columns that hold a SHA-256 and the manifest's frame,
+receipt, receipt-file and table digests), which must be 64 lowercase
+hexadecimal characters or refuses `digest_field_format`; every other string is
+scanned even when it looks like a digest.
 The 2026-11 floor applies only to kept snapshots. Each snapshot is compared with
 its own source's current capture; current retrieval months may differ and may
 predate the keeper floor.
@@ -59,8 +76,9 @@ An ephemeral input-licence set extends the same token checks to every non-key
 released field, including numeric values, and manifests/reports including table
 counts added by storage. It is never exported. The dedicated key exemption is
 unchanged: an intake licence equal to a published registration passes because
-no licence field is released. A registration or licence token in a non-key field
-still refuses. Under decision 0105 (proposed), the closed typed-field list
+no licence field is released and the key slot meets withheld numbers only. A
+licence or withheld token in a non-key field still refuses; a released
+registration token there is published (decision 0119). Under decision 0105 (proposed), the closed typed-field list
 `contracts.TYPED_FIELDS` (the five ISO dates, `zone`, `street_number`,
 `block_en`, `block_ar`, `lon`, `lat`, `capital_qar`, the tax year and the yes/no
 tax flag of `pub_register_company`, the list's `employee_count`, and the
@@ -71,13 +89,15 @@ equal to its one fixed text (`contracts.FIXED_TEXTS`), and the `period` columns 
 the snapshot and list tables, each a real `YYYY-MM` month (else
 `snapshot_month`), each format and declared shape checked before the scan: the two
 snapshot coverage fields are lists of months, every other field one value, and
-a container in place of one value refuses) admits a token equal to a
-registration, licence or withheld number only when that number has one or two
+a container in place of one value refuses) admits a token equal to a key it
+meets (a licence or withheld number in a release column; in a manifest or
+report field also a published registration) only when that number has one or two
 digits or the shape 19xx or 20xx. Longer numbers, every unlisted field, the other
 manifest fields (the receipt's text included) and the rest of the report keep
-the full scan; other coincidental token
-matches still refuse. Every number of every release table meets every key by the
-token match (decision 0105 item 4), with no string check.
+the full scan against the keys they meet; other coincidental token
+matches with those keys still refuse. Every number of every release table meets
+the licence and withheld numbers by the token match (decision 0105 item 4 as
+amended by decision 0119), with no string check.
 
 Commerce registrations accept exactly one to six ASCII digits with an optional
 slash followed by one to three ASCII digits (at most ten characters).
@@ -107,14 +127,16 @@ slots, across current and historical captures, manifests/reports and storage-add
 counts. No duplicate-number list is exported; assembly retains its existing
 lead-pin trust boundary.
 Financial-centre numbers keep their five-digit declaration. Duplicate
-financial-centre keys and collisions of `ROW-` identities still refuse as
-`duplicate_registration_key`; duplicate published row keys still refuse as
+companies and geocoded keys and collisions of `ROW-` identities still refuse as
+`duplicate_registration_key`; winning-group event conflicts are counted absences
+under decision 0117 item 3, not refusals. Duplicate published row keys still refuse as
 `duplicate_row_key` when their identities differ. Cross-register ambiguity still
 refuses as `ambiguous_cross_source_key`, with no source prefix added.
 
-Missing financial-centre keys, duplicate financial-centre keys or row identities, cross-source key ambiguity, unknown
-columns, unconfirmed branch structure and other malformed notice dates refuse with
-named reasons. There is no merge, date repair, inferred cancellation
+Missing financial-centre keys, duplicate financial-centre companies or geocoded keys,
+duplicate row identities, cross-source key ambiguity, unknown columns, unconfirmed
+branch structure and other malformed notice dates refuse with named reasons.
+There is no merge, date repair, inferred cancellation
 date or opening/closure column. A historical company need not be in today's
 card table. Its cell belongs to its own snapshot. Empty kept snapshots and
 missing snapshots are distinct; `Built.snapshot_reason` returns

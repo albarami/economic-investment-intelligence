@@ -54174,3 +54174,228 @@ S2-P84 lead ceiling commit (ruling L-1723, 2026-11-24): `custodian/publicdata/so
 | 2026-11-25 | S2-LMK2 approval | `ffde3644f1` (showcase landmarks as reviewed district areas, proposed decision 0115) and `2f83d0ee39` (round 2: stored district point checked as stored; West Bay members under ruling L-1869). Built by Cognition Devin. S2-LMK2.rv1 (OpenAI Codex gpt-6.1-sol, 899 s): **REJECTED** `ffde3644f1`; S2-LMK2.rv2 (OpenAI Codex gpt-6.1-sol, 605 s): **APPROVED** `2f83d0ee391830ee1fcbd4910b0558dbf4489018`. | OpenAI Codex |
 | 2026-11-25 | S2-B3 approval | `846f3582c2` (a reviewed choice for a building row the name route leaves ambiguous; `building:3` filled; ruling L-1865) and `a9ef6755b5` (round 2: stored source and kind checked; a non-text reference refuses closed), built by Cognition Devin, re-cut by the lead onto S2-LMK2 `2f83d0ee39` as `31d403b5` and `84ab2fdf` with identical changed lines per file (one decision 0115 conflict: items 6 and 7 both kept). S2-B3.rv1 (OpenAI Codex gpt-6.1-sol, 436 s): **REJECTED** `846f3582c2` (P1, P2); S2-B3.rv2 (Anthropic Claude Opus 5.5, 883 s): **APPROVED** `84ab2fdffed94d6fac76aef91c23e08df260e497`, with records-only finding R1 (decision 0115 item 7 wording) applied by the lead in `289159f78a` with the reviewer's exact sentence, and two non-rejecting nits N1 (repeated test block) and N2 (fill mode of the blank-reason test) recorded here, non-rejecting. | Anthropic Claude |
 | 2026-11-25 | Train S2-39 identity | Four approved commits cherry-picked with `-x` onto main `3324611712ac3e9a26baea3b58623c18f9dedb3c`: S2-LMK2 `ffde3644f1`, `2f83d0ee39`; S2-B3 `31d403b5`, `84ab2fdf`; then the R1 records commit. The one join difference is `AGENTS.md`/`CLAUDE.md` rule 44, where S2-B3's reviewed-choice sentence is joined to S2-FPR's fingerprint wording already on main (records only). Every other changed line is identical per file to the approved commits. The joined code tree equals candidate `4c42ec81`, on which the frame probe S2-FRAMEPROBE.3 runs (ruling L-1876). | lead |
+
+
+## S2-P97 — Foursquare no-cell coverage exclusion
+
+- Brief/ruling: supplied S2-P97 round b2, L-1881; requirement document 04 PUB-102. Base commit: `97a8ec2b3e605b0ef32899135f46195814851368` on `task/s2-p97-fsq-no-cell`. This is the Foursquare task; the older country-crosswalk approval using the same task identifier is unchanged and flagged in the handoff alert.
+- Maker/model/tool: OpenAI, GPT-6 / Codex (backend revision not exposed), `functions.exec` / `exec_command` and `apply_patch`. Builder persona: senior geospatial data engineer for public place layers. Strict reviewer persona: strict-reviewer, the rule-7 auditor. Different-maker review is the lead's next step; none is claimed here.
+- Plan and implementation: add invented source-shaped red tests, preserve the exact `FrameError` refusal, filter each kept row through one cell lookup, reuse only located row/table pairs downstream, record the coverage count, plant individual violations, then run the required checks. No nearest cell or other coverage field is added. `Production.fsq` already records the whole coverage dataclass; `assembly_io.write_record` / `read_object` prove `no_cell` survives that existing serializer, so no adapter edit is needed.
+- Skills and equivalent rules: project-orientation found and reused the open-places exclusion and Foursquare test helpers; task-standards set the two personas; test-driven-development equivalent rules established (a), (b), (d) red before implementation; systematic-debugging equivalent rules separated a missing cell from `FrameError`; receiving-code-review equivalent rules verified b1's already-green refusal and swept old refusal expectations; sanad-provenance attributes the real counts only to supplied L-1881 and reads no real cache; property-based-testing checks conservation, ordering, closure and one lookup per kept row with fresh per-example temporary files; dimensional-analysis scoped rules keep subtraction in units of rows and treat cell values as identifiers; spec-to-code-compliance scoped rules match PUB-102 and every L-1881 downstream exclusion to the implementation and tests; github-flow keeps one scoped branch and one requested local commit; requesting-code-review equivalent rules identify the unchanged parser, frame ownership and adapter for the lead's independent review; verification-before-completion equivalent rules record actual exits; muhasabah-gate checks claims, scope and incomplete live evidence. Missing superpowers skills use the brief's equivalent rules.
+- Environment: offline (`UV_OFFLINE=1`), Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15, profile `eii`, database disabled. Fixtures are invented Parquet rows and H3 cells. The property uses `deadline=None` for file-backed work and no reduced example count or suppressed health check.
+
+| Command / evidence | Exit and result |
+|---|---|
+| `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_places_fsq_no_cell.py -vv -p no:cacheprovider`, before source change | 1: cases (a), (b), (d) red with `cell`; initial property setup also exposed the function-scoped-fixture health check. Corrected using a per-example temporary-directory/patch context, without suppressing a check; rerun exit 1, all four tests red on the original source, seed `1795562487`. |
+| `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_places_fsq_join.py::test_ambiguous_base_cell_refuses_with_exact_reason -vv -p no:cacheprovider` | 0: one passed, seed `1795562465`; case (c) green-before, pinned by the b2 brief's unchanged earlier result at `3324611712ac3e9a26baea3b58623c18f9dedb3c`. |
+| `UV_OFFLINE=1 uv run --locked python .overnight/tmp/plant_runner.py baseline custodian/tests/test_places_fsq_no_cell.py` | 1: final five tests red against an isolated exact copy of the base source (`git show HEAD:custodian/src/eii_custodian/publicdata/places_fsq/assemble.py`); `.overnight/tmp/baseline-final.log`. |
+| `UV_OFFLINE=1 uv run --locked python .overnight/tmp/plant_runner.py PLANT TEST` | Each isolated plant exit 1: `cell-zero`, `frame-error`, `withhold-filter`, `count-zero`, `duplicate-input`, `names-input`, `closed-input`, `unmapped-input`, `lookup-twice`; exact commands and per-plant logs in `.overnight/tmp/plants.json`. Additional literal `no-cell-guard-deleted` plant exit 1 on case (a), `.overnight/tmp/no-cell-guard-deleted.log`. Source in the workspace was never mutated by a plant. |
+| `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_places_fsq_no_cell.py custodian/tests/test_places_fsq_join.py custodian/tests/test_places_fsq.py -vv -p no:cacheprovider` | 0: final touched selection at that point, thirty-three passed, seed `1795562738`; `.overnight/tmp/touched-final.log`. |
+| `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_places_fsq_breaks.py::test_one_kept_place_carries_the_hand_written_table_fields -vv -p no:cacheprovider` | 1: reproduced one further old expectation of a blanket missing-cell refusal, seed `1795562777`; updated only that expectation to counted withholding, reusing `_build`, and retained its other refusal checks. |
+| `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_places_fsq*.py -vv -p no:cacheprovider` | 0: 264 passed in 21.23 seconds, seed `1795562795`; all four touched test files included; `.overnight/tmp/fsq-final.log`. |
+| `UV_OFFLINE=1 uv run --locked ruff check .` | First exit 1: two new-test style defects (import grouping, explicit zip strictness). Corrected both; final exit 0, all checks passed. |
+| `UV_OFFLINE=1 uv run --locked ruff format .`; `UV_OFFLINE=1 uv run --locked ruff format --check .` | Formatter exit 0, two in-scope files reformatted; final format check exit 0, 1013 files formatted. |
+| `UV_OFFLINE=1 uv run --locked mypy` | 0: no issues in 531 source files. |
+| `UV_OFFLINE=1 uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'` | 0: 37 tests passed. |
+| `python3 scripts/check_docs.py` | 0: 1369 text files, 163 Markdown files checked before this evidence append; final check recorded below. |
+| `python3 scripts/check_tree.py`; `git diff --check` | Both 0: eight tree rules pass; no whitespace defects. |
+
+- Changed withholding outcome: `point_cell` returning `None` yields no table row and increments `no_cell`; case (a) changes one row's cell membership while preserving valid other inputs, and both the cell-zero and literal guard-deletion plants turn it red. Preserved refusal: `FrameError` becomes exact `PlacesFsqError.reason == "cell"`; its single-translation deletion plant turns the already-green case (c) red. All other source/release/receipt/category/name refusal rules are unchanged.
+- Edge classes: empty input, one covered row, one uncovered row, repeated coordinates with distinct source identifiers, arbitrary row order, mixed covered/uncovered rows and open/closed states are covered by the property and explicit examples. Cell-zero/withholding/count plants expose absent/single-row accounting; the lookup-twice plant exposes repeated lookup even on a covered singleton; duplicate/name/unmapped/closed input plants each expose the corresponding leak. The mixed country/frame exclusion test preserves the earlier coverage labels; ambiguous fine-plus-parent ownership still refuses. No parser shape or key policy changes.
+- Scope limits: no real cache, network, source fetch, frame modification, live coverage replay, independent approval, task-box tick or slice gate is claimed. The frame's coastal coverage remains open in PO-S2-P97-NO-CELL; the three supplied sub-counts are written there in words and attributed to L-1881.
+
+- BLOCKED correction / local commit attempt: exact-path `git add custodian/src/eii_custodian/publicdata/places_fsq/assemble.py custodian/tests/test_places_fsq.py custodian/tests/test_places_fsq_join.py custodian/tests/test_places_fsq_breaks.py custodian/tests/test_places_fsq_no_cell.py docs/04_PUBLIC_DATA_PACK.md PROGRESS.md OPEN_ITEMS.md TASKS.md` exited 128: Git could not create its worktree `index.lock` on the read-only shared Git filesystem. No commit or push was made and no bypass was attempted. The base hash above remains HEAD. Implementation stopped under brief L-1705; the final documentation recheck promised above was not run after this evidence append. The lead can stage and create the requested one Conventional Commit as `albarami` from a shell with writable Git metadata. Already-started supplemental assembly regressions are allowed to finish and will be reported in the return.
+- Supplemental already-started assembly run completed after the Git blocker: `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests/test_places_fsq_no_cell.py custodian/tests/test_places_fsq_join.py custodian/tests/test_places_fsq.py custodian/tests/test_assembly_producers.py custodian/tests/test_assembly_refusals.py -vv -p no:cacheprovider` exited 0, 1524 passed in 215.12 seconds, seed `1795562641`; `.overnight/tmp/final-pytest.log`. This run predates the final serialization assertion and the old-break-test correction; the final Foursquare run recorded above covers those final test edits. `AGENTS.md` and `CLAUDE.md` remain byte-identical (read-only comparison exit 0).
+
+## S2-T39B b1 — Year-range contact reading — 2026-11-25
+
+- Builder: OpenAI Codex, GPT-6 (exact deployed revision not exposed), using the Codex shell and patch tools. Senior persona: engineer of the agency-page quotation seam. Strict self-review persona: privacy auditor of decision 0029 item 5. Base/HEAD: `97a8ec2b3e605b0ef32899135f46195814851368`; no commit or push.
+- Plan and scope: reuse `extract_page`, `_quotation_row` and `quotation_page`; plant cases before implementation; add only an exact whole-match, ascending ASCII year-range filter to the existing phone-match generator. Proposed decisions 0120 and 0121 record the owner's brief-relayed words "option b", dated 2026-11-25. No actual evidence flag or acceptance checkbox changes; no saved-page/cache read.
+- Environment: Python 3.14.6; `UV_OFFLINE=1`; existing locked workspace and Hypothesis `eii` profile (100 examples, database disabled). Final generated-test seed: `1764060001` through `PYTEST_ADDOPTS`; plants pass the same seed explicitly. Initial diagnostic red/green runs used the bootstrap time seed, which their quiet output did not capture; no seed is retrospectively claimed for those runs.
+- Tests first: `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests -q -k 'page_text_year_range or page_text_phone_near or page_text_phone_rule' -p no:cacheprovider` returned **1**, 9 failed / 13 passed / 15916 deselected on the old rule; after the four-line change the same selection returned **0**, 22 passed / 15916 deselected. Named cases were then extended with equal upper-bound years, separated contacts and digit-count edges; the generator was widened to Unicode Nd.
+- Full requested selection: `UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests -q -k 'investment or agency or investqa' -p no:cacheprovider` returned **0**, 806 passed / 15140 deselected, 66.42 seconds. The final restored-source run, with `PYTEST_ADDOPTS='--hypothesis-seed=1764060001'`, returned **0**, 806 passed / 15140 deselected, 65.22 seconds.
+- Guard proofs: disposable runner `.overnight/tmp/guard_proofs.py` returned **0** after separately restoring source bytes following every plant. Each pytest command used `UV_OFFLINE=1`, `PYTHONDONTWRITEBYTECODE=1`, `uv run --locked python -m pytest custodian/tests -q -k SELECTION -p no:cacheprovider --hypothesis-seed=1764060001`:
+  - Exception removed, `SELECTION=page_text_year_range`: **1**, 10 failed / 2 passed / 15934 deselected.
+  - Phone refusal removed, `SELECTION=page_text_phone_near`: **1**, 13 failed / 15933 deselected.
+  - E-mail refusal removed, `SELECTION=page_text_refusals_are_named`: **1**, 1 failed / 8 passed / 15937 deselected.
+  - Exact-year-shape predicate removed, `SELECTION=page_text_phone_near`: **1**, 8 failed / 5 passed / 15933 deselected.
+  - Year-order predicate removed, `SELECTION=page_text_phone_near`: **1**, 1 failed / 12 passed / 15933 deselected.
+- Check results: `uv run --locked ruff check .` first returned **1**, six RUF001 findings in new Unicode fixture spellings; using an escaped en dash and the Unicode Nd character strategy fixed those findings, and the next run returned **0**. `uv run --locked ruff format custodian/tests/test_investment_build.py` returned **0**, file unchanged. `uv run --locked ruff format --check .` returned **0**, 1012 files formatted. `uv run --locked mypy` returned **0**, 531 source files. `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'` returned **0**, 37 tests. These uv commands used `UV_OFFLINE=1`. `python3 scripts/check_docs.py` returned **0**, 1370 text files / 165 Markdown files. `git diff --check` returned **0**; direct byte comparison confirmed AGENTS.md and CLAUDE.md remain identical.
+- Security/spec review: production diff adds four lines and deletes none; one direct production caller (`selected_page_rows`) has two build/assembly call sites. The old e-mail, identifier and release-token checks and phone digit-count/matcher remain unchanged. Whole-match ASCII years make fixed-width lexical order equivalent to chronological order. Separate contact matches before and after an allowed range still refuse. The independent test oracle uses split strings and integer bounds rather than the production year regex. Manual scoped comparison found no mismatch with brief Build item 1 or proposed decision 0120 item 1; this is builder evidence, not different-maker approval.
+- Skills applied: project-orientation reused the existing seam and fixtures; task-standards supplied the two personas; test-driven-development equivalent established the old-rule red before the minimal change; sharp-edges constrained the exception to whole matches and checked Unicode, prefixes, malformed separators and empty/count edges; property-based-testing added a Unicode digit-group oracle plus generated year pairs; differential-review traced the baseline checks and three production functions in the call chain; security-review equivalent planted both contact refusal arms; spec-to-code-compliance traced the narrow proposed rule manually (focused child unavailable); sanad-provenance attributed saved-page counts to OI-414 and the owner's words to the brief; verification-before-completion equivalent recorded real exits and restored-source green; github-flow kept the task isolated without commits or remote operations as instructed; muhasabah-gate checked scope, provenance and pending real evidence.
+- Tool limitations: the focused read-only spec-check child failed to start with an invalid thread-store/no-rollout error. The patch tool rejected a separate additional security-review file as outside the project; the review is instead included in the explicitly requested return report. No rejected write was retried. Installed skill instruction files were read outside the worktree as required by higher-priority session instructions; all project reads and edits stayed within the workspace. See `.overnight/ALERT.md`.
+- Open: proposed decisions need their normal acceptance; the lead must rerun real stored pages, update the two flags only on evidence and tick S2-T39 box 1 only after that rerun. OI-414 remains open for the two e-mail pages. No different-maker approval is asserted.
+
+## S2-ADDF b1 — published additions shapes, local builder evidence
+
+Base: `97a8ec2b3e605b0ef32899135f46195814851368`; no commit or network
+operation. Builder: OpenAI Codex, GPT-6 family, functions exec/exec_command tools.
+Persona: senior data engineer of public statistical tables. Strict self-review:
+provenance auditor; independent different-maker approval is not claimed.
+Scope: S2-T11, document 03 section 7.3, proposed decision 0122 items 1 to 3.
+The supplied lead sweep is the source for field names and label inventories;
+only invented fixture measures were used. No real public cache was opened.
+
+Skills and effects: project-orientation reused the existing field lists and
+mapping helpers; task-standards applied the named engineering/auditor personas;
+github-flow kept the task in its supplied worktree without committing, as the
+brief requires; sanad-provenance kept snapshots and lineage intact. The brief's
+skill-equivalent rules supplied test-driven-development (red before source
+changes), sharp-edges (malformed alias maps and exact lookup),
+property-based-testing (decimal-domain and withheld-count generators),
+dimensional-analysis (published units unchanged, decimal scale only),
+spec-to-code-compliance (DDL, contract and parser aligned), and
+verification-before-completion (real exits and individually restored plants).
+Muhasabah-gate checks the return against the observed results. Further installed
+skill files were not opened outside the worktree after reading the brief; the
+initial outside-worktree skill reads are disclosed in the task alert.
+
+Commands below ran from the repository root using the installed locked
+environment, `UV_OFFLINE=1`, pytest cache provider disabled. The first test
+runs used the repository's time-derived Hypothesis seed; that seed was not
+captured and is not represented as reproducible evidence. All plant runs
+used `PYTEST_ADDOPTS=--hypothesis-seed=65211`.
+
+| Evidence | Command or exact selection | Exit | Result |
+|---|---|---|---|
+| Initial red named tests | `uv run --locked python -m pytest custodian/tests/test_additions_industry.py -q -k 'published_activity or sweep_country or published_certificate or agricultural_certificate or alias_table or withheld_country' -p no:cacheprovider` | 1 | 38 failed, 8 passed, 59 deselected |
+| Initial red including decimal property | same command, adding `or six_place_manufacturing` to the selection | 1 | 39 failed, 8 passed, 58 deselected |
+| Initial green | `uv run --locked python -m pytest custodian/tests -q -k "addition" -p no:cacheprovider` | 0 | 488 passed, 15479 deselected; expanded tests added afterward |
+| Precision plant | remove the `measure_precision` comparison guard; selection `seven_place_manufacturing` | 1 | 2 failed |
+| Unknown-column plant | remove only the unknown-source-field guard; selection `published_activity_names_do_not_admit` | 1 | 7 failed |
+| Withheld-count plant | remove only the withheld-label count increment; selection `sweep_country_labels` | 1 | 14 failed, 4 passed |
+| Alias lookup plant | remove only the mapped-value shape guard; selection `alias_table_hostile_leaf_mutations` | 1 | 2 failed, 2 passed; hostile containers lose the named refusal |
+| Alias target plant | remove only the canonical-type membership guard; selection `alias_target_must_be` | 1 | 1 failed |
+| Withheld-list plant | bypass only the closed string-list validation; selection `withheld_country_list_is_closed_text` | 1 | 4 failed |
+| Alias-container plant | remove only the mapping-container guard; selection `alias_table_container_mutations` | 1 | 3 failed, 1 passed |
+| Alias-duplicate plant | remove only duplicate-key validation in the finishing step; selection `published_certificate_spelling` | 1 | 4 failed |
+| Missing-column plant | remove only the missing-source-field guard; selection `missing_published_activity_column` | 1 | 14 failed |
+| First Ruff | `uv run --locked ruff check .` | 0 | all checks passed |
+| First format check | `uv run --locked ruff format --check .` | 0 | 1012 files formatted |
+| First typing | `uv run --locked mypy` | 0 | 531 source files |
+| First documentation | `python3 scripts/check_docs.py` | 0 | 1370 text files, 165 Markdown files |
+| Import boundary | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'` | 0 | 37 tests |
+
+Every plant was restored individually in a `finally` block. The plant runner
+itself exited 0 only after requiring exit 1 from every planted test command.
+No fallback, gate reduction, expected baseline refresh or tolerated survivor
+was introduced. Logs and the return remain under the task's `.overnight/`.
+The country-reference audit found Congo is an exact reference spelling, but
+the source label still does not distinguish the two Congos; withholding does
+not depend solely on exact reference-list membership.
+
+S2-ADDF b1 appended verification correction: the expanded full selection with
+seed `65211` exited 1 (1 failed, 526 passed, 15479 deselected). The isolated
+expanded selection with `-x` also exited 1 (1 failed, 30 passed, 105 deselected).
+The deterministic cause was the newly added test's use of DuckDB relation
+`fetchone()`, which the pinned API rejects. The test now uses the already-used
+`fetchall()` API and retains the exact `DECIMAL(18,6)` and Decimal-value
+assertions. No production code or expectation changed. The same expanded
+selection without `-x` then exited 0 (39 passed, 105 deselected). A fresh full
+selection is required after this correction; a green retry alone is not the
+explanation or closure of this failure.
+
+S2-ADDF b1 final evidence, appended after the assertion-preserving test fix:
+`PYTEST_ADDOPTS=--hypothesis-seed=65211 UV_OFFLINE=1 uv run --locked python -m pytest custodian/tests -q -k "addition" -p no:cacheprovider`
+exited 0: 527 passed, 15479 deselected. Ruff check, Ruff format check and mypy
+all exited 0 after the correction; mypy checked 531 source files. The
+documentation check exited 0 (1370 text files, 165 Markdown files), and the
+import-boundary command exited 0 (37 tests). The initial, expanded and
+post-correction static rounds each returned 0. `git diff --check` exited 0,
+and AGENTS.md / CLAUDE.md byte parity was true. No earlier failure row was
+rewritten. The return lists the changed paths, all country dispositions,
+refusal cases, nine red plants, limitations and proposed open items.
+
+## S2-ADDF fx1 — rv1 F1/F2 correction, 2026-11-25
+
+Base remains `97a8ec2b3e605b0ef32899135f46195814851368`; changes are against
+its supplied uncommitted b1 tree. Builder: OpenAI Codex, GPT-6 (exact serving
+variant not exposed), functions exec/exec_command. Persona: senior data
+engineer of public statistical tables; strict self-review: provenance auditor.
+The supplied different-maker review is `.overnight/IN/ADDF-rv1-return.md`
+(Cognition Devin, SWE-2 High). Its two findings were accepted by the lead in
+the fx1 brief; this correction does not claim independent reapproval.
+
+Correction to the earlier b1 country-disposition evidence: thirteen labels
+remain withheld and four remain regions (seventeen omitted dispositions).
+Bosnia now maps by its exact spelling to BIH, the sole Bosnia and Herzegovina
+row in the committed country reference. Antigua, Trinidad and all other
+dispositions are unchanged. Earlier b1 rows and their historical counts are
+retained; they are superseded on this point only. Proposed decision 0122 item 3,
+the existing additions README and the b1 open-item entry now state this result.
+No parser or build implementation, precision, unit, privacy rule or gate changes.
+
+F1 is reproduced with two pinned Kosovo examples (mapped and unmapped) in the
+existing generated-label property. Its shallow copy now explicitly clears
+`country_labels_withheld`, just as its other country dispositions are replaced.
+The family sweep found only this shallow-copy label generator. The separate
+withheld-count label property already replaces withheld, regions and crosswalk;
+all other additions-family copies concern rows or schema blocks, not drawn labels.
+
+All uv commands below used `UV_OFFLINE=1`; pytest also used
+`PYTEST_ADDOPTS=--hypothesis-seed=65211` and `-p no:cacheprovider`.
+Logs are `.overnight/tmp/fx1-*.log`.
+
+| Evidence | Command or exact selection | Exit | Result |
+|---|---|---|---|
+| F1 red, old shallow copy | `uv run --locked python -m pytest custodian/tests/test_additions_industry.py -q -k a_label_is_skipped_only_when_listed -p no:cacheprovider` | 1 | 1 failed, 143 deselected; both pinned examples fail |
+| F2 initial test error | same file, `-k bosnia_maps` | 1 | 1 failed, 143 deselected; test used an incorrect reference-column name (`is_region`); corrected to the committed `human_reviewed` field before testing the defect |
+| F2 red, corrected test | same file, `-k bosnia_maps` | 1 | 1 failed, 143 deselected; Bosnia still in the old withheld list |
+| Focused green | same file, `-k 'a_label_is_skipped_only_when_listed or bosnia_maps or sweep_country_labels'` | 0 | 19 passed, 125 deselected |
+| Ruff | `uv run --locked ruff check .` | 0 | all checks passed |
+| Formatting | `uv run --locked ruff format --check .` | 0 | 1012 files already formatted |
+| Typing | `uv run --locked mypy` | 0 | 531 source files |
+| Documentation | `python3 scripts/check_docs.py` | 0 | 1370 text files, 165 Markdown files |
+| Import boundary | `uv run --locked python -m unittest discover -s scripts/tests -p 'test_import_boundary_*.py'` | 0 | 37 tests |
+| Whitespace | `git diff --check` | 0 | no errors |
+| Rules parity | byte comparison of `AGENTS.md` and `CLAUDE.md` | 0 | identical |
+
+Skills and effects: project-orientation reused the existing tests/map; task-standards
+set the engineer/auditor personas; receiving-code-review verified both findings
+and swept the family; test-driven-development pinned red cases before fixes;
+property-based-testing retained the arbitrary-label oracle with isolated inputs;
+sanad-provenance bound Bosnia to the committed reference only;
+spec-to-code-compliance aligned proposed decision 0122 item 3 and the records;
+github-flow preserved the supplied worktree with no commit or push;
+verification-before-completion recorded actual exits; requesting-code-review
+prepares these two fixes for the lead's different-maker confirmation;
+muhasabah-gate limits claims to fixture evidence and records the initial
+outside-worktree instruction-file reads in `.overnight/ALERT.md`. These skills
+use the brief's equivalent rules where no workspace-local skill file exists.
+No network or real-cache read was performed. No new refusal branch or guard
+is introduced; the retained omission cases assert exact coverage reasons.
+
+S2-ADDF fx1 final verification (2026-11-25):
+`UV_OFFLINE=1 PYTEST_ADDOPTS=--hypothesis-seed=65211 uv run --locked python -m pytest custodian/tests -q -k "addition" -p no:cacheprovider`
+exited 0: 527 passed, 15479 deselected in 168.35 seconds. Environment: Linux,
+locked Python 3.14.6; no dependency, pin or baseline changes. The documentation
+check after the correction record also exited 0 (1370 text files, 165 Markdown
+files). The inline YAML comparison to the captured starting b1 tree exited 0:
+exactly Bosnia leaves withholding and gains the BIH crosswalk row; all other
+YAML entries are unchanged. The append-only comparison of PROGRESS.md exited 0.
+The return's per-file additions/removals are measured against the starting b1
+snapshot, not the clean base. No unresolved random test failure was observed;
+the incorrect initial test column is explained above. The lead's real-input
+replay and different-maker confirmation remain pending. No commit was made.
+
+S2-GREC (2026-11-25): dispositions of the 37 F1 entries of the gate pre-review (43 rows) are appended to OPEN_ITEMS.md, drafted by Claude Opus 5.5 (S2-GREC.b1). The lead routed the two no-fit rows. OI-410 now has a dated count note in Proposed decision 0114 item 2. The rule-3 sentence of `custodian/README.md` is corrected. The follow-up routes name S3-T11. `python3 scripts/check_docs.py` exit 0. Records only; another maker reviews.
+
+S2-GREC fx1 (2026-11-25), correction to the S2-GREC row above, appended: S2-GREC.rv1 (OpenAI Codex) REJECTED `01e5db61` on three record findings, now fixed by the lead.
+1. OI-410 is LEAD-EVIDENCE: the recorded acceptance is owed.
+2. The 0114 note now cites decision 0081 item 4, with the count of 27 in the loaded-module digest, and 0114's Amends field names item 4.
+3. OI-409, S2-FPR b1 and S2-ADDF b1 each have one line.
+
+The section holds 37 dated disposition lines for the F1 entries. The "43 rows" of the row above counted the draft's sub-obligations. `python3 scripts/check_docs.py` exit 0.
+
+### S2-C7C b1 — defer the uncommitted C7 coordinates (2026-11-25; uncommitted)
+
+- Base/full HEAD `9e979ed7ed1337a0242eea28d77484662241d326`. Builder/maker/model/tool: Cognition, Devin, Kimi K3.1 Pro High, file tools and shell. Senior methods engineer; strict provenance self-review. Choice **defer** under proposed decision 0125: decision 0115 items 2–3 and `showcase_gazetteer.yaml` rows `landmark:0`–`landmark:3` commit district members but no coordinate values; `places/stage.py::_district_points` derives six-decimal points from selected archive polygons. `S7_DEFERRED_PINS` now includes `c7.coordinates`; `collect_pin_rows` checks deferred pins before configuration pins so the pending reason cannot become a value. OI-283, generation config and source-check reason agree on S7-T05. No coordinate, live build, card write or gate closure is claimed; no commit, push or network.
+- Test first: three focused assertions exited 1 (3 failed: set membership, missing OI row, old config reason), then exited 0 after the scoped change. The first full run exited 1 (19 failed, 307 passed), exposing the configuration-first collector and an OI plant that targeted the newly inserted row. After the test oracle was corrected, the plain-CLI test exited 1 specifically on `values={'pending_reason': ...}` versus `{}`; deferral-first collection and the targeted OI plant then exited 0. Final required command `uv run --locked python -m pytest -q -p no:cacheprovider custodian/tests/test_method_card_pins.py custodian/tests/test_method_pin_supply.py` exited 0: 326 passed in 19.56 seconds.
+- Guard plants: deleting only `c7.coordinates` from `S7_DEFERRED_PINS` exited 1 (3 failed, 5 passed), including exact `S2:unpinned:c7.coordinates`; restoration exited 0 (8 passed). Reverting only the collector branch order exited 1 on the pending-reason-as-value mismatch; restoration exited 0 (1 passed). Existing one-change tests cover seven wrong OI prefixes, exact S7 refusal by name, empty values/lineage, missing OI row/task and the property oracle over pending subsets. No new exception branch or numerical parser was added.
+- Verification with `UV_OFFLINE=1` and workspace temporary/cache paths: `ruff check .` exit 0; `ruff format --check .` exit 0 (1016 files); isolated import-boundary discovery exit 0 (37 tests); `python3 scripts/check_docs.py` exit 0 (1381 text files, 172 Markdown files); `git diff --check` exit 0. Record-inclusive documentation verification is rerun after this row. Skills: project-orientation reused existing pin machinery; task-standards held the methods/provenance bar; sanad-provenance refused uncommitted coordinates; spec-to-code-compliance aligned decision 0115, stage derivation, gate and records; test-driven-development supplied the red/green sequence; strict-reviewer found the configuration-first defect; verification-before-completion recorded actual exits; muhasabah-gate limits claims to offline fixture evidence. No copied code block or new function was added.
+
+### S2-C7C fx1 — restore the non-deferred pending-pin guard (2026-11-25)
+
+- Review S2-C7C.rv1 (OpenAI) REJECTED on F1: the tracked-configuration test no longer exercised a non-deferred pending pin. Fix by the lead (Anthropic): new test `test_tracked_configuration_withholds_a_non_deferred_pending_pin` marks only `wilson.period` pending on a copy of the tracked configuration and asserts `configuration_pending` is true, `method_pins()` is empty, the reason is `pin_configuration_pending`, and neither `PIN_ARTIFACT_NAME` nor `PIN_CONFIG_NAME` is written.
+- Plant: `configuration_pending` made to skip `wilson.period` gave exit 1 (1 failed); restored, exit 0 (1 passed). `-k test_tracked_configuration` gave 6 passed.
+- Records note of rv1: the S2-P63 "DONE SO FAR" line of OPEN_ITEMS.md is restored to its base text; only the two DEFERRED TO SLICE S7 summary lines differ from the base.

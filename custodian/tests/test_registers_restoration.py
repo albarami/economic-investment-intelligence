@@ -355,13 +355,17 @@ def test_register_numberless_row_does_not_fill_required_fields(field, reason):
 
 
 def test_register_restored_key_leak_refuses():
+    """Decision 0119: re-pointed from the released `ROW-` identity (which now
+    publishes) to the withheld duplicate number that a row identity replaces."""
     frame = Frame(frozenset())
     rows = parse("biz_register", inputs(rows=[commerce(registration_number="")]), frame)
+    tables = {"pub_register_company": rows, "pub_register_snapshot": []}
     rows[0]["name_en"] = "SYN " + rows[0]["registration_number"]
+    validate_release(tables, frame)
+    rows[0]["name_en"] = "SYN 97531"
+    validate_release(tables, frame)
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(
-            {"pub_register_company": rows, "pub_register_snapshot": []}, frame
-        )
+        validate_release(tables, frame, withheld_registrations=frozenset({"97531"}))
 
 
 @pytest.mark.parametrize(
@@ -371,8 +375,10 @@ def test_register_restored_key_leak_refuses():
         - {"pub_register_company", "pub_register_snapshot", "register_company_list"}
     ),
 )
-@pytest.mark.parametrize("token", ["54321", "97003", "ROW-" + "a" * 20])
+@pytest.mark.parametrize("token", ["54321", "97003", "97531", "ROW-" + "a" * 20])
 def test_register_every_released_table_keeps_identifier_scan(table, token):
+    """Decision 0119: the licence 97003 and the withheld 97531 refuse in every
+    other release table; the released keys 54321 and the `ROW-` identity publish."""
     frame = Frame(frozenset())
     rows = parse(
         "biz_register",
@@ -384,16 +390,19 @@ def test_register_every_released_table_keeps_identifier_scan(table, token):
     # Use the restored company's actual key, retaining the same valid baseline.
     if token.startswith("ROW-"):
         token = "ROW-" + "a" * 19 + "b"
+    tables = {
+        "pub_register_company": rows,
+        "pub_register_snapshot": [],
+        table: [{"value": token}],
+    }
+    keys = dict(
+        licences=frozenset({"97003"}), withheld_registrations=frozenset({"97531"})
+    )
+    if token not in {"97003", "97531"}:
+        assert token in validate_release(tables, frame, **keys)
+        return
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        validate_release(
-            {
-                "pub_register_company": rows,
-                "pub_register_snapshot": [],
-                table: [{"value": token}],
-            },
-            frame,
-            licences=frozenset({"97003"}),
-        )
+        validate_release(tables, frame, **keys)
 
 
 @pytest.mark.parametrize(

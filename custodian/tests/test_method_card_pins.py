@@ -203,12 +203,13 @@ def test_plant_unpinned_at_gate_even_with_open_item(tmp_path, gate, pin):
         _complete(paths, record, gate=gate)
 
 
-# Decision 0094: the five C6 neighbour and C7 shared-reach result pins, written
-# out literally so the module's own set is checked, never trusted.
+# Decisions 0094 and proposed 0125: the C6 neighbour and C7 pins deferred to
+# S7, written out literally so the module's own set is checked, never trusted.
 DEFERRED_TO_S7 = (
     "c6.expected_clq",
     "c6.expected_p",
     "c6.expected_q",
+    "c7.coordinates",
     "c7.shared_b_given_a",
     "c7.shared_a_given_b",
 )
@@ -239,7 +240,7 @@ def _refusal(paths, record, gate):
     return str(refused.value)
 
 
-def test_s7_deferred_pins_are_the_five_result_pins():
+def test_s7_deferred_pins_are_the_six_decision_pins():
     assert S7_DEFERRED_PINS == frozenset(DEFERRED_TO_S7)
     assert S7_DEFERRAL_ITEM == "OI-283: "
 
@@ -397,7 +398,8 @@ def _assert_deferred_rows(open_items):
         if not any(
             line.startswith(f"  - `{pin}` deferred to slice S7")
             and f"task {owners[pin[:2]]}" in line
-            and "decision 0094" in line
+            and ("decision 0125" if pin == "c7.coordinates" else "decision 0094")
+            in line
             for line in section.splitlines()
         )
     ]
@@ -413,7 +415,12 @@ def test_plant_deferred_pin_row_without_its_task(tmp_path):
     original = COMMITTED_OPEN_ITEMS.read_text(encoding="utf-8")
     planted = tmp_path / "OPEN_ITEMS.md"
     planted.write_text(
-        original.replace("task S7-T05", "task S7-T99", 1), encoding="utf-8"
+        original.replace(
+            "computed and pinned by task S7-T05; decision 0094.",
+            "computed and pinned by task S7-T99; decision 0094.",
+            1,
+        ),
+        encoding="utf-8",
     )
     with pytest.raises(
         AssertionError,

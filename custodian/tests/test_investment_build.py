@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import re
 from dataclasses import replace
 from pathlib import Path
 
@@ -1426,6 +1427,96 @@ def test_page_text_refusals_are_named(plant, check):
     assert isinstance(result, InvestmentFailure)
     assert result.check == check
     assert result.observed == "refused"  # Never echo the offending token.
+
+
+@pytest.mark.parametrize("language", ["en", "ar"])
+@pytest.mark.parametrize(
+    "years",
+    ["2024-2030", "1900-2099", "1999-2000", "2000-2000", "2099-2099", "2024\u20132030"],
+)
+def test_page_text_year_range_is_not_a_phone_shape(language, years):
+    text = ("Invented period " if language == "en" else "فترة مخترعة ") + years
+    result = _quotation_row(
+        _fixtures.quotation_page(language, extra=f"<p>{text}</p>"), language
+    )
+    assert not isinstance(result, InvestmentFailure), result
+    assert result["page_text"].endswith(text)
+
+
+@pytest.mark.parametrize(
+    "token",
+    [
+        "4412-3456",
+        "+777 777 7777",
+        "(777) 777-7777",
+        "2024-2030-777",
+        "2030-2024",
+        "2024 2030",
+        "1899-1900",
+        "2099-2100",
+        "+2024-2030",
+        "2024--2030 777",
+        "٢٠٢٤-٢٠٣٠",
+        "2024-2030; 777-7777",
+        "777-7777; 2024-2030",
+    ],
+)
+def test_page_text_phone_near_year_range_is_refused(token):
+    result = _quotation_row(_fixtures.quotation_page(extra=f"<p>{token}</p>"))
+    assert isinstance(result, InvestmentFailure), result
+    assert result.check == "page_contact_shape"
+    assert result.observed == "refused"
+
+
+@pytest.mark.parametrize("token", ["", "7", "7" * 6, "7" * 15 + "7"])
+def test_page_text_phone_digit_count_edges_are_unchanged(token):
+    result = _quotation_row(_fixtures.quotation_page(extra=f"<p>{token}</p>"))
+    assert not isinstance(result, InvestmentFailure), result
+
+
+@given(
+    groups=st.lists(
+        st.text(
+            alphabet=st.characters(whitelist_categories=("Nd",)),
+            min_size=1,
+            max_size=16,
+        ),
+        min_size=1,
+        max_size=5,
+    ),
+    separator=st.sampled_from([" ", "(", ")", "-", "\u2013", "--"]),
+    prefix=st.sampled_from(["", "+"]),
+    years=st.tuples(st.integers(1900, 2099), st.integers(1900, 2099)),
+)
+def test_page_text_phone_rule_only_admits_exact_year_ranges(
+    groups, separator, prefix, years
+):
+    """Compare the old matcher with an independent ASCII-year oracle."""
+    for token in (prefix + separator.join(groups), f"{years[0]}-{years[1]}"):
+        result = _quotation_row(_fixtures.quotation_page(extra=f"<p>{token}</p>"))
+        if any(len(run) in {8, 11} for run in re.findall(r"\d+", token)):
+            assert isinstance(result, InvestmentFailure), result
+            assert result.check == "page_identifier_shape"
+            continue
+        refused = False
+        for match in re.findall(r"\+?\d+(?:[ ()-]\d+)*", token):
+            if not 7 <= sum(char.isdecimal() for char in match) <= 15:
+                continue
+            parts = match.split("-")
+            year_range = (
+                len(parts) == 2
+                and all(
+                    len(part) == 4 and part.isascii() and part.isdecimal()
+                    for part in parts
+                )
+                and 1900 <= int(parts[0]) <= int(parts[1]) <= 2099
+            )
+            refused |= not year_range
+        if refused:
+            assert isinstance(result, InvestmentFailure), result
+            assert result.check == "page_contact_shape"
+        else:
+            assert not isinstance(result, InvestmentFailure), result
 
 
 @pytest.mark.parametrize(

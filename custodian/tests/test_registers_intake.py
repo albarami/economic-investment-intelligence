@@ -363,14 +363,20 @@ def test_table_catalogue_drift_and_every_other_table_identifier_plant(tmp_path):
         "pub_register_snapshot",
         "register_company_list",
     }:
-        for column, reason in (
-            ("registration_number", "release_identifier_column"),
-            ("invented_text", "registration_egress"),
+        # Decision 0119: the text plant holds the licence 97003, an input-only
+        # key; the released key 54321 in the same column publishes.
+        for column, value, reason in (
+            ("registration_number", "54321", "release_identifier_column"),
+            ("invented_text", "97003", "registration_egress"),
         ):
             with pytest.raises(RegisterError, match="^" + reason + "$"):
                 validate_release(
-                    {**built.tables, table: [{column: "54321"}]}, frame_value()
+                    {**built.tables, table: [{column: value}]},
+                    frame_value(),
+                    licences=frozenset({"97003"}),
                 )
+        released = {**built.tables, table: [{"invented_text": "54321"}]}
+        validate_release(released, frame_value(), licences=frozenset({"97003"}))
 
 
 def test_build_dispatch_never_opens_a_register_file_or_transport(tmp_path, monkeypatch):

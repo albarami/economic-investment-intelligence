@@ -10,12 +10,13 @@ from pathlib import Path
 import duckdb
 import pytest
 import yaml
-from hypothesis import given
+from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
 from eii_custodian.publicdata.additions.build import parsers
 from eii_custodian.publicdata.additions.common import (
     AdditionError,
+    Coverage,
     FamilyParse,
     require_lineage,
 )
@@ -187,6 +188,8 @@ def test_size_bulletin_keeps_its_own_class_and_its_own_years() -> None:
     large = {
         "year": "2015",
         "activity_code": "11",
+        "main_economic_activity": "SYN Activity",
+        "lnsht_lqtsdy_lry_ysy": "SYN-AR",
         "size_of_establishment": S2_LARGE,
         "hjm_lmnsh": S2_LARGE_AR,
         "indicator": "Employees",
@@ -196,6 +199,8 @@ def test_size_bulletin_keeps_its_own_class_and_its_own_years() -> None:
     small = {
         "year": "2022",
         "activity_code": "11",
+        "main_economic_activity": "SYN Activity",
+        "lnsht_lqtsdy_lry_ysy": "SYN-AR",
         "size_of_establishment": "Establishments with Less than 10 Employees",
         "hjm_lmnsh": "المنشآت أقل من 10 مشتغلين",
         "indicator": "Establishments",
@@ -247,6 +252,8 @@ def test_bulletins_do_not_share_a_size_class_or_a_last_year() -> None:
             {
                 "year": "2018",
                 "activity_code": "B",
+                "main_economic_activity": "SYN Activity",
+                "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                 "establishment_size": S1_LARGE,
                 "hjm_lmnsh": S1_LARGE_AR,
                 "indicator": "Number of Employees",
@@ -264,6 +271,8 @@ def test_bulletins_do_not_share_a_size_class_or_a_last_year() -> None:
             {
                 "year": "2014",
                 "activity_code": "4911",
+                "main_economic_activity": "SYN Activity",
+                "main_economic_activity_ar": "SYN-AR",
                 "establishment_size": S3_LARGE,
                 "establishment_size_ar": "SYN-AR",
                 "item_type": "Employee",
@@ -273,6 +282,8 @@ def test_bulletins_do_not_share_a_size_class_or_a_last_year() -> None:
             {
                 "year": "2019",
                 "activity_code": "4911",
+                "main_economic_activity": "SYN Activity",
+                "main_economic_activity_ar": "SYN-AR",
                 "establishment_size": S3_LARGE,
                 "establishment_size_ar": "SYN-AR",
                 "item_type": "Establishment",
@@ -335,6 +346,8 @@ def test_wholesale_uses_its_own_size_field_and_four_digit_codes() -> None:
             {
                 "year": "2016",
                 "activity_code": "4711",
+                "main_economic_activity": "SYN Activity",
+                "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                 "establishment_size": S2_LARGE,
                 "hjm_lmnsh": S2_LARGE_AR,
                 "indicator": "Employees",
@@ -355,6 +368,8 @@ def test_wholesale_uses_its_own_size_field_and_four_digit_codes() -> None:
                 {
                     "year": "2016",
                     "activity_code": "47",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "establishment_size": S2_LARGE,
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Employees",
@@ -377,6 +392,8 @@ def test_section_letters_of_the_one_bulletin_are_closed() -> None:
             {
                 "year": "2017",
                 "activity_code": "J",
+                "main_economic_activity": "SYN Activity",
+                "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                 "size_of_establishment": S2_LARGE,
                 "hjm_lmnsh": S2_LARGE_AR,
                 "indicator": "Establishments",
@@ -396,6 +413,8 @@ def test_section_letters_of_the_one_bulletin_are_closed() -> None:
                 {
                     "year": "2017",
                     "activity_code": "A",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": S2_LARGE,
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Establishments",
@@ -448,6 +467,8 @@ def test_business_services_has_no_size_class_and_all_is_not_filled() -> None:
             {
                 "year": "2018",
                 "activity_code": "62",
+                "economic_activity": "SYN Activity",
+                "lnsht_lqtsdy": "SYN-AR",
                 "indicator": "Compensation of Employees",
                 "lbyn": "SYN-IND",
                 "group": "SYN Section",
@@ -477,6 +498,8 @@ def test_a_null_measure_is_not_zero_and_other_text_stops() -> None:
     base = {
         "year": "2018",
         "activity_code": "11",
+        "main_economic_activity": "SYN Activity",
+        "lnsht_lqtsdy_lry_ysy": "SYN-AR",
         "size_of_establishment": S2_LARGE,
         "hjm_lmnsh": S2_LARGE_AR,
         "indicator": "Employees",
@@ -512,6 +535,8 @@ def test_an_unknown_size_or_a_mismatched_arabic_twin_stops() -> None:
                 {
                     "year": "2018",
                     "activity_code": "11",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": "SYN Size",
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Employees",
@@ -531,6 +556,8 @@ def test_an_unknown_size_or_a_mismatched_arabic_twin_stops() -> None:
                 {
                     "year": "2018",
                     "activity_code": "11",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": S2_LARGE,
                     "hjm_lmnsh": "SYN-AR",
                     "indicator": "Employees",
@@ -551,6 +578,8 @@ def test_unknown_fields_and_a_year_held_as_a_number_stop() -> None:
     row = {
         "year": "2018",
         "activity_code": "11",
+        "main_economic_activity": "SYN Activity",
+        "lnsht_lqtsdy_lry_ysy": "SYN-AR",
         "size_of_establishment": S2_LARGE,
         "hjm_lmnsh": S2_LARGE_AR,
         "indicator": "Employees",
@@ -573,6 +602,8 @@ def test_duplicate_size_keys_and_an_empty_file_stop() -> None:
     row = {
         "year": "2018",
         "activity_code": "11",
+        "main_economic_activity": "SYN Activity",
+        "lnsht_lqtsdy_lry_ysy": "SYN-AR",
         "size_of_establishment": S2_LARGE,
         "hjm_lmnsh": S2_LARGE_AR,
         "indicator": "Employees",
@@ -606,15 +637,19 @@ def test_manufacturing_licence_rows_keep_cumulative_investment() -> None:
     assert parsed.period_last == "2020"
     key = f"mfg_industry/{METALS}"
     assert parsed.rows == (
-        _mfg_row(METALS, "2019", "firms", Decimal("4.0000"), "to_be_confirmed", key),
-        _mfg_row(METALS, "2019", "investment", Decimal("10.5000"), "qar_million", key),
-        _mfg_row(METALS, "2019", "labour", Decimal("7.0000"), "to_be_confirmed", key),
-        _mfg_row(METALS, "2020", "firms", Decimal("4.0000"), "to_be_confirmed", key),
-        _mfg_row(METALS, "2020", "investment", Decimal("16.0000"), "qar_million", key),
-        _mfg_row(METALS, "2020", "labour", Decimal("7.0000"), "to_be_confirmed", key),
+        _mfg_row(METALS, "2019", "firms", Decimal("4.000000"), "to_be_confirmed", key),
+        _mfg_row(
+            METALS, "2019", "investment", Decimal("10.500000"), "qar_million", key
+        ),
+        _mfg_row(METALS, "2019", "labour", Decimal("7.000000"), "to_be_confirmed", key),
+        _mfg_row(METALS, "2020", "firms", Decimal("4.000000"), "to_be_confirmed", key),
+        _mfg_row(
+            METALS, "2020", "investment", Decimal("16.000000"), "qar_million", key
+        ),
+        _mfg_row(METALS, "2020", "labour", Decimal("7.000000"), "to_be_confirmed", key),
     )
-    assert parsed.rows[1]["value"].as_tuple().exponent == -4
-    assert Decimal("5.5000") not in {row["value"] for row in parsed.rows}
+    assert parsed.rows[1]["value"].as_tuple().exponent == -6
+    assert Decimal("5.500000") not in {row["value"] for row in parsed.rows}
     assert "plants" not in {row["indicator"] for row in parsed.rows}
 
 
@@ -630,7 +665,7 @@ def test_a_null_labour_cell_is_omitted_and_a_fraction_on_an_integer_stops() -> N
     indicators = {row["indicator"] for row in parsed.rows}
     assert indicators == {"firms", "investment"}
     assert _coverage(parsed, "measure_missing") == 1
-    assert Decimal("0.0000") == next(
+    assert Decimal("0.000000") == next(
         row["value"] for row in parsed.rows if row["indicator"] == "investment"
     )
     with pytest.raises(AdditionError) as caught:
@@ -663,7 +698,7 @@ def test_textiles_labour_may_be_fractional_and_uses_the_a2_investment_field() ->
         {},
     )
     labour = next(row for row in parsed.rows if row["indicator"] == "labour")
-    assert labour["value"] == Decimal("2.5000")
+    assert labour["value"] == Decimal("2.500000")
     assert labour["breakdown_key"] == "licence_type=Industrial License"
 
 
@@ -724,11 +759,11 @@ def test_schema_b_has_no_arabic_licence_field_and_computer_has_one_licence() -> 
 
 
 def test_extra_investment_precision_stops() -> None:
-    """A figure finer than decimal(18,4) is not rounded into the table."""
+    """A figure finer than decimal(18,6) is not rounded into the table."""
     with pytest.raises(AdditionError) as caught:
         parse_manufacturing(
             _entry("mfg_industry", METALS),
-            [_metals("2019", 1, "1.23456", 1)],
+            [_metals("2019", 1, "1.2345678", 1)],
             RECEIPT,
             _map(),
             {},
@@ -737,7 +772,7 @@ def test_extra_investment_precision_stops() -> None:
 
 
 def test_quantize_is_unchanged_when_the_caller_context_changes() -> None:
-    """14.00, 10.5000 and the precision refusal do not follow the caller context."""
+    """14.00, 10.500000 and the precision refusal do not follow the caller context."""
     with localcontext(Context(prec=1, rounding=ROUND_DOWN)):
         parsed = parse_establishment_size(
             _entry("est_size_act", TWO),
@@ -745,6 +780,8 @@ def test_quantize_is_unchanged_when_the_caller_context_changes() -> None:
                 {
                     "year": "2018",
                     "activity_code": "11",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": S2_LARGE,
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Employees",
@@ -767,11 +804,11 @@ def test_quantize_is_unchanged_when_the_caller_context_changes() -> None:
         investment = next(
             row for row in manufactured.rows if row["indicator"] == "investment"
         )
-        assert investment["value"] == Decimal("10.5000")
+        assert investment["value"] == Decimal("10.500000")
         with pytest.raises(AdditionError) as caught:
             parse_manufacturing(
                 _entry("mfg_industry", METALS),
-                [_metals("2019", 1, "1.23456", 1)],
+                [_metals("2019", 1, "1.2345678", 1)],
                 RECEIPT,
                 _map(),
                 {},
@@ -1139,11 +1176,14 @@ _LABEL_ENTRIES = {
     mapped=st.booleans(),
     layout=st.sampled_from((CERTIFICATES, HAMAD)),
 )
+@example(label="Kosovo", listed=False, mapped=False, layout=CERTIFICATES)
+@example(label="Kosovo", listed=False, mapped=True, layout=CERTIFICATES)
 def test_a_label_is_skipped_only_when_listed_and_mapped_only_by_exact_row(
     label: str, listed: bool, mapped: bool, layout: str
 ) -> None:
     """Over any label: listed is skipped, else an exact row maps it, else it stops."""
     review = dict(_LABEL_MAP)
+    review["country_labels_withheld"] = []
     review["regions_not_countries"] = [label] if listed else []
     review["country_crosswalk"] = (
         [{"published_label": label, "iso3": "SLL"}] if mapped else []
@@ -1256,6 +1296,8 @@ def test_lineage_fields_are_refused_one_at_a_time() -> None:
             {
                 "year": "2018",
                 "activity_code": "11",
+                "main_economic_activity": "SYN Activity",
+                "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                 "size_of_establishment": S2_LARGE,
                 "hjm_lmnsh": S2_LARGE_AR,
                 "indicator": "Employees",
@@ -1287,6 +1329,8 @@ def test_lineage_fields_are_refused_one_at_a_time() -> None:
                 {
                     "year": "2018",
                     "activity_code": "11",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": S2_LARGE,
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Employees",
@@ -1319,6 +1363,8 @@ def test_a_missing_field_and_an_empty_arabic_twin_stop() -> None:
     row = {
         "year": "2018",
         "activity_code": "11",
+        "main_economic_activity": "SYN Activity",
+        "lnsht_lqtsdy_lry_ysy": "SYN-AR",
         "size_of_establishment": S2_LARGE,
         "hjm_lmnsh": S2_LARGE_AR,
         "indicator": "Employees",
@@ -1345,6 +1391,8 @@ def test_an_activity_code_held_as_a_number_stops() -> None:
                 {
                     "year": "2018",
                     "activity_code": 11,
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": S2_LARGE,
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Employees",
@@ -1418,6 +1466,8 @@ def test_the_review_file_is_read_when_the_passed_map_is_not_the_industry_map(
             {
                 "year": "2018",
                 "activity_code": "11",
+                "main_economic_activity": "SYN Activity",
+                "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                 "size_of_establishment": S2_LARGE,
                 "hjm_lmnsh": S2_LARGE_AR,
                 "indicator": "Employees",
@@ -1472,6 +1522,8 @@ def test_an_unconfirmed_period_field_stops_before_a_row_is_written() -> None:
                 {
                     "year": "2018",
                     "activity_code": "11",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": S2_LARGE,
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Employees",
@@ -1570,6 +1622,8 @@ def test_a_corrupt_review_cell_stops_by_name() -> None:
                 {
                     "year": "2018",
                     "activity_code": "11",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": S2_LARGE,
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Employees",
@@ -1617,6 +1671,8 @@ def test_an_empty_licence_twin_and_a_blank_unit_stop() -> None:
                 {
                     "year": "2018",
                     "activity_code": "11",
+                    "main_economic_activity": "SYN Activity",
+                    "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                     "size_of_establishment": S2_LARGE,
                     "hjm_lmnsh": S2_LARGE_AR,
                     "indicator": "Employees",
@@ -1682,6 +1738,8 @@ def test_a_size_row_round_trips_through_parquet(tmp_path: Path) -> None:
             {
                 "year": "2018",
                 "activity_code": "11",
+                "main_economic_activity": "SYN Activity",
+                "lnsht_lqtsdy_lry_ysy": "SYN-AR",
                 "size_of_establishment": S2_LARGE,
                 "hjm_lmnsh": S2_LARGE_AR,
                 "indicator": "Employees",
@@ -1735,6 +1793,8 @@ def _energy(code: str, value: int) -> dict[str, object]:
     return {
         "year": "2018",
         "activity_code": code,
+        "main_economic_activity": "SYN Activity",
+        "lnsht_lqtsdy_lry_ysy": "SYN-AR",
         "establishment_size": S1_LARGE,
         "hjm_lmnsh": S1_LARGE_AR,
         "indicator": "Number of Establishments",
@@ -1747,6 +1807,8 @@ def _social(code: str) -> dict[str, object]:
     return {
         "year": "2018",
         "activity_code": code,
+        "main_economic_activity": "SYN Activity",
+        "lnsht_lqtsdy_lry_ysy": "SYN-AR",
         "establishment_size": S2_LARGE,
         "hjm_lmnsh": S2_LARGE_AR,
         "indicator": "Employees",
@@ -1864,3 +1926,394 @@ def _hamad(**measures: object) -> dict[str, object]:
     }
     row.update(measures)
     return row
+
+
+# S2-ADDF: invented cells, with column names supplied by ADDF-SWEEP.md.
+_ACTIVITY_NAMES = {
+    BUSINESS: ("economic_activity", "lnsht_lqtsdy"),
+    TRANSPORT: ("main_economic_activity", "main_economic_activity_ar"),
+    **{
+        slug: ("main_economic_activity", "lnsht_lqtsdy_lry_ysy")
+        for slug in (TWO, WHOLESALE, SOCIAL, ENERGY, ONE)
+    },
+}
+_WITHHELD_LABELS = (
+    "Antigua",
+    "Congo",
+    "Grand Cayman Islands",
+    "Kosovo",
+    "Macedonia",
+    "Mordovia",
+    "NOT STATED",
+    "Pretoria",
+    "Scotland",
+    "Tahiti",
+    "Taipei",
+    "Tasmania",
+    "Trinidad",
+)
+_REGION_LABELS = ("Caribbean", "Central Africa", "New Guinea", "Timor")
+_CERTIFICATE_ALIASES = {
+    "Certificate of Origin Under Preferential System": "Certificate of Origin under Preferential System",
+    "Gulf Cooperation Council Certificates": "GCC Certificates",
+    "Unified Gulf Cooperation Council Certificate of Origin with European Free Trade Association Countries": "Unified GCC Certificate of Origin with EFTA Countries",
+    "Unified Gulf Cooperation Council Certificate of Origin with Singapore": "Unified GCC Certificate of Origin with Singapore",
+}
+
+
+def _published_establishment(slug: str) -> dict[str, object]:
+    # Source names are independently pinned above, not derived from the review map.
+    spec = _map()["slugs"][slug]
+    row = {
+        "year": "2018",
+        "activity_code": "11",
+        "value": 1,
+        spec["indicator_field"]: "Employees",
+        spec["indicator_ar"]: "SYN-IND",
+    }
+    if slug == ENERGY:
+        row["indicator"] = "Number of Employees"
+    if slug == ONE:
+        row["activity_code"] = "J"
+    if slug in (TRANSPORT, WHOLESALE):
+        row["activity_code"] = "4911"
+    if slug == TRANSPORT:
+        row["item_type"] = "Employee"
+    if slug == SOCIAL:
+        row["activity_code"] = "45"
+    if "size_field" in spec:
+        row[spec["size_field"]] = spec["size_classes"][0]
+        row[spec["size_ar"]] = spec.get("size_pairs", {}).get(
+            spec["size_classes"][0], "SYN-AR"
+        )
+    else:
+        row.update(group="SYN Group", lmjmw="SYN-AR")
+    english, arabic = _ACTIVITY_NAMES[slug]
+    row.update({english: "SYN Activity", arabic: "SYN-AR"})
+    return row
+
+
+@pytest.mark.parametrize("slug", tuple(_ACTIVITY_NAMES))
+def test_published_activity_name_columns_are_declared_but_not_released(
+    slug: str,
+) -> None:
+    row = _published_establishment(slug)
+    entry = _entry("est_size_act", slug)
+    if slug == SOCIAL:
+        with pytest.raises(AdditionError, match="indicator_labels_unconfirmed"):
+            parse_establishment_size(entry, [row], RECEIPT, _map(), {})
+        return
+    parsed = parse_establishment_size(entry, [row], RECEIPT, _map(), {})
+    if slug == BUSINESS:
+        assert parsed.rows == ()
+        assert _coverage(parsed, "missing_size_class") == 1
+    else:
+        assert parsed.rows[0]["activity_key"] == row["activity_code"]
+        assert not set(_ACTIVITY_NAMES[slug]) & set(parsed.rows[0])
+
+
+@pytest.mark.parametrize("slug", tuple(_ACTIVITY_NAMES))
+def test_published_activity_names_do_not_admit_another_column(slug: str) -> None:
+    row = _published_establishment(slug)
+    row["SYN_unknown_column"] = "SYN"
+    with pytest.raises(AdditionError, match="unknown_source_field"):
+        parse_establishment_size(
+            _entry("est_size_act", slug), [row], RECEIPT, _map(), {}
+        )
+
+
+@pytest.mark.parametrize("label", _WITHHELD_LABELS + _REGION_LABELS)
+def test_sweep_country_labels_are_withheld_and_counted(label: str) -> None:
+    parsed = parse_logistics(
+        _entry("trade_logistics", CERTIFICATES),
+        [_certificate(label, "Certificates of Origin", 1)],
+        RECEIPT,
+        _map(),
+        {},
+    )
+    reason = (
+        "region_not_country" if label in _REGION_LABELS else "country_label_withheld"
+    )
+    assert parsed.rows == ()
+    assert parsed.coverage == (Coverage(reason, 1),)
+    assert label not in _crosswalk(_map())
+
+
+def test_bosnia_maps_to_one_bih_row() -> None:
+    with (REVIEW / "country_iso3.csv").open(encoding="utf-8", newline="") as stream:
+        reference = [
+            row for row in csv.DictReader(stream) if "Bosnia" in row["name_en"]
+        ]
+    assert reference == [
+        {"name_en": "Bosnia and Herzegovina", "iso3": "BIH", "human_reviewed": "false"}
+    ]
+    review = _map()
+    assert "Bosnia" not in review["country_labels_withheld"]
+    assert "Bosnia" not in review["regions_not_countries"]
+    assert _crosswalk(review)["Bosnia"] == "BIH"
+    parsed = parse_logistics(
+        _entry("trade_logistics", CERTIFICATES),
+        [_certificate("Bosnia", "Certificates of Origin", 1)],
+        RECEIPT,
+        review,
+        {},
+    )
+    assert len(parsed.rows) == 1
+    assert parsed.rows[0]["breakdown_key"] == (
+        "certificate_type=Certificates of Origin|importing_country=BIH"
+    )
+    assert parsed.coverage == ()
+
+
+@pytest.mark.parametrize("alias, canonical", tuple(_CERTIFICATE_ALIASES.items()))
+def test_published_certificate_spelling_has_one_canonical_series(
+    alias: str, canonical: str
+) -> None:
+    entry = _entry("trade_logistics", CERTIFICATES)
+    row = _certificate("SYN Land", alias, 1)
+    parsed = parse_logistics(entry, [row], RECEIPT, _with_countries(WALK), {})
+    assert (
+        parsed.rows[0]["breakdown_key"]
+        == f"certificate_type={canonical}|importing_country=SLL"
+    )
+    row["type_of_certificate"] = canonical
+    with pytest.raises(AdditionError, match="duplicate_key"):
+        parse_logistics(
+            entry,
+            [_certificate("SYN Land", alias, 1), row],
+            RECEIPT,
+            _with_countries(WALK),
+            {},
+        )
+
+
+def test_agricultural_certificate_is_a_new_type() -> None:
+    kind = "Certificate for Agricultural and Animal Products"
+    parsed = parse_logistics(
+        _entry("trade_logistics", CERTIFICATES),
+        [_certificate("SYN Land", kind, 1)],
+        RECEIPT,
+        _with_countries(WALK),
+        {},
+    )
+    assert (
+        parsed.rows[0]["breakdown_key"]
+        == f"certificate_type={kind}|importing_country=SLL"
+    )
+
+
+@pytest.mark.parametrize(
+    "kind", ("Gulf Cooperation Council Certificates ", "SYN Unknown", "")
+)
+def test_certificate_alias_lookup_remains_closed(kind: str) -> None:
+    with pytest.raises(
+        AdditionError,
+        match="measure_unparsed" if not kind else "unknown_certificate_type",
+    ):
+        parse_logistics(
+            _entry("trade_logistics", CERTIFICATES),
+            [_certificate("SYN Land", kind, 1)],
+            RECEIPT,
+            _with_countries(WALK),
+            {},
+        )
+
+
+@pytest.mark.parametrize("bad", ({"toString": None}, 7, None, []))
+def test_alias_table_hostile_leaf_mutations_refuse(bad: object) -> None:
+    for alias in _CERTIFICATE_ALIASES:
+        spec = _with_countries(WALK)
+        spec["certificate_type_aliases"][alias] = bad
+        with pytest.raises(AdditionError, match="unknown_certificate_type"):
+            parse_logistics(
+                _entry("trade_logistics", CERTIFICATES),
+                [_certificate("SYN Land", alias, 1)],
+                RECEIPT,
+                spec,
+                {},
+            )
+
+
+@pytest.mark.parametrize("bad", (None, 7, [7], {}))
+def test_withheld_country_list_is_closed_text(bad: object) -> None:
+    spec = _with_countries(WALK)
+    spec["country_labels_withheld"] = bad
+    with pytest.raises(AdditionError, match="field_map_unreadable"):
+        parse_logistics(
+            _entry("trade_logistics", CERTIFICATES),
+            [_certificate("SYN Land", "Certificates of Origin", 1)],
+            RECEIPT,
+            spec,
+            {},
+        )
+
+
+@settings(deadline=None)
+@given(units=st.integers(min_value=0, max_value=999999999999999999))
+def test_six_place_manufacturing_values_round_trip_exactly(units: int) -> None:
+    # An integer in millionths of the published unit; no currency conversion.
+    from eii_custodian.publicdata.additions.build import _tables
+
+    value = Decimal(units).scaleb(-6)
+    parsed = parse_manufacturing(
+        _entry("mfg_industry", METALS),
+        [_metals("2019", 1, str(value), 1)],
+        RECEIPT,
+        _map(),
+        {},
+    )
+    table, columns, rows = _tables([parsed])[0]
+    assert table == "pub_manufacturing"
+    assert dict(columns)["value"] == "DECIMAL(18,6)"
+    index = tuple(name for name, _ in columns).index("value")
+    assert next(row[index] for row in rows if "investment" in row) == value
+    assert (
+        next(row["value"] for row in parsed.rows if row["indicator"] == "investment")
+        .as_tuple()
+        .exponent
+        == -6
+    )
+
+
+@pytest.mark.parametrize("value", ("1.2345678", "0.0000001"))
+def test_seven_place_manufacturing_value_still_refuses(value: str) -> None:
+    with pytest.raises(AdditionError, match="measure_precision"):
+        parse_manufacturing(
+            _entry("mfg_industry", METALS),
+            [_metals("2019", 1, value, 1)],
+            RECEIPT,
+            _map(),
+            {},
+        )
+
+
+@pytest.mark.parametrize("slug", tuple(_ACTIVITY_NAMES))
+@pytest.mark.parametrize("language", (0, 1))
+def test_missing_published_activity_column_refuses(slug: str, language: int) -> None:
+    row = _published_establishment(slug)
+    del row[_ACTIVITY_NAMES[slug][language]]
+    with pytest.raises(AdditionError, match="source_field_absent"):
+        parse_establishment_size(
+            _entry("est_size_act", slug), [row], RECEIPT, _map(), {}
+        )
+
+
+@pytest.mark.parametrize(
+    "slug",
+    (
+        METALS,
+        "manufacture-of-beverages",
+        COMPUTER,
+        "manufacture-of-food-products",
+        "manufacture-of-furniture",
+        "manufacture-of-motor-vehicles-trailers-and-semi-trailers",
+        "manufacture-of-rubber-and-plastics-products",
+        TEXTILES,
+    ),
+)
+@pytest.mark.parametrize("value", ("1.23456", "1.234567"))
+def test_all_swept_manufacturing_shapes_keep_five_and_six_places(
+    slug: str, value: str
+) -> None:
+    spec = _map()["slugs"][slug]
+    row = _metals("2019", 1, value, 1)
+    if spec["schema"] == "a2":
+        row["investment_in_million_qatari_riyals"] = row.pop(
+            "investment_million_qatari_riyals"
+        )
+    parsed = parse_manufacturing(
+        _entry("mfg_industry", slug), [row], RECEIPT, _map(), {}
+    )
+    investment = next(row for row in parsed.rows if row["indicator"] == "investment")
+    assert investment["value"] == Decimal(value)
+    assert investment["unit"] == "qar_million"
+
+
+def test_manufacturing_parquet_keeps_six_places(tmp_path: Path) -> None:
+    from eii_custodian.publicdata.additions.build import _tables
+
+    parsed = parse_manufacturing(
+        _entry("mfg_industry", METALS),
+        [_metals("2019", 1, "1.234567", 1)],
+        RECEIPT,
+        _map(),
+        {},
+    )
+    _, columns, rows = _tables([parsed])[0]
+    path = tmp_path / "manufacturing.parquet"
+    write_parquet(path, columns, rows)
+    found = duckdb.read_parquet(str(path)).filter("indicator = 'investment'")
+    assert found.types[found.columns.index("value")] == duckdb.decimal_type(18, 6)
+    assert found.fetchall()[0][found.columns.index("value")] == Decimal("1.234567")
+
+
+@pytest.mark.parametrize("value", ("1000000000000", "999999999999.999999"))
+def test_manufacturing_decimal_integer_boundary(value: str) -> None:
+    from eii_custodian.publicdata.additions.build import _tables
+
+    parsed = parse_manufacturing(
+        _entry("mfg_industry", METALS),
+        [_metals("2019", 1, value, 1)],
+        RECEIPT,
+        _map(),
+        {},
+    )
+    if value == "1000000000000":
+        with pytest.raises(AdditionError, match="value_out_of_column"):
+            _tables([parsed])
+    else:
+        assert _tables([parsed])
+
+
+@pytest.mark.parametrize("bad", ({"toString": None}, 7, None, []))
+def test_alias_table_container_mutations_refuse(bad: object) -> None:
+    spec = _with_countries(WALK)
+    spec["certificate_type_aliases"] = bad
+    # An object with an unlisted string key is still a mapping, but not an alias.
+    reason = (
+        "unknown_certificate_type" if isinstance(bad, dict) else "field_map_unreadable"
+    )
+    with pytest.raises(AdditionError, match=reason):
+        parse_logistics(
+            _entry("trade_logistics", CERTIFICATES),
+            [_certificate("SYN Land", next(iter(_CERTIFICATE_ALIASES)), 1)],
+            RECEIPT,
+            spec,
+            {},
+        )
+
+
+def test_alias_target_must_be_a_listed_certificate_type() -> None:
+    spec = _with_countries(WALK)
+    alias = next(iter(_CERTIFICATE_ALIASES))
+    spec["certificate_type_aliases"][alias] = "SYN Unlisted Type"
+    with pytest.raises(AdditionError, match="unknown_certificate_type"):
+        parse_logistics(
+            _entry("trade_logistics", CERTIFICATES),
+            [_certificate("SYN Land", alias, 1)],
+            RECEIPT,
+            spec,
+            {},
+        )
+
+
+@settings(deadline=None)
+@given(
+    label=st.text(min_size=1, max_size=12), copies=st.integers(min_value=1, max_value=8)
+)
+def test_withheld_label_count_is_exact_and_lookup_is_not_normalized(
+    label: str, copies: int
+) -> None:
+    spec = _with_countries(WALK)
+    spec["country_labels_withheld"] = [label]
+    spec["regions_not_countries"] = []
+    spec["country_crosswalk"] = []
+    row = _certificate(label, "Certificates of Origin", 1)
+    parsed = parse_logistics(
+        _LABEL_ENTRIES[CERTIFICATES], [row] * copies, RECEIPT, spec, {}
+    )
+    assert parsed.rows == ()
+    assert _coverage(parsed, "country_label_withheld") == copies
+    row["importing_country"] = label + " "
+    with pytest.raises(AdditionError, match="country_unreviewed"):
+        parse_logistics(_LABEL_ENTRIES[CERTIFICATES], [row], RECEIPT, spec, {})

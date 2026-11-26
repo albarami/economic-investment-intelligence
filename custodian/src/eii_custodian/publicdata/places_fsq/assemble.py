@@ -76,6 +76,7 @@ class Coverage:
     name_ar_filled: int
     point_not_country: int
     country_not_point: int
+    no_cell: int
     unmapped_places: int
     duplicate_not_shown: int
     closed_not_shown: int
@@ -120,31 +121,34 @@ def build_places(
         raise PlacesFsqError("attribution")
     parsed = _parsed(files, expected_sha256)
     account = account_rows(parsed, frame)
-    links = duplicate_links(account.kept, places)
-    table = tuple(_table_row(row, grid, release) for row in account.kept)
+    located = tuple(
+        (row, table_row)
+        for row in account.kept
+        if (table_row := _table_row(row, grid, release)) is not None
+    )
+    kept = tuple(row for row, _ in located)
+    links = duplicate_links(kept, places)
+    table = tuple(table_row for _, table_row in located)
     eligible = tuple(
         _eligible(row, table_row, mapping, attribution, receipt_sha256)
-        for row, table_row in zip(account.kept, table, strict=True)
+        for row, table_row in located
         if is_eligible(row, frame, links)
     )
     unmapped = sum(
-        1
-        for row in account.kept
-        if product_categories(row.category_ids, mapping) is None
+        1 for row in kept if product_categories(row.category_ids, mapping) is None
     )
-    names = check_labels(
-        labels, tuple(row.name for row in account.kept), min_edit_distance
-    )
+    names = check_labels(labels, tuple(row.name for row in kept), min_edit_distance)
     if not names.ok:
         raise PlacesFsqError("name_collision")
     coverage = Coverage(
-        name_ar_null=len(account.kept),
+        name_ar_null=len(kept),
         name_ar_filled=0,
         point_not_country=account.point_not_country,
         country_not_point=account.country_not_point,
+        no_cell=len(account.kept) - len(kept),
         unmapped_places=unmapped,
         duplicate_not_shown=len(links),
-        closed_not_shown=sum(1 for row in account.kept if row.date_closed is not None),
+        closed_not_shown=sum(1 for row in kept if row.date_closed is not None),
     )
     return BuiltPlaces(
         rows=table,
@@ -172,13 +176,13 @@ def _parsed(
     return tuple(found)
 
 
-def _table_row(row: ParsedRow, grid: Grid, release: str) -> TableRow:
+def _table_row(row: ParsedRow, grid: Grid, release: str) -> TableRow | None:
     try:
         cell = point_cell(float(row.lon), float(row.lat), ownership_index(grid))
     except FrameError as exc:
         raise PlacesFsqError("cell") from exc
     if cell is None:
-        raise PlacesFsqError("cell")
+        return None
     return TableRow(
         fsq_place_id=row.fsq_place_id,
         name=row.name,
