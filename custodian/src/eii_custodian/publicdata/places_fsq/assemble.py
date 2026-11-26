@@ -121,10 +121,12 @@ def build_places(
         raise PlacesFsqError("attribution")
     parsed = _parsed(files, expected_sha256)
     account = account_rows(parsed, frame)
+    # R1: the ownership index is built once for the batch, not once per place.
+    stored = ownership_index(grid)
     located = tuple(
         (row, table_row)
         for row in account.kept
-        if (table_row := _table_row(row, grid, release)) is not None
+        if (table_row := _table_row(row, grid, release, stored)) is not None
     )
     kept = tuple(row for row, _ in located)
     links = duplicate_links(kept, places)
@@ -176,9 +178,12 @@ def _parsed(
     return tuple(found)
 
 
-def _table_row(row: ParsedRow, grid: Grid, release: str) -> TableRow | None:
+def _table_row(
+    row: ParsedRow, grid: Grid, release: str, stored: frozenset[int] | None = None
+) -> TableRow | None:
+    owned = ownership_index(grid) if stored is None else stored
     try:
-        cell = point_cell(float(row.lon), float(row.lat), ownership_index(grid))
+        cell = point_cell(float(row.lon), float(row.lat), owned)
     except FrameError as exc:
         raise PlacesFsqError("cell") from exc
     if cell is None:

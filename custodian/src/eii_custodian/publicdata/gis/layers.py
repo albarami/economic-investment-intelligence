@@ -238,6 +238,7 @@ def address_rows(
     features: list[dict[str, object]], grid: list[dict[str, object]]
 ) -> list[dict[str, object]]:
     """Address points. PIN stays out of the release."""
+    owned = ownership_index(_frame_grid(grid))
     rows: list[dict[str, object]] = []
     for feature in features:
         attributes = _attributes(feature)
@@ -253,7 +254,7 @@ def address_rows(
                 "survey_date": _calendar_date(attributes.get("SURVEYED_DATE")),
                 "lon": lon,
                 "lat": lat,
-                "cell": _cell(lon, lat, grid),
+                "cell": _cell(lon, lat, owned),
             }
         )
     keyed = assign_feature_keys(rows)
@@ -379,6 +380,7 @@ def poi_rows(
     features: list[dict[str, object]], grid: list[dict[str, object]]
 ) -> list[dict[str, object]]:
     """Commercial points. The layer publishes no category."""
+    owned = ownership_index(_frame_grid(grid))
     rows: list[dict[str, object]] = []
     for feature in features:
         attributes = _attributes(feature)
@@ -390,7 +392,7 @@ def poi_rows(
                 "category": None,
                 "lon": lon,
                 "lat": lat,
-                "cell": _cell(lon, lat, grid),
+                "cell": _cell(lon, lat, owned),
             }
         )
     keyed = assign_feature_keys(rows)
@@ -683,8 +685,10 @@ def _coordinate(value: object) -> Decimal:
     return Decimal(str(value)).quantize(_COORD, rounding=ROUND_HALF_EVEN)
 
 
-def _cell(lon: Decimal, lat: Decimal, grid: list[dict[str, object]]) -> int:
-    found = point_cell(float(lon), float(lat), ownership_index(_frame_grid(grid)))
+def _cell(lon: Decimal, lat: Decimal, owned: frozenset[int]) -> int:
+    # The ownership index is built once per layer, not once per point (R1: 164k
+    # address points against 72k cells was about 35 minutes of rebuilding).
+    found = point_cell(float(lon), float(lat), owned)
     if found is None:
         raise LayerError("cell")
     return found
