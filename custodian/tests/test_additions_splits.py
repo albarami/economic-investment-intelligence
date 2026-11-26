@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from eii_custodian.publicdata.additions import build
 from eii_custodian.publicdata.additions.build import parsers
 from eii_custodian.publicdata.additions.common import (
     AdditionError,
@@ -550,6 +551,90 @@ def test_hotel_guests_keep_eight_groups_and_a_fraction(tmp_path: Path) -> None:
             **_line(entry.key, "2021"),
         },
     )
+
+
+def _hotel_cell(number: object) -> dict[str, object]:
+    return {
+        "year": "2020",
+        "nationality": "Other Arabs",
+        "ljnsy": "SYN-AR",
+        "hotel_rating": "Four Star",
+        "drj_lfndq": "SYN-AR",
+        "metric": "Nights",
+        "lmqys": "SYN-AR",
+        "number": number,
+    }
+
+
+@pytest.mark.parametrize("number", (185295.174, 185295.17, 185295.1))
+def test_hotel_withholds_only_cells_exceeding_column_scale(
+    number: float, tmp_path: Path
+) -> None:
+    entry = _hotel()
+    raw = [_hotel_cell(number)]
+    parsed = _parse(entry, raw, tmp_path)
+    if number == 185295.174:
+        assert parsed.rows == ()
+        assert parsed.coverage == (Coverage("value_scale_exceeds_column", 1),)
+    else:
+        assert len(parsed.rows) == 1
+        assert parsed.rows[0]["value"] == Decimal(str(number))
+        assert parsed.coverage == ()
+    assert raw == [_hotel_cell(number)]
+
+
+def test_hotel_scale_omission_leaves_other_cells_unchanged(tmp_path: Path) -> None:
+    entry = _hotel()
+    good = {**_hotel_cell(185295.17), "metric": "Guests"}
+    alone = _parse(entry, [good], tmp_path)
+    together = _parse(entry, [_hotel_cell(185295.174), good], tmp_path)
+    assert together.rows == alone.rows
+    assert together.coverage == (Coverage("value_scale_exceeds_column", 1),)
+
+
+def test_hotel_scale_comes_from_column_catalogue(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    columns, keys = build._CATALOGUE["pub_visitor_markets"]
+    monkeypatch.setitem(
+        build._CATALOGUE,
+        "pub_visitor_markets",
+        (
+            tuple(
+                (name, "DECIMAL(18,3)" if name == "value" else kind)
+                for name, kind in columns
+            ),
+            keys,
+        ),
+    )
+    parsed = _parse(_hotel(), [_hotel_cell(185295.174)], tmp_path)
+    assert parsed.rows[0]["value"] == Decimal("185295.174")
+    assert parsed.coverage == ()
+
+
+@pytest.mark.parametrize("field", tuple(_hotel_cell(1)))
+@pytest.mark.parametrize("bad", ({"toString": None}, 7, None, []))
+def test_hotel_hostile_payload_leaves(field: str, bad: object, tmp_path: Path) -> None:
+    raw = [{**_hotel_cell(1), field: bad}]
+    if field in {"ljnsy", "drj_lfndq", "lmqys"}:
+        assert (
+            _parse(_hotel(), raw, tmp_path).rows
+            == _parse(_hotel(), [_hotel_cell(1)], tmp_path).rows
+        )
+    elif field == "number" and bad is None:
+        parsed = _parse(_hotel(), raw, tmp_path)
+        assert parsed.rows == ()
+        assert parsed.coverage == (Coverage("missing_measure", 1),)
+    elif field == "number" and bad == 7:
+        assert _parse(_hotel(), raw, tmp_path).rows[0]["value"] == Decimal("7")
+    else:
+        reason = "category_unlisted"
+        if field == "year":
+            reason = "period_form"
+        elif field == "number":
+            reason = "measure_unparsed"
+        with pytest.raises(AdditionError, match=f"^{reason}$"):
+            _parse(_hotel(), raw, tmp_path)
 
 
 def test_arrival_tables_are_not_added_together(tmp_path: Path) -> None:

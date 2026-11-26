@@ -1076,24 +1076,25 @@ def test_an_unpublished_certificate_type_is_omitted() -> None:
 
 
 def test_arabic_country_spelling_is_not_a_second_key() -> None:
-    """Two Arabic spellings of one English label are one country, so the key repeats."""
-    with pytest.raises(AdditionError) as caught:
-        parse_logistics(
-            _entry("trade_logistics", CERTIFICATES),
-            [
-                _certificate("SYN Land", "Certificates of Origin", 6, arabic="SYN-A"),
-                _certificate(
-                    "SYN Land",
-                    "Certificates of Origin",
-                    6,
-                    arabic="SYN-B\u00a0",
-                ),
-            ],
-            RECEIPT,
-            _with_countries(WALK),
-            {},
-        )
-    assert caught.value.name == "duplicate_key"
+    """Two Arabic spellings keep one country key and its additive count."""
+    parsed = parse_logistics(
+        _entry("trade_logistics", CERTIFICATES),
+        [
+            _certificate("SYN Land", "Certificates of Origin", 6, arabic="SYN-A"),
+            _certificate(
+                "SYN Land",
+                "Certificates of Origin",
+                6,
+                arabic="SYN-B\u00a0",
+            ),
+        ],
+        RECEIPT,
+        _with_countries(WALK),
+        {},
+    )
+    assert len(parsed.rows) == 1
+    assert parsed.rows[0]["value"] == Decimal("12")
+    assert parsed.coverage == (Coverage("country_labels_merged", 1),)
 
 
 def test_previous_port_regions_are_not_written_as_iso_countries() -> None:
@@ -2140,14 +2141,16 @@ def test_published_certificate_spelling_has_one_canonical_series(
         == f"certificate_type={canonical}|importing_country=SLL"
     )
     row["type_of_certificate"] = canonical
-    with pytest.raises(AdditionError, match="duplicate_key"):
-        parse_logistics(
-            entry,
-            [_certificate("SYN Land", alias, 1), row],
-            RECEIPT,
-            _with_countries(WALK),
-            {},
-        )
+    combined = parse_logistics(
+        entry,
+        [_certificate("SYN Land", alias, 1), row],
+        RECEIPT,
+        _with_countries(WALK),
+        {},
+    )
+    assert len(combined.rows) == 1
+    assert combined.rows[0]["value"] == Decimal("2")
+    assert combined.coverage == (Coverage("country_labels_merged", 1),)
 
 
 def test_agricultural_certificate_is_a_new_type() -> None:
@@ -2198,13 +2201,14 @@ def test_alias_table_hostile_leaf_mutations_refuse(bad: object) -> None:
 
 
 @pytest.mark.parametrize("bad", (None, 7, [7], {}))
-def test_withheld_country_list_is_closed_text(bad: object) -> None:
+@pytest.mark.parametrize("slug", (CERTIFICATES, PREVIOUS, HAMAD))
+def test_withheld_country_list_is_closed_text(bad: object, slug: str) -> None:
     spec = _with_countries(WALK)
     spec["country_labels_withheld"] = bad
     with pytest.raises(AdditionError, match="field_map_unreadable"):
         parse_logistics(
-            _entry("trade_logistics", CERTIFICATES),
-            [_certificate("SYN Land", "Certificates of Origin", 1)],
+            _entry("trade_logistics", slug),
+            [_logistics_row(slug)],
             RECEIPT,
             spec,
             {},
@@ -2380,3 +2384,176 @@ def test_withheld_label_count_is_exact_and_lookup_is_not_normalized(
     row["importing_country"] = label + " "
     with pytest.raises(AdditionError, match="country_unreviewed"):
         parse_logistics(_LABEL_ENTRIES[CERTIFICATES], [row], RECEIPT, spec, {})
+
+
+@pytest.mark.parametrize("copies", (2, 3))
+def test_certificate_country_aliases_sum_exactly(copies: int) -> None:
+    raw = [
+        _certificate(label, "Certificates of Origin", count)
+        for label, count in zip(
+            ("Cape Verde", "Cape Verde Islands", "Cape Verde"),
+            (9999999999999999, 1, 0),
+            strict=True,
+        )
+    ][:copies]
+    with localcontext(Context(prec=3, rounding=ROUND_DOWN)):
+        parsed = parse_logistics(_LABEL_ENTRIES[CERTIFICATES], raw, RECEIPT, _map(), {})
+    assert len(parsed.rows) == 1
+    assert parsed.rows[0]["value"] == Decimal("10000000000000000")
+    assert parsed.coverage == (Coverage("country_labels_merged", copies - 1),)
+    assert parsed.rows[0]["sha256"] == RECEIPT["sha256"]
+    assert parsed.rows[0]["method"] == LOG_METHOD
+    require_lineage(parsed.rows[0])
+
+
+@settings(deadline=None)
+@given(
+    cells=st.lists(
+        st.tuples(
+            st.sampled_from(
+                ("Cape Verde", "Cape Verde Islands", "SYN Land", "NOT STATED")
+            ),
+            st.sampled_from(("2020", "2021")),
+            st.sampled_from(("Certificates of Origin", "Arab Certificate of Origin")),
+            st.integers(min_value=-(10**40), max_value=10**40),
+        ),
+        min_size=1,
+        max_size=20,
+    )
+)
+@example(cells=[("Cape Verde", "2020", "Certificates of Origin", 0)])
+@example(cells=[("NOT STATED", "2020", "Certificates of Origin", 1)])
+@example(
+    cells=[
+        ("Cape Verde", "2020", "Certificates of Origin", 1),
+        ("Cape Verde Islands", "2020", "Certificates of Origin", 2),
+        ("Cape Verde", "2021", "Certificates of Origin", 3),
+        ("Cape Verde", "2020", "Arab Certificate of Origin", 4),
+        ("SYN Land", "2020", "Certificates of Origin", 5),
+    ]
+)
+def test_certificate_consolidation_preserves_keys_and_total(
+    cells: list[tuple[str, str, str, int]],
+) -> None:
+    review = _map()
+    review["country_crosswalk"].append(WALK[0])
+    raw = [
+        {**_certificate(label, kind, count), "year": year}
+        for label, year, kind, count in cells
+    ]
+    entry = _LABEL_ENTRIES[CERTIFICATES]
+    forward = parse_logistics(entry, raw, RECEIPT, review, {})
+    backward = parse_logistics(entry, raw[::-1], RECEIPT, review, {})
+    expected: dict[tuple[str, str, str], int] = {}
+    for label, year, kind, count in cells:
+        if label == "NOT STATED":
+            continue
+        key = (year, kind, "SLL" if label == "SYN Land" else "CPV")
+        expected[key] = expected.get(key, 0) + count
+    assert len(forward.rows) == len(expected)
+    actual = {
+        (row["period"], row["breakdown_key"], row["indicator"]): row["value"]
+        for row in forward.rows
+    }
+    assert len(actual) == len(forward.rows)
+    assert sum(int(row["value"]) for row in forward.rows) == sum(expected.values())
+    assert all(
+        actual[
+            (
+                year,
+                f"certificate_type={kind}|importing_country={country}",
+                "certificates",
+            )
+        ]
+        == count
+        for (year, kind, country), count in expected.items()
+    )
+    assert actual == {
+        (row["period"], row["breakdown_key"], row["indicator"]): row["value"]
+        for row in backward.rows
+    }
+    kept = sum(label != "NOT STATED" for label, _, _, _ in cells)
+    assert _coverage(forward, "country_labels_merged") == kept - len(expected)
+
+
+def test_fractional_certificate_count_still_refuses() -> None:
+    row = _certificate("Cape Verde", "Certificates of Origin", 1)
+    row["number_of_issued_certificates"] = 1.5
+    with pytest.raises(AdditionError, match=r"^measure_not_integral$"):
+        parse_logistics(_LABEL_ENTRIES[CERTIFICATES], [row], RECEIPT, _map(), {})
+
+
+@pytest.mark.parametrize("slug", (CERTIFICATES, PREVIOUS, HAMAD))
+@pytest.mark.parametrize("label", ("NOT STATED", "SYN Unreviewed"))
+def test_logistics_country_withholding_is_shared_and_exact(
+    slug: str, label: str
+) -> None:
+    row = _logistics_row(slug)
+    field = {
+        CERTIFICATES: "importing_country",
+        PREVIOUS: "country_of_previous_port",
+        HAMAD: "country_of_registration",
+    }[slug]
+    row[field] = label
+    entry = _entry("trade_logistics", slug)
+    if label == "SYN Unreviewed":
+        with pytest.raises(AdditionError, match=r"^country_unreviewed$"):
+            parse_logistics(entry, [row], RECEIPT, _with_countries(WALK), {})
+    else:
+        parsed = parse_logistics(entry, [row], RECEIPT, _with_countries(WALK), {})
+        assert parsed.rows == ()
+        assert parsed.coverage == (Coverage("country_label_withheld", 1),)
+
+
+@pytest.mark.parametrize("slug", (PREVIOUS, HAMAD))
+def test_other_logistics_readers_keep_duplicate_refusal(slug: str) -> None:
+    row = _logistics_row(slug)
+    with pytest.raises(AdditionError, match=r"^duplicate_key$"):
+        parse_logistics(
+            _entry("trade_logistics", slug),
+            [row, row],
+            RECEIPT,
+            _with_countries(WALK),
+            {},
+        )
+
+
+def _logistics_row(slug: str) -> dict[str, object]:
+    if slug == CERTIFICATES:
+        return _certificate("SYN Land", "Certificates of Origin", 1)
+    if slug == PREVIOUS:
+        return _previous("SYN Land", "Bulk", "Net Tonnage", 1)
+    return _hamad(oil_tankers=1)
+
+
+@pytest.mark.parametrize("slug", (CERTIFICATES, PREVIOUS, HAMAD))
+@pytest.mark.parametrize("bad", ({"toString": None}, 7, None, []))
+def test_logistics_hostile_payload_leaves(slug: str, bad: object) -> None:
+    baseline = _logistics_row(slug)
+    entry = _entry("trade_logistics", slug)
+    review = _with_countries(WALK)
+    for field, original in baseline.items():
+        row = {**baseline, field: bad}
+        if not isinstance(original, str):
+            if bad is None:
+                parsed = parse_logistics(entry, [row], RECEIPT, review, {})
+                assert parsed.coverage == (Coverage("measure_missing", 1),)
+            elif bad == 7:
+                parsed = parse_logistics(entry, [row], RECEIPT, review, {})
+                assert Decimal("7") in [item["value"] for item in parsed.rows]
+            else:
+                with pytest.raises(AdditionError, match=r"^measure_unparsed$"):
+                    parse_logistics(entry, [row], RECEIPT, review, {})
+            continue
+        reason = "measure_unparsed"
+        if field == "year":
+            reason = "period_form"
+        elif original == "SYN-AR":
+            reason = "arabic_twin_missing"
+        with pytest.raises(AdditionError, match=f"^{reason}$"):
+            parse_logistics(entry, [row], RECEIPT, review, {})
+
+
+def test_empty_certificate_source_still_refuses() -> None:
+    with pytest.raises(AdditionError, match=r"^period_absent$"):
+        parse_logistics(_LABEL_ENTRIES[CERTIFICATES], [], RECEIPT, _map(), {})

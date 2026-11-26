@@ -11,9 +11,11 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
+from typing import cast
 
 import yaml
 
+from eii_custodian.publicdata.additions.build import _CATALOGUE
 from eii_custodian.publicdata.additions.common import (
     FIELD_UNCONFIRMED,
     METHOD_VERSION,
@@ -425,6 +427,12 @@ def _hotel(
     indicator = _mapped(source.get("metric"), _string_map(vocab, "metrics"))
     number = _measure(source.get(role.measure), role, counts)
     if number is None:
+        return None
+    column = dict(_CATALOGUE[_TABLES["hotel"]][0])["value"]
+    scale = int(column.removesuffix(")").split(",")[1])
+    # The source's decimal places must fit the declared column without rounding.
+    if cast(int, Decimal(number).as_tuple().exponent) < -scale:
+        _add(counts, "value_scale_exceeds_column")
         return None
     return {
         "table_code": role.table_code or "",
