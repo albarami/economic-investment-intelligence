@@ -317,7 +317,9 @@ def check(
             # jointly omitted and duplicated rows still fail below.
             if actual_keys not in (expected_components, expected_components | {source}):
                 fail(source, "source_completeness: component keys")
-            if rows and (len(rows) != 1 or rows[0].key != source):
+            if expected_components - actual_keys or (
+                rows and (len(rows) != 1 or rows[0].key != source)
+            ):
                 fail(source, "source_completeness: duplicate or missing row")
         elif len(rows) != 1:
             fail(source, "source_completeness: duplicate or missing row")

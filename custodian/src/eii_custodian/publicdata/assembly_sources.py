@@ -64,6 +64,7 @@ PACK_IDENTITIES: dict[str, tuple[str, ...]] = {
     "bank_credit_act": (),
     "biz_register": (),
     "bldg_3dglobfp": (),
+    "bldg_gba": (),
     "bldg_ovt": (),
     "bldg_wsf3d": (),
     "bnd_district_2020": (),
@@ -138,6 +139,21 @@ PACK_IDENTITIES: dict[str, tuple[str, ...]] = {
     "insurance_tables": (),
     "investqa_pages": (),
     "jobseekers": (),
+    "landmark_business_destinations": (),
+    "landmark_dezzzme": (),
+    "landmark_fifa": (),
+    "landmark_megatalls": (),
+    "landmark_nabk_mast_climber_rental_qatar": (),
+    "landmark_qatar_museums": (),
+    "landmark_scraperbase_com": (),
+    "landmark_skyscraperpage_com": (),
+    "landmark_stadiumdb_com": (),
+    "landmark_the_national": (),
+    "landmark_the_skyscraper_center_council_on_vertical_urbanism": (),
+    "landmark_visit_qatar": (),
+    "landmark_werner_sobek_ag": (),
+    "landmark_wikiarquitectura": (),
+    "landmark_wikipedia": (),
     "lf_muni_sex": (
         "female-population-and-labour-force-by-municipality",
         "male-population-and-labour-force-by-municipality",
@@ -261,7 +277,7 @@ PACK_IDENTITIES: dict[str, tuple[str, ...]] = {
 }
 
 # Closed component keys from the joined registry contracts of S2-T14,
-# S2-T15, S2-T19 and S2-T28; runtime registry rows cannot define this list.
+# S2-T15, S2-T19, S2-T20 and S2-T28; runtime registry rows cannot define this list.
 BLDG_OVT_KEYS: tuple[str, ...] = (
     "bldg_ovt",
     "bldg_ovt/part-00288",
@@ -784,6 +800,12 @@ BLDG_OVT_KEYS: tuple[str, ...] = (
 
 SOURCE_COMPONENTS: dict[str, frozenset[str]] = {
     "bldg_3dglobfp": frozenset(("bldg_3dglobfp/1636", "bldg_3dglobfp/1639")),
+    "bldg_gba": frozenset(
+        (
+            "bldg_gba/e050_n25_e055_n20",
+            "bldg_gba/e050_n30_e055_n25",
+        )
+    ),
     "bldg_ovt": frozenset(BLDG_OVT_KEYS),
     "completions_ext": frozenset(
         (
@@ -836,6 +858,136 @@ SOURCE_COMPONENTS: dict[str, frozenset[str]] = {
             "jobseekers/unemployed-qataris-less-than-secondary-by-gender-and-readiness-to-train-for-craft-work0",
             "jobseekers/unemployed-qataris-not-willing-to-work-in-the-private-sector-by-gender-and-reasons",
             "jobseekers/unemployed-qataris-with-secondary-education-and-training-courses-refusing-work-in-private-sector-by",
+        )
+    ),
+    "landmark_business_destinations": frozenset(
+        (
+            "landmark_business_destinations/page-888533b0f5dc6e4b33c22d2f1c75143f6b9a42ac51f22d0dcb2fc3dd0b23e16f",
+        )
+    ),
+    "landmark_dezzzme": frozenset(
+        (
+            "landmark_dezzzme/page-8b81e2b88e68f782c4f2cb4a5e818574e60c2282c1e922e405c762f2e45c3622",
+        )
+    ),
+    "landmark_fifa": frozenset(
+        (
+            "landmark_fifa/page-eff7cceac9ecb833f1c3fc6b6677590ba49fab9d7e192d0220a65914c944df25",
+        )
+    ),
+    "landmark_megatalls": frozenset(
+        (
+            "landmark_megatalls/page-5e759ef5d7baa23af9df6906b0b625ab59ff9f901d5f128c5b91eb7ac2c6baa8",
+        )
+    ),
+    "landmark_nabk_mast_climber_rental_qatar": frozenset(
+        (
+            "landmark_nabk_mast_climber_rental_qatar/page-bbecec4d5c89a45c793952b5e91ca157ef12245aba1548dd0e7a4abe04cb782c",
+        )
+    ),
+    "landmark_qatar_museums": frozenset(
+        (
+            "landmark_qatar_museums/page-9f6894562fd3fe5e24ae658217428dc4f3a69324ffec4d8facb92e684ada0882",
+            "landmark_qatar_museums/page-eb2dfa7db90ac4eb7eb38cd211427e33a40558c6b627cb9931f62c344987d8f3",
+        )
+    ),
+    "landmark_scraperbase_com": frozenset(
+        (
+            "landmark_scraperbase_com/page-32caa547d0eac5000f91823c0106708f287051204fe2347d55ef9fd26f327034",
+        )
+    ),
+    "landmark_skyscraperpage_com": frozenset(
+        (
+            "landmark_skyscraperpage_com/page-a4474c164d99fd530665e2e45c1419e2e7872e9ba8cefe248e372243c595d794",
+        )
+    ),
+    "landmark_stadiumdb_com": frozenset(
+        (
+            "landmark_stadiumdb_com/page-315e32f6547b80db29d25db49bed81b61871d6d48512b5fd7e6da793831c810c",
+        )
+    ),
+    "landmark_the_national": frozenset(
+        (
+            "landmark_the_national/page-60ee1e70fb8ac0e241c4667ebf2831579f11da16e0ffdc1d09e3e693f1ee349b",
+        )
+    ),
+    "landmark_the_skyscraper_center_council_on_vertical_urbanism": frozenset(
+        (
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-103f0703da7cb06816a1f4e1523e4f498de12ad091d5551e847f99fb58d18680",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-1251d192dac0fcf46be790a026a386a6993d409e1107a0a2ef6f7c16c75604b0",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-1b90316735c27f085b020ab385bd5215e2b8b3ea420809f5fa4e2aae30bf14dd",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-1bd5fde27cf4e7540394dad4a68d08f800d51b168a9064234ee13fd367c31573",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-1cfce47656a092f8f201dd974c2009c2223d93870fc44ff00749dd67d82a65cd",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-23ffdfde2ca30e03e9f2a7c973b7ff6595843e89bed43ba7efe733e2d6e85923",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-24ceca0e589d88c1a3c73a2c85b101d9c6ec98ac95960045192c811666c3d162",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-273ba5582270e180acb2a6a91cd8cb4f8403b7c9a00457d12a8161946878471a",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-2ee741ea52a07fb6558b3dd297c4d661d2f2a832d4b7ac72106c4a7fbbf5191c",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-31be17fd6359869503b552083585a36380b02f3e7496e4b374c2caa2c03e2a0c",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-376ac80f8c8edd67f364e2ad4eefcb0ca044c713b240c296166c3ee9b4190e79",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-3782e77638e60b3652fe01a1f7030ac6c86b282efca434c8220cc1ea84b1b85d",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-380afb564fa93e4ccbba1ac7bc74b1a11c4dbdb0d54bc8475427140ba988c37f",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-3afd30c6afaf9498f16338486f9591ed85a5baf7b387a0effaf67e36d56c8695",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-40add4a6ebc347e8c92543719e0e87437801aba697f8f2e336844f3265e8f02b",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-460b9dd1bfd741acee7e2ff7f52d816931796873d8b3846db50ba29a76913c08",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-48e95ac789ab0f553a753c6c128b83e40c09f0cbd5688d68910fb47fb25e2ed4",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-49ddcfe82748255c20ac1196e2233934accb4692be8da51828b707ab6ee38e67",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-4c2a1a36cdf15c46a6a8c1ce1eab88dca7d98df4023d78f38641778791ae94b4",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-4f7a52d8e113a71de6b09cc423dff87d2e83933177d54c6853990f0782b30c14",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-54c7d0bca304a5e4c6e0225894a6636933e0133935867faa32f09753e198a45d",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-5c1e38d9cd694b1ac0bb3dba45d76b4d00af0845799f57aba678b7eac95da274",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-5fce6c15a694244ca317ad1e05053269c4a9333ed5a6d4dec36188f06a103140",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-713e420cf257a59b7b797b6fed2f2ae25d2d939156ef9567362728676a4fa04d",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-715c77448e0a56116b1877403ac7ba22fb92c9ade9db366f02f3751d3577b1cf",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-73af4df8888bba403f4f6e643b2d5cc50d6f351804590845248e1b103c5da734",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-8ec9a0f61a5e9d6c31ae56222a48aa7ebc3d44f2113c782f28565d1d5ac843a1",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-9210431a4a6e6497f5bc8aef1cf0602246ac9fec311b9b2ec97353c50d37cc3d",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-92b90728b82573af9b2a519e1fc25080d2123eb3222283b4be7964f91ed088ba",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-950aa0383994347e966f094efbdfc55178f8c9f8d310893a1cca371a66663a69",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-9e53d298e85df42001c1528c405cd5272ce803566143b1114bb3b6fb740cad8f",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-acc52baa1d23120e4c53d07773a4d2587a4d858c38ff1b9e10a7a333de892d93",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-c119ffb0e1111d699ff8bc10ca156bd50a2775b72d0f8a1efdb552515ba8f6bb",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-caa1160fc2786e59b51fbf35bb8bab67eac796dea64544cf8b4a97d22b3703ea",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-eef81aaa60b0da1f951c663fda4ec654ed427fe242a3643cb89cee618638920d",
+            "landmark_the_skyscraper_center_council_on_vertical_urbanism/page-f1fd9da94286099c8b54da135ae2ef18d34914265b20257660f54e69fdaa90de",
+        )
+    ),
+    "landmark_visit_qatar": frozenset(
+        (
+            "landmark_visit_qatar/page-3ff6630384fa730007906659b887db974b352195854c6323b9d4add1d55847be",
+        )
+    ),
+    "landmark_werner_sobek_ag": frozenset(
+        (
+            "landmark_werner_sobek_ag/page-ded802dfa75bb2945d920fbe64326e4d3b0d778158710a84a50fc4fe86b46122",
+        )
+    ),
+    "landmark_wikiarquitectura": frozenset(
+        (
+            "landmark_wikiarquitectura/page-67f4180d60901c86184deefc7fd019ceae2f3cc04e38d6cba6af8e2431462e4a",
+            "landmark_wikiarquitectura/page-d58c524f37b99a713c1becfa9c6fb1c60621a264d48082a7b0b14934b562efe4",
+        )
+    ),
+    "landmark_wikipedia": frozenset(
+        (
+            "landmark_wikipedia/page-00ca3bd1229a1d4c401e197abdc1644fb12b2ade4f8d185b800548e907450069",
+            "landmark_wikipedia/page-09ebc8205b2113fe2851a8b02e740096c24270243101c740de382d47e8f539d5",
+            "landmark_wikipedia/page-0b0680820f19ffb345921b4227aa83d4a0fcba0d62cd9b0b2957460b46d9bc40",
+            "landmark_wikipedia/page-11d5db2af6356b5dac624a1016e5943962487e28dbf3a43ff80588bd5b8fc0e0",
+            "landmark_wikipedia/page-18581eeb2274f57faf93cf8f2355d2e373c7cb6ee122d32e271fd24b3a686e7b",
+            "landmark_wikipedia/page-1a42ed5c0e02c35d0db22048f75c2b67bade7ba327e4ea340042c5de5017737a",
+            "landmark_wikipedia/page-32a253b63d8f99e9a45e76c9e663a829c78172e3b0b5be261e680e01f4c3e5cb",
+            "landmark_wikipedia/page-6521569535b142e69ea03f5a78f62dc512cd5735b923dab5b64bffe9552884c1",
+            "landmark_wikipedia/page-67c5c2d3c0c5076ced4e5ea3d808d21ca8c9318ea22dce86860b915b4a24c3c1",
+            "landmark_wikipedia/page-6e56498694f360a8dde91c8fd3378565d5e1b3c2e91a8855b2af2a87778c4ba9",
+            "landmark_wikipedia/page-8366d2b26dc17946d3b088747d59b462f2d91a12bfe2c3bbd5faee623f437b07",
+            "landmark_wikipedia/page-83f36de33119d0dbc4703b52067fc1155a2ea03fdda6ff4980292fe943006433",
+            "landmark_wikipedia/page-88bb8679fe7e130c0713291b1788abde53e39f8b378898b20025e44a2ce5fc5a",
+            "landmark_wikipedia/page-8d3645b4a879104a81c763df9e5232d9962c4a4c3f410649d55fbb20bbdb8bcd",
+            "landmark_wikipedia/page-a031b7ecd4e42b565307a0a36d6978fec1d1ba1940ba4e2e5dba70582d591300",
+            "landmark_wikipedia/page-f2baab11a74d779cd525b6a728246653892513beb4eebb817730af648f865a32",
+            "landmark_wikipedia/page-f5a70c91c50e07ef825dc83dc166af8709f15f3bac3a4a388a66cf0ef73675e8",
+            "landmark_wikipedia/page-f787cf2b37b0b73cc7e8f2f30ecfb2cc1e21bb3d912ec838acd95ef31ed92780",
+            "landmark_wikipedia/page-fc9995c0b127ef734f08f7c27f7e90db98d9432cf1d06012982a748759db9a2b",
         )
     ),
     "ntl_blackmarble": frozenset(
