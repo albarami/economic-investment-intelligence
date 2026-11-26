@@ -6872,6 +6872,8 @@ introduced.
 - NEEDED: exclude `__pycache__` and `*.pyc` from the fingerprint, or run the boundary child processes with `PYTHONDONTWRITEBYTECODE=1`. The guard itself stays unchanged.
 - NEEDED BY: before the S2 gate record.
 
+- UPDATE (2026-11-26, S2-OI405.b1): concurrent imports write interpreter caches into the shared source trees; `_tree_fingerprint` now excludes every `__pycache__` subtree and regular `.pyc`/`.pyo` file, while the guards remain unchanged. Fix commit unavailable: `git add` exited 128 on the read-only git index; delivery is `.overnight/OUT/S2-OI405.b1.patch`, with its SHA-256 in `.overnight/RETURN.md`. Planted import: original fingerprint exit 1, fixed focused suite exit 0 (10 tests, 6 subtests); concurrent boundary/core collection exits 0/0 with zero extra fingerprint entries; fake-guard real-file plant exit 1; removing each cache, pyc or pyo exclusion alone exit 1. Remains OPEN for different-maker approval and the lead merge record under AGENTS.md rule 39. Verification BLOCKED: script discovery invocation ended with exit 143, five visible failure markers and no final count/diagnostics; see PROGRESS.md, **S2-OI405.b1 — concurrent bytecode fingerprint**.
+
 ## OI-406 — Three low points of the S2-P77 review
 
 - ID: OI-406

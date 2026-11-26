@@ -4,11 +4,13 @@
 from __future__ import annotations
 
 import hashlib
+import subprocess
 import sys
 import tempfile
 import tomllib
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import import_boundary_cases as cases
 import import_boundary_child as child
@@ -30,12 +32,16 @@ def _source_tree_paths(root: Path) -> list[Path]:
 
 
 def _tree_fingerprint(root: Path) -> list[tuple[str, str]]:
-    """Return a sorted (relative path, sha256) listing under all scanned trees."""
+    """Fingerprint scanned trees, excluding interpreter bytecode and its caches."""
     entries: list[tuple[str, str]] = []
     for tree in _source_tree_paths(root):
         if not tree.is_dir():
             continue
         for path in sorted(tree.rglob("*")):
+            if "__pycache__" in path.relative_to(tree).parts or (
+                path.suffix in (".pyc", ".pyo") and path.is_file()
+            ):
+                continue
             rel = path.relative_to(root).as_posix()
             if path.is_dir():
                 entries.append((rel + "/", ""))
@@ -48,6 +54,84 @@ def _tree_fingerprint(root: Path) -> list[tuple[str, str]]:
 
 class ImportBoundaryRealTest(unittest.TestCase):
     """Checks against the working tree and metadata wiring."""
+
+    def test_fingerprint_ignores_concurrent_import_bytecode(self) -> None:
+        """An unrelated interpreter may cache imports during the guard check."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            cases.make_tree(root)
+            source = cases.package_dir(root, "eii_core")
+            (source / "syn_probe.py").write_text("value = None\n", encoding="utf-8")
+            with subprocess.Popen(
+                [
+                    sys.executable,
+                    "-I",
+                    "-S",
+                    "-c",
+                    "import sys; sys.stdin.read(); sys.dont_write_bytecode = False; "
+                    "sys.pycache_prefix = None; sys.path.insert(0, sys.argv[1]); "
+                    "import syn_probe",
+                    str(source),
+                ],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            ) as process:
+                before = _tree_fingerprint(root)
+                self.assertIsNotNone(process.stdin)
+                assert process.stdin is not None
+                process.stdin.close()
+                process.stdin = None
+                self.assertEqual(guard.check_imports(root), ([], []))
+                _out, err = process.communicate()
+                self.assertEqual(process.returncode, 0, err)
+            self.assertTrue(list((source / "__pycache__").glob("syn_probe.*.pyc")))
+            self.assertEqual(before, _tree_fingerprint(root))
+
+    def test_fingerprint_ignores_bytecode_paths(self) -> None:
+        """Ignore cache subtrees and loose compiled files in every scanned tree."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            cases.make_tree(root)
+            before = _tree_fingerprint(root)
+            for tree in _source_tree_paths(root):
+                cache = tree / "__pycache__" / "nested"
+                cache.mkdir(parents=True)
+                for path in (cache / "probe.txt", tree / "probe.pyc", tree / "probe.pyo"):
+                    path.write_bytes(b"syn-bytecode")
+            self.assertEqual(before, _tree_fingerprint(root))
+
+    def test_fingerprint_detects_real_changes(self) -> None:
+        """Keep non-bytecode additions, edits, removals and directories visible."""
+        for change in ("add", "edit", "remove", "directory"):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                cases.make_tree(root)
+                path = cases.package_dir(root, "eii_core") / "syn-proof.bin"
+                if change in ("edit", "remove"):
+                    path.write_bytes(b"syn-before")
+                before = _tree_fingerprint(root)
+                if change == "remove":
+                    path.unlink()
+                elif change == "directory":
+                    path.mkdir()
+                else:
+                    path.write_bytes(b"syn-after")
+                self.assertNotEqual(before, _tree_fingerprint(root), change)
+
+    def test_guard_changes_nothing_detects_fake_guard_write(self) -> None:
+        """The unchanged assertion still rejects a guard writing a real file."""
+
+        def fake_guard(root: Path) -> tuple[list[str], list[str]]:
+            path = cases.package_dir(root, "eii_core") / "syn-guard-output.txt"
+            path.write_text("syn-output\n", encoding="utf-8")
+            return [], []
+
+        with (
+            mock.patch.object(guard, "check_imports", side_effect=fake_guard),
+            self.assertRaisesRegex(AssertionError, "syn-guard-output"),
+        ):
+            self.test_guard_changes_nothing()
 
     def test_real_tree_static_passes(self) -> None:
         """The real repository passes the static import-boundary guard."""
