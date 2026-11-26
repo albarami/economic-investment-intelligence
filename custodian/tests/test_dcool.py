@@ -9,6 +9,8 @@ from pathlib import Path
 import pytest
 from custodian.tests.repository_root import repository_root
 from custodian.tests.singles_entries import dcool_entry
+from hypothesis import given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.frame.crosswalk import load_municipality_names, read_csv
 from eii_custodian.publicdata.singles.dcool import CoolingError, parse_dcool
@@ -178,8 +180,13 @@ def test_a_missing_sector_field_and_a_duplicate_around_a_null_still_fail() -> No
     with pytest.raises(CoolingError) as missing:
         parse_dcool((row,), _names())
     assert missing.value.reason == "unexpected_column"
+    only = dict.fromkeys((*_ORDINARY, "culture"))
+    first = _row(**{**only, "industrial": 2})
+    gap = _row(**{**only, "industrial": None})
+    again = _row(**{**only, "industrial": 3})
+    assert [row.value for row in parse_dcool((first, gap), _names())] == [Decimal(2)]
     with pytest.raises(CoolingError) as repeated:
-        parse_dcool((_row(), _row(industrial=None), _row()), _names())
+        parse_dcool((first, gap, again), _names())
     assert repeated.value.reason == "duplicate_key"
 
 
@@ -210,3 +217,41 @@ def test_two_statuses_of_one_indicator_refuse(first: str, second: str) -> None:
     with pytest.raises(CoolingError) as wrong:
         parse_dcool(rows, _names())
     assert wrong.value.reason == "project_status"
+
+
+_ORDINARY = (
+    "other",
+    "industrial",
+    "real_estate_development",
+    "sport",
+    "health",
+    "transport",
+    "education",
+    "hotels",
+    "commercial",
+    "district_cooling_service_supply",
+)
+
+
+@given(
+    sector=st.sampled_from(_ORDINARY),
+    raw=st.one_of(
+        st.none(),
+        st.integers(min_value=-(10**12), max_value=10**12),
+        st.text(max_size=6),
+        st.booleans(),
+        st.floats(allow_nan=True),
+    ),
+)
+def test_every_ordinary_sector_cell_by_type(sector: str, raw: object) -> None:
+    """R1-DCOOL.cf1 F1: null is no row, an integer is kept exactly, else sector_type."""
+    if isinstance(raw, int) and not isinstance(raw, bool):
+        rows = parse_dcool((_row(**{sector: raw}),), _names())
+        assert [row.value for row in rows if row.sector_key == sector] == [Decimal(raw)]
+    elif raw is None:
+        rows = parse_dcool((_row(**{sector: raw}),), _names())
+        assert [row for row in rows if row.sector_key == sector] == []
+    else:
+        with pytest.raises(CoolingError) as wrong:
+            parse_dcool((_row(**{sector: raw}),), _names())
+        assert wrong.value.reason == "sector_type"
