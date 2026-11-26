@@ -1879,6 +1879,7 @@
 - DONE SO FAR: The loader, its refusals and the count of unmapped places are built and approved. The first confirmation: "reviewed rows remain the lead's."
 - OPTIONS: **Recommendation:** the lead enters the rows after the live fetch shows which source categories occur in the fetched files, each row with its mapping version, review status, reviewer role, review date and rationale, and no value edited by hand in a place's record. A source category is an identifier and a label of the publisher's own category list; the registry row records the licence the copy states with basis `dataset`, and item 5 of [decision 0026](docs/decisions/0026-public-sources-used-in-full-locally.md) stays the rule for the commit of the rows.
 - NEEDED BY: the slice S2 gate; before S3-T12 shows a product category for a place of this source.
+- UPDATE 2026-11-26 (S2-FSQMAP.b2): 725 rows filled from the lead-supplied publisher label paths; 38 identifiers have no unambiguous fitting target and are listed with their nearest considered keys and reasons in the worker handoff `OUT/UNFIT.csv`. This is a partial build, pending the lead's ruling on those identifiers, different-maker review and the real-cache load; S2-T15 criterion 7 remains open. Row status `approved` is the brief's review convention, not a claim that independent review has happened.
 
 ## OI-199 — The terms of the copy of `places_fsq` are recorded as "terms to be read"
 
