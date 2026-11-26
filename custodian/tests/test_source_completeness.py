@@ -288,6 +288,21 @@ def test_table_catalogue_is_read_from_its_anchor_only():
     ) == {"pub_invented"}
 
 
+def test_uncatalogued_table_refusal_is_exact():
+    args = inputs()
+    row = entry(release_tables=("pub_invented_unknown",))
+    args["entries"] = [row]
+    args["receipts"] = {row.key: receipt(row)}
+    args["outputs"] = {row.key: row.release_tables}
+    assert failures(c.check(**args)) == [
+        {
+            "id": "invented",
+            "state": "failed",
+            "reason": "source_table_uncatalogued: pub_invented_unknown",
+        }
+    ]
+
+
 def test_existing_expectations_are_passed_and_not_copied():
     from custodian.tests import test_publicdata_registry as existing
 

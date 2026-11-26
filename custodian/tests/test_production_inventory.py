@@ -5,7 +5,31 @@ from dataclasses import replace
 import pytest
 
 from eii_custodian.publicdata.assembly import PHASES, AssemblyError
-from eii_custodian.publicdata.assembly_inventory import INVENTORY, validate_inventory
+from eii_custodian.publicdata.assembly_inventory import (
+    INVENTORY,
+    validate_inventory,
+)
+
+CONTRACTED_TRADE_AND_BENCHMARK_TABLES = frozenset(
+    """
+pub_atlas_country_partner_product_year pub_atlas_country_product_year
+pub_atlas_cppy_country pub_atlas_cppy_product pub_atlas_cpy_country
+pub_atlas_cpy_product pub_gravity_bilateral pub_gravity_country pub_baci_trade
+pub_baci_country pub_baci_product pub_wdi_benchmark pub_unctad_fdi_benchmark
+pub_weo_benchmark pub_ilostat_benchmark
+""".split()
+)
+
+
+def test_contracted_trade_and_benchmark_tables_are_in_actual_catalogue() -> None:
+    from pathlib import Path
+
+    from eii_custodian.publicdata.completeness import table_catalogue
+
+    catalogue = table_catalogue(
+        Path("docs/03_DATA_CONTRACTS.md").read_text(encoding="utf-8")
+    )
+    assert CONTRACTED_TRADE_AND_BENCHMARK_TABLES <= catalogue
 
 
 def test_inventory_has_each_phase_and_explicit_inputs_and_outputs() -> None:
