@@ -461,7 +461,10 @@ def landmark_rows(
             "lon": float(body.lon),
             "lat": float(body.lat),
         }
-    rows = reviewed_points(specifications, points, _frame_grid(grid))
+    frame_grid = _frame_grid(grid)
+    if not specifications:
+        return []
+    rows = reviewed_points(specifications, points, frame_grid, stored=owned())
     require_release_columns(rows)
     return rows
 

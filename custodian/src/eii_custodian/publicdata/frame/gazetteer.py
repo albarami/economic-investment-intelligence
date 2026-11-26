@@ -86,8 +86,11 @@ def reviewed_points(
     specifications: list[dict[str, Any]],
     points: dict[tuple[str, str], dict[str, Any]],
     grid: list[dict[str, Any]],
+    *,
+    stored: frozenset[int] | None = None,
 ) -> list[dict[str, Any]]:
-    stored = ownership_index(grid)
+    if stored is None:
+        stored = ownership_index(grid)
     result = []
     seen = set()
     for item in specifications:
