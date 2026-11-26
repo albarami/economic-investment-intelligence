@@ -463,7 +463,7 @@ slugs:
     size_ar: hjm_lmnsh
     indicator_field: indicator
     indicator_ar: lbyn
-    indicators: to_be_confirmed
+    indicators: *s2_indicators
     size_classes: *s2_sizes
     size_pairs: *s2_pairs
     unit: to_be_confirmed

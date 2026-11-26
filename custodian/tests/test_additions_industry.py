@@ -429,34 +429,100 @@ def test_section_letters_of_the_one_bulletin_are_closed() -> None:
     assert caught.value.name == "activity_code_unlisted"
 
 
-def test_social_keeps_code_45_and_stops_while_indicator_labels_are_unconfirmed() -> (
-    None
-):
-    """Code 45 stays on this slug. Indicator words the inventory does not give stop the build."""
+def test_social_keeps_code_45_and_refuses_unlisted_activity() -> None:
+    """The confirmed bulletin retains its own closed activity codes."""
+    parsed = parse_establishment_size(
+        _entry("est_size_act", SOCIAL), [_social("45")], RECEIPT, _map(), {}
+    )
+    assert parsed.rows[0]["activity_key"] == "45"
+    with pytest.raises(AdditionError) as unlisted:
+        parse_establishment_size(
+            _entry("est_size_act", SOCIAL), [_social("99")], RECEIPT, _map(), {}
+        )
+    assert unlisted.value.name == "activity_code_unlisted"
+
+
+def test_unconfirmed_indicator_labels_still_refuse_an_invented_bulletin() -> None:
+    """Confirming one source does not bypass the pending-label guard."""
     loaded = _map()
     slugs = loaded["slugs"]
     assert isinstance(slugs, dict)
-    social = slugs[SOCIAL]
-    assert isinstance(social, dict)
-    assert "45" in social["activity_codes"]
-    with pytest.raises(AdditionError) as unlisted:
+    slug = "SYN-unconfirmed-size-bulletin"
+    slugs[slug] = {**slugs[SOCIAL], "indicators": "to_be_confirmed"}
+    entry = replace(
+        _entry("est_size_act", SOCIAL), slug=slug, key=f"est_size_act/{slug}"
+    )
+    with pytest.raises(AdditionError) as caught:
+        parse_establishment_size(entry, [_social("45")], RECEIPT, loaded, {})
+    assert caught.value.name == "indicator_labels_unconfirmed"
+
+
+@pytest.mark.parametrize(
+    ("label", "arabic", "indicator"),
+    [
+        ("Employees", "مشتغلون", "employees"),
+        ("Establishments", "منشآت", "establishments"),
+    ],
+)
+@pytest.mark.parametrize(
+    ("size", "size_ar"),
+    [
+        (S2_LARGE, S2_LARGE_AR),
+        ("Establishments with Less than 10 Employees", "المنشآت أقل من 10 مشتغلين"),
+    ],
+)
+def test_social_confirmed_labels_parse_with_lineage(
+    label: str, arabic: str, indicator: str, size: str, size_ar: str
+) -> None:
+    """Invented integer cells use the exact keys and closed labels supplied in IN."""
+    row = _social("45")
+    row.update(indicator=label, lbyn=arabic, establishment_size=size, hjm_lmnsh=size_ar)
+    entry = _entry("est_size_act", SOCIAL)
+    parsed = parse_establishment_size(entry, [row], RECEIPT, _map(), {})
+    assert parsed.rows == (
+        {
+            "table_code": SOCIAL,
+            "activity_key": "45",
+            "size_class": size,
+            "period": "2018",
+            "indicator": indicator,
+            "value": Decimal("1.00"),
+            "unit": "to_be_confirmed",
+            **_lineage(entry.key, entry.publisher, EST_METHOD),
+        },
+    )
+    assert parsed.coverage == ()
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "reason"),
+    [
+        ("indicator", "SYN-unknown", "unknown_indicator"),
+        ("lbyn", "", "arabic_twin_missing"),
+        ("hjm_lmnsh", "المنشآت أقل من 10 مشتغلين", "arabic_twin_mismatch"),
+    ],
+)
+def test_social_one_changed_label_refuses(field: str, value: str, reason: str) -> None:
+    """Each negative changes one field of an otherwise valid source-shaped row."""
+    row = _social("45")
+    row[field] = value
+    with pytest.raises(AdditionError) as caught:
         parse_establishment_size(
-            _entry("est_size_act", SOCIAL),
-            [_social("99")],
-            RECEIPT,
-            loaded,
-            {},
+            _entry("est_size_act", SOCIAL), [row], RECEIPT, _map(), {}
         )
-    assert unlisted.value.name == "activity_code_unlisted"
-    with pytest.raises(AdditionError) as labels:
+    assert caught.value.name == reason
+
+
+@given(suffix=st.text(max_size=100))
+def test_social_unlisted_indicator_words_never_become_facts(suffix: str) -> None:
+    """An invented prefix keeps generated words outside both confirmed labels."""
+    row = _social("45")
+    row["indicator"] = "SYN-" + suffix
+    with pytest.raises(AdditionError) as caught:
         parse_establishment_size(
-            _entry("est_size_act", SOCIAL),
-            [_social("45")],
-            RECEIPT,
-            loaded,
-            {},
+            _entry("est_size_act", SOCIAL), [row], RECEIPT, _map(), {}
         )
-    assert labels.value.name == "indicator_labels_unconfirmed"
+    assert caught.value.name == "unknown_indicator"
 
 
 def test_business_services_has_no_size_class_and_all_is_not_filled() -> None:
@@ -1812,7 +1878,7 @@ def _social(code: str) -> dict[str, object]:
         "establishment_size": S2_LARGE,
         "hjm_lmnsh": S2_LARGE_AR,
         "indicator": "Employees",
-        "lbyn": "SYN-IND",
+        "lbyn": "مشتغلون",
         "value": 1,
     }
 
@@ -1963,6 +2029,8 @@ _CERTIFICATE_ALIASES = {
 
 def _published_establishment(slug: str) -> dict[str, object]:
     # Source names are independently pinned above, not derived from the review map.
+    if slug == SOCIAL:
+        return _social("45")
     spec = _map()["slugs"][slug]
     row = {
         "year": "2018",
@@ -1979,8 +2047,6 @@ def _published_establishment(slug: str) -> dict[str, object]:
         row["activity_code"] = "4911"
     if slug == TRANSPORT:
         row["item_type"] = "Employee"
-    if slug == SOCIAL:
-        row["activity_code"] = "45"
     if "size_field" in spec:
         row[spec["size_field"]] = spec["size_classes"][0]
         row[spec["size_ar"]] = spec.get("size_pairs", {}).get(
@@ -1999,10 +2065,6 @@ def test_published_activity_name_columns_are_declared_but_not_released(
 ) -> None:
     row = _published_establishment(slug)
     entry = _entry("est_size_act", slug)
-    if slug == SOCIAL:
-        with pytest.raises(AdditionError, match="indicator_labels_unconfirmed"):
-            parse_establishment_size(entry, [row], RECEIPT, _map(), {})
-        return
     parsed = parse_establishment_size(entry, [row], RECEIPT, _map(), {})
     if slug == BUSINESS:
         assert parsed.rows == ()
