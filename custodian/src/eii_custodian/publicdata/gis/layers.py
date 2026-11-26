@@ -284,7 +284,7 @@ def parcel_rows(features: list[dict[str, object]]) -> list[dict[str, object]]:
             {
                 "area_m2": _money(attributes.get("SHAPE.AREA")),
                 "start_date": _calendar_date(attributes.get("STARTDATE")),
-                "end_date": _calendar_date(attributes.get("ENDDATE")),
+                "end_date": _survey_date(attributes.get("ENDDATE")),
                 "geometry": geometry_wkb(_geometry(feature), "polygon"),
             }
         )
@@ -422,9 +422,14 @@ def landmark_rows(
     name and point, never the input order.
     """
     prepared: list[_LandmarkBody] = []
+    owned = ownership_index(_frame_grid(grid))
     for feature in features:
         attributes = _attributes(feature)
         lon, lat = _lon_lat(feature)
+        if point_cell(float(lon), float(lat), owned) is None:
+            # R1: a landmark outside the frame grid is left out, never refused
+            # (41 live points); the count is written after go-live.
+            continue
         prepared.append(
             _LandmarkBody(
                 name_en=_required_text(attributes.get("ENAME")),
@@ -656,8 +661,9 @@ def _calendar_date(value: object) -> str | None:
 
 
 def _survey_date(value: object) -> str | None:
-    # A served survey date before 1970 is an impossible entry (one live row
-    # carries year 201); it is left blank instead of refusing the whole layer.
+    # A served date before 1970 is an impossible entry (one address row carries
+    # year 201; 63 parcel end dates carry the 1900-01-01 placeholder); it is left
+    # blank instead of refusing the whole layer. A parcel START date stays strict.
     if isinstance(value, int) and not isinstance(value, bool) and value < 0:
         return None
     return _calendar_date(value)

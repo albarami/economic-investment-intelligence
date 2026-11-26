@@ -409,6 +409,19 @@ def test_poi_category_stays_null_and_landmarks_use_reviewed_points() -> None:
     assert "EMAIL" not in landmarks[0]
 
 
+def test_landmark_outside_the_grid_is_left_out() -> None:
+    inside = {
+        "attributes": {"ENAME": "SYN MARK", "ANAME": "معلم تجريبي"},
+        "geometry": _point(10.25, 20.5),
+    }
+    outside = {
+        "attributes": {"ENAME": "SYN FAR", "ANAME": "معلم بعيد"},
+        "geometry": _point(11.75, 21.5),
+    }
+    rows = landmark_rows([inside, outside], _grid(10.25, 20.5))
+    assert [row["name_en"] for row in rows] == ["SYN MARK"]
+
+
 def test_landmark_keys_are_content_based() -> None:
     """J24: the same landmarks in another order give the same lm- keys."""
     souq = {

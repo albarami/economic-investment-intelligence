@@ -104,6 +104,20 @@ def test_row_refusals(call: Callable[[], object], message: str) -> None:
     _refusal(call, message)
 
 
+def test_parcel_end_date_before_1970_is_blank() -> None:
+    feature = {
+        "attributes": {
+            "SHAPE.AREA": 1,
+            "STARTDATE": 1579046400000,
+            "ENDDATE": -2209161600000,
+        },
+        "geometry": _square(),
+    }
+    rows = subject.parcel_rows([feature])
+    assert rows[0]["start_date"] == "2020-01-15"
+    assert rows[0]["end_date"] is None
+
+
 @pytest.mark.parametrize("value", [True, -1, 1.5, "0"])
 def test_date_refusal(value: object) -> None:
     feature = {
