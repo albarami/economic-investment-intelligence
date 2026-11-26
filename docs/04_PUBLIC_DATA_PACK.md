@@ -747,8 +747,9 @@ legacy pin, an initial request or redirect to these hosts refuses with
 request. The stream and attempt openers refuse these hosts unconditionally.
 The four active records name `digicert_g2_2020_ca1.der` in each source
 intake (`intake/insurance_tables/`, `intake/monaqasat_classified/` and
-`intake/schools_private_directory/`). The bytes in those lead intakes and
-independent security approval remain pending; all four records stay PENDING.
+`intake/schools_private_directory/`). A different maker's security review
+approved all four records on 2026-11-26 (S2-PINS.rv1), so they are APPROVED;
+the bytes in those lead intakes are placed by the lead at staging.
 The fifth, `icv.qa`, record is retired from active pin selection and stays PENDING; reviving it needs a new ruling and issuer check.
 Initial, redirected and terms requests each select their own verifying context;
 an unpinned full-chain host receives fresh ordinary trust. Each of these contexts, pinned or not, and the

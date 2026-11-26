@@ -5556,8 +5556,9 @@ evidence; no live fetch or acceptance is claimed.
   always required; optional publisher date separate; observed periods or two
   nulls. This implementation claims no decision-record amendment.
 - O9: the five exact-host pin hashes are supplied; the four active records name
-  `digicert_g2_2020_ca1.der` in each source intake. Their bytes in the lead
-  intakes and independent security approval remain pending (all four PENDING).
+  `digicert_g2_2020_ca1.der` in each source intake. A different maker's
+  security review approved all four on 2026-11-26 (S2-PINS.rv1; APPROVED);
+  their bytes in the lead intakes are placed by the lead at staging.
   The retired `icv.qa` record is unchanged; the lead Sectigo recheck remains pending.
 - O10: second-round O10 words and check date are recorded. The education policy
   PDF is unread; ICV reuse wording and GIS terms were not found in the saved

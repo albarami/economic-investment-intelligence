@@ -17,20 +17,20 @@ FILENAME = "digicert_g2_2020_ca1.der"
 
 
 @pytest.mark.parametrize("source,host", ROWS)
-def test_page_pin_named_intake_pending_then_approved(
+def test_page_pin_named_intake_approved_pending_refused(
     tmp_path, invented_certs, source, host
 ):
     row = next(pin for pin in load_declaration(source)["pins"] if pin["host"] == host)
     assert row["file"] == FILENAME
-    assert row["security_review"] == "PENDING"
+    assert row["security_review"] == "APPROVED"
     der = invented_certs["intermediate"]
     config = config_file(tmp_path, der, host, source)
     folder = tmp_path / "intake" / source
     (folder / config["file"]).rename(folder / row["file"])
-    config.update(file=row["file"], security_review=row["security_review"])
+    config.update(file=row["file"], security_review="PENDING")
     with pytest.raises(PinError, match=r"^certificate_review_pending$"):
         load_pin(tmp_path, source, config)
-    config["security_review"] = "APPROVED"
+    config["security_review"] = row["security_review"]
     loaded = load_pin(tmp_path, source, config)
     assert (loaded.host, loaded.der, loaded.sha256, loaded.approved) == (
         host,
