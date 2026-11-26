@@ -20,7 +20,13 @@ from .contracts import (
 )
 from .parse import InputAudit, parse
 from .provenance import Capture, Frame, digest, month, validate_capture
-from .validate import MetadataInputs, scan_content, scan_metadata, validate_release
+from .validate import (
+    CardContent,
+    MetadataInputs,
+    scan_content,
+    scan_metadata,
+    validate_release,
+)
 
 
 @dataclass(frozen=True, repr=False)
@@ -187,7 +193,7 @@ def build(
     }
     egress = keys | frozenset(licences) | frozenset(withheld_registrations)
     metadata_inputs = MetadataInputs(current, snapshots, tables)
-    content = frozenset(card_content)
+    content = CardContent.prepare(frozenset(card_content))
     for name, artefact in (("manifest", manifest), ("report", report)):
         scan_metadata(artefact, egress, name, inputs=metadata_inputs, content=content)
         scan_content(artefact, content, name, inputs=metadata_inputs)

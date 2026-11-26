@@ -55217,3 +55217,68 @@ Skills applied: project-orientation traced existing mapping and task scope; task
 - The text at `d975159d` (blob `4f44ec2f`) differs from main. The earlier S2-DREC.cf2 confirmation was refused admission at launch, and is history only.
 - 0117 stays Proposed. Its builder is Moonshot, so its confirmation needs a maker other than Moonshot.
 - Documents only: no code, test, gate or acceptance box changes.
+
+## S2-REGSHORT.b2 — short card content matching
+
+- Date: 2026-11-27. Task S2-T49, rulings L-2199 and L-2201; proposed
+  decision 0132. Builder: OpenAI Codex; senior persona: senior privacy engineer
+  for data-release egress scanners; self-review persona: strict-reviewer.
+  Base commit: `7df3ab370ac39e396eb0103dab9897923e39398e`.
+- Environment: workspace-only invented captures; no network; `UV_OFFLINE=1`,
+  `TMPDIR=$PWD/.overnight/tmp`; property tests use `database=None`, default
+  Hypothesis example budget and generated seeds (no fixed seed claimed).
+- Red-first command, once for each of `e`, `re`, `pub`, `-`:
+  `uv run --locked python -m pytest custodian/tests/test_registers_short_content.py::test_register_short_name_builds[NAME] -q -p no:cacheprovider`.
+  Each exits 1, one failed test, exact `register_content_egress` on the unchanged
+  production scanner. `Q`, `QZ`, `a b` are retained passing build controls.
+- Implemented a frozen prepared card-content structure once per build and one
+  string matcher: unchanged long substring relation, short consecutive Unicode
+  word-token relation including underscore, punctuation-only equality. No
+  existing register test or expected refusal reason was changed.
+- Focused command: `uv run --locked python -m pytest custodian/tests/test_registers_fixed_metadata.py custodian/tests/test_registers_input_only_scan.py custodian/tests/test_registers_typed_scan.py custodian/tests/test_registers_digest_fields.py custodian/tests/test_registers.py custodian/tests/test_registers_short_content.py -q -p no:cacheprovider`:
+  exit 0, 1489 passed. This includes the unchanged decision 0124 realistic
+  invented label/schema-key plants and the new one-input exact-reason plants.
+- Guard deletions against the new test file, each alone: short-token matching,
+  exit 1 (11 failed, 10 passed); punctuation equality, exit 1 (2 failed,
+  19 passed); additional unchanged long-substring guard, exit 1 (2 failed,
+  19 passed). Each restored from original bytes and checked by byte equality.
+  No mutant is retained.
+- Initial test setup exposed duplicate lambda parameter IDs (collection exit 2,
+  twice) and import/raw-regex lint errors; corrected only the new test file.
+  Formatter and lint fixes did not change an existing test or fixture.
+- The first register selection exited 0 (2806 passed, 14403 deselected), but an
+  optional long-guard deletion overlapped it. It is not final evidence;
+  `.overnight/ALERT.md` records the overlap and the serial verification below.
+- Static commands: `uv run --locked ruff check .` exit 0;
+  `uv run --locked ruff format --check .` exit 0 (1024 files);
+  `uv run --locked mypy` exit 0 (531 source files);
+  `python3 scripts/check_docs.py` exit 0 (1393 text, 176 Markdown);
+  `python3 scripts/check_tree.py` exit 0 (8 rules);
+  `cmp AGENTS.md CLAUDE.md` exit 0. These preceded final evidence-only entries;
+  final document checks are recorded below.
+- Skills: project-orientation: reused the capture helper and existing scanner;
+  task-standards: named privacy-engineer and strict-reviewer personas;
+  test-driven-development (brief equivalent): proved four unchanged-code reds;
+  property-based-testing: independent character-walk short oracle and long
+  substring properties; sharp-edges: checked Unicode, underscore and zero-length
+  category boundaries; security-review (brief equivalent) and differential-review:
+  traced card text, keys, leaves and decoded bytes in the self-review artifact;
+  sanad-provenance: tied observations to command logs and brief rulings;
+  spec-to-code-compliance (brief bounded equivalent): mapped decision items to
+  preparation, matching and unchanged traversal; receiving-code-review (brief
+  equivalent): verified corrected b2 red cases before implementation;
+  requesting-code-review (brief equivalent): exact candidate returned for
+  different-maker review; verification-before-completion (brief equivalent):
+  serial final checks and byte restoration; muhasabah-gate: no real-release,
+  independent-approval or gate claim; github-flow: task-only patch handoff.
+- Git staging refused with exit 128, read-only index; no commit or hook ran.
+  The brief's patch handoff applies. Different-maker approval, lead real-register
+  replay and the full lead test remain owed. No acceptance box is ticked.
+- Final serial verification after byte restoration:
+  `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k register`
+  exit 0, 2806 passed, 14403 deselected (53.53 seconds). All 21 new cases pass.
+  Final ruff, format, mypy, check_docs, check_tree and cmp commands above each
+  exit 0 again with unchanged counts. No source mutation overlapped this run.
+  `git diff --check` exits 0. Evidence logs and security self-review are under
+  `.overnight/OUT/`. The reviewable patch includes new files using no-index
+  diffs because index intent-to-add is unavailable.
