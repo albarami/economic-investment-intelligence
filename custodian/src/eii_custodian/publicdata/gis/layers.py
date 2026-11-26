@@ -8,10 +8,11 @@ fails closed; this module does not project.
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import ROUND_HALF_EVEN, Decimal
@@ -247,7 +248,7 @@ def address_rows(
     features: list[dict[str, object]], grid: list[dict[str, object]]
 ) -> list[dict[str, object]]:
     """Address points. PIN stays out of the release."""
-    owned = ownership_index(_frame_grid(grid))
+    owned = _lazy_owned(grid)
     rows: list[dict[str, object]] = []
     for feature in features:
         attributes = _attributes(feature)
@@ -261,7 +262,7 @@ def address_rows(
             "lon": lon,
             "lat": lat,
         }
-        if point_cell(float(lon), float(lat), owned) is None:
+        if point_cell(float(lon), float(lat), owned()) is None:
             # R1: a point outside the frame grid is left out, never refused
             # (328 of 163,860 live points), after every field check above;
             # the count is written after go-live.
@@ -395,7 +396,7 @@ def poi_rows(
     features: list[dict[str, object]], grid: list[dict[str, object]]
 ) -> list[dict[str, object]]:
     """Commercial points. The layer publishes no category."""
-    owned = ownership_index(_frame_grid(grid))
+    owned = _lazy_owned(grid)
     rows: list[dict[str, object]] = []
     for feature in features:
         attributes = _attributes(feature)
@@ -424,7 +425,7 @@ def landmark_rows(
     name and point, never the input order.
     """
     prepared: list[_LandmarkBody] = []
-    owned = ownership_index(_frame_grid(grid))
+    owned = _lazy_owned(grid)
     for feature in features:
         attributes = _attributes(feature)
         lon, lat = _lon_lat(feature)
@@ -434,7 +435,7 @@ def landmark_rows(
             lon=lon,
             lat=lat,
         )
-        if point_cell(float(lon), float(lat), owned) is None:
+        if point_cell(float(lon), float(lat), owned()) is None:
             # R1: a landmark outside the frame grid is left out, never refused
             # (41 live points), after its name checks; the count is written
             # after go-live.
@@ -714,10 +715,19 @@ def _coordinate(value: object) -> Decimal:
     return Decimal(str(value)).quantize(_COORD, rounding=ROUND_HALF_EVEN)
 
 
-def _cell(lon: Decimal, lat: Decimal, owned: frozenset[int]) -> int:
-    # The ownership index is built once per layer, not once per point (R1: 164k
-    # address points against 72k cells was about 35 minutes of rebuilding).
-    found = point_cell(float(lon), float(lat), owned)
+def _lazy_owned(grid: list[dict[str, object]]) -> Callable[[], frozenset[int]]:
+    """Build the ownership index at the first point lookup, then reuse it.
+
+    Once per layer, not once per point (R1: 164k address points against 72k
+    cells was about 35 minutes of rebuilding). A batch with no point never
+    builds it, and a grid refusal comes at the first lookup, where it came
+    before, so results and refusal order are unchanged.
+    """
+    return functools.cache(lambda: ownership_index(_frame_grid(grid)))
+
+
+def _cell(lon: Decimal, lat: Decimal, owned: Callable[[], frozenset[int]]) -> int:
+    found = point_cell(float(lon), float(lat), owned())
     if found is None:
         raise LayerError("cell")
     return found

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+import functools
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 
 from eii_custodian.publicdata.fetch.receipts import sha256_hex
@@ -121,8 +123,10 @@ def build_places(
         raise PlacesFsqError("attribution")
     parsed = _parsed(files, expected_sha256)
     account = account_rows(parsed, frame)
-    # R1: the ownership index is built once for the batch, not once per place.
-    stored = ownership_index(grid)
+    # R1: the ownership index is built once for the batch, not once per place,
+    # at the first lookup inside _table_row's try, so an empty batch never
+    # builds it and refusal order is unchanged.
+    stored = functools.cache(partial(ownership_index, grid))
     located = tuple(
         (row, table_row)
         for row in account.kept
@@ -179,11 +183,17 @@ def _parsed(
 
 
 def _table_row(
-    row: ParsedRow, grid: Grid, release: str, stored: frozenset[int] | None = None
+    row: ParsedRow,
+    grid: Grid,
+    release: str,
+    stored: Callable[[], frozenset[int]] | None = None,
 ) -> TableRow | None:
-    owned = ownership_index(grid) if stored is None else stored
     try:
-        cell = point_cell(float(row.lon), float(row.lat), owned)
+        cell = point_cell(
+            float(row.lon),
+            float(row.lat),
+            ownership_index(grid) if stored is None else stored(),
+        )
     except FrameError as exc:
         raise PlacesFsqError("cell") from exc
     if cell is None:
