@@ -243,6 +243,10 @@ def address_rows(
     for feature in features:
         attributes = _attributes(feature)
         lon, lat = _lon_lat(feature)
+        if point_cell(float(lon), float(lat), owned) is None:
+            # R1: a point outside the frame grid is left out, never refused
+            # (328 of 163,860 live points); the count is written after go-live.
+            continue
         rows.append(
             {
                 "zone_number": _digits(attributes.get("ZONE_NO")),
@@ -251,7 +255,7 @@ def address_rows(
                 "building_subtype": _optional_digits(
                     attributes.get("BUILDING_NO_SUBTYPE")
                 ),
-                "survey_date": _calendar_date(attributes.get("SURVEYED_DATE")),
+                "survey_date": _survey_date(attributes.get("SURVEYED_DATE")),
                 "lon": lon,
                 "lat": lat,
                 "cell": _cell(lon, lat, owned),
@@ -640,6 +644,14 @@ def _calendar_date(value: object) -> str | None:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         raise LayerError("date")
     return datetime.fromtimestamp(value // _MILLIS, UTC).date().isoformat()
+
+
+def _survey_date(value: object) -> str | None:
+    # A served survey date before 1970 is an impossible entry (one live row
+    # carries year 201); it is left blank instead of refusing the whole layer.
+    if isinstance(value, int) and not isinstance(value, bool) and value < 0:
+        return None
+    return _calendar_date(value)
 
 
 def _digits(value: object) -> str:

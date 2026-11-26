@@ -164,6 +164,20 @@ def test_land_price_period_is_exactly_one_year_of_the_service_name() -> None:
             land_price_rows([feature], name, as_of=_INVENTED_AS_OF)
 
 
+def test_address_outside_the_grid_is_left_out_and_early_survey_date_is_blank() -> None:
+    inside = _load("qars_features.json")[0]
+    outside = json.loads(json.dumps(inside))
+    outside["geometry"]["x"] = 11.75
+    outside["geometry"]["y"] = 21.5
+    early = json.loads(json.dumps(inside))
+    early["attributes"]["SURVEYED_DATE"] = -55813363200000
+    early["attributes"]["BUILDING_NO"] = 4
+    rows = address_rows([inside, outside, early], _grid(10.25, 20.5))
+    assert [row["building_number"] for row in rows] == ["3", "4"]
+    assert rows[0]["survey_date"] == "2020-01-15"
+    assert rows[1]["survey_date"] is None
+
+
 def test_address_and_parcel_drop_pin_and_keep_published_dates() -> None:
     grid = _grid(10.25, 20.5)
     address = address_rows([_load("qars_features.json")[0]], grid)
