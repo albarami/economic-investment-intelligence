@@ -97,7 +97,11 @@ class ImportBoundaryRealTest(unittest.TestCase):
             for tree in _source_tree_paths(root):
                 cache = tree / "__pycache__" / "nested"
                 cache.mkdir(parents=True)
-                for path in (cache / "probe.txt", tree / "probe.pyc", tree / "probe.pyo"):
+                for path in (
+                    cache / "probe.txt",
+                    tree / "probe.pyc",
+                    tree / "probe.pyo",
+                ):
                     path.write_bytes(b"syn-bytecode")
             self.assertEqual(before, _tree_fingerprint(root))
 
