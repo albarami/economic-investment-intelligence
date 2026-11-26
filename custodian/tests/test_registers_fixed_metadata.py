@@ -1,6 +1,7 @@
 """Decision 0124 / L-2139: exact metadata checks, invented inputs only."""
 
 import copy
+import unicodedata
 from dataclasses import replace
 
 import pytest
@@ -47,15 +48,20 @@ def test_register_m1_control(bundle):
     )
 
 
-def test_register_m1_owner_label_absent_from_cards(tmp_path):
-    item = capture()
+@pytest.mark.parametrize("field", ["publisher", "dataset", "basis_note"])
+@pytest.mark.parametrize("in_cards", [False, True])
+def test_register_m1_owner_label(tmp_path, field, in_cards):
+    item = (
+        capture(files=inputs(rows=[commerce(name_en=COMPANY)]))
+        if in_cards
+        else capture()
+    )
     build(
         tmp_path / "control", "public_only", FRAME, (item, capture("fc_register")), ()
     )
-    changed = replace(
-        item, receipt={**item.receipt, "publisher": "Publisher " + COMPANY}
-    )
-    with pytest.raises(RegisterError, match=r"^metadata_fixed_text_mismatch$"):
+    changed = replace(item, receipt={**item.receipt, field: "Prefix " + COMPANY})
+    reason = "register_content_egress" if in_cards else "metadata_fixed_text_mismatch"
+    with pytest.raises(RegisterError, match="^" + reason + "$"):
         build(
             tmp_path / "plant",
             "public_only",
@@ -64,24 +70,6 @@ def test_register_m1_owner_label_absent_from_cards(tmp_path):
             (),
         )
     assert not (tmp_path / "plant/current").exists()
-
-
-def test_register_m1_owner_label_present_in_cards(tmp_path):
-    item = capture(files=inputs(rows=[commerce(name_en=COMPANY)]))
-    build(
-        tmp_path / "control", "public_only", FRAME, (item, capture("fc_register")), ()
-    )
-    changed = replace(
-        item, receipt={**item.receipt, "publisher": "Publisher " + COMPANY}
-    )
-    with pytest.raises(RegisterError, match=r"^register_content_egress$"):
-        build(
-            tmp_path / "plant",
-            "public_only",
-            FRAME,
-            (changed, capture("fc_register")),
-            (),
-        )
 
 
 @pytest.mark.parametrize(
@@ -126,11 +114,12 @@ def test_register_m1_owner_table_count(bundle):
         check(body, context)
 
 
-def test_register_m1_owner_eight_digit_count(bundle):
+@pytest.mark.parametrize("digits", [8, 11])
+def test_register_m1_owner_digit_count(bundle, digits):
     built, context = bundle
     body = copy.deepcopy(built.manifest)
     check(body, context)
-    receipt(body)["files"]["establishments"]["bytes"] = int("8" * 8)
+    receipt(body)["files"]["establishments"]["bytes"] = int("8" * digits)
     with pytest.raises(RegisterError, match=r"^identifier_digit_run$"):
         check(body, context)
 
@@ -393,3 +382,45 @@ def test_register_m1_wrapped_approved_text_keeps_full_scan(bundle, wrapper, fiel
     target[field] = wrapper([text])
     with pytest.raises(RegisterError, match=r"^register_content_egress$"):
         check(body, context, root, content=content)
+
+
+@pytest.mark.parametrize("role", ["establishments", "companies", "geocoded", "events"])
+def test_register_m1_file_count_equal_to_card_licence(bundle, role):
+    built, context = bundle
+    body = copy.deepcopy(built.manifest)
+    licence = commerce()["licence_number"]
+    keys = frozenset({licence})
+    check(body, context, keys=keys)
+    side = next(e["receipt"] for e in body["receipts"] if role in e["receipt"]["files"])
+    assert side["files"][role]["bytes"] != int(licence)
+    side["files"][role]["bytes"] = int(licence)
+    with pytest.raises(RegisterError, match=r"^registration_egress$"):
+        check(body, context, keys=keys)
+
+
+@pytest.mark.parametrize("field", ["publisher", "dataset", "basis_note"])
+def test_register_m1_nfd_label_is_not_exact(bundle, monkeypatch, field):
+    _, context = bundle
+    approved = "SYN Invented Caf\u00e9 Source"
+    wording = copy.deepcopy(validate.APPROVED_RECEIPT_WORDING)
+    wording["biz_register"][field] = approved
+    monkeypatch.setattr(validate, "APPROVED_RECEIPT_WORDING", wording)
+    body = {
+        "receipts": [
+            {"use": "current", "receipt": copy.deepcopy(context.current[0].receipt)}
+        ]
+    }
+    receipt(body)[field] = approved
+    check(body, context)
+    decomposed = unicodedata.normalize("NFD", approved)
+    assert decomposed.encode() != approved.encode()
+    assert unicodedata.normalize("NFC", decomposed) == approved
+    receipt(body)[field] = decomposed
+    with pytest.raises(RegisterError, match=r"^metadata_fixed_text_mismatch$"):
+        check(body, context)
+
+
+def test_register_m1_real_approved_labels_are_nfc():
+    for wording in validate.APPROVED_RECEIPT_WORDING.values():
+        for label in wording.values():
+            assert unicodedata.normalize("NFC", label) == label

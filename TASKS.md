@@ -2578,3 +2578,15 @@ run red and restore by cmp. Whole-custodian verification remains BLOCKED by
 the job window (fresh final command interrupted, exit 130), so this evidence
 marks no acceptance box and authorizes no admission. See PROGRESS.md **B3
 final verification boundary** and OPEN_ITEMS.md PO-S2-REGM1-04.
+
+
+## S2-T49 evidence update — S2-REGM1 b4 (2026-11-26)
+
+Test-only continuation under L-2152 covers the three receipt labels with an
+invented company absent from and present in cards, all four file-byte counts
+altered to an intake licence, both prohibited digit-run lengths, and byte-exact
+Unicode wording using a monkeypatched invented source label. Real approved
+wording is checked for NFC form. The row-count licence plant is retained.
+Production code and acceptance boxes are unchanged; different-maker review,
+real-file evidence and the S2 gate remain pending. See PROGRESS.md
+**S2-REGM1 b4 — rejected-review test coverage continuation**.

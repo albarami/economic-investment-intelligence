@@ -7271,3 +7271,13 @@ independent maker review and every other gate remain required.
   whole command on the base and final patch with enough runtime, record both
   full counts/exits, then obtain the different-maker review. No further owner
   change to count/label policy is requested and no gate is waived.
+
+## Proposed open items — S2-REGM1 b4
+
+- PO-S2-REGM1-b4-01: the required unchanged documentation check scans untracked
+  `.overnight/tmp/` job-runtime files, including preparation logs, generated
+  absolute symlinks and an invalid-encoding negative-test fixture. Exit 1,
+  290 failures; see PROGRESS.md **S2-REGM1 b4 — rejected-review test coverage continuation**.
+  Lead: verify the patch in a clean checkout and record the unchanged checker
+  result. No exclusion or baseline change is proposed. Different-maker review
+  remains pending before admission; no S2-T49 box is ticked.

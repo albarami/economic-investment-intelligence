@@ -55039,3 +55039,69 @@ count. Therefore neither required whole-suite before/after count is claimed.
 This is an explicit incomplete verification return under the brief's BLOCKED
 rule. The register before/after commands and all reported targeted/static
 checks completed with the real exits above. No running test job is left.
+
+
+## S2-REGM1 b4 — rejected-review test coverage continuation
+
+- Scope/source: S2-T49; decision 0124 **Exact checks and scan order**;
+  L-2152 and the job-bound b4 brief; different-maker rv1 findings 1 to 3.
+  Base: `08f7905675d03876ae432c24d430460650183bdf`, branch `regm1`;
+  production code unchanged. Senior persona: senior privacy-test engineer
+  for egress validators; self-review persona: strict-reviewer.
+- Tests reuse `bundle`, `capture`, `commerce`, `receipt` and `check`. Each
+  rejection changes one label or count after a passing control. The licence
+  comes from the invented commerce fixture, never a real register. The
+  existing row-count equivalent remains unchanged. No new production refusal
+  branch exists, so no new production guard needs deletion.
+- Environment: Linux, Python 3.14.6, locked uv environment; invented fixtures
+  only, default Hypothesis settings and generated seed (no explicit seed).
+  No cache, vault, credential or real-register input was read.
+- Initial focused run: exit 1, 90 passed and 3 failed. The Unicode control
+  incorrectly included an unchanged historical receipt after patching its
+  source wording. Correction: isolate one current receipt; no validator change.
+  Corrected focused command `uv run --locked python -m pytest
+  custodian/tests/test_registers_fixed_metadata.py -q -p no:cacheprovider`:
+  exit 0, 93 passed.
+- Red proof: `uv run --locked python .overnight/OUT/plant_nfc.py` wrongly
+  normalizes values in a process-local wrapper around `_metadata_verdict`.
+  It runs only `test_register_m1_nfd_label_is_not_exact[publisher]`: exit 1,
+  1 failed, specifically DID NOT RAISE at the new mismatch assertion. No
+  source file is edited by the plant. Clean-process replay with
+  `uv run --locked python -m pytest
+  'custodian/tests/test_registers_fixed_metadata.py::test_register_m1_nfd_label_is_not_exact[publisher]'
+  -q -p no:cacheprovider`: exit 0, 1 passed.
+- Preliminary checks: `uv run --locked ruff check .`: exit 0, all checks
+  passed; `uv run --locked ruff format --check .`: exit 0, 1018 files
+  formatted; `uv run --locked mypy`: exit 0, 531 source files.
+  `uv run --locked ruff format .` applied formatting to the test file only
+  (exit 0, 1 reformatted, 1017 unchanged). `git diff --check` and
+  `cmp AGENTS.md CLAUDE.md`: exit 0.
+- Self-review: every rv1 mandatory case maps to a named test; UTF-8
+  difference and NFC equality are asserted independently of the validator;
+  patching targets the name read by validate.py and restores automatically.
+  Four existing Hypothesis equality/suffix/schema properties remain intact.
+  No source normalization, privacy rule, tolerance or expected baseline changes.
+  Independent different-maker approval is still owed before admission.
+- Final register suite: `uv run --locked python -m pytest custodian/tests -q
+  -p no:cacheprovider -k "register"`: exit 0, 2785 passed, 14190 deselected,
+  66.60 seconds. Selected named plants plus retained row-count equivalent:
+  `uv run --locked python -m pytest
+  custodian/tests/test_registers_fixed_metadata.py
+  custodian/tests/test_registers_restoration.py -q -p no:cacheprovider
+  -k 'owner_label or file_count_equal_to_card_licence or owner_digit_count or nfd_label or real_approved_labels or altered_count_equal_to_key'`:
+  exit 0, 17 passed, 586 deselected.
+- Required `python3 scripts/check_docs.py`: exit 1, 4392 text files and
+  184 Markdown files, 290 failures. The unchanged checker includes untracked
+  job-runtime files under `.overnight/tmp/`, including absolute symlink
+  targets, preparation logs and a deliberately invalid-encoding test fixture.
+  Evidence: job OUT/docs.log; alert: job ALERT.md. No exclusion, ignore rule,
+  gate or baseline was changed. BLOCKED: the required documentation check is
+  not green. Smallest unblocking action: lead verifies the patch in a clean
+  checkout without job-runtime artefacts and records the unchanged checker
+  result. No admission, real-file build or slice-gate completion is claimed.
+- Handoff: `git add` of the four changed tracked files exited 128 because Git
+  metadata is read-only. L-2077 applies: no commit or rebase; the full diff
+  against base `08f7905675d03876ae432c24d430460650183bdf` is delivered as
+  `.overnight/OUT/S2-REGM1.b4.patch` with its SHA-256 sidecar. No new source
+  file requires inclusion outside that diff. Final `git diff --check` and
+  production-only `git diff --exit-code` against the base: exit 0.
