@@ -36,6 +36,7 @@ _MONEY = Decimal("0.01")
 _COORD = Decimal("0.000001")
 _MILLIS = 1000
 _PRICE = re.compile(r"^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$")
+_PRICE_RANGE = re.compile(r"^\d+-\d+$")
 _PRICE_FIELDS = (
     "ResidentialPrices",
     "ResidentialCityCenter",
@@ -221,6 +222,14 @@ def land_price_rows(
         attributes = _attributes(feature)
         district = _district_key(attributes)
         for field in _PRICE_FIELDS:
+            served = attributes.get(field)
+            if field in attributes and (
+                served is None
+                or (isinstance(served, str) and _PRICE_RANGE.fullmatch(served))
+            ):
+                # R1: a use with no published price, or a published range
+                # (not a single guide price), gives no row; counts after go-live.
+                continue
             row = {
                 "district_key": district,
                 "period": period,
