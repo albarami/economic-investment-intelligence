@@ -265,6 +265,31 @@ def test_register_duplicate_registration_cross_capture_leak_refuses(tmp_path, ch
         current = (duplicates, centre)
     elif channel == "snapshot":
         current, snapshots = (duplicates, centre), (capture(),)
+    if channel == "storage_count":
+        # Decision 0124 / L-2141 F3: this exact recomputed count is exempt.
+        from copy import deepcopy
+
+        from eii_custodian.publicdata.registers.validate import (
+            MetadataInputs,
+            scan_metadata,
+        )
+
+        result = build(tmp_path, "public_only", Frame(frozenset()), current, snapshots)
+        context = MetadataInputs(current, snapshots, result.tables)
+        keys = frozenset({"125"})
+        scan_metadata(result.manifest, keys, "manifest", inputs=context)
+        company = next(
+            t for t in result.manifest["tables"] if t["name"] == "pub_register_company"
+        )
+        assert company["rows"] == len(result.tables["pub_register_company"]) == 125
+        changed = deepcopy(result.manifest)
+        snapshot = next(
+            t for t in changed["tables"] if t["name"] == "pub_register_snapshot"
+        )
+        snapshot["rows"] = 125  # Actual snapshot count is zero; 125 is withheld.
+        with pytest.raises(RegisterError, match=r"^registration_egress$"):
+            scan_metadata(changed, keys, "manifest", inputs=context)
+        return
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
         build(tmp_path, "public_only", Frame(frozenset()), current, snapshots)
 

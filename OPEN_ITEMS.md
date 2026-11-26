@@ -7200,3 +7200,70 @@ This append-only section answers pre-review round 4 finding F1 (C-P5, TST-168). 
   execution satisfying the read boundary from its first call. The current
   implementation and test evidence are preserved for review, without claiming
   that they erase the process deviation.
+
+
+## Proposed open items — S2-REGM1 b1, 2026-11-26
+
+- PO-S2-REGM1-01: The M1 brief requires `metadata_fixed_text_mismatch` on
+  changed listed labels, while forbidding changes to existing expected reasons.
+  Existing exact-reason tests require `registration_egress` on receipt
+  publisher/dataset/basis_note and `register_content_egress` on copied card
+  content in dataset/basis_note. The lead must authorize migration of these
+  affected cases to the new reason, retaining equivalent unlisted-field
+  regressions. No reason has been changed by this worker.
+- PO-S2-REGM1-02: Supply the trusted approved wording for publisher, dataset,
+  basis_note and terms_words per register source, and specify fixture binding.
+  The committed registry publishers are `Lead receipt required` placeholders
+  refused by `provenance.validate_receipt`; receipts currently supply
+  attribution and read terms. Deriving approved values from the receipt being
+  checked would be self-approval. No real file was read and no value invented.
+- PO-S2-REGM1-03: After the corrected brief and implementation, obtain the
+  required job-bound read-only approval from another maker on the exact
+  candidate before it joins. This worker cannot substitute self-review for
+  that approval. No M1 implementation or acceptance is claimed.
+
+## Proposed open items — S2-REGM1 b2
+
+The supplied L-2139 amendment answers both b1 questions under **Proposed open
+items — S2-REGM1 b1**: trusted receipt wording is supplied and mismatches meet
+the existing scans before new mismatch reasons; supplied terms remain records.
+This resolution does not erase the b1 history or claim implementation.
+
+A further brief decision is required before S2-T49's M1 implementation:
+`test_register_storage_manifest_count_keeps_egress_scan` requires the correct
+company-table row count of an invented bundle to refuse against its intake
+licence, while M1 requires that exact count to be exempt. The Never/D clauses
+forbid changing the existing reason, plant or count. Baseline exit 0 and the
+one-seam exact-count probe exit 1 prove the contradictory expectation; see
+PROGRESS.md **S2-REGM1 b2 — additional exact-count test conflict**.
+Smallest resolution: an explicit bounded amendment allowing this particular
+existing case to become a positive exact-count control, with a separate
+one-input altered-count refusal plant. No check is changed under this open item;
+independent maker review and every other gate remain required.
+
+## S2-REGM1 b3 — bounded resolutions and admission still owed
+
+- L-2141 F1 to F5 in the S2-REGM1.b3 brief resolves b2's exact-count
+  blocker: the old 125-row refusal becomes an exact-count passing control,
+  with an altered count still refusing. L-2139's b1 resolutions remain in
+  force. Earlier b1/b2 records above are unchanged.
+- The inventory's 30 exact-field-family assertions were classified; the full
+  register run identified two more exact-count migrations allowed by F3.
+  Proposed decision 0124, **Plants and permitted test migrations**, records
+  all three and their matching negatives. No other expected reason changes.
+- Different-maker read-only review on the exact candidate remains owed before
+  admission (PO-S2-REGM1-03). This worker's self-review is not that approval.
+  The lead's real-register replay, freeze/release checks and S2 gate remain
+  separate obligations. No real register or public cache was read here.
+- Git index writes are refused by this workspace's read-only metadata mount
+  (actual `git add -N` exit 128). Under L-2077 this is a patch handoff, not a
+  build blocker: the lead must apply and commit the exact patch, then obtain
+  the different-maker review. No push or merge is attempted here.
+
+- PO-S2-REGM1-04 — OPEN, b3 runtime verification: the final corrected full
+  custodian command did not complete in this job's window and was interrupted
+  with exit 130. Targeted evidence is 2772 register and 80 fixed-metadata tests
+  passing; it cannot substitute for the required whole suite. Run the exact
+  whole command on the base and final patch with enough runtime, record both
+  full counts/exits, then obtain the different-maker review. No further owner
+  change to count/label policy is requested and no gate is waived.

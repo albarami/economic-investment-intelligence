@@ -817,9 +817,7 @@ def test_register_long_key_in_manifest_receipt_time_build_refuses(tmp_path, role
     assert not (tmp_path / "refuse" / "current").exists()
 
 
-def test_register_short_key_in_table_counts_builds_and_unlisted_refuses(
-    tmp_path, monkeypatch
-):
+def test_register_exact_table_count_survives_typed_list_removal(tmp_path, monkeypatch):
     # One card per source gives the storage-added count 2, also the token of the
     # unlisted `version` "v2"; three commerce cards give the count 4 instead.
     rows = [
@@ -839,6 +837,22 @@ def test_register_short_key_in_table_counts_builds_and_unlisted_refuses(
     ]
     _build(tmp_path / "pass", rows)
     _drop_from_list(monkeypatch, "manifest.tables.rows")
+    # Decision 0124 / L-2141 F3: the separate exact-count list still validates it.
+    result = _build(tmp_path / "exact", rows)
+    company = next(
+        t for t in result.manifest["tables"] if t["name"] == "pub_register_company"
+    )
+    assert company["rows"] == len(result.tables["pub_register_company"]) == 4
+    # Matching negative: removing its exact-count authority makes it unlisted.
+    monkeypatch.setattr(
+        validate,
+        "FIXED_METADATA",
+        {
+            path: rule
+            for path, rule in contracts.FIXED_METADATA.items()
+            if path != "manifest.tables.rows"
+        },
+    )
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
         _build(tmp_path / "refuse", rows)
 

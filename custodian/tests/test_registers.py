@@ -17,7 +17,11 @@ import h3
 from eii_custodian.publicdata.fetch.kinds import prepare
 from eii_custodian.publicdata.fetch.registry import load_registry, nightly_blocked
 from eii_custodian.publicdata.registers.build import build
-from eii_custodian.publicdata.registers.contracts import SCHEMAS, RegisterError
+from eii_custodian.publicdata.registers.contracts import (
+    APPROVED_RECEIPT_WORDING,
+    SCHEMAS,
+    RegisterError,
+)
 from eii_custodian.publicdata.registers.intake import from_environment
 from eii_custodian.publicdata.registers.parse import parse
 from eii_custodian.publicdata.registers.provenance import Capture, Frame, receipt_for
@@ -134,14 +138,14 @@ def capture(source="biz_register", period="2026-11", files=None):
         source,
         period,
         files,
-        publisher="SYN invented publisher",
-        dataset="SYN register capture",
+        publisher=APPROVED_RECEIPT_WORDING[source]["publisher"],
+        dataset=APPROVED_RECEIPT_WORDING[source]["dataset"],
         retrieved_utc=period + "-20T00:00:00Z",
         licence_id="pending",
         licence_basis="owner_decision",
         terms_words="terms to be read",
         terms_read_on="pending",
-        basis_note="decision 0026; local use",
+        basis_note=APPROVED_RECEIPT_WORDING[source]["basis_note"],
     )
     return Capture(source, period, files, receipt)
 
