@@ -5,6 +5,8 @@ import sys
 from dataclasses import replace
 
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata import completeness as c
 from eii_custodian.publicdata.fetch.receipts import sidecar_for
@@ -218,6 +220,76 @@ def test_citation_only_and_component_rows():
     )
 
 
+def landmark_inputs():
+    rows = [
+        entry("landmark_wikipedia", key="landmark_wikipedia/SYN-a"),
+        entry("landmark_wikipedia", key="landmark_wikipedia/SYN-b"),
+    ]
+    args = inputs()
+    args.update(
+        entries=rows,
+        pack=c.Pack({"landmark_wikipedia": ()}, frozenset()),
+        inventory={"landmark_wikipedia": ()},
+        receipts={row.key: receipt(row) for row in rows},
+        outputs={row.key: row.release_tables for row in rows},
+        component_keys={"landmark_wikipedia": frozenset(row.key for row in rows)},
+    )
+    return args
+
+
+def test_removed_landmark_key_refuses_duplicate_or_missing_row():
+    args = landmark_inputs()
+    assert not failures(c.check(**args))
+    # Change only entries; preserve all original evidence and the closed set.
+    args["entries"] = args["entries"][:1]
+    assert {
+        "id": "landmark_wikipedia",
+        "state": "failed",
+        "reason": "source_completeness: duplicate or missing row",
+    } in failures(c.check(**args))
+
+
+def test_extra_landmark_registry_source_refuses_exact_reason():
+    args = landmark_inputs()
+    assert not failures(c.check(**args))
+    args["entries"].append(entry("SYN_extra"))
+    assert {
+        "id": "SYN_extra",
+        "state": "failed",
+        "reason": "source_completeness: extra registry source",
+    } in failures(c.check(**args))
+
+
+def test_unknown_landmark_component_key_refuses_exact_reason():
+    args = landmark_inputs()
+    assert not failures(c.check(**args))
+    args["entries"].append(
+        entry("landmark_wikipedia", key="landmark_wikipedia/SYN-extra")
+    )
+    assert {
+        "id": "landmark_wikipedia",
+        "state": "failed",
+        "reason": "source_completeness: component keys",
+    } in failures(c.check(**args))
+
+
+@given(
+    st.sets(
+        st.sampled_from(("landmark_wikipedia/SYN-a", "landmark_wikipedia/SYN-b")),
+        min_size=1,
+    )
+)
+def test_every_removed_landmark_component_subset_refuses_missing_rows(removed):
+    args = landmark_inputs()
+    assert not failures(c.check(**args))
+    args["entries"] = [row for row in args["entries"] if row.key not in removed]
+    assert {
+        "id": "landmark_wikipedia",
+        "state": "failed",
+        "reason": "source_completeness: duplicate or missing row",
+    } in failures(c.check(**args))
+
+
 def test_pack_reader_covers_all_three_inventory_sections():
     text = """## 2. Source registry
 `traffic_tomtom_flow` has no row in `source_registry` and no file.
@@ -286,6 +358,21 @@ def test_table_catalogue_is_read_from_its_anchor_only():
     assert c.table_catalogue(
         "### 7.2 Table catalogue\n| `pub_invented` | Public |\n### 7.3 Next\n| `wrong` | Public |"
     ) == {"pub_invented"}
+
+
+def test_uncatalogued_table_refusal_is_exact():
+    args = inputs()
+    row = entry(release_tables=("pub_invented_unknown",))
+    args["entries"] = [row]
+    args["receipts"] = {row.key: receipt(row)}
+    args["outputs"] = {row.key: row.release_tables}
+    assert failures(c.check(**args)) == [
+        {
+            "id": "invented",
+            "state": "failed",
+            "reason": "source_table_uncatalogued: pub_invented_unknown",
+        }
+    ]
 
 
 def test_existing_expectations_are_passed_and_not_copied():

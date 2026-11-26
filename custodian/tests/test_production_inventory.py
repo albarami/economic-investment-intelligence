@@ -1,11 +1,85 @@
 """The production inventory is independent of the executable adapter map."""
 
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
+from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata.assembly import PHASES, AssemblyError
-from eii_custodian.publicdata.assembly_inventory import INVENTORY, validate_inventory
+from eii_custodian.publicdata.assembly_inventory import (
+    INVENTORY,
+    validate_inventory,
+)
+
+CONTRACTED_TRADE_AND_BENCHMARK_TABLES = frozenset(
+    """
+pub_atlas_country_partner_product_year pub_atlas_country_product_year
+pub_atlas_cppy_country pub_atlas_cppy_product pub_atlas_cpy_country
+pub_atlas_cpy_product pub_gravity_bilateral pub_gravity_country pub_baci_trade
+pub_baci_country pub_baci_product pub_wdi_benchmark pub_unctad_fdi_benchmark
+pub_weo_benchmark pub_ilostat_benchmark
+""".split()
+)
+
+
+def test_contracted_trade_and_benchmark_tables_are_in_actual_catalogue() -> None:
+    from pathlib import Path
+
+    from eii_custodian.publicdata.completeness import table_catalogue
+
+    catalogue = table_catalogue(
+        Path("docs/03_DATA_CONTRACTS.md").read_text(encoding="utf-8")
+    )
+    assert CONTRACTED_TRADE_AND_BENCHMARK_TABLES <= catalogue
+
+
+def test_landmark_and_gba_inventory_is_complete_and_closed() -> None:
+    from eii_custodian.publicdata.assembly_sources import (
+        FAMILY_COUNTS,
+        PACK_IDENTITIES,
+        SOURCE_COMPONENTS,
+    )
+    from eii_custodian.publicdata.completeness import check, pack_sources
+    from eii_custodian.publicdata.fetch.registry import load_registry
+
+    root = repository_root(Path(__file__))
+    entries = load_registry(root / "custodian/publicdata/sources.yaml")
+    rows = [
+        row
+        for row in entries
+        if row.source_id.startswith("landmark_") or row.source_id == "bldg_gba"
+    ]
+    sources = {row.source_id for row in rows}
+    assert len(rows) == 72
+    assert len(sources) == 16
+    pack = pack_sources(
+        (root / "docs/04_PUBLIC_DATA_PACK.md").read_text(), FAMILY_COUNTS
+    )
+    record = check(
+        entries=entries,
+        pack=pack,
+        inventory=PACK_IDENTITIES,
+        catalogue=frozenset(),
+        receipts={},
+        outputs={},
+        absences={},
+        cached_source_ids=(),
+        component_keys=SOURCE_COMPONENTS,
+    )
+    # Receipt/output obligations remain live-run work; inspect only this shape.
+    keys = {row.key for row in rows}
+    assert not [
+        item
+        for item in record
+        if item["id"] in keys | sources
+        and item["reason"].startswith("source_completeness:")
+    ]
+    assert sources <= pack.sources.keys() & PACK_IDENTITIES.keys()
+    for source in sources:
+        assert SOURCE_COMPONENTS[source] == {
+            row.key for row in rows if row.source_id == source
+        }
 
 
 def test_inventory_has_each_phase_and_explicit_inputs_and_outputs() -> None:
