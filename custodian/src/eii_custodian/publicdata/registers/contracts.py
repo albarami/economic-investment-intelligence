@@ -223,6 +223,56 @@ DIGEST_FIELDS = frozenset(
 )
 
 
+# Decision 0124 / L-2139: lead-authored intake wording, copied byte for byte
+# from the bounded job's approved_receipt_wording.json; never receipt-supplied
+# values or registry placeholders. The source_id selects its one wording row.
+APPROVED_RECEIPT_WORDING = {
+    "biz_register": {
+        "publisher": "Public business register map of the State of Qatar (visitor capture of the public map page)",
+        "dataset": "Business types map lists: active and expired licences, all ownership groups",
+        "basis_note": "Decision 0026; personal local use. Collected by visitor capture on 2026-11-13 from about 16:45 to 17:00 +03; the timestamp is the start of that window in UTC under the owner's note of 2026-11-13 (ruling L-133).",
+    },
+    "fc_register": {
+        "publisher": "Qatar Financial Centre public register (visitor capture of the register pages)",
+        "dataset": "Company register pages and voluntary and involuntary notices",
+        "basis_note": "Decision 0026; personal local use. Verified visitor capture of the register pages on 2026-11-02 (191 pages); its time of day was not recorded, so the timestamp is that date at 00:00 UTC, added 2026-11-13 under ruling L-137.",
+    },
+}
+TERMS_WORDS_EXEMPT_SET = frozenset(["terms to be read"])
+
+# One closed path table. exact_count authorities identify independently read
+# quantities; fixed_text authorities are code/schema constants or the wording
+# above. A schema_keys entry applies to mapping keys only, never their values.
+FIXED_METADATA: dict[str, tuple[str, str | frozenset[str]]] = {
+    **{
+        f"manifest.receipts.receipt.files.{role}.bytes": ("exact_count", "file_bytes")
+        for roles in ROLES.values()
+        for role in roles
+    },
+    "manifest.tables.rows": ("exact_count", "table_rows"),
+    **{
+        f"manifest.receipts.receipt.{field}": ("fixed_text", "receipt_wording")
+        for field in ("publisher", "dataset", "basis_note")
+    },
+    "manifest.receipts.receipt.terms_words": (
+        "approved_exempt",
+        TERMS_WORDS_EXEMPT_SET,
+    ),
+    "manifest.field_absences.field": (
+        "fixed_text",
+        frozenset(f for _, f, _ in ABSENCE_KINDS),
+    ),
+    "manifest.field_absences.reason": (
+        "fixed_text",
+        frozenset(r for _, _, r in ABSENCE_KINDS),
+    ),
+    "report.source_status": ("fixed_text", frozenset({"validated"})),
+    "report.missing_snapshot_reason": ("fixed_text", frozenset({"snapshot_not_kept"})),
+    "released.pub_register_company": ("schema_keys", frozenset(CARD_COLUMNS)),
+    "released.pub_register_snapshot": ("schema_keys", frozenset(SNAPSHOT_COLUMNS)),
+}
+
+
 def column_type(name: str) -> str:
     if name == "registered_cell":
         return "UBIGINT"

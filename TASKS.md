@@ -2531,3 +2531,50 @@ The following S7-T09 dependency row is retained verbatim from the S2-TSKIP and S
 ```
 
 The S2-TSKIP status line is historical: S2-TSEP now tests the pinned pick-up in the separate lane. Its earlier `own_run_pickup_unbuilt` refusal applied only before that join. No S2-T13 or S2-T19 acceptance box is ticked by these offline tests.
+
+
+## S2-T49 evidence update — S2-REGM1 b1 (2026-11-26)
+
+BLOCKED before implementation under the task brief's L-1705 stop rule: M1's
+new exact-mismatch reasons conflict with existing required egress reasons that
+the same brief forbids changing; the committed register publisher rows are
+placeholders rejected by receipt validation, not approved fixed wording.
+The unchanged-code register baseline passed (2691 passed, exit 0), and nine
+targeted existing cases confirm the conflicting contracts (exit 0).
+See PROGRESS.md **S2-REGM1 b1 — M1 build stopped on incompatible acceptance
+requirements** and OPEN_ITEMS.md **Proposed open items — S2-REGM1 b1**.
+No acceptance box, implementation, independent approval or gate is claimed.
+
+## S2-T49 evidence update — S2-REGM1 b2 (2026-11-26)
+
+L-2139 resolves b1's wording and mismatch-order questions, but b2 is BLOCKED
+under L-1705 on another unchanged test. The correct-count expectation in
+`test_register_storage_manifest_count_keeps_egress_scan` requires a scan
+refusal that M1's exact-count exemption forbids; changing that reason, plant
+or count is prohibited by the brief. The original case passes (exit 0);
+a temporary one-seam exact-count exemption makes that same unchanged case
+fail `DID NOT RAISE RegisterError` (exit 1). The register baseline remains
+2691 passed (exit 0). See PROGRESS.md **S2-REGM1 b2 — additional exact-count
+test conflict** and OPEN_ITEMS.md **Proposed open items — S2-REGM1 b2**.
+No implementation, review approval, acceptance box or gate is claimed.
+
+## S2-T49 evidence update — S2-REGM1 b3 (2026-11-26)
+
+L-2139 and L-2141 resolve the earlier M1 brief conflicts. The implementation
+extends the existing register scanners with the closed exact-field table of
+proposed [decision 0124](docs/decisions/0124-register-fixed-metadata-fields-meet-exact-checks.md).
+Exact byte lengths and table row counts are recomputed from the actual inputs;
+approved labels and schema keys match their code-owned authority. Altered
+fields still meet both old scans before a new mismatch refusal; other supplied
+terms and every unlisted field retain their scans. Three existing exact-count
+outcomes migrate under L-2141 F1 to F4, with matching negatives; no other
+expected reason changes. Guard-deletion and suite evidence is appended in
+PROGRESS.md **S2-REGM1 b3 — exact fixed metadata checks**. Different-maker
+review, lead real-register replay and every gate remain owed; no box is ticked.
+
+S2-T49 b3 closing evidence: the final scalar-container correction passes 2772
+register tests and 80 focused metadata cases; all five final guard deletions
+run red and restore by cmp. Whole-custodian verification remains BLOCKED by
+the job window (fresh final command interrupted, exit 130), so this evidence
+marks no acceptance box and authorizes no admission. See PROGRESS.md **B3
+final verification boundary** and OPEN_ITEMS.md PO-S2-REGM1-04.

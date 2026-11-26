@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterator, Mapping, Sequence
+from dataclasses import dataclass
 
 from eii_custodian.publicdata.fetch.snapshots import SnapshotError, utc
 
 from .contracts import (
+    APPROVED_RECEIPT_WORDING,
     BARE_DIGITS,
     DIGEST_FIELDS,
+    FIXED_METADATA,
     FIXED_TEXTS,
     FORMAT_ONLY_NUMBER,
     NUMERIC_COLUMNS,
@@ -23,7 +26,7 @@ from .contracts import (
     refuse,
 )
 from .parse import parse_value, validate_card
-from .provenance import Frame, month
+from .provenance import Capture, Frame, month
 
 # Document 03 section 7.2. A drift test binds this closed name list to the pack.
 # The other builders still own their table schemas and privacy checks.
@@ -172,14 +175,143 @@ def _typed_value(path: str, kind: str, value: object) -> None:
         refuse("typed_field_format")
 
 
-def scan_metadata(value: object, keys: frozenset[str], path: str) -> None:
+@dataclass(frozen=True)
+class MetadataInputs:
+    """Independent build inputs, never counts read back from checked metadata."""
+
+    current: tuple[Capture, ...]
+    snapshots: tuple[Capture, ...]
+    tables: Mapping[str, Sequence[Mapping[str, object]]]
+
+
+def _metadata_count(
+    authority: str, path: str, inputs: MetadataInputs, scope: Mapping[str, object]
+) -> int | None:
+    if authority == "table_rows":
+        name = scope.get("name")
+        rows = inputs.tables.get(name) if isinstance(name, str) else None
+        return len(rows) if rows is not None else None  # unit: rows
+    receipt = scope.get("receipt")
+    if not isinstance(receipt, Mapping):
+        return None
+    batch = {"current": inputs.current, "snapshot": inputs.snapshots}.get(
+        str(scope.get("use")), ()
+    )
+    role = path.split(".")[-2]
+    for item in batch:
+        if (item.source_id, item.period) == (
+            receipt.get("source_id"),
+            receipt.get("period"),
+        ):
+            body = item.files.get(role)
+            return len(body) if isinstance(body, bytes) else None  # unit: bytes
+    return None
+
+
+def _metadata_verdict(
+    value: object,
+    path: str,
+    inputs: MetadataInputs | None,
+    scope: Mapping[str, object],
+) -> str | None:
+    """None: ordinary scan; empty: exact exemption; otherwise scan then refuse."""
+    rule = FIXED_METADATA.get(path)
+    if rule is None or rule[0] == "schema_keys":
+        return None
+    kind, authority = rule
+    if kind == "exact_count":
+        if inputs is None:
+            return None  # A raw scanner has no independent bundle quantity.
+        assert isinstance(authority, str)
+        expected = _metadata_count(authority, path, inputs, scope)
+        return (
+            ""
+            if type(value) is int and value == expected
+            else "metadata_count_mismatch"
+        )
+    approved: Sequence[str | None] | frozenset[str]
+    if authority == "receipt_wording":
+        receipt = scope.get("receipt")
+        source = receipt.get("source_id") if isinstance(receipt, Mapping) else None
+        wording = (
+            APPROVED_RECEIPT_WORDING.get(source, {}) if isinstance(source, str) else {}
+        )
+        approved = (wording.get(path.rsplit(".", 1)[-1]),)
+    else:
+        assert isinstance(authority, frozenset)
+        approved = authority
+    if type(value) is str and value in approved:
+        return ""
+    return (
+        None
+        if kind == "approved_exempt" or inputs is None
+        else "metadata_fixed_text_mismatch"
+    )
+
+
+def _metadata_scope(
+    path: str, value: object, scope: Mapping[str, object]
+) -> Mapping[str, object]:
+    if path in {"manifest.receipts", "manifest.tables"} and isinstance(value, Mapping):
+        return value
+    return scope
+
+
+def _metadata_item_path(path: str) -> str:
+    """A fixed scalar never grants its exemption to items of a wrong-shape list."""
+    rule = FIXED_METADATA.get(path)
+    return "" if rule is not None and rule[0] != "schema_keys" else path
+
+
+def _schema_key(
+    path: str,
+    key: object,
+    keys: frozenset[str],
+    content: frozenset[str],
+    *,
+    closed: bool = True,
+) -> bool:
+    rule = FIXED_METADATA.get(path)
+    if rule is None or rule[0] != "schema_keys":
+        return False
+    if type(key) is str and key in rule[1]:
+        return True
+    if not closed:
+        return False
+    scan_artefact(key, keys)
+    scan_content(key, content)
+    refuse("metadata_key_not_schema")
+
+
+def scan_metadata(
+    value: object,
+    keys: frozenset[str],
+    path: str,
+    *,
+    inputs: MetadataInputs | None = None,
+    content: frozenset[str] = frozenset(),
+    _scope: Mapping[str, object] | None = None,
+) -> None:
     """Scan a manifest or report as an artefact; a listed field is typed.
 
     `path` is the artefact and the mapping keys down to `value`; list positions
     are not part of it, and a key holding a dot ends typing below it. A listed
     field's shape and format are checked, never skipped, then it meets
-    `_typed_keys`. A named digest field is checked and not scanned.
+    `_typed_keys`. Decision 0124 exempts exact approved labels and schema keys;
+    bound `inputs` additionally enforce fixed-label mismatches and recompute
+    counts. A mismatch meets the legacy scans first, including `content`.
+    Without inputs this remains a raw scanner and never exempts counts.
+    A named digest field is checked and not scanned.
     """
+    scope = _metadata_scope(path, value, _scope or {})
+    verdict = _metadata_verdict(value, path, inputs, scope)
+    if verdict is not None:
+        if verdict:
+            # L-2139: preserve existing reasons before the closed mismatch.
+            scan_metadata(value, keys, path)
+            scan_content(value, content, path)
+            refuse(verdict)
+        return
     kind = TYPED_FIELDS.get(path)
     if _digest_field(path, value):
         return
@@ -188,21 +320,47 @@ def scan_metadata(value: object, keys: frozenset[str], path: str) -> None:
         scan_artefact(value, _typed_keys(keys))
     elif isinstance(value, Mapping):
         for key, item in value.items():
-            scan_artefact(key, keys)
-            scan_metadata(item, keys, _child(path, key))
+            if not _schema_key(path, key, keys, content):
+                scan_artefact(key, keys)
+            scan_metadata(
+                item,
+                keys,
+                _child(path, key),
+                inputs=inputs,
+                content=content,
+                _scope=scope,
+            )
     elif isinstance(value, list | tuple):
         for item in value:
-            scan_metadata(item, keys, path)
+            scan_metadata(
+                item,
+                keys,
+                _metadata_item_path(path),
+                inputs=inputs,
+                content=content,
+                _scope=scope,
+            )
     else:
         scan_artefact(value, keys)
 
 
-def scan_content(value: object, content: frozenset[str], path: str = "") -> None:
+def scan_content(
+    value: object,
+    content: frozenset[str],
+    path: str = "",
+    *,
+    inputs: MetadataInputs | None = None,
+    _scope: Mapping[str, object] | None = None,
+) -> None:
     """Card names and published addresses belong in tables, never metadata.
 
-    `path` names the field as in `scan_metadata`; only a named digest field is
-    skipped, so with no path every string is scanned.
+    `path` names the field as in `scan_metadata`; exact metadata and named
+    digests share its exemptions. Run `scan_metadata` with bound inputs first
+    to enforce mismatches. With no path every string is scanned.
     """
+    scope = _metadata_scope(path, value, _scope or {})
+    if _metadata_verdict(value, path, inputs, scope) == "":
+        return
     if _digest_field(path, value):
         return
     if isinstance(value, bytes):
@@ -215,11 +373,14 @@ def scan_content(value: object, content: frozenset[str], path: str = "") -> None
             refuse("register_content_egress")
     elif isinstance(value, Mapping):
         for key, item in value.items():
-            scan_content(key, content)
-            scan_content(item, content, _child(path, key))
+            if not _schema_key(path, key, frozenset(), content):
+                scan_content(key, content)
+            scan_content(item, content, _child(path, key), inputs=inputs, _scope=scope)
     elif isinstance(value, list | tuple):
         for item in value:
-            scan_content(item, content, path)
+            scan_content(
+                item, content, _metadata_item_path(path), inputs=inputs, _scope=scope
+            )
 
 
 def _scan_release_value(value: object, keys: frozenset[str]) -> None:
@@ -263,7 +424,10 @@ def _scan_release_row(
             column == "registration_number" and table not in TABLE_COLUMNS
         ):
             refuse("release_identifier_column")
-        scan_artefact(column, egress_keys)
+        if not _schema_key(
+            f"released.{table}", column, egress_keys, frozenset(), closed=False
+        ):
+            scan_artefact(column, egress_keys)
         if column == "registration_number" and table in TABLE_COLUMNS:
             continue
         if _digest_field(f"{table}.{column}", value):

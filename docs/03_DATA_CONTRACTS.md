@@ -2731,6 +2731,17 @@ again by the full output guard only when extracted.
 
 ## Register file projections (S2-T49)
 
+Proposed [decision 0124](decisions/0124-register-fixed-metadata-fields-meet-exact-checks.md)
+amends the metadata-scan statements below for its closed list only: exact file
+byte lengths and table row counts are recomputed from the actual inputs; approved
+receipt/absence/report labels and schema column-name keys are checked exactly.
+Exact matches are exempt from token and content scans; alterations meet the old
+scans first, then refuse with a closed metadata mismatch reason if those pass.
+Other supplied terms remain scanned records, not fixed text. Every unlisted
+field and release value retains its existing scan. Decision 0105 item 5 is
+amended for exact recomputed counts only; its original record is preserved.
+Different-maker review remains required before admission.
+
 This schema records the lead's column/type/format metadata, not a source value.
 OPEN (S2-T49): the published-card basis of the tower is confirmed by the lead in
 the lead's shell; an inferred geocoder label is not such a basis.

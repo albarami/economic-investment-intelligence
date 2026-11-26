@@ -574,9 +574,9 @@ def test_register_licence_column_in_other_table_refuses():
         )
 
 
-def test_register_storage_manifest_count_keeps_egress_scan(tmp_path):
-    # Decision 0105 item 5: a count of three or more digits still meets every key.
-    rows = [
+def register_count_rows():
+    """The unchanged 124-row invented control of decision 0124 / L-2141 F1."""
+    return [
         commerce(
             row_key=f"{index:020x}",
             registration_number=str(50000 + index),
@@ -584,15 +584,46 @@ def test_register_storage_manifest_count_keeps_egress_scan(tmp_path):
         )
         for index in range(124)
     ]
+
+
+def test_register_storage_manifest_exact_count_is_not_scanned(tmp_path):
+    # Decision 0124 supersedes 0105 item 5 for exact recomputed counts only.
+    result = build(
+        tmp_path,
+        "public_only",
+        Frame(frozenset()),
+        (capture(files=inputs(rows=register_count_rows())), capture("fc_register")),
+        (),
+    )
+    company = next(
+        t for t in result.manifest["tables"] if t["name"] == "pub_register_company"
+    )
+    assert company["rows"] == len(result.tables["pub_register_company"]) == 125
+
+
+def test_register_storage_altered_count_equal_to_key_still_refuses(tmp_path):
+    from copy import deepcopy
+
+    from eii_custodian.publicdata.registers.validate import (
+        MetadataInputs,
+        scan_metadata,
+    )
+
+    # Keep F1's current rows. An earlier capture supplies the other key, 126.
+    current = (
+        capture(files=inputs(rows=register_count_rows())),
+        capture("fc_register"),
+    )
+    snapshots = (capture(files=inputs(rows=[commerce(licence_number="126")])),)
+    result = build(tmp_path, "public_only", Frame(frozenset()), current, snapshots)
+    context = MetadataInputs(current, snapshots, result.tables)
+    keys = frozenset({"125", "126"})
+    scan_metadata(result.manifest, keys, "manifest", inputs=context)
+    changed = deepcopy(result.manifest)
+    company = next(t for t in changed["tables"] if t["name"] == "pub_register_company")
+    company["rows"] = 126
     with pytest.raises(RegisterError, match=r"^registration_egress$"):
-        build(
-            tmp_path,
-            "public_only",
-            Frame(frozenset()),
-            (capture(files=inputs(rows=rows)), capture("fc_register")),
-            (),
-        )
-    assert not (tmp_path / "current").exists()
+        scan_metadata(changed, keys, "manifest", inputs=context)
 
 
 def test_register_snapshot_restored_key_guard():
