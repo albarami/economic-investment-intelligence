@@ -420,7 +420,20 @@ def test_register_m1_nfd_label_is_not_exact(bundle, monkeypatch, field):
         check(body, context)
 
 
-def test_register_m1_real_approved_labels_are_nfc():
+def _real_fixed_labels():
     for wording in validate.APPROVED_RECEIPT_WORDING.values():
-        for label in wording.values():
-            assert unicodedata.normalize("NFC", label) == label
+        yield from wording.values()
+    for _, authority in validate.FIXED_METADATA.values():
+        if isinstance(authority, frozenset):
+            yield from authority
+    yield from validate.FIXED_TEXTS.values()
+
+
+def test_register_m1_real_approved_labels_are_nfc():
+    labels = list(_real_fixed_labels())
+    assert "snapshot_not_kept" in labels
+    assert "terms to be read" in labels
+    assert validate.FIXED_TEXTS["receipt_version"] in labels
+    for label in labels:
+        assert type(label) is str
+        assert unicodedata.normalize("NFC", label) == label
