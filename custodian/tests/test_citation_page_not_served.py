@@ -12,6 +12,10 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.test_production_adapters import context
+from custodian.tests.test_registry_terms_record import (
+    GIS_TERMS_KEYS,
+    _assert_gis_terms_reading,
+)
 from hypothesis import example, given
 from hypothesis import strategies as st
 
@@ -233,6 +237,19 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     cweb = [row for row in rows if row["key"] == CWEB_ROW]
     assert len(cweb) == 1
     assert cweb[0]["caveat_keys"] == CWEB_CAVEAT_KEYS
+    # S2-LICREC: check reviewed values before restoring only these base fields.
+    _assert_gis_terms_reading(rows)
+    rows = [
+        dict(
+            item,
+            terms_url="",
+            terms_words="terms to be read",
+            terms_read_on="2026-11-15",
+        )
+        if item["key"] in GIS_TERMS_KEYS
+        else item
+        for item in rows
+    ]
     restored = [
         {
             field: value

@@ -102,6 +102,24 @@ EXPECTED = frozenset(
 )
 
 
+GIS_TERMS_KEYS = frozenset(
+    {
+        "gis_address",
+        "gis_boundaries",
+        "gis_context",
+        "gis_imagery_history",
+        "gis_land_price",
+        "gis_landmarks",
+        "gis_locator",
+        "gis_parcels",
+        "gis_phcc",
+        "gis_poi_comm",
+        "gis_rail",
+        "gis_zoning",
+    }
+)
+
+
 def test_all_s2_t19_sources_are_registered():
     entries = load_registry(REPO / "custodian/publicdata/sources.yaml")
     actual = {entry.key for entry in entries}
@@ -187,7 +205,11 @@ def test_exact_block_and_metadata():
             elif entry.source_id not in {"bank_credit_act", "dcool_capacity"}:
                 assert entry.release_tables == ()
         assert entry.terms_read_on == (
-            "2026-11-14" if entry.source_id == "tenders_pub" else "2026-11-15"
+            "2026-11-27"
+            if entry.key in GIS_TERMS_KEYS
+            else "2026-11-14"
+            if entry.source_id == "tenders_pub"
+            else "2026-11-15"
         )
 
 
@@ -688,6 +710,17 @@ def test_confirmation_matches_registered_not_fetched_states():
                 # Preserve the earlier confirmation as history; S2-T29 only confirms URLs.
                 assert row[field] == "direct_url_unconfirmed"
                 assert entry.skip_reason == "schema_unconfirmed" and entry.layer is None
+            elif entry.key in GIS_TERMS_KEYS and field in {
+                "terms_words",
+                "terms_read_on",
+            }:
+                # L-2189: keep history, as the earlier skip_reason precedent above does.
+                if field == "terms_words":
+                    assert row[field] == "terms to be read"
+                    assert entry.terms_words == "© جميع الحقوق محفوظة 2024 @ CGIS Qatar"
+                else:
+                    assert row[field] == "2026-11-15"
+                    assert entry.terms_read_on == "2026-11-27"
             else:
                 assert row[field] == getattr(entry, field)
         assert row["review_ref"] and row["note"]

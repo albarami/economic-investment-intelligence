@@ -25579,9 +25579,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25620,9 +25620,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/ZonesA/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/ZonesA/MapServer
     nightly_live_fetch: false
     public_splits: []
@@ -25645,9 +25645,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/ROADFlowlnA/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/ROADFlowlnA/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25689,9 +25689,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_1995/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_1995/MapServer
     nightly_live_fetch: false
     public_splits: []
@@ -25714,9 +25714,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/LandPricing2026/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/LandPricing2026/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25761,9 +25761,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/Landmarks/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/Landmarks/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25794,9 +25794,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS_Custom_Locator/GeocodeServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS_Custom_Locator/GeocodeServer
     nightly_live_fetch: false
     public_splits: []
@@ -25819,9 +25819,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/CadastrePlots/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/CadastrePlots/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25856,9 +25856,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/PHCC_LOCATION_2026/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/PHCC_LOCATION_2026/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25894,9 +25894,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/POIs_COMM/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/POIs_COMM/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25933,9 +25933,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25982,9 +25982,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/Zoning/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/Zoning/MapServer
     nightly_live_fetch: true
     public_splits: []
