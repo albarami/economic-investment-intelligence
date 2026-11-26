@@ -6874,6 +6874,8 @@ introduced.
 
 - UPDATE (2026-11-26, S2-OI405.b1): concurrent imports write interpreter caches into the shared source trees; `_tree_fingerprint` now excludes every `__pycache__` subtree and regular `.pyc`/`.pyo` file, while the guards remain unchanged. Fix commit unavailable: `git add` exited 128 on the read-only git index; delivery is `.overnight/OUT/S2-OI405.b1.patch`, with its SHA-256 in `.overnight/RETURN.md`. Planted import: original fingerprint exit 1, fixed focused suite exit 0 (10 tests, 6 subtests); concurrent boundary/core collection exits 0/0 with zero extra fingerprint entries; fake-guard real-file plant exit 1; removing each cache, pyc or pyo exclusion alone exit 1. Remains OPEN for different-maker approval and the lead merge record under AGENTS.md rule 39. Verification BLOCKED: script discovery invocation ended with exit 143, five visible failure markers and no final count/diagnostics; see PROGRESS.md, **S2-OI405.b1 — concurrent bytecode fingerprint**.
 
+- UPDATE (2026-11-26, S2-OI405.fx1): fix committed as e4e4778, ruff format of one tuple as c5884b6; the lead's discovery on e4e4778 ran 1219 tests with 5 failures, all ruff-format guards on that tuple, cleared by c5884b6; review S2-OI405.rv1b REJECTED on F1 (the fixture bytecode assertion was made vacuous), closed by this round's commit. Stays OPEN until another maker confirms and the lead records the merge.
+
 ## OI-406 — Three low points of the S2-P77 review
 
 - ID: OI-406

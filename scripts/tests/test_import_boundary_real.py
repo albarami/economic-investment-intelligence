@@ -170,7 +170,15 @@ class ImportBoundaryRealTest(unittest.TestCase):
             child.check_fresh(root)
             after_fixture = _tree_fingerprint(root)
             self.assertEqual(before_fixture, after_fixture)
-            self.assertFalse(any("__pycache__" in row[0] for row in after_fixture))
+            self.assertEqual(
+                [
+                    path.relative_to(root).as_posix()
+                    for tree in _source_tree_paths(root)
+                    for path in tree.rglob("*")
+                    if path.name == "__pycache__" or path.suffix in (".pyc", ".pyo")
+                ],
+                [],
+            )
 
         before_real = _tree_fingerprint(cases.ROOT)
         guard.check_imports(cases.ROOT)
