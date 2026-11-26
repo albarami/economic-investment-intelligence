@@ -64,7 +64,7 @@ def test_fixture_file_unpivots() -> None:
     path = ROOT / "custodian/tests/fixtures/dcool/capacity.json"
     rows = parse_dcool(json.loads(path.read_text(encoding="utf-8")), _names())
     assert {row.sector_key for row in rows} >= {"culture", "industrial"}
-    assert all(row.indicator == "capacity" for row in rows)
+    assert all(row.indicator.startswith("capacity_") for row in rows)
 
 
 def test_unpivot_uses_the_municipality_map_and_drops_geometry() -> None:
@@ -73,7 +73,7 @@ def test_unpivot_uses_the_municipality_map_and_drops_geometry() -> None:
     assert by_sector["culture"].value == Decimal("5")
     assert by_sector["culture"].municipality_code == "1"
     assert by_sector["industrial"].value == Decimal("2")
-    assert by_sector["culture"].indicator == "capacity"
+    assert by_sector["culture"].indicator == "capacity_invented_status"
     assert by_sector["culture"].unit == "TR"
     assert by_sector["culture"].period == "2019-01-01"
     assert "geo_point" not in by_sector["culture"].__dict__
@@ -98,7 +98,7 @@ def test_culture_integer_and_unmapped_municipality_fail() -> None:
     assert consumption.value.reason == "consumption"
     with pytest.raises(CoolingError) as duplicate:
         parse_dcool(
-            (_row(), _row(project_status="Other invented status", industrial=4)),
+            (_row(), _row(industrial=4)),
             _names(),
         )
     assert duplicate.value.reason == "duplicate_key"
@@ -111,3 +111,26 @@ def test_an_empty_sector_cell_is_no_row_and_a_text_cell_still_fails() -> None:
     with pytest.raises(CoolingError) as text_sector:
         parse_dcool((_row(industrial="2"),), _names())
     assert text_sector.value.reason == "sector_type"
+
+
+def test_each_published_status_is_its_own_capacity_indicator() -> None:
+    """R1: the export is by status; one municipality and year has a row per status."""
+    rows = parse_dcool(
+        (
+            _row(project_status="Operation Project"),
+            _row(project_status="Project Under Construction"),
+        ),
+        _names(),
+    )
+    culture = sorted(row.indicator for row in rows if row.sector_key == "culture")
+    assert culture == [
+        "capacity_operation_project",
+        "capacity_project_under_construction",
+    ]
+    with pytest.raises(CoolingError) as repeated:
+        parse_dcool((_row(), _row()), _names())
+    assert repeated.value.reason == "duplicate_key"
+    for status in ("", "  ", None, 3):
+        with pytest.raises(CoolingError) as bad:
+            parse_dcool((_row(project_status=status),), _names())
+        assert bad.value.reason == "project_status"
