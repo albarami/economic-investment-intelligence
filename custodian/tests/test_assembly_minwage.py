@@ -92,8 +92,17 @@ def test_minwage_exact_rows_and_credit(tmp_path, survey):
         assert build.source_tables["wage_occ"] == ["pub_wage_table"]
 
 
-@pytest.mark.parametrize("receipt_state", ["absent", "licence_drift"])
-def test_minwage_invalid_receipt_withholds_rows_and_credit(tmp_path, receipt_state):
+@pytest.mark.parametrize(
+    "receipt_state,expected_reason",
+    [
+        ("absent", "source_receipt_missing: missing or invalid receipt"),
+        ("licence_drift", "source_receipt_missing: field=licence_id"),
+    ],
+    ids=["absent", "licence_drift"],
+)
+def test_minwage_invalid_receipt_withholds_rows_and_credit(
+    tmp_path, receipt_state, expected_reason
+):
     row, build = wage_build(tmp_path, True, receipt_state)
     assert all(item["table_code"] != row.key for item in build.tables["pub_wage_table"])
     assert row.key not in build.table_sources["pub_wage_table"]
@@ -101,5 +110,5 @@ def test_minwage_invalid_receipt_withholds_rows_and_credit(tmp_path, receipt_sta
     assert {
         "id": row.key,
         "state": "failed",
-        "reason": "source_receipt_missing: missing or invalid receipt",
+        "reason": expected_reason,
     } in minimum_check(row, build)

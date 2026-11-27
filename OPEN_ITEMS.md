@@ -7386,3 +7386,5 @@ Correction to the L-2344 oracle correction — S2-RCPTDRIFT.b1f / S2-T19, L-2347
 b1g: the guard test pins the GIS licence marker as the literal not_stated (L-2356 item 2)
 
 OPEN — S2-RCPTDRIFT.b1g / S2-T19: BLOCKED under L-1705. G1 deletes only the receipt licence comparison row but the substitution remains refused by the independent validate_lineage licence check; targeted pytest exit 0, 1 passed, restore cmp 0. Required red proof cannot be met as written. Smallest unblock: authorize accepting the redundant-guard survival or specify a revised isolated proof; no guard weakened. G2/G3, consumer sweep and remaining checks not run after stop.
+
+OPEN — S2-T19 / S2-46.fx1, L-2360 item 1 and decision 0032 item 2: forced test-oracle correction distinguishes absent receipt from licence_id disagreement with literal exact reasons; withholding assertions unchanged. Base red/green and isolated P1/P2 proofs recorded in PROGRESS.md and assigned return; production unchanged. Lead to obtain different-maker confirmation of this forced train diff and run the fresh exact-merge whole test required by L-2360 item 5.
