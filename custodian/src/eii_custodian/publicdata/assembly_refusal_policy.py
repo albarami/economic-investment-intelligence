@@ -117,6 +117,7 @@ NAMED_REASONS: Mapping[type[Exception], frozenset[str]] = MappingProxyType(
             """
         assembly_additions_pending assembly_buildings_incomplete
         assembly_confirmation_invalid assembly_draw_field_unknown
+        assembly_draw_held_rows_changed
         assembly_draw_lineage_ambiguous assembly_draw_table_unindexed
         assembly_draw_value_invalid assembly_family_shape_invalid assembly_fetch_refused
         assembly_fetch_unbound assembly_frame_incomplete assembly_fsq_missing

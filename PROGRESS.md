@@ -55225,3 +55225,126 @@ Skills applied: project-orientation traced existing mapping and task scope; task
 - Text since that review: PR 164 (`a3efa045`) added the recorded verdict to each Status line, and for 0115 its Owner row and the reviewer's wording note ("non-null member fields"). That was records only, with no change of substance.
 - This change replaces only the two Status lines. 0113 and 0125 stay Proposed: each needs a fresh independent review before the owner's acceptance, 0113 first.
 - Documents only: no code, test, gate or acceptance box changes.
+
+## S2-DRAWMEM.b1a — bounded assembly draw (2026-11-27, L-2284)
+
+- Base: `a3efa045450c411d52c39cab0d334fd095940e39`; branch `s2/s2-drawmem`.
+  Builder: OpenAI GPT-6 Astra, senior Python data-platform engineer for
+  memory-bounded batch pipelines and provenance chains. Self-review persona:
+  strict-reviewer. Independent different-maker review remains with the lead.
+- Cause supplied by the brief: the assembly was killed at its 32 GiB ceiling
+  after final audit, while repeatedly parsing a roughly 4.35 GB phase. The
+  lead's single-parse probe reported about 19.2 GiB RSS. These are brief-sourced
+  observations, not measurements made by this worker.
+- `Production.record` now retains table references and a frozen copy of the
+  other envelope fields alongside the actual written file hash. `HeldRecord.verify`
+  incrementally reproduces exactly the writer's JSON bytes and final newline,
+  checking that hash. `bound_files` independently verifies the stored file first.
+  Thus the held envelope and the stored envelope have the same SHA-256; changed
+  held rows refuse `assembly_draw_held_rows_changed`, and changed stored bytes
+  refuse `assembly_output_invalid`. No separate unbound row digest is trusted.
+- `draw_tables` consumes each phase before the next. A held phase is never parsed;
+  a file-only phase is parsed once. Readers retain Figures, not parsed phases.
+  Gazetteer comparison retains encoded prefix rows only and preserves decoded
+  prefix equality. Table ordering, field ordering, sample selection, source links
+  and output bytes stay unchanged. The existing nested `reader` still owns numeric
+  field/value checks; no refusal-inventory anchor or payload changed.
+- New tests: `custodian/tests/test_assembly_draw_memory.py`, 21 cases including
+  exact read counts, weak-reference lifetime probes for phase objects, row lists
+  and row dictionaries, mixed held/file-only phases, binding-before-use probes,
+  held mutation, stored-byte mutation, duplicate/unindexed/invalid tables,
+  byte hashes captured from the base, and a Hypothesis Decimal serialization
+  property. Existing tests were not edited.
+- Environment: WSL2 Linux, Python 3.14.6; invented fixtures only, no source network,
+  no real cache. Tooling cache and temporary artifacts stayed under the workspace
+  (`UV_CACHE_DIR=.overnight/tmp/uv-cache`, `MYPY_CACHE_DIR=.overnight/tmp/mypy`).
+  Fixed-seed runs and all plants used `--hypothesis-seed=17`; no skip or retry.
+- Red-first: `uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py -p no:cacheprovider -q --hypothesis-seed=17`,
+  exit 1, 6 failed / 4 passed, `.overnight/OUT/red-first.log`.
+  The closed-reason extension was separately red: 1 failed / 17 passed, exit 1,
+  `.overnight/OUT/expanded-red.log`. Initial lint found six new-test style/import
+  errors (exit 1); they were corrected without changing expectations.
+- Required existing suite:
+  `uv run --locked python -m pytest custodian/tests/test_assembly_reports.py custodian/tests/test_assembly_native.py custodian/tests/test_assembly_layers.py custodian/tests/test_assembly_producers.py custodian/tests/test_property_sale.py custodian/tests/test_register_tables.py -p no:cacheprovider -q`,
+  exit 0, 394 passed. A final run of these six files plus the new file, with
+  `--hypothesis-seed=17`, exited 0: 415 passed, no skips, 63.88 seconds
+  (`.overnight/OUT/final-tests.log`).
+- Additional unchanged refusal-inventory suite plus the then-current 18 new cases:
+  1473 passed, exit 0 (`.overnight/OUT/memory-refusals.log`). Final new-file check:
+  21 passed, exit 0. Final `uv run --locked ruff check .`, `uv run --locked ruff format --check .`
+  (1026 files), and `uv run --locked mypy` (531 source files) all exited 0.
+- Before/after artifacts for the existing single-source, multisource and series
+  fixtures were compared by nine `cmp` calls, all exit 0
+  (`.overnight/OUT/byte-identity.log`). Before bytes were saved while production
+  still matched the base. No existing baseline was refreshed.
+- Largest parse-count fixture: three phases, two tables per phase, 2500 rows per
+  table, two numeric fields per row. Before: 3 parses per phase, 9 total, even
+  when the rows were held. After: 0 for held phases; 1 per file-only phase,
+  3 total. Fresh-process final measurements: held draw 0.270642 seconds,
+  fixture plus draw 0.308062 seconds, peak RSS 104720 KiB; file-only draw
+  0.142950 seconds, fixture plus draw 0.157945 seconds, peak RSS 105968 KiB.
+  The largest held fixture file was 173211 bytes. These are mechanism checks,
+  not evidence that the real 32 GiB assembly now completes; the lead must rerun it.
+- Isolated plants, each exit 1: extra parse (2 failed), overlapping phase (1),
+  changed Figure bytes (3), removed held digest guard (1), removed closed reason
+  (1), unindexed guard (2), gazetteer duplicate guard (1), unreachable guard (1),
+  reader lineage guard (1), pre-use binding (2), reader binding (1), invalid table
+  envelope guard (1 failed / 1 passed). Final restorations each passed
+  `git diff --exit-code -- <planted-file>` against the staged implementation.
+  An initial reader-binding restoration matched the wrong source occurrence:
+  its diff check exited 1. It was corrected with full function context; that
+  plant and the subsequent invalid-table plant were repeated in isolation and
+  both restoration checks exited 0. The final 415-test run followed all restores.
+- Scope extension under brief L-2230: `assembly_io` centralizes the unchanged
+  encoder and holds the proof; `Production.record` captures it and `run` clears
+  it; the closed refusal vocabulary adds the new diagnostic. `Production.draw`,
+  the sampler, pins, fixture inventory and all existing expectations are unchanged.
+  The base's pre-index rehash of changed files is corrected by retaining the
+  original recorded hash; `.overnight/ALERT.md` records that in-scope finding.
+- Skills applied: project-orientation reused the existing writer/draw paths;
+  task-standards fixed the personas and scope; writing-plans recorded the proof;
+  test-driven-development captured reds before production edits;
+  systematic-debugging traced the repeated parses and pre-index rehash;
+  sanad-provenance bound held rows to actual written bytes;
+  sharp-edges added pre-use binding and malformed-table cases;
+  property-based-testing checked stored Decimal representation and field order;
+  al-muhasibi rejected parse-once alone as insufficient;
+  github-flow retained the assigned branch and reviewed staged changes;
+  spec-to-code-compliance equivalent mapped the brief to code/tests (no dispatcher
+  available); requesting-code-review prepares the lead's independent review;
+  strict-reviewer preserved anchors and limits; verification-before-completion
+  and muhasabah-gate separate fixture proof from the unrun live-memory gate.
+- Final records checks: `python3 scripts/check_docs.py` exit 0 (1394 text files,
+  175 Markdown files); `python3 scripts/check_tree.py` exit 0 (8 rules);
+  `cmp AGENTS.md CLAUDE.md`, staged whitespace checks and the append-only prefix
+  proof for both ledgers all exit 0. No temporary helper script was created.
+- Commit attempt exited 128 because the environment has no configured Git author
+  identity. Identity was not set or overridden. Under the brief's Git fallback,
+  the complete change is delivered as `.overnight/OUT/S2-DRAWMEM.b1a.patch` with
+  its SHA-256 sidecar; the lead must commit it. HEAD remains the base above.
+
+
+## S2-DRAWMEM.fx1 — lineage revalidation and reference lifetimes
+
+- Date: 2026-11-27. Reviewed parent: `b82ba5d144d0de6137156097a4812d377ec89d8f`; base parity anchor remains `a3efa045450c411d52c39cab0d334fd095940e39`. Builder: OpenAI GPT-6, Codex API tools; persona: senior Python data-platform engineer for memory-bounded batch pipelines and provenance chains. Self-review: strict-reviewer; independent different-maker approval remains the lead's gate.
+- F1 verified against `draw_tables` and the reviewer's mutation sequence: readers previously checked only receipt presence. A sorted per-table signature now binds source keys and receipt source_id, fetch_url and sha256; readers check it after the existing missing-lineage guard. Four one-input mutation cases assert exactly assembly_draw_lineage_ambiguous. Other precomputed Figure fields are stored row values protected by the existing phase hash; source links are covered by the expanded signature. No phase is retained or reparsed for this check.
+- F2 verified: resolved row_sources and the encoded frame gazetteer prefix survived into later reads. Both are released after consumption/check; the unused held local is deleted at phase end too. Weak-reference probes cover resolved source lists and encoded prefix strings. Phase dictionaries, table lists and row dictionaries retain their original exact lifetime probe. No other phase-sized local remains across the next read_object; the Figure universe and build-owned tables remain intentionally live.
+- Review NOTES disposition: frozen HeldRecord metadata remains necessary for the exact original envelope hash proof during a run. Production.run now clears held_phases in finally around execution and completion checks, on success, step failure and completion refusal; three weak-reference cases prove release. This does not establish real-assembly memory headroom or a fit within 32 GiB.
+- Red-first: `UV_CACHE_DIR=.overnight/tmp/uv uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py -k 'changed_lineage or lineage_and_prefix' -p no:cacheprovider -q`: 6 failed / 21 deselected, exit 1 (`.overnight/OUT/fx1-red.log`). Run cleanup cases: same command with `-k run_releases`, 3 failed / 27 deselected, exit 1 (`fx1-run-red.log`). Full memory file after fixes: 30 passed, exit 0 (`fx1-memory-green.log`). Fixture seed 17; Hypothesis uses its runner-assigned seed, not printed by -q. Only invented fixtures; no real data or cache read. UV cache and temporary test files use .overnight/tmp.
+- Required command: `uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py custodian/tests/test_assembly_reports.py custodian/tests/test_assembly_native.py custodian/tests/test_assembly_layers.py custodian/tests/test_assembly_producers.py custodian/tests/test_property_sale.py custodian/tests/test_register_tables.py -p no:cacheprovider -q`: 424 passed, exit 0 (`fx1-required-tests.log`). A final run after every plant is recorded separately in `fx1-required-final.log`. Original nine base-output hash expectations, parse-count bounds and one-phase probe are unchanged.
+- Required checks: `uv run --locked ruff check .`: exit 0; `uv run --locked ruff format --check .`: exit 0, 1026 files; `uv run --locked mypy`: exit 0, 531 source files; `python3 scripts/check_docs.py`: exit 0, 1394 text files / 175 Markdown files. Full output and exit codes: `.overnight/OUT/fx1-{ruff,format,mypy,docs}.log`. Formatter application changed one file; no pins or baselines changed.
+- Guard plants, each broken alone and restored: signature 4 failed, exit 1; row-source release 1 failed, exit 1; prefix release 1 failed / 1 passed, exit 1. Evidence: `fx1-final-plant-{signature,row-sources,prefix}.log`. Each restoration `git diff --exit-code -- custodian/src/eii_custodian/publicdata/assembly_reports.py` exits 0 against the staged implementation (`fx1-final-restore-*.log`). Earlier prefix plant produced a syntax error, exit 2; it is not behavioral evidence and was replaced by the valid isolated plant. Initial no-index restoration checks also exit 0.
+- Skills applied: project-orientation reused the existing draw machinery; task-standards set the expert and strict-review personas; github-flow kept this on the assigned branch; receiving-code-review rules verified both findings then swept their families; test-driven-development rules produced nine red cases before their fixes; systematic-debugging rules isolated the two retained objects; sanad-provenance bound report claims to these logs; sharp-edges found URL/hash mutation alongside source-ID mutation; property-based-testing preserved the existing finite-Decimal serialization property and base-byte oracle; spec-to-code-compliance checked the brief against implementation; requesting-code-review rules leave independent approval pending; verification-before-completion rules require real exits; muhasabah-gate limits memory and review claims to observed evidence. Uninstalled superpowers skills use the brief's equivalent rules.
+- Delivery identity, final file counts and commit or patch digest are in `.overnight/RETURN.md` and `.overnight/OUT/S2-DRAWMEM.fx1.RETURN.md`; this record names the immutable reviewed parent to avoid a self-referential commit hash. No earlier evidence row was rewritten. Real assembly replay, hosted checks and different-maker review remain pending.
+
+- Family-sweep correction: an absent gis_property_singles phase skips its end-of-phase cleanup. The added valid absent-GIS fixture initially fails only its prefix lifetime case (1 failed / 3 passed, exit 1; `fx1-missing-gis-red-confirmed.log`). The preceding draft fixture left two registered tables unreachable (2 failed / 2 passed, exit 1; `fx1-missing-gis-red.log`); that invalid fixture is not used as proof. Cleanup now also runs when the GIS file is absent. Expanded memory suite: 32 passed, exit 0 (`fx1-memory-final.log`). Final sweep plants: signature 4 failed; row sources 2 failed; prefix 2 failed / 2 passed; all exit 1. Each final restoration uses `git diff --exit-code --no-index` against a saved byte-exact implementation, exit 0 (`fx1-sweep-restore-*.log`). Staging the expanded change was refused with read-only Git metadata, exit 128; use the brief's patch fallback. Final full regression and static-check outputs use `fx1-*-sweep-final.log`; earlier successful checks above remain historical evidence.
+
+- Final post-sweep verification: required seven-file pytest command 426 passed in 56.10s, exit 0; ruff, formatter check, mypy and documentation checks all exit 0. Full logs: `.overnight/OUT/fx1-required-sweep-final.log`, `fx1-ruff-sweep-final.log`, `fx1-format-sweep-final.log`, `fx1-mypy-sweep-final.log`, `fx1-docs-sweep-final.log`. No skips, expected-output updates or weakened assertions. Self-review found no further defect; different-maker approval is not supplied by this builder.
+
+## S2-DRAWMEM.fx2 — file-backed property carries no deadline (hosted python-guards on PR 169)
+
+- Cause: the hosted PR 169 checks run (Actions run id ending 1154) on `6b8e237f99efe72294a2d7c1a6fc03130fa5afdd`, suite python-guards 1488 passed, 1 failed: `scripts/tests/test_test_bootstrap.py::TestBootstrap::test_file_backed_properties_carry_no_deadline` named `custodian/tests/test_assembly_draw_memory.py::check:142`, a file-backed Hypothesis property without `settings(deadline=None)`. The b1a and fx1 briefs ran only the seven named custodian test files, not the script guards, and the review did not run them.
+- Change: one decorator `@settings(deadline=None)` and its import on that property; no product code, guard, fixture or other test changes.
+- Red first: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_test_bootstrap.py' -k deadline` on `6b8e237f`: 6 tests, 1 failure (the same list), exit 1. Green after the change: 6 tests OK, exit 0. `uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py -p no:cacheprovider -q`: 32 passed, exit 0. Ruff check and format check of the file: exit 0. UV_OFFLINE=1; no seed.
+- Sibling search: the guard scans every test file under its roots; this property was its only finding on this head.
+- Builder: the lead (Anthropic, Claude Opus 5.5, Claude Code); confirmation by another maker follows, then hosted checks and the lead's whole test on the merge result.
