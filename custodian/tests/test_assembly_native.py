@@ -2,12 +2,13 @@
 
 import importlib
 import json
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_production_adapters import context
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 
@@ -909,3 +910,1732 @@ def test_agency_projection_missing_language_is_reported(tmp_path, monkeypatch):
     assert lines == [
         f"OMITTED pub_investqa_record {source['page_url']} check=record_key reason=unresolved"
     ]
+
+
+def _parameter_pages():
+    """Invented level-four blocks, with the cache's JSON text-item shape."""
+    english = [
+        ("Rent subsidy", "25% for 3 years"),
+        ("Rent allowance", "QAR 1200 per month"),
+        ("Salary subsidy", "40%"),
+        ("Salary allowance", "QAR 800 per month"),
+        ("Tax exemption", "Exemption applies"),
+        ("Rent allowance", "QAR 500 one-off"),
+        ("Rent subsidy", "up to 30%"),
+        ("Land offer", "Land available"),
+        ("Welcome", "Read the guide"),
+    ]
+    arabic = [
+        ("دعم الإيجار", "25% لمدة 3 سنوات"),
+        ("بدل الإيجار", "1200 ريال قطري شهرياً"),
+        ("دعم الرواتب", "40%"),
+        ("بدل الرواتب", "800 ريال قطري شهرياً"),
+        ("إعفاء ضريبي", "يسري الإعفاء"),
+        ("بدل الإيجار", "500 ريال قطري لمرة واحدة"),
+        ("دعم الإيجار", "حتى 30%"),
+    ]
+    rows, pages = [], []
+    for language, blocks in (("en", english), ("ar", arabic)):
+        url = f"https://agency.invalid/{language}/incentives/invented"
+        pages.append(
+            dict(page_key="incentives_invented", page_language=language, page_url=url)
+        )
+        rows.append(
+            dict(
+                record_type="incentive",
+                ordinal=None,
+                level=None,
+                title="Invented package" if language == "en" else "حزمة افتراضية",
+                heading=None,
+                text_items=None,
+                page_url=url,
+                source_id="investqa_pages",
+                language=language,
+            )
+        )
+        for ordinal, (heading, text) in enumerate(blocks, 1):
+            rows.append(
+                dict(
+                    record_type="incentive_parameter",
+                    ordinal=ordinal,
+                    heading=heading,
+                    level=4,
+                    text_items=json.dumps([text]),
+                    page_url=url,
+                    source_id="investqa_pages",
+                    language=language,
+                )
+            )
+    return rows, pages
+
+
+_PARAMETER_COMMON = dict(
+    record_type="incentive_parameter",
+    parent_key="incentives_invented",
+    sequence=None,
+    reference=None,
+    link_url=None,
+    activity_keys=None,
+    period=None,
+    page_url="https://agency.invalid/en/incentives/invented",
+    source_id="investqa_pages",
+)
+PARAMETER_EXPECTED = [
+    dict(
+        _PARAMETER_COMMON,
+        record_type="incentive",
+        record_key="incentives_invented",
+        parent_key=None,
+        title_en="Invented package",
+        title_ar="حزمة افتراضية",
+        parameter_key=None,
+        value=None,
+        unit=None,
+        duration_months=None,
+        as_stated=None,
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:rent_share",
+        title_en="Rent subsidy",
+        title_ar="دعم الإيجار",
+        parameter_key="rent_share",
+        value="0.25",
+        unit="ratio",
+        duration_months=36,
+        as_stated="Rent subsidy\n25% for 3 years",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:rent_amount",
+        title_en="Rent allowance",
+        title_ar="بدل الإيجار",
+        parameter_key="rent_amount",
+        value="1200",
+        unit="qar_per_month",
+        duration_months=None,
+        as_stated="Rent allowance\nQAR 1200 per month",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:staff_share",
+        title_en="Salary subsidy",
+        title_ar="دعم الرواتب",
+        parameter_key="staff_share",
+        value="0.4",
+        unit="ratio",
+        duration_months=None,
+        as_stated="Salary subsidy\n40%",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:staff_amount",
+        title_en="Salary allowance",
+        title_ar="بدل الرواتب",
+        parameter_key="staff_amount",
+        value="800",
+        unit="qar_per_month",
+        duration_months=None,
+        as_stated="Salary allowance\nQAR 800 per month",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:other_5",
+        title_en="Tax exemption",
+        title_ar="إعفاء ضريبي",
+        parameter_key="other",
+        value=None,
+        unit=None,
+        duration_months=None,
+        as_stated="Tax exemption\nExemption applies",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:other_6",
+        title_en="Rent allowance",
+        title_ar="بدل الإيجار",
+        parameter_key="other",
+        value="500",
+        unit="QAR",
+        duration_months=None,
+        as_stated="Rent allowance\nQAR 500 one-off",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:other_7",
+        title_en="Rent subsidy",
+        title_ar="دعم الإيجار",
+        parameter_key="other",
+        value=None,
+        unit="%",
+        duration_months=None,
+        as_stated="Rent subsidy\nup to 30%",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:other_8",
+        title_en="Land offer",
+        title_ar=None,
+        parameter_key="other",
+        value=None,
+        unit=None,
+        duration_months=None,
+        as_stated="Land offer\nLand available",
+    ),
+]
+
+
+def test_incentive_parameter_literal_oracle():
+    rows, pages = _parameter_pages()
+    released, lines = _project(rows, pages)
+    assert released == PARAMETER_EXPECTED
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing",
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_kind reason=unclassified",
+    ]
+
+
+@pytest.mark.parametrize(
+    "change,expected,reason",
+    [
+        (
+            {"heading": "Salary subsidy"},
+            ("staff_share", "0.25", "ratio", 36),
+            "pair_missing",
+        ),
+        (
+            {"text_items": '["USD 50 per month"]'},
+            ("other", None, None, None),
+            "pair_missing",
+        ),
+        ({"text_items": '["125%"]'}, ("other", None, "%", None), "pair_missing"),
+        ({"text_items": '["up to 30%"]'}, ("other", None, "%", None), "pair_missing"),
+        ({"text_items": '["20% and 30%"]'}, ("other", None, "%", None), "pair_missing"),
+        (
+            {"text_items": '["QAR 500 one-off for 3 years"]'},
+            ("other", "500", "QAR", None),
+            "pair_missing",
+        ),
+        (
+            {"text_items": '["25%"]'},
+            ("rent_share", "0.25", "ratio", None),
+            "pair_missing",
+        ),
+        ({"heading": "Unknown benefit"}, None, "unclassified"),
+    ],
+)
+def test_parameter_planted_inputs(change, expected, reason):
+    rows, pages = _parameter_pages()
+    row = {**rows[1], **change}
+    released, lines = _project([row], pages)
+    if expected is None:
+        assert released == []
+        assert lines == [
+            f"OMITTED pub_investqa_record {row['page_url']} check=parameter_kind reason={reason}"
+        ]
+    else:
+        assert len(released) == 1
+        assert (
+            tuple(
+                released[0][key]
+                for key in ("parameter_key", "value", "unit", "duration_months")
+            )
+            == expected
+        )
+        assert released[0]["title_ar"] is None
+        assert lines == [
+            f"REPORT pub_investqa_record {row['page_url']} check=parameter_pair reason={reason}"
+        ]
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"text_items": '["30% لمدة 3 سنوات"]'},
+        {"heading": "بدل الإيجار"},
+        {"text_items": '["25% لمدة 4 سنوات"]'},
+    ],
+)
+def test_parameter_arabic_conflict_is_not_copied(change):
+    rows, pages = _parameter_pages()
+    arabic = {**rows[11], **change}
+    released, lines = _project([rows[1], arabic], pages)
+    assert released == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_value_mismatch"
+    ]
+
+
+def test_parameter_unknown_arabic_phrase_conflicts():
+    rows, pages = _parameter_pages()
+    released, lines = _project(
+        [rows[1], {**rows[11], "heading": "معلومات عامة"}], pages
+    )
+    assert released == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/ar/incentives/invented check=parameter_kind reason=unclassified",
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_value_mismatch",
+    ]
+
+
+@pytest.mark.parametrize("items", ["null", "{}", "[4]"])
+def test_parameter_malformed_text_refuses_specific_shape(items):
+    rows, pages = _parameter_pages()
+    with pytest.raises(ValueError, match=r"^parameter_text_shape$"):
+        _project([{**rows[1], "text_items": items}], pages)
+
+
+def test_parameter_contract_scale_is_not_rounded():
+    rows, pages = _parameter_pages()
+    result, lines = _project([{**rows[1], "text_items": '["25.12345%"]'}], pages)
+    assert result[0]["parameter_key"] == "other"
+    assert result[0]["value"] is None
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
+    ]
+
+
+@settings(derandomize=True, max_examples=100)
+@given(
+    percent=st.integers(min_value=0, max_value=10000),
+    amount=st.integers(min_value=0, max_value=999999),
+)
+def test_parameter_number_grammar(percent, amount):
+    rows, pages = _parameter_pages()
+    percentage = Decimal(percent) / Decimal(100)
+    result, _ = _project(
+        [{**rows[1], "text_items": json.dumps([f"{percentage}%"])}], pages
+    )
+    assert Decimal(result[0]["value"]) == percentage / Decimal(100)
+    result, _ = _project(
+        [
+            {
+                **rows[1],
+                "heading": "Rent allowance",
+                "text_items": json.dumps([f"QAR {amount} per month"]),
+            }
+        ],
+        pages,
+    )
+    assert Decimal(result[0]["value"]) == Decimal(amount)
+    result, _ = _project(
+        [{**rows[1], "text_items": json.dumps([f"{percentage}% and {amount}%"])}], pages
+    )
+    assert result[0]["parameter_key"] == "other"
+    assert result[0]["value"] is None
+
+
+@pytest.mark.parametrize("text", ["-25%", ".25%", "99.999999999999999999999999999999%"])
+def test_parameter_invalid_share_never_becomes_usable(text):
+    rows, pages = _parameter_pages()
+    result, _ = _project([{**rows[1], "text_items": json.dumps([text])}], pages)
+    assert (result[0]["parameter_key"], result[0]["value"]) == ("other", None)
+
+
+@pytest.mark.parametrize(
+    "wording",
+    [
+        "25% in 2099",
+        "forecast 25%",
+        "projected rent support: 25%",
+        "expected support: 25%",
+    ],
+)
+def test_parameter_forward_looking_figure_is_omitted(wording):
+    rows, pages = _parameter_pages()
+    row = {
+        **rows[1],
+        "text_items": json.dumps([wording]),
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    result, lines = _project([row], pages)
+    assert result == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_period reason=forward_looking"
+    ]
+
+
+def test_parameter_stated_period_and_arabic_digits():
+    rows, pages = _parameter_pages()
+    english = {
+        **rows[1],
+        "text_items": '["25% in 2024"]',
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    arabic = {
+        **rows[11],
+        "text_items": '["٢٥٪ في ٢٠٢٤"]',
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    result, lines = _project([english, arabic], pages)
+    assert (result[0]["value"], result[0]["period"], result[0]["title_ar"]) == (
+        "0.25",
+        "2024",
+        "دعم الإيجار",
+    )
+    assert lines == []
+
+
+@pytest.mark.parametrize(
+    "wording",
+    ["متوقع 25% لمدة 3 سنوات", "تشير التوقعات إلى دعم بنسبة 25% لمدة 3 سنوات"],
+)
+def test_parameter_arabic_forecast_is_omitted(wording):
+    rows, pages = _parameter_pages()
+    result, lines = _project(
+        [rows[1], {**rows[11], "text_items": json.dumps([wording])}], pages
+    )
+    assert result == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_period reason=forward_looking"
+    ]
+
+
+def test_parameter_fractional_month_duration_is_not_invented():
+    rows, pages = _parameter_pages()
+    result, lines = _project(
+        [{**rows[1], "text_items": '["25% for 1.5 months"]'}], pages
+    )
+    assert result[0]["duration_months"] is None
+    assert result[0]["value"] == "0.25"
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
+    ]
+
+
+def test_parameter_quantity_wrong_for_share_key():
+    rows, pages = _parameter_pages()
+    result, lines = _project([{**rows[1], "text_items": '["QAR 50 per month"]'}], pages)
+    assert (result[0]["parameter_key"], result[0]["value"], result[0]["unit"]) == (
+        "other",
+        "50",
+        "QAR",
+    )
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
+    ]
+
+
+def test_parameter_ambiguous_phrases_do_not_default_to_other():
+    rows, pages = _parameter_pages()
+    row = {**rows[1], "heading": "Rent subsidy and salary subsidy"}
+    result, lines = _project([row], pages)
+    assert result == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_kind reason=unclassified"
+    ]
+
+
+def test_parameter_amount_pair_compares_values_not_spelling():
+    rows, pages = _parameter_pages()
+    result, lines = _project(
+        [rows[2], {**rows[12], "text_items": '["1200.0 ريال قطري شهرياً"]'}], pages
+    )
+    assert (result[0]["parameter_key"], result[0]["value"]) == ("rent_amount", "1200")
+    assert lines == []
+
+
+def test_parameter_other_preserves_stated_unit_spelling():
+    rows, pages = _parameter_pages()
+    result, lines = _project(
+        [{**rows[2], "text_items": '["qar 500 one-off"]'}],
+        pages,
+    )
+    assert (result[0]["parameter_key"], result[0]["value"], result[0]["unit"]) == (
+        "other",
+        "500",
+        "qar",
+    )
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
+    ]
+
+
+@pytest.mark.parametrize(
+    "language,heading,key,text,value,unit",
+    [
+        ("en", "Rent subsidy", "rent_share", "25%", "0.25", "ratio"),
+        ("en", "Rental subsidy", "rent_share", "25%", "0.25", "ratio"),
+        (
+            "en",
+            "Rent allowance",
+            "rent_amount",
+            "QAR 50 per month",
+            "50",
+            "qar_per_month",
+        ),
+        (
+            "en",
+            "Rental allowance",
+            "rent_amount",
+            "QAR 50 per month",
+            "50",
+            "qar_per_month",
+        ),
+        ("en", "Salary subsidy", "staff_share", "25%", "0.25", "ratio"),
+        ("en", "Staff cost subsidy", "staff_share", "25%", "0.25", "ratio"),
+        (
+            "en",
+            "Salary allowance",
+            "staff_amount",
+            "QAR 50 per month",
+            "50",
+            "qar_per_month",
+        ),
+        (
+            "en",
+            "Staff cost allowance",
+            "staff_amount",
+            "QAR 50 per month",
+            "50",
+            "qar_per_month",
+        ),
+        ("en", "Tax exemption", "other", "Exemption applies", None, None),
+        ("en", "Land offer", "other", "Land available", None, None),
+        ("ar", "دعم الإيجار", "rent_share", "25%", "0.25", "ratio"),
+        ("ar", "دعم تكاليف الإيجار", "rent_share", "25%", "0.25", "ratio"),
+        (
+            "ar",
+            "بدل الإيجار",
+            "rent_amount",
+            "50 ريال قطري شهرياً",
+            "50",
+            "qar_per_month",
+        ),
+        ("ar", "دعم الرواتب", "staff_share", "25%", "0.25", "ratio"),
+        ("ar", "دعم الأجور", "staff_share", "25%", "0.25", "ratio"),
+        (
+            "ar",
+            "بدل الرواتب",
+            "staff_amount",
+            "50 ريال قطري شهرياً",
+            "50",
+            "qar_per_month",
+        ),
+        (
+            "ar",
+            "بدل الأجور",
+            "staff_amount",
+            "50 ريال قطري شهرياً",
+            "50",
+            "qar_per_month",
+        ),
+        ("ar", "إعفاء ضريبي", "other", "يسري الإعفاء", None, None),
+        ("ar", "تخصيص أرض", "other", "تتوفر أرض للمشروع", None, None),
+    ],
+)
+def test_parameter_closed_phrase(language, heading, key, text, value, unit):
+    from eii_custodian.publicdata.assembly_native import classify_parameter
+
+    rows, _ = _parameter_pages()
+    parsed = classify_parameter(
+        {
+            **rows[1],
+            "language": language,
+            "heading": heading,
+            "text_items": json.dumps([text]),
+        }
+    )
+    assert parsed is not None
+    assert (parsed.key, parsed.value, parsed.unit) == (key, value, unit)
+
+
+@pytest.mark.parametrize(
+    "language,text,key,value,unit,duration",
+    [
+        ("en", "QAR 50 per month", "rent_amount", "50", "qar_per_month", None),
+        ("en", "QAR 50 monthly", "rent_amount", "50", "qar_per_month", None),
+        ("ar", "50 ريال قطري شهرياً", "rent_amount", "50", "qar_per_month", None),
+        ("ar", "50 ريال قطري شهريا", "rent_amount", "50", "qar_per_month", None),
+        ("en", "QAR 50 one-off for 3 years", "other", "50", "QAR", None),
+        ("en", "QAR 50 one time for 3 years", "other", "50", "QAR", None),
+        (
+            "ar",
+            "50 ريال قطري لمرة واحدة لمدة 3 سنوات",
+            "other",
+            "50",
+            "ريال قطري",
+            None,
+        ),
+    ],
+)
+def test_parameter_monthly_and_once_markers(language, text, key, value, unit, duration):
+    from eii_custodian.publicdata.assembly_native import classify_parameter
+
+    rows, _ = _parameter_pages()
+    parsed = classify_parameter(
+        {
+            **rows[2],
+            "language": language,
+            "heading": "Rent allowance" if language == "en" else "بدل الإيجار",
+            "text_items": json.dumps([text]),
+        }
+    )
+    assert parsed is not None
+    assert (parsed.key, parsed.value, parsed.unit, parsed.duration) == (
+        key,
+        value,
+        unit,
+        duration,
+    )
+
+
+@pytest.mark.parametrize(
+    "text,number,unit",
+    [
+        ("for 1 month", "1", "month"),
+        ("for 3 months", "3", "months"),
+        ("for 1 year", "1", "year"),
+        ("for 3 years", "3", "years"),
+        ("لمدة 1 شهر", "1", "شهر"),
+        ("لمدة 3 أشهر", "3", "أشهر"),
+        ("لمدة 12 شهراً", "12", "شهراً"),
+        ("لمدة 1 سنة", "1", "سنة"),
+        ("لمدة 3 سنوات", "3", "سنوات"),
+    ],
+)
+def test_parameter_duration_token_consumed_whole(text, number, unit):
+    from eii_custodian.publicdata.assembly_native import _DURATION
+
+    token = _DURATION.fullmatch(text)
+    assert token is not None
+    assert token.groups() == (number, unit)
+
+
+@pytest.mark.parametrize(
+    "marker", ["up to", "between", "حتى", "ما بين", "2-3", "2\u20133"]
+)
+def test_parameter_range_vocabulary(marker):
+    from eii_custodian.publicdata.assembly_native import _RANGE
+
+    assert _RANGE.fullmatch(marker) is not None
+
+
+@pytest.mark.parametrize("marker", ["per month", "monthly", "شهرياً", "شهريا"])
+def test_parameter_monthly_vocabulary_consumed_whole(marker):
+    from eii_custodian.publicdata.assembly_native import _MONTHLY
+
+    assert _MONTHLY.fullmatch(marker) is not None
+
+
+@pytest.mark.parametrize(
+    "english,arabic,heading,key,value,unit,duration,period,forward",
+    [
+        (
+            "unexpected 25%",
+            "٢٥٪ دون تغيير",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        (
+            "unexpectedly 25%",
+            "٢٥٪ دون تغيير",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        (
+            "25%",
+            "دعم غير متوقع بنسبة ٢٥٪",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        (
+            "25%",
+            "التكاليف غير المتوقعة بنسبة ٢٥٪",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        *[
+            (
+                "25%",
+                text,
+                "Rent subsidy",
+                "rent_share",
+                "0.25",
+                "ratio",
+                None,
+                None,
+                True,
+            )
+            for text in (
+                "النسبة المتوقعة ٢٥٪",
+                "والمتوقع دعم بنسبة ٢٥٪",
+                "التوقعات تشير إلى ٢٥٪",
+                "وتوقعات الدعم بنسبة ٢٥٪",
+            )
+        ],
+        *[
+            pytest.param(
+                f"{marker} 25%",
+                "٢٥٪",
+                "Rent subsidy",
+                "rent_share",
+                "0.25",
+                "ratio",
+                None,
+                None,
+                True,
+                id=marker,
+            )
+            for marker in ("forecasts", "forecasted", "forecasting", "projected")
+        ],
+        *[
+            pytest.param(
+                "25%",
+                text,
+                "Rent subsidy",
+                "rent_share",
+                "0.25",
+                "ratio",
+                None,
+                None,
+                forward,
+                id=name,
+            )
+            for name, text, forward in (
+                ("accusative", "دعماً متوقعا بنسبة ٢٥٪", True),
+                ("tanween", "دعماً متوقعاً بنسبة ٢٥٪", True),
+                ("and-unexpected", "النفقات الطارئة وغير المتوقعة بنسبة ٢٥٪", False),
+                ("so-unexpected", "النفقات الطارئة فغير المتوقع منها بنسبة ٢٥٪", False),
+                ("bare-negation-control", "النفقات غير المتوقعة بنسبة ٢٥٪", False),
+                ("word-start-control", "تغير متوقع بنسبة ٢٥٪", True),
+            )
+        ],
+        pytest.param(
+            "25% for 12 months",
+            "٢٥٪ لمدة ١٢ شهرا",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            12,
+            None,
+            False,
+            id="bare-months",
+        ),
+        pytest.param(
+            "25% plus 3",
+            "نسبة الدعم ٢٥٪ لمدة \u0663 بالسنوات المالية",
+            "Rent subsidy",
+            "other",
+            None,
+            "%",
+            None,
+            None,
+            False,
+            id="prefixed-unit",
+        ),
+        *[
+            (
+                f"QAR 50 {term}",
+                "\u0665\u0660 ريال قطري",
+                "Rent allowance",
+                "other",
+                "50",
+                "QAR",
+                None,
+                None,
+                False,
+            )
+            for term in ("bimonthly", "semimonthly")
+        ],
+        (
+            "25% none time",
+            "٢٥٪",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        *[
+            (
+                f"25% {term}",
+                "٢٥٪ مع مبلغ إضافي ٢٠٢٤",
+                "Rent subsidy",
+                "other",
+                None,
+                "%",
+                None,
+                None,
+                False,
+            )
+            for term in ("within 2099", "bargain 2024")
+        ],
+        *[
+            (
+                "25% plus 2024",
+                f"٢٥٪ {term}",
+                "Rent subsidy",
+                "other",
+                None,
+                "%",
+                None,
+                None,
+                False,
+            )
+            for term in ("يكفي ٢٠٢٤", "إضافي ٢٠٢٤")
+        ],
+        (
+            "25% in 2024",
+            "٢٥٪ وفي ٢٠٢٤",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            "2024",
+            False,
+        ),
+        (
+            "25% therefor 12 months",
+            "٢٥٪ مع مبلغ إضافي ١٢",
+            "Rent subsidy",
+            "other",
+            None,
+            "%",
+            None,
+            None,
+            False,
+        ),
+        (
+            "25% for 3 years",
+            "٢٥٪ ولمدة ٣ سنوات",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            36,
+            None,
+            False,
+        ),
+        (
+            "25%",
+            "ودعم الإيجار ٢٥٪",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+    ],
+)
+def test_parameter_literal_boundaries(
+    english, arabic, heading, key, value, unit, duration, period, forward
+):
+    rows, pages = _parameter_pages()
+    en = {
+        **rows[1],
+        "heading": heading,
+        "text_items": json.dumps([english]),
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    ar = {
+        **rows[11],
+        "heading": "بدل الإيجار" if heading == "Rent allowance" else "دعم الإيجار",
+        "text_items": json.dumps([arabic]),
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    if arabic.startswith("ودعم"):
+        ar["heading"] = "تفاصيل الدعم"
+    result, lines = _project([en, ar], pages)
+    if forward:
+        assert result == []
+        assert lines == [
+            "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_period reason=forward_looking"
+        ]
+    else:
+        assert lines == []
+        assert [
+            (
+                r["parameter_key"],
+                r["value"],
+                r["unit"],
+                r["duration_months"],
+                r["period"],
+            )
+            for r in result
+        ] == [(key, value, unit, duration, period)]
+
+
+_CLOSED_ENGLISH = (
+    "forecast",
+    "forecasts",
+    "forecasted",
+    "forecasting",
+    "projected",
+    "expected",
+    "expects",
+    "expecting",
+    "anticipated",
+    "projection",
+    "projections",
+    "for",
+    "month",
+    "months",
+    "year",
+    "years",
+    "in",
+    "QAR",
+    "per month",
+    "monthly",
+    "one-off",
+    "one time",
+    "up to",
+    "between",
+    "rent subsidy",
+    "rental subsidy",
+    "rent allowance",
+    "rental allowance",
+    "salary subsidy",
+    "staff cost subsidy",
+    "salary allowance",
+    "staff cost allowance",
+    "tax exemption",
+    "land offer",
+)
+_CLOSED_ARABIC = (
+    "متوقع",
+    "توقعات",
+    "توقع",
+    "يتوقع",
+    "يُتوقع",
+    "نتوقع",
+    "تتوقع",
+    "من غير المتوقع",
+    "لمدة",
+    "شهر",
+    "شهور",
+    "شهرا",
+    "أشهر",
+    "شهراً",
+    "سنة",
+    "سنوات",
+    "في",
+    "ريال قطري",
+    "شهرياً",
+    "شهريا",
+    "لمرة واحدة",
+    "حتى",
+    "ما بين",
+    "دعم الإيجار",
+    "دعم تكاليف الإيجار",
+    "بدل الإيجار",
+    "دعم الرواتب",
+    "دعم الأجور",
+    "بدل الرواتب",
+    "بدل الأجور",
+    "إعفاء ضريبي",
+    "تخصيص أرض",
+)
+
+
+@pytest.mark.parametrize("term", _CLOSED_ENGLISH + _CLOSED_ARABIC)
+def test_closed_term_positive_and_containing_word(term):
+    import re
+
+    from eii_custodian.publicdata.assembly_native import _closed_terms
+
+    pattern = _closed_terms((term,))
+    assert re.search(pattern, term)
+    assert re.search(pattern, "س" + term) is None
+    assert re.search(pattern, term + "س") is None
+    if term in _CLOSED_ARABIC:
+        for prefix in _FORWARD_COMPARATIVES:
+            assert re.search(pattern, prefix + term) is None
+        for prefix in (
+            "و",
+            "ف",
+            "ب",
+            "ل",
+            "ال",
+            "وال",
+            "بال",
+            "فال",
+            "لل",
+            "وب",
+            "ول",
+            "وبال",
+            "ولل",
+        ):
+            assert re.search(pattern, prefix + term)
+            assert re.search(pattern, "س" + prefix + term) is None
+            assert re.search(pattern, prefix + term + "س") is None
+
+
+@settings(max_examples=100, derandomize=True)
+@given(
+    term=st.sampled_from(_CLOSED_ENGLISH + _CLOSED_ARABIC),
+    tail=st.text(alphabet="xyzسصض", min_size=1, max_size=12),
+)
+def test_closed_term_generated_containing_words(term, tail):
+    import re
+
+    from eii_custodian.publicdata.assembly_native import _closed_terms
+
+    pattern = _closed_terms((term,))
+    assert re.search(pattern, tail + term) is None
+    assert re.search(pattern, term + tail) is None
+
+
+# L-2358 item 2: independent closed-paradigm oracle, never from production.
+_FORWARD_PREFIXES = (
+    "",
+    "و",
+    "ف",
+    "ب",
+    "ل",
+    "ال",
+    "وال",
+    "بال",
+    "فال",
+    "لل",
+    "وب",
+    "ول",
+    "وبال",
+    "ولل",
+)
+_FORWARD_COMPARATIVES = ("ك", "كال", "وك", "وكال")
+_FORWARD_ADJECTIVES = ("متوقع",)
+_FORWARD_NOUNS = ("توقعات", "توقع")
+_FORWARD_ADJECTIVE_SUFFIXES = (
+    "",
+    "ة",
+    "\u0647",
+    "ات",
+    "ين",
+    "ون",
+    "\u0627",
+    "اً",
+    "ًا",
+    "ان",
+    "تان",
+    "تين",
+    "و",
+    "ي",
+    "تا",
+    "تي",
+)
+_FORWARD_PRONOUNS = (
+    "\u0647",
+    "\u0647\u0627",
+    "هما",
+    "هم",
+    "هن",
+    "ك",
+    "كما",
+    "كم",
+    "كن",
+    "ي",
+    "نا",
+)
+_FORWARD_OBJECTS = ("", *_FORWARD_PRONOUNS)
+_FORWARD_VERBS = ("يتوقع", "نتوقع", "تتوقع", "أتوقع")
+_FORWARD_PASSIVES = ("يُتوقع",)
+_FORWARD_FUTURES = ("", "س")
+_FORWARD_SUBJECTS = ("", "ون", "ان", "ين")
+_FORWARD_ENGLISH = (
+    "forecast",
+    "forecasts",
+    "forecasted",
+    "forecasting",
+    "forecaster",
+    "forecasters",
+    "projected",
+    "projection",
+    "projections",
+    "expected",
+    "expects",
+    "expecting",
+    "expectation",
+    "expectations",
+    "anticipated",
+    "anticipate",
+    "anticipates",
+    "anticipating",
+)
+_OLD_FORWARD = r"forecast|projected|expected|متوقع|توقعات"
+NOT_FORWARD: tuple[tuple[str, str], ...] = ()
+
+
+# Arabic: the definite article and an attached pronoun never co-occur
+# (*التوقعاته); such non-words are excluded from the oracle, not from production.
+def _article_with_pronoun(prefix, pronoun):
+    return bool(pronoun) and ("ال" in prefix or prefix.endswith("لل"))
+
+
+def _forward_paradigm(prefixes):
+    adjectives = (
+        prefix + stem + suffix
+        for prefix in prefixes
+        for stem in _FORWARD_ADJECTIVES
+        for suffix in _FORWARD_ADJECTIVE_SUFFIXES
+    )
+    nouns = (
+        prefix + stem + pronoun
+        for prefix in prefixes
+        for stem in _FORWARD_NOUNS
+        for pronoun in ("", *_FORWARD_PRONOUNS)
+        if not _article_with_pronoun(prefix, pronoun)
+    )
+    verbs = (
+        prefix + future + stem + subject + pronoun
+        for prefix in _FORWARD_PREFIXES
+        for future in _FORWARD_FUTURES
+        for stem in _FORWARD_VERBS
+        for subject in _FORWARD_SUBJECTS
+        for pronoun in _FORWARD_OBJECTS
+        if not _article_with_pronoun(prefix, pronoun)
+    )
+    passives = (prefix + stem for prefix in prefixes for stem in _FORWARD_PASSIVES)
+    return tuple(dict.fromkeys((*adjectives, *nouns, *verbs, *passives)))
+
+
+def test_forward_oracle_excludes_nonwords():
+    forms = _forward_paradigm(_FORWARD_PREFIXES + _FORWARD_COMPARATIVES)
+    assert "التوقعاته" not in forms
+    assert "للتوقعاتهم" not in forms
+    assert "كيتوقع" not in forms
+    assert "كاليتوقع" not in forms
+    assert "توقعاته" in forms
+    assert "يتوقع" in forms
+
+
+def test_forward_paradigm_differential():
+    import re
+
+    from eii_custodian.publicdata.assembly_native import Parameter, parameter_is_forward
+
+    forms = (
+        _forward_paradigm(_FORWARD_PREFIXES + _FORWARD_COMPARATIVES) + _FORWARD_ENGLISH
+    )
+    pinned = {form for form, _reason in NOT_FORWARD}
+    for wording in ("بحسب الهيئة يبلغ الدعم ٢٥٪", "The agency offers 25% support"):
+        assert not parameter_is_forward(
+            Parameter("rent_share", "25", "%", None, None, wording), "2026-11-27"
+        )
+    missing = set()
+    old_only = set()
+    for form in forms:
+        wording = (
+            f"The agency {form} 25% support"
+            if form.isascii()
+            else f"بحسب {form} يبلغ الدعم ٢٥٪"
+        )
+        parameter = Parameter("rent_share", "25", "%", None, None, wording)
+        if not parameter_is_forward(parameter, "2026-11-27"):
+            missing.add(form)
+            if re.search(_OLD_FORWARD, wording.casefold()):
+                old_only.add(form)
+    assert old_only == pinned, f"OLD_ONLY {len(old_only)}: {sorted(old_only)}"
+    assert missing == old_only & pinned, (
+        f"MISSING {len(missing - pinned)}: {sorted(missing - pinned)}"
+    )
+
+
+@pytest.mark.parametrize("marker", ("متوقع", "توقعات", "توقع", "يتوقع"))
+@pytest.mark.parametrize(
+    "suffix",
+    (
+        "",
+        "ة",
+        "\u0647",
+        "ات",
+        "ين",
+        "ون",
+        "\u0627",
+        "ان",
+        "تان",
+        "تين",
+        "\u0647\u0627",
+        "هم",
+        "هن",
+        "هما",
+        "كم",
+        "نا",
+        "ي",
+        "س",
+        "ني",
+    ),
+)
+def test_forward_closed_suffix_and_negation(marker, suffix):
+    from eii_custodian.publicdata.assembly_native import Parameter, parameter_is_forward
+
+    # L-2363 item 3b: containment keeps توقعات near-miss tails forward.
+    for prefix, forward in (
+        ("ال", True),
+        ("غير ال", False),
+        ("غير ", False),
+        ("تغير ", True),
+    ):
+        parameter = Parameter(
+            "rent_share", "25", "%", None, None, prefix + marker + suffix
+        )
+        assert parameter_is_forward(parameter, "2026-11-27") == forward
+
+
+@pytest.mark.parametrize(
+    "kind,wording",
+    [
+        ("forward", word)
+        for term in (
+            "forecast",
+            "forecasts",
+            "forecasted",
+            "forecasting",
+            "projected",
+            "expected",
+            "expects",
+            "expecting",
+            "anticipated",
+            "projection",
+            "projections",
+        )
+        for word in (term, term.capitalize())
+    ]
+    + [
+        ("forward", term)
+        for term in (
+            "متوقع",
+            "متوقعه",
+            "المتوقعه",
+            "متوقعان",
+            "متوقعتان",
+            "متوقعتين",
+            "متوقعًا",
+            "توقع",
+            "يتوقع",
+            "يُتوقع",
+            "نتوقع",
+            "تتوقع",
+            "من غير المتوقع",
+            "متوقعة",
+            "متوقعات",
+            "متوقعين",
+            "متوقعون",
+            "متوقعا",
+            "متوقعاً",
+            "المتوقع",
+            "المتوقعة",
+            "والمتوقعة",
+            "للمتوقع",
+            "توقعات",
+            "التوقعات",
+            "وتوقعات",
+            "بالتوقعات",
+            "توقعاته",
+            "توقعاتها",
+            "توقعاتهم",
+            "توقعاتهن",
+            "توقعاتهما",
+            "توقعاتكم",
+            "توقعاتنا",
+            "توقعاتي",
+            # L-2363 containment supersedes the old suffix-only non-word pins.
+            "توقعاتا",
+            "توقعاتة",
+            "توقعاتات",
+            "توقعاتين",
+            "توقعاتون",
+        )
+    ]
+    + [("duration", "for 3 " + term) for term in ("month", "months", "year", "years")]
+    + [
+        ("duration", "لمدة \u0663 " + term)
+        for term in ("شهر", "شهرا", "شهراً", "شهور", "أشهر", "سنة", "سنوات")
+    ]
+    + [("duration_marked", "لمدة ١٢ شهرًا"), ("duration_marked", "لمدة \u0661 سنةً")]
+    + [
+        ("not_forward", term)
+        for term in (
+            "غير متوقع",
+            "وغير المتوقعة",
+            "فغير المتوقع",
+            "لغير المتوقع",
+        )
+    ]
+    + [("duration", "ولمدة \u0663 سنوات")]
+    + [("monthly", term) for term in ("per month", "monthly", "شهرياً", "شهريا")]
+    + [("once", term) for term in ("one-off", "one time", "لمرة واحدة")],
+)
+def test_parameter_natural_forms_under_match(kind, wording):
+    import re
+
+    from eii_custodian.publicdata.assembly_native import (
+        _DIGITS,
+        _DURATION,
+        _MONTHLY,
+        _ONCE,
+        Parameter,
+        parameter_is_forward,
+    )
+
+    if kind in ("forward", "not_forward"):
+        parameter = Parameter("rent_share", "0.25", "ratio", None, None, wording)
+        assert parameter_is_forward(parameter, "2026-11-27T00:00:00Z") == (
+            kind == "forward"
+        )
+    elif kind == "duration_marked":
+        match = _DURATION.search(wording.translate(_DIGITS))
+        assert match is not None
+        assert match.groups() == (("12", "شهر") if "شهر" in wording else ("1", "سنة"))
+    else:
+        pattern = {"duration": _DURATION, "monthly": _MONTHLY, "once": _ONCE}[kind]
+        assert re.fullmatch(pattern, wording.translate(_DIGITS)) is not None
+        if kind == "duration" and wording.endswith("شهراً"):
+            match = pattern.search(wording.translate(_DIGITS))
+            assert match is not None
+            assert match[2] == "شهراً"
+
+
+@pytest.mark.parametrize(
+    "english,arabic,forward,duration",
+    [
+        pytest.param(
+            "25%", "النسبة المتوقعه للدعم ٢٥٪", True, None, id="adjective-\u0647"
+        ),
+        pytest.param(
+            "25%", "مبلغان متوقعان للدعم بنسبة ٢٥٪", True, None, id="adjective-ان"
+        ),
+        pytest.param(
+            "25%", "نسبتان متوقعتان للدعم عند ٢٥٪", True, None, id="adjective-تان"
+        ),
+        pytest.param(
+            "25%",
+            "تشير الدراسة إلى نسبتين متوقعتين للدعم عند ٢٥٪",
+            True,
+            None,
+            id="adjective-تين",
+        ),
+        pytest.param(
+            "25%", "توقعاته تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-\u0647"
+        ),
+        pytest.param(
+            "25%",
+            "توقعاتها تشير إلى دعم بنسبة ٢٥٪",
+            True,
+            None,
+            id="pronoun-\u0647\u0627",
+        ),
+        pytest.param(
+            "25%", "توقعاتهم تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-هم"
+        ),
+        pytest.param(
+            "25%", "توقعاتهن تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-هن"
+        ),
+        pytest.param(
+            "25%", "توقعاتهما تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-هما"
+        ),
+        pytest.param(
+            "25%", "توقعاتكم تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-كم"
+        ),
+        pytest.param(
+            "25%", "توقعاتنا تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-نا"
+        ),
+        pytest.param(
+            "25%", "توقعاتي تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-ي"
+        ),
+        pytest.param(
+            "25%", "تشير الدراسة إلى توقع بلوغ الدعم ٢٥٪", True, None, id="arabic-توقع"
+        ),
+        pytest.param("25%", "يتوقع أن يبلغ الدعم ٢٥٪", True, None, id="arabic-يتوقع"),
+        pytest.param("25%", "يُتوقع أن يبلغ الدعم ٢٥٪", True, None, id="arabic-يُتوقع"),
+        pytest.param("25%", "نتوقع أن يبلغ الدعم ٢٥٪", True, None, id="arabic-نتوقع"),
+        pytest.param("25%", "تتوقع أن يبلغ الدعم ٢٥٪", True, None, id="arabic-تتوقع"),
+        pytest.param("expects 25%", "٢٥٪", True, None, id="expects"),
+        pytest.param("expecting 25%", "٢٥٪", True, None, id="expecting"),
+        pytest.param("anticipated 25%", "٢٥٪", True, None, id="anticipated"),
+        pytest.param("projection 25%", "٢٥٪", True, None, id="projection"),
+        pytest.param("projections 25%", "٢٥٪", True, None, id="projections"),
+        pytest.param(
+            "25%",
+            "من غير المتوقع أن يتجاوز الدعم ٢٥٪",
+            True,
+            None,
+            id="negated-forecast",
+        ),
+        pytest.param("25% for 3 months", "٢٥٪ لمدة ٣ شهور", False, 3, id="months"),
+        pytest.param(
+            "25%", "لغير المتوقع منها دعم بنسبة ٢٥٪", False, None, id="l-negation"
+        ),
+        pytest.param(
+            "Projects in the zone receive 25% support",
+            "٢٥٪",
+            False,
+            None,
+            id="projects-control",
+        ),
+        pytest.param("projecting 25%", "٢٥٪", False, None, id="projecting-control"),
+        pytest.param(
+            "not expected to exceed 25%", "٢٥٪", True, None, id="not-expected-control"
+        ),
+        pytest.param(
+            "not forecasted to exceed 25%",
+            "٢٥٪",
+            True,
+            None,
+            id="not-forecasted-control",
+        ),
+        pytest.param("25%", "يبلغ الدعم ٢٥٪", False, None, id="fact-control"),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «الإيجار» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="paradigm-ar-frame-control",
+        ),
+        pytest.param("25%", "تغير متوقع بنسبة ٢٥٪", True, None, id="change-expected"),
+        pytest.param(
+            "25%", "تغيّر متوقع بنسبة ٢٥٪", True, None, id="change-shadda-expected"
+        ),
+        pytest.param(
+            "25%", "توقعت الهيئة أن يبلغ الدعم ٢٥٪", True, None, id="past-authority"
+        ),
+        pytest.param(
+            "25%", "توقعوا أن يبلغ دعم الإيجار ٢٥٪", True, None, id="past-plural"
+        ),
+        pytest.param(
+            "25%", "توقعا أن يبلغ دعم الإيجار ٢٥٪", True, None, id="past-dual"
+        ),
+        pytest.param(
+            "25%",
+            "من الممكن أن يتوقعوا دعماً للإيجار بنسبة ٢٥٪",
+            True,
+            None,
+            id="subjunctive",
+        ),
+        pytest.param(
+            "25%",
+            "نشرت الهيئة توقعاً ببلوغ دعم الإيجار ٢٥٪",
+            True,
+            None,
+            id="accusative-noun",
+        ),
+        pytest.param(
+            "25%",
+            "قال المسؤول: يتوقعني الفريق في اجتماع دعم الإيجار بنسبة ٢٥٪",
+            True,
+            None,
+            id="object-ni",
+        ),
+        pytest.param(
+            "25%",
+            "الصندوق غيّر توقعاته لدعم الإيجار إلى ٢٥٪",
+            True,
+            None,
+            id="change-previous-shadda",
+        ),
+        pytest.param(
+            "25%",
+            "تغطي الهيئة التكاليف الغير متوقعة بنسبة ٢٥٪",
+            False,
+            None,
+            id="al-negation",
+        ),
+        pytest.param(
+            "25%", "دعم الغير المتوقع بنسبة ٢٥٪", False, None, id="negation-الغير"
+        ),
+        pytest.param(
+            "25%",
+            "العقود التي تُوَقِّعُونَهَا مع الجهة تحصل على دعم بنسبة ٢٥٪",
+            True,
+            None,
+            id="sign-full-nonambiguous",
+        ),
+        pytest.param(
+            "25%",
+            "ورد في التقرير توقّعٌ ببلوغ دعم الإيجار ٢٥٪",
+            True,
+            None,
+            id="noun-shadda",
+        ),
+        pytest.param(
+            "25%",
+            "ورد في التقرير تَوَقُّعٌ ببلوغ دعم الإيجار ٢٥٪",
+            True,
+            None,
+            id="noun-vowelled",
+        ),
+        pytest.param(
+            "25%",
+            "وقّع المدير عقد الإيجار بدعم ثابت قدره ٢٥٪",
+            False,
+            None,
+            id="sign-past-shadda",
+        ),
+        pytest.param(
+            "25%",
+            "تُّوَقِّعُ الجهة عقود الإيجار بدعم ثابت قدره ٢٥٪",
+            True,
+            None,
+            id="sign-shadda-ta",
+        ),
+        pytest.param(
+            "25%", "يُتوقع أن يبلغ دعم الإيجار ٢٥٪", True, None, id="passive-diacritic"
+        ),
+        pytest.param(
+            "25%",
+            "تُوَقِّعُ الجهة عقود الإيجار بدعم ثابت قدره ٢٥٪",
+            False,
+            None,
+            id="sign-full",
+        ),
+        pytest.param(
+            "25%",
+            "توقع الجهة عقود الإيجار بدعم ثابت قدره ٢٥٪",
+            True,
+            None,
+            id="sign-unvowelled",
+        ),
+        pytest.param(
+            "25%",
+            "تتوقع الجهة أن يبلغ دعم الإيجار ٢٥٪",
+            True,
+            None,
+            id="expect-present",
+        ),
+        pytest.param(
+            "25%", "توقع الجهة ارتفاع الدعم إلى ٢٥٪", True, None, id="expect-unvowelled"
+        ),
+        pytest.param(
+            "25%", "تُوُقِّعَ ارتفاع الدعم إلى ٢٥٪", True, None, id="expect-passive"
+        ),
+        pytest.param(
+            "25%",
+            "تتوقع الجهة أن توقع عقودا بدعم ٢٥٪",
+            True,
+            None,
+            id="expect-before-sign",
+        ),
+        pytest.param(
+            "25%",
+            "تَوَقَّعَ المديرُ عَقْدَ اتفاقيةٍ لدعم الإيجار بنسبة ٢٥٪",
+            True,
+            None,
+            id="document-expect",
+        ),
+        pytest.param(
+            "25%",
+            "توقع المدير عقد اتفاقية لدعم الإيجار بنسبة ٢٥٪",
+            True,
+            None,
+            id="document-ambiguous",
+        ),
+        pytest.param(
+            "25%",
+            "تُوَقِّعُ المديرةُ عَقْدَ اتفاقيةٍ لدعم الإيجار بنسبة ٢٥٪",
+            False,
+            None,
+            id="document-sign",
+        ),
+        pytest.param(
+            "25%",
+            "تُوقِّع الجهة عقود الإيجار بدعم ثابت قدره ٢٥٪",
+            True,
+            None,
+            id="partial-sign",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «موقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-موقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «الموقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-الموقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «التوقيع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-التوقيع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «توقيع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-توقيع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «وقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-وقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «الواقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-الواقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «بغير المتوقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-بغير المتوقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «كغير المتوقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-كغير المتوقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «لغير المتوقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-لغير المتوقع",
+        ),
+        pytest.param(
+            "The agency offers 25% support",
+            "٢٥٪",
+            False,
+            None,
+            id="paradigm-en-frame-control",
+        ),
+        pytest.param(
+            "25%",
+            "تغطى التكاليف غير المتوقعة بنسبة ٢٥٪",
+            False,
+            None,
+            id="unexpected-control",
+        ),
+    ]
+    + [
+        pytest.param(
+            "25%",
+            f"تورد الصفحة عبارة «{form}» مع دعم بنسبة ٢٥٪",
+            True,
+            None,
+            id="paradigm-ar-" + form,
+        )
+        for form in _forward_paradigm(("",))
+    ]
+    + [
+        pytest.param(
+            f"The agency {form} 25% support",
+            "٢٥٪",
+            True,
+            None,
+            id="paradigm-en-" + form,
+        )
+        for form in _FORWARD_ENGLISH
+    ]
+    + [
+        pytest.param(
+            "25%",
+            f"بحسب {prefix}متوقع يبلغ الدعم ٢٥٪",
+            True,
+            None,
+            id="comparative-" + prefix,
+        )
+        for prefix in _FORWARD_COMPARATIVES
+    ],
+)
+def test_parameter_bounded_bilingual_corpus(english, arabic, forward, duration):
+    test_parameter_literal_boundaries(
+        english,
+        arabic,
+        "Rent subsidy",
+        "rent_share",
+        "0.25",
+        "ratio",
+        duration,
+        None,
+        forward,
+    )
+
+
+@settings(max_examples=100, derandomize=True)
+@given(
+    prefix=st.text(alphabet="ابتثجحخدذرزسشصضطظعغفقكلمنهوي", max_size=10),
+    suffix=st.text(alphabet="ابتثجحخدذرزسشصضطظعغفقكلمنهوي", max_size=10),
+    decoration=st.sampled_from(("", "ـ", "ُ", "َ", "ِ", "ّ", "ٰ")),
+)
+def test_forward_stem_containment_generated(prefix, suffix, decoration):
+    # Independent arbitrary-letter oracle: no unvowelled stem may escape.
+    form = decoration.join(prefix + "توقع" + suffix)
+    test_parameter_bounded_bilingual_corpus(
+        "25%", f"تورد الصفحة عبارة «{form}» مع دعم بنسبة ٢٥٪", True, None
+    )
+
+
+@pytest.mark.parametrize("conjunction", ("", "و", "ف"))
+@pytest.mark.parametrize(
+    "suffix",
+    (
+        "",
+        "ان",
+        "ون",
+        "ين",
+        "وا",
+        "ي",
+        "\u0627",
+        "\u0647",
+        "\u0647\u0627",
+        "هم",
+        "هما",
+        "هن",
+        "ك",
+        "كم",
+        "نا",
+        "ني",
+    ),
+)
+@pytest.mark.parametrize("qaf", ("ِ", "ِّ", "ِّ"))
+def test_signing_full_vowels(conjunction, suffix, qaf):
+    test_parameter_bounded_bilingual_corpus(
+        "25%",
+        f"تورد الصفحة عبارة «{conjunction}تُوَق{qaf}ع{suffix}» مع دعم بنسبة ٢٥٪",
+        False,
+        None,
+    )
+
+
+@pytest.mark.parametrize("form", ("تُوَقِّع", "تَوَقَّع", "تُوُقِّعَ"))
+@pytest.mark.parametrize("missing", ("ُ", "َ", "ِ"))
+def test_signing_incomplete_vowels(form, missing):
+    # Removing one required vowel from signing cannot release; expectation
+    # and passive expectation also remain forward under any partial deletion.
+    test_parameter_bounded_bilingual_corpus(
+        "25%",
+        f"تورد الصفحة عبارة «{form.replace(missing, '')}» مع دعم بنسبة ٢٥٪",
+        True,
+        None,
+    )
