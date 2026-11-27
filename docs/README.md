@@ -172,6 +172,7 @@
 | [0124](decisions/0124-register-fixed-metadata-fields-meet-exact-checks.md) | Exact file-byte and table-row counts, approved labels and schema keys; altered values scan first; amends decision 0105 item 5 for exact counts only | Accepted by the owner, 2026-11-27 (M1, with its conditions) |
 | [0125](decisions/0125-c7-coordinates-defer-to-s7.md) | `c7.coordinates` joins the S7-deferred pins; S7-T05 derives, source-checks and pins the coordinates; no value is bound at S2 | Proposed, 2026-11-25 |
 | [0131](decisions/0131-the-public-company-register-and-its-remaining-gaps.md) | Public real company register retained in releases; three collection gaps assigned outside the S2 gate; scheduled imagery and rent starts | Accepted by the owner, 2026-11-26 |
+| [0133](decisions/0133-fdi-projects-lineage-and-coverage-columns-in-the-contract.md) | Declare the fifteen existing FDI project lineage and coverage columns; bounded DAT-120 amendment for the S2-T12 release row | Proposed, 2026-11-27 |
 
 ## Identifiers and change control
 

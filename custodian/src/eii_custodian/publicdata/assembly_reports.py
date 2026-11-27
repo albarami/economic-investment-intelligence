@@ -129,6 +129,12 @@ RATIO_FIELDS = RATIO_FIELDS | frozenset({"busyness_index"})
 ADMIN_FIELDS = ADMIN_FIELDS | frozenset(
     {
         "aggregation_level",
+        "caveat_keys",
+        "crosswalk_sha256",
+        "mapping_coverage",
+        "provenance",
+        "terms_sha256",
+        "terms_url",
         "decision_record",
         "city_id",
         "lng",
