@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Accepted by the owner, 2026-11-27 ("ACCEPT 0116, 0117, 0118, 0120, 0121 and 0122", relayed by the advisor in note owner-relayed-20261127-060429), on the lead's confirmation (ruling L-2272) that its review still stands on main `bc9bb749`: the record's text is byte-equal to its text at `247c6dc` (S2-DREC.fx1), which S2-DREC.cf2 (Cursor, grok-4.7-high, a maker other than the builders) CONFIRMED |
+| Status | Proposed |
 | Date | 2026-11-25 |
 | Scope | `custodian/src/eii_custodian/publicdata/registers/parse.py`; its invented parser tests; the package README; [document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)** |
 | Amends | [Document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)**, the sentences on the financial-centre events selection (proposed) |
