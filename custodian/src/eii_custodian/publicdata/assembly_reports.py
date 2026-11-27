@@ -11,7 +11,7 @@ from functools import partial
 from typing import TYPE_CHECKING, Any
 
 from .assembly import AssemblyError
-from .assembly_io import bound_files, local, read_object, write_record
+from .assembly_io import bound_files, local, read_object, record_encoder, write_record
 from .assembly_sources import (
     CITATIONS,
     DECISION_0019,
@@ -707,80 +707,12 @@ def _draw_row_sources(
 
 
 def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
-    """Bind every registered table to its stored phase envelope and exact hash."""
-    files: dict[str, tuple[str, str]] = {}
-    for phase in (
-        "reviewed_selections",
-        "frame",
-        "register_tables",
-        "gis_property_singles",
-        "fsq",
-        "series_stage",
-        "additions",
-        "busyness",
-    ):
-        name = "assembly/" + phase + ".json"
-        if not local(build.cache, name).is_file():
-            continue
-        data = read_object(build.cache, name)
-        tables = data.get("tables", {})
-        if not isinstance(tables, dict):
-            raise AssemblyError("assembly_output_invalid")
-        for table in tables:
-            if table not in build.tables:
-                if (
-                    table in {"fact_lineage", "source_registry", "grid_cell"}
-                    or tables[table] == []
-                ):
-                    continue
-                raise AssemblyError("assembly_draw_table_unindexed")
-            if table in files:
-                previous_name, previous_hash = files[table]
-                bound_files(build.cache, {previous_name: previous_hash})
-                previous_rows = read_object(build.cache, previous_name)["tables"][table]
-                if not (
-                    table == "gazetteer"
-                    and phase == "gis_property_singles"
-                    and previous_name == "assembly/frame.json"
-                    and tables[table][: len(previous_rows)] == previous_rows
-                ):
-                    raise AssemblyError("assembly_table_duplicate")
-            files[table] = (name, file_hash(local(build.cache, name)))
-    if set(build.tables) - set(files):
-        raise AssemblyError("figure_table_unreachable")
+    """Bind and consume one phase at a time; readers retain figures, not phases."""
 
-    build.draw_exclusions.clear()
-    for table, (name, digest) in sorted(files.items()):
-        if len(build.table_sources.get(table, set())) <= 1:
-            continue
-        bound_files(build.cache, {name: digest})
-        data = read_object(build.cache, name)
-        if _draw_row_sources(build, table, data) is None:
-            stored = data.get("row_sources", {}).get(table, [])
-            build.draw_exclusions.append(
-                {
-                    "table": table,
-                    "sources": sorted(build.table_sources[table]),
-                    "reason": (
-                        "assembly_draw_table_empty"
-                        if not data["tables"][table] and not stored
-                        else "assembly_draw_lineage_ambiguous"
-                    ),
-                }
-            )
-    excluded = {item["table"] for item in build.draw_exclusions}
-
-    def reader(table: str) -> Sequence[Figure]:
-        name, digest = files[table]
-        bound_files(build.cache, {name: digest})
-        data = read_object(build.cache, name)
-        rows = data["tables"][table]
-        row_sources = _draw_row_sources(build, table, data)
-        if row_sources is None:
-            raise AssemblyError("assembly_draw_lineage_ambiguous")
+    def reader(
+        table: str, rows: list[dict[str, Any]], row_sources: list[str]
+    ) -> list[Figure]:
         sources = build.table_sources.get(table, set())
-        if not sources or any(source not in build.receipts for source in sources):
-            raise AssemblyError("assembly_lineage_missing")
         keys = sorted(sources)
         links = [
             {
@@ -790,7 +722,8 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
             for source in keys
         ]
         output = []
-        for index, row in enumerate(rows):
+        for index, stored_row in enumerate(rows):
+            row = json.loads(record_encoder().encode(stored_row))
             receipt = build.receipts[row_sources[index]]
             if not isinstance(row, dict):
                 raise AssemblyError("assembly_output_invalid")
@@ -858,11 +791,95 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
                 )
         return output
 
-    return {
-        table: partial(reader, table)
-        for table in sorted(files)
-        if table not in excluded
-    }
+    files: dict[str, tuple[str, str]] = {}
+    figures: dict[str, Sequence[Figure]] = {}
+    exclusions: dict[str, dict[str, Any]] = {}
+    previous_gazetteer: list[str] = []
+    for phase in (
+        "reviewed_selections",
+        "frame",
+        "register_tables",
+        "gis_property_singles",
+        "fsq",
+        "series_stage",
+        "additions",
+        "busyness",
+    ):
+        name = "assembly/" + phase + ".json"
+        if not local(build.cache, name).is_file():
+            continue
+        held = build.held_phases.get(name)
+        digest = (
+            held.sha256
+            if held is not None
+            else build.files.get(name) or file_hash(local(build.cache, name))
+        )
+        bound_files(build.cache, {name: digest})
+        data = held.verify() if held is not None else read_object(build.cache, name)
+        tables = data.get("tables", {})
+        if not isinstance(tables, dict):
+            raise AssemblyError("assembly_output_invalid")
+        for table in sorted(tables):
+            if table not in build.tables:
+                if (
+                    table in {"fact_lineage", "source_registry", "grid_cell"}
+                    or tables[table] == []
+                ):
+                    continue
+                raise AssemblyError("assembly_draw_table_unindexed")
+            if table in files:
+                previous_name, previous_hash = files[table]
+                bound_files(build.cache, {previous_name: previous_hash})
+                if not (
+                    table == "gazetteer"
+                    and phase == "gis_property_singles"
+                    and previous_name == "assembly/frame.json"
+                    and len(tables[table]) >= len(previous_gazetteer)
+                    and all(
+                        json.loads(body)
+                        == json.loads(record_encoder().encode(tables[table][index]))
+                        for index, body in enumerate(previous_gazetteer)
+                    )
+                ):
+                    raise AssemblyError("assembly_table_duplicate")
+            if table == "gazetteer" and phase == "frame":
+                # Keep only encoded prefix rows, not any part of a parsed phase.
+                previous_gazetteer = [
+                    record_encoder().encode(row) for row in tables[table]
+                ]
+            files[table] = (name, digest)
+            exclusions.pop(table, None)
+            row_sources = _draw_row_sources(build, table, data)
+            if row_sources is None:
+                stored = data.get("row_sources", {}).get(table, [])
+                exclusions[table] = {
+                    "table": table,
+                    "sources": sorted(build.table_sources[table]),
+                    "reason": (
+                        "assembly_draw_table_empty"
+                        if not tables[table] and not stored
+                        else "assembly_draw_lineage_ambiguous"
+                    ),
+                }
+                figures.pop(table, None)
+                del stored
+            else:
+                figures[table] = reader(table, tables[table], row_sources)
+        del tables, data
+    if set(build.tables) - set(files):
+        raise AssemblyError("figure_table_unreachable")
+    build.draw_exclusions.clear()
+    build.draw_exclusions.extend(exclusions[table] for table in sorted(exclusions))
+
+    def bound_reader(table: str) -> Sequence[Figure]:
+        name, digest = files[table]
+        bound_files(build.cache, {name: digest})
+        sources = build.table_sources.get(table, set())
+        if not sources or any(source not in build.receipts for source in sources):
+            raise AssemblyError("assembly_lineage_missing")
+        return figures[table]
+
+    return {table: partial(bound_reader, table) for table in sorted(figures)}
 
 
 def write_reports(build: Production) -> dict[str, str]:

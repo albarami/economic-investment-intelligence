@@ -17,7 +17,7 @@ from typing import Any
 from .assembly import AssemblyError, Step, run_steps
 from .assembly_intake import write_intake_evidence
 from .assembly_inventory import INVENTORY, InventoryItem, validate_inventory
-from .assembly_io import bound_files, local, read_object, write_record
+from .assembly_io import HeldRecord, bound_files, local, read_object, write_record
 from .fetch.bounded import file_hash
 from .fetch.registry import Entry, RegistryError, parse_yaml, read_yaml
 from .fetch.snapshots import Snapshot, read_snapshot, reviewed_selections
@@ -73,6 +73,7 @@ class Production:
     audit: dict[str, Any] = field(default_factory=dict)
     stamp: str = ""
     draw_exclusions: list[dict[str, Any]] = field(default_factory=list)
+    held_phases: dict[str, HeldRecord] = field(default_factory=dict)
     intake_refusal: str = ""
 
     def adapters(self) -> dict[str, Callable[[], Mapping[str, str]]]:
@@ -118,6 +119,7 @@ class Production:
             self.files.clear()
             self.data_files.clear()
             self.tables.clear()
+            self.held_phases.clear()
             self.source_tables.clear()
             self.table_sources.clear()
             self.receipts.clear()
@@ -177,16 +179,17 @@ class Production:
             key: {field: receipt.get(field, "") for field in fields}
             for key, receipt in self.receipts.items()
         }
-        result = write_record(
-            self.cache,
-            "assembly/" + phase + ".json",
-            {
-                "method": "public-assembly." + phase,
-                "method_version": "1",
-                "source_chain": chain,
-                **value,
-            },
-        )
+        name = "assembly/" + phase + ".json"
+        envelope = {
+            "method": "public-assembly." + phase,
+            "method_version": "1",
+            "source_chain": chain,
+            **value,
+        }
+        result = write_record(self.cache, name, envelope)
+        self.held_phases.pop(name, None)
+        if isinstance(envelope.get("tables"), dict):
+            self.held_phases[name] = HeldRecord.capture(envelope, result[name])
         self.files.update(result)
         return result
 

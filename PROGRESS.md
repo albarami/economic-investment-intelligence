@@ -55203,3 +55203,100 @@ Skills applied: project-orientation traced existing mapping and task scope; task
   - Its two records-only notes on 0115 are applied here: the Owner header row, and "non-null member fields" in 0115 item 4 and in document 03.
   - 0113 and 0125 keep Proposed. Their earlier reviews are S2-D113.rv1 and S2-C7C.rv1 with cf1 (OpenAI Codex). Both runs were refused admission by the gate at their launch and are kept as history. A fresh different-maker review waits for the gate to admit a maker other than the builders' (ruling L-2274).
 - Documents only: no code, test, gate or acceptance box changes. `python3 scripts/check_docs.py` exit 0.
+
+## S2-DRAWMEM.b1a — bounded assembly draw (2026-11-27, L-2284)
+
+- Base: `a3efa045450c411d52c39cab0d334fd095940e39`; branch `s2/s2-drawmem`.
+  Builder: OpenAI GPT-6 Astra, senior Python data-platform engineer for
+  memory-bounded batch pipelines and provenance chains. Self-review persona:
+  strict-reviewer. Independent different-maker review remains with the lead.
+- Cause supplied by the brief: the assembly was killed at its 32 GiB ceiling
+  after final audit, while repeatedly parsing a roughly 4.35 GB phase. The
+  lead's single-parse probe reported about 19.2 GiB RSS. These are brief-sourced
+  observations, not measurements made by this worker.
+- `Production.record` now retains table references and a frozen copy of the
+  other envelope fields alongside the actual written file hash. `HeldRecord.verify`
+  incrementally reproduces exactly the writer's JSON bytes and final newline,
+  checking that hash. `bound_files` independently verifies the stored file first.
+  Thus the held envelope and the stored envelope have the same SHA-256; changed
+  held rows refuse `assembly_draw_held_rows_changed`, and changed stored bytes
+  refuse `assembly_output_invalid`. No separate unbound row digest is trusted.
+- `draw_tables` consumes each phase before the next. A held phase is never parsed;
+  a file-only phase is parsed once. Readers retain Figures, not parsed phases.
+  Gazetteer comparison retains encoded prefix rows only and preserves decoded
+  prefix equality. Table ordering, field ordering, sample selection, source links
+  and output bytes stay unchanged. The existing nested `reader` still owns numeric
+  field/value checks; no refusal-inventory anchor or payload changed.
+- New tests: `custodian/tests/test_assembly_draw_memory.py`, 21 cases including
+  exact read counts, weak-reference lifetime probes for phase objects, row lists
+  and row dictionaries, mixed held/file-only phases, binding-before-use probes,
+  held mutation, stored-byte mutation, duplicate/unindexed/invalid tables,
+  byte hashes captured from the base, and a Hypothesis Decimal serialization
+  property. Existing tests were not edited.
+- Environment: WSL2 Linux, Python 3.14.6; invented fixtures only, no source network,
+  no real cache. Tooling cache and temporary artifacts stayed under the workspace
+  (`UV_CACHE_DIR=.overnight/tmp/uv-cache`, `MYPY_CACHE_DIR=.overnight/tmp/mypy`).
+  Fixed-seed runs and all plants used `--hypothesis-seed=17`; no skip or retry.
+- Red-first: `uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py -p no:cacheprovider -q --hypothesis-seed=17`,
+  exit 1, 6 failed / 4 passed, `.overnight/OUT/red-first.log`.
+  The closed-reason extension was separately red: 1 failed / 17 passed, exit 1,
+  `.overnight/OUT/expanded-red.log`. Initial lint found six new-test style/import
+  errors (exit 1); they were corrected without changing expectations.
+- Required existing suite:
+  `uv run --locked python -m pytest custodian/tests/test_assembly_reports.py custodian/tests/test_assembly_native.py custodian/tests/test_assembly_layers.py custodian/tests/test_assembly_producers.py custodian/tests/test_property_sale.py custodian/tests/test_register_tables.py -p no:cacheprovider -q`,
+  exit 0, 394 passed. A final run of these six files plus the new file, with
+  `--hypothesis-seed=17`, exited 0: 415 passed, no skips, 63.88 seconds
+  (`.overnight/OUT/final-tests.log`).
+- Additional unchanged refusal-inventory suite plus the then-current 18 new cases:
+  1473 passed, exit 0 (`.overnight/OUT/memory-refusals.log`). Final new-file check:
+  21 passed, exit 0. Final `uv run --locked ruff check .`, `uv run --locked ruff format --check .`
+  (1026 files), and `uv run --locked mypy` (531 source files) all exited 0.
+- Before/after artifacts for the existing single-source, multisource and series
+  fixtures were compared by nine `cmp` calls, all exit 0
+  (`.overnight/OUT/byte-identity.log`). Before bytes were saved while production
+  still matched the base. No existing baseline was refreshed.
+- Largest parse-count fixture: three phases, two tables per phase, 2500 rows per
+  table, two numeric fields per row. Before: 3 parses per phase, 9 total, even
+  when the rows were held. After: 0 for held phases; 1 per file-only phase,
+  3 total. Fresh-process final measurements: held draw 0.270642 seconds,
+  fixture plus draw 0.308062 seconds, peak RSS 104720 KiB; file-only draw
+  0.142950 seconds, fixture plus draw 0.157945 seconds, peak RSS 105968 KiB.
+  The largest held fixture file was 173211 bytes. These are mechanism checks,
+  not evidence that the real 32 GiB assembly now completes; the lead must rerun it.
+- Isolated plants, each exit 1: extra parse (2 failed), overlapping phase (1),
+  changed Figure bytes (3), removed held digest guard (1), removed closed reason
+  (1), unindexed guard (2), gazetteer duplicate guard (1), unreachable guard (1),
+  reader lineage guard (1), pre-use binding (2), reader binding (1), invalid table
+  envelope guard (1 failed / 1 passed). Final restorations each passed
+  `git diff --exit-code -- <planted-file>` against the staged implementation.
+  An initial reader-binding restoration matched the wrong source occurrence:
+  its diff check exited 1. It was corrected with full function context; that
+  plant and the subsequent invalid-table plant were repeated in isolation and
+  both restoration checks exited 0. The final 415-test run followed all restores.
+- Scope extension under brief L-2230: `assembly_io` centralizes the unchanged
+  encoder and holds the proof; `Production.record` captures it and `run` clears
+  it; the closed refusal vocabulary adds the new diagnostic. `Production.draw`,
+  the sampler, pins, fixture inventory and all existing expectations are unchanged.
+  The base's pre-index rehash of changed files is corrected by retaining the
+  original recorded hash; `.overnight/ALERT.md` records that in-scope finding.
+- Skills applied: project-orientation reused the existing writer/draw paths;
+  task-standards fixed the personas and scope; writing-plans recorded the proof;
+  test-driven-development captured reds before production edits;
+  systematic-debugging traced the repeated parses and pre-index rehash;
+  sanad-provenance bound held rows to actual written bytes;
+  sharp-edges added pre-use binding and malformed-table cases;
+  property-based-testing checked stored Decimal representation and field order;
+  al-muhasibi rejected parse-once alone as insufficient;
+  github-flow retained the assigned branch and reviewed staged changes;
+  spec-to-code-compliance equivalent mapped the brief to code/tests (no dispatcher
+  available); requesting-code-review prepares the lead's independent review;
+  strict-reviewer preserved anchors and limits; verification-before-completion
+  and muhasabah-gate separate fixture proof from the unrun live-memory gate.
+- Final records checks: `python3 scripts/check_docs.py` exit 0 (1394 text files,
+  175 Markdown files); `python3 scripts/check_tree.py` exit 0 (8 rules);
+  `cmp AGENTS.md CLAUDE.md`, staged whitespace checks and the append-only prefix
+  proof for both ledgers all exit 0. No temporary helper script was created.
+- Commit attempt exited 128 because the environment has no configured Git author
+  identity. Identity was not set or overridden. Under the brief's Git fallback,
+  the complete change is delivered as `.overnight/OUT/S2-DRAWMEM.b1a.patch` with
+  its SHA-256 sidecar; the lead must commit it. HEAD remains the base above.
