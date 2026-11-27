@@ -316,9 +316,7 @@ _DIGITS = str.maketrans(
 )
 
 
-def _closed_terms(
-    terms: tuple[str, ...], *, forward: bool = False, prefixed: bool = True
-) -> str:
+def _closed_terms(terms: tuple[str, ...], *, prefixed: bool = True) -> str:
     """Bound closed terms, allowing only the ruled Arabic affixes."""
     patterns = []
     for term in terms:
@@ -327,23 +325,7 @@ def _closed_terms(
             prefix = (
                 r"(?:و|ف|ب|ل|ال|وال|بال|فال|لل|وب|ول|وبال|ولل)?" if prefixed else ""
             )
-            if forward and prefixed:
-                prefix = "(?:" + prefix + r"|ك|كال|وك|وكال)"
-            pronoun = r"(?:\u0647|\u0647\u0627|هما|هم|هن|ك|كما|كم|كن|ي|نا)?"
-            suffix = ""
-            if forward and term == "متوقع":
-                suffix = r"(?:ة|\u0647|ات|ين|ون|اً|ًا|\u0627|ان|تان|تين|و|ي|تا|تي)?"
-            elif forward and term in ("توقعات", "توقع"):
-                suffix = pronoun
-            elif forward and term in ("يتوقع", "نتوقع", "تتوقع", "أتوقع"):
-                token = "س?" + token
-                suffix = r"(?:ون|ان|ين)?" + pronoun
-            negation = (
-                r"(?<!(?<!\w)غير )(?<!(?<!\w)وغير )(?<!(?<!\w)فغير )(?<!(?<!\w)لغير )"
-                if forward
-                else ""
-            )
-            patterns.append(negation + r"(?<!\w)" + prefix + token + suffix + r"(?!\w)")
+            patterns.append(r"(?<!\w)" + prefix + token + r"(?!\w)")
         else:
             patterns.append(r"(?<!\w)" + token + r"(?!\w)")
     return "(?:" + "|".join(patterns) + ")"
@@ -484,12 +466,44 @@ def classify_parameter(row: Mapping[str, object]) -> Parameter | None:
     return Parameter(key, value, unit, duration, period, wording)
 
 
+# L-2363 item 3c, amended by L-2369: only these words negate the stem.
+_ARABIC_FORWARD_NEGATIONS = frozenset(
+    ("غير", "وغير", "فغير", "لغير", "بغير", "كغير", "الغير")
+)
+
+
 def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
     """DAT-143/PUB-88 exclude future periods and source-labelled forecasts."""
+    # L-2363/L-2365/L-2367: containment replaces forward affix lists;
+    # only full Form II vowels release the ambiguous signing homograph.
+    marks = r"[\u064b-\u0652\u0670]"
+    wording = parameter.wording.casefold()
+    checked = re.sub(marks + r"|\u0640", "", wording)
+    if (
+        parameter.period is not None and period_is_future(parameter.period, retrieved)
+    ) or re.search(_closed_terms(("من غير المتوقع",)), checked):
+        return True
+    previous = ""
+    for raw in re.findall(
+        r"[\u0621-\u064a\u064b-\u0652\u0670]+", wording.replace("ـ", "")
+    ):
+        word = re.sub(marks, "", raw)
+        if "توقع" in word and previous not in _ARABIC_FORWARD_NEGATIONS:
+            ambiguous = re.fullmatch(
+                r"[وف]?توقع(?:ان|ون|ين|وا|ي|\u0627|\u0647|\u0647\u0627|هم|هما|هن|ك|كم|نا|ني)?",
+                word,
+            )
+            letters = re.findall(r"([\u0621-\u064a])(" + marks + "*)", raw)
+            stem = letters[1:] if word.startswith(("و", "ف")) else letters
+            signing = ambiguous is not None and all(
+                set(stem[index][1]) - {"ّ"} == {vowel}
+                for index, vowel in enumerate(("ُ", "َ", "ِ"))
+            )
+            if not signing:
+                return True
+        previous = word
     return bool(
-        (parameter.period is not None and period_is_future(parameter.period, retrieved))
-        or re.search(_closed_terms(("من غير المتوقع",)), parameter.wording.casefold())
-        or re.search(
+        re.search(
             _closed_terms(
                 (
                     "forecast",
@@ -510,18 +524,9 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
                     "anticipating",
                     "projection",
                     "projections",
-                    "توقع",
-                    "يتوقع",
-                    "يُتوقع",
-                    "نتوقع",
-                    "تتوقع",
-                    "أتوقع",
-                    "متوقع",
-                    "توقعات",
                 ),
-                forward=True,
             ),
-            parameter.wording.casefold(),
+            wording,
         )
     )
 

@@ -1982,6 +1982,12 @@ _OLD_FORWARD = r"forecast|projected|expected|متوقع|توقعات"
 NOT_FORWARD: tuple[tuple[str, str], ...] = ()
 
 
+# Arabic: the definite article and an attached pronoun never co-occur
+# (*التوقعاته); such non-words are excluded from the oracle, not from production.
+def _article_with_pronoun(prefix, pronoun):
+    return bool(pronoun) and ("ال" in prefix or prefix.endswith("لل"))
+
+
 def _forward_paradigm(prefixes):
     adjectives = (
         prefix + stem + suffix
@@ -1994,19 +2000,29 @@ def _forward_paradigm(prefixes):
         for prefix in prefixes
         for stem in _FORWARD_NOUNS
         for pronoun in ("", *_FORWARD_PRONOUNS)
-        if not ("ال" in prefix or prefix.endswith("لل")) or not pronoun
+        if not _article_with_pronoun(prefix, pronoun)
     )
     verbs = (
         prefix + future + stem + subject + pronoun
-        for prefix in prefixes
+        for prefix in _FORWARD_PREFIXES
         for future in _FORWARD_FUTURES
         for stem in _FORWARD_VERBS
         for subject in _FORWARD_SUBJECTS
         for pronoun in _FORWARD_OBJECTS
-        if not ("ال" in prefix or prefix.endswith("لل")) or not pronoun
+        if not _article_with_pronoun(prefix, pronoun)
     )
     passives = (prefix + stem for prefix in prefixes for stem in _FORWARD_PASSIVES)
     return tuple(dict.fromkeys((*adjectives, *nouns, *verbs, *passives)))
+
+
+def test_forward_oracle_excludes_nonwords():
+    forms = _forward_paradigm(_FORWARD_PREFIXES + _FORWARD_COMPARATIVES)
+    assert "التوقعاته" not in forms
+    assert "للتوقعاتهم" not in forms
+    assert "كيتوقع" not in forms
+    assert "كاليتوقع" not in forms
+    assert "توقعاته" in forms
+    assert "يتوقع" in forms
 
 
 def test_forward_paradigm_differential():
@@ -2017,6 +2033,11 @@ def test_forward_paradigm_differential():
     forms = (
         _forward_paradigm(_FORWARD_PREFIXES + _FORWARD_COMPARATIVES) + _FORWARD_ENGLISH
     )
+    pinned = {form for form, _reason in NOT_FORWARD}
+    for wording in ("بحسب الهيئة يبلغ الدعم ٢٥٪", "The agency offers 25% support"):
+        assert not parameter_is_forward(
+            Parameter("rent_share", "25", "%", None, None, wording), "2026-11-27"
+        )
     missing = set()
     old_only = set()
     for form in forms:
@@ -2030,46 +2051,22 @@ def test_forward_paradigm_differential():
             missing.add(form)
             if re.search(_OLD_FORWARD, wording.casefold()):
                 old_only.add(form)
-    assert old_only == {form for form, reason in NOT_FORWARD}, (
-        f"OLD_ONLY {len(old_only)}: {sorted(old_only)}"
+    assert old_only == pinned, f"OLD_ONLY {len(old_only)}: {sorted(old_only)}"
+    assert missing == old_only & pinned, (
+        f"MISSING {len(missing - pinned)}: {sorted(missing - pinned)}"
     )
-    assert not missing, f"MISSING {len(missing)}: {sorted(missing)}"
 
 
-@pytest.mark.parametrize(
-    "marker,suffix,admitted",
-    [
-        ("متوقع", suffix, True)
-        for suffix in (
-            "",
-            "ة",
-            "\u0647",
-            "ات",
-            "ين",
-            "ون",
-            "\u0627",
-            "ان",
-            "تان",
-            "تين",
+@pytest.mark.parametrize("marker", ("متوقع", "توقعات", "توقع", "يتوقع"))
+@pytest.mark.parametrize("suffix", ("", "ة", "ات", "ين", "ون", "\u0627", "س", "ني"))
+def test_forward_closed_suffix_and_negation(marker, suffix):
+    from eii_custodian.publicdata.assembly_native import Parameter, parameter_is_forward
+
+    for prefix, forward in (("ال", True), ("غير ال", False), ("غير ", False)):
+        parameter = Parameter(
+            "rent_share", "25", "%", None, None, prefix + marker + suffix
         )
-    ]
-    + [
-        ("توقعات", suffix, True)
-        for suffix in ("", "\u0647", "\u0647\u0627", "هم", "هن", "هما", "كم", "نا", "ي")
-    ]
-    + [("توقعات", suffix, False) for suffix in ("ة", "ات", "ين", "ون", "\u0627")],
-)
-def test_forward_closed_suffix_and_negation(marker, suffix, admitted):
-    import re
-
-    from eii_custodian.publicdata.assembly_native import _closed_terms
-
-    pattern = _closed_terms((marker,), forward=True)
-    assert bool(re.search(pattern, "ال" + marker + suffix)) == admitted
-    assert re.search(pattern, "غير ال" + marker + suffix) is None
-    assert re.search(pattern, "غير " + marker + suffix) is None
-    assert re.search(pattern, marker + suffix + "س") is None
-    assert bool(re.search(pattern, "تغير " + marker + suffix)) == admitted
+        assert parameter_is_forward(parameter, "2026-11-27") == forward
 
 
 @pytest.mark.parametrize(
@@ -2129,6 +2126,12 @@ def test_forward_closed_suffix_and_negation(marker, suffix, admitted):
             "توقعاتكم",
             "توقعاتنا",
             "توقعاتي",
+            # L-2363 containment supersedes the old suffix-only non-word pins.
+            "توقعاتا",
+            "توقعاتة",
+            "توقعاتات",
+            "توقعاتين",
+            "توقعاتون",
         )
     ]
     + [("duration", "for 3 " + term) for term in ("month", "months", "year", "years")]
@@ -2144,11 +2147,6 @@ def test_forward_closed_suffix_and_negation(marker, suffix, admitted):
             "وغير المتوقعة",
             "فغير المتوقع",
             "لغير المتوقع",
-            "توقعاتا",
-            "توقعاتة",
-            "توقعاتات",
-            "توقعاتين",
-            "توقعاتون",
         )
     ]
     + [("duration", "ولمدة \u0663 سنوات")]
@@ -2276,6 +2274,182 @@ def test_parameter_natural_forms_under_match(kind, wording):
         pytest.param("25%", "يبلغ الدعم ٢٥٪", False, None, id="fact-control"),
         pytest.param(
             "25%",
+            "تورد الصفحة عبارة «الإيجار» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="paradigm-ar-frame-control",
+        ),
+        pytest.param("25%", "تغير متوقع بنسبة ٢٥٪", True, None, id="change-expected"),
+        pytest.param(
+            "25%", "تغيّر متوقع بنسبة ٢٥٪", True, None, id="change-shadda-expected"
+        ),
+        pytest.param(
+            "25%", "توقعت الهيئة أن يبلغ الدعم ٢٥٪", True, None, id="past-authority"
+        ),
+        pytest.param(
+            "25%", "توقعوا أن يبلغ دعم الإيجار ٢٥٪", True, None, id="past-plural"
+        ),
+        pytest.param(
+            "25%", "توقعا أن يبلغ دعم الإيجار ٢٥٪", True, None, id="past-dual"
+        ),
+        pytest.param(
+            "25%",
+            "من الممكن أن يتوقعوا دعماً للإيجار بنسبة ٢٥٪",
+            True,
+            None,
+            id="subjunctive",
+        ),
+        pytest.param(
+            "25%",
+            "نشرت الهيئة توقعاً ببلوغ دعم الإيجار ٢٥٪",
+            True,
+            None,
+            id="accusative-noun",
+        ),
+        pytest.param(
+            "25%",
+            "قال المسؤول: يتوقعني الفريق في اجتماع دعم الإيجار بنسبة ٢٥٪",
+            True,
+            None,
+            id="object-ni",
+        ),
+        pytest.param(
+            "25%", "يُتوقع أن يبلغ دعم الإيجار ٢٥٪", True, None, id="passive-diacritic"
+        ),
+        pytest.param(
+            "25%",
+            "تُوَقِّعُ الجهة عقود الإيجار بدعم ثابت قدره ٢٥٪",
+            False,
+            None,
+            id="sign-full",
+        ),
+        pytest.param(
+            "25%",
+            "توقع الجهة عقود الإيجار بدعم ثابت قدره ٢٥٪",
+            True,
+            None,
+            id="sign-unvowelled",
+        ),
+        pytest.param(
+            "25%",
+            "تتوقع الجهة أن يبلغ دعم الإيجار ٢٥٪",
+            True,
+            None,
+            id="expect-present",
+        ),
+        pytest.param(
+            "25%", "توقع الجهة ارتفاع الدعم إلى ٢٥٪", True, None, id="expect-unvowelled"
+        ),
+        pytest.param(
+            "25%", "تُوُقِّعَ ارتفاع الدعم إلى ٢٥٪", True, None, id="expect-passive"
+        ),
+        pytest.param(
+            "25%",
+            "تتوقع الجهة أن توقع عقودا بدعم ٢٥٪",
+            True,
+            None,
+            id="expect-before-sign",
+        ),
+        pytest.param(
+            "25%",
+            "تَوَقَّعَ المديرُ عَقْدَ اتفاقيةٍ لدعم الإيجار بنسبة ٢٥٪",
+            True,
+            None,
+            id="document-expect",
+        ),
+        pytest.param(
+            "25%",
+            "توقع المدير عقد اتفاقية لدعم الإيجار بنسبة ٢٥٪",
+            True,
+            None,
+            id="document-ambiguous",
+        ),
+        pytest.param(
+            "25%",
+            "تُوَقِّعُ المديرةُ عَقْدَ اتفاقيةٍ لدعم الإيجار بنسبة ٢٥٪",
+            False,
+            None,
+            id="document-sign",
+        ),
+        pytest.param(
+            "25%",
+            "تُوقِّع الجهة عقود الإيجار بدعم ثابت قدره ٢٥٪",
+            True,
+            None,
+            id="partial-sign",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «موقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-موقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «الموقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-الموقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «التوقيع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-التوقيع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «توقيع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-توقيع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «وقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-وقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «الواقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-الواقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «بغير المتوقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-بغير المتوقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «كغير المتوقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-كغير المتوقع",
+        ),
+        pytest.param(
+            "25%",
+            "تورد الصفحة عبارة «لغير المتوقع» مع دعم بنسبة ٢٥٪",
+            False,
+            None,
+            id="overmatch-لغير المتوقع",
+        ),
+        pytest.param(
+            "The agency offers 25% support",
+            "٢٥٪",
+            False,
+            None,
+            id="paradigm-en-frame-control",
+        ),
+        pytest.param(
+            "25%",
             "تغطى التكاليف غير المتوقعة بنسبة ٢٥٪",
             False,
             None,
@@ -2324,4 +2498,63 @@ def test_parameter_bounded_bilingual_corpus(english, arabic, forward, duration):
         duration,
         None,
         forward,
+    )
+
+
+@settings(max_examples=100, derandomize=True)
+@given(
+    prefix=st.text(alphabet="ابتثجحخدذرزسشصضطظعغفقكلمنهوي", max_size=10),
+    suffix=st.text(alphabet="ابتثجحخدذرزسشصضطظعغفقكلمنهوي", max_size=10),
+    decoration=st.sampled_from(("", "ـ", "ُ", "َ", "ِ", "ّ", "ٰ")),
+)
+def test_forward_stem_containment_generated(prefix, suffix, decoration):
+    # Independent arbitrary-letter oracle: no unvowelled stem may escape.
+    form = decoration.join(prefix + "توقع" + suffix)
+    test_parameter_bounded_bilingual_corpus(
+        "25%", f"تورد الصفحة عبارة «{form}» مع دعم بنسبة ٢٥٪", True, None
+    )
+
+
+@pytest.mark.parametrize("conjunction", ("", "و", "ف"))
+@pytest.mark.parametrize(
+    "suffix",
+    (
+        "",
+        "ان",
+        "ون",
+        "ين",
+        "وا",
+        "ي",
+        "\u0627",
+        "\u0647",
+        "\u0647\u0627",
+        "هم",
+        "هما",
+        "هن",
+        "ك",
+        "كم",
+        "نا",
+        "ني",
+    ),
+)
+@pytest.mark.parametrize("qaf", ("ِ", "ِّ", "ِّ"))
+def test_signing_full_vowels(conjunction, suffix, qaf):
+    test_parameter_bounded_bilingual_corpus(
+        "25%",
+        f"تورد الصفحة عبارة «{conjunction}تُوَق{qaf}ع{suffix}» مع دعم بنسبة ٢٥٪",
+        False,
+        None,
+    )
+
+
+@pytest.mark.parametrize("form", ("تُوَقِّع", "تَوَقَّع", "تُوُقِّعَ"))
+@pytest.mark.parametrize("missing", ("ُ", "َ", "ِ"))
+def test_signing_incomplete_vowels(form, missing):
+    # Removing one required vowel from signing cannot release; expectation
+    # and passive expectation also remain forward under any partial deletion.
+    test_parameter_bounded_bilingual_corpus(
+        "25%",
+        f"تورد الصفحة عبارة «{form.replace(missing, '')}» مع دعم بنسبة ٢٥٪",
+        True,
+        None,
     )
