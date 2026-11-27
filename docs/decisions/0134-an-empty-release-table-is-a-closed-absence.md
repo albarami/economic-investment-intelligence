@@ -6,8 +6,8 @@
 | Date | 2026-11-27 |
 | Owner | The owner |
 | Amends | Document 04 section 2, **Source registry**, the empty-table credit sentence quoted in item 1 |
-| Purpose | Replace bare credits for empty release tables with closed absences, while retaining the held trade rows and their contract question. |
-| Read first | Ruling L-2340 item 2 and L-2335 item 1; document 03 section 7.3; document 04 section 2; decision 0040; TASKS.md S7-T12 |
+| Purpose | Distinguish held-blocked open obligations, substantiated closed absences and populated credits. |
+| Read first | Ruling L-2345 item 1; OWNER_RULES 53 and 57; ruling L-2340 item 2 and L-2335 item 1; document 03 section 7.3; document 04 section 2; decision 0040; TASKS.md S7-T12 |
 
 ## Proposed rule and follow-up
 
@@ -23,12 +23,40 @@
    `_finish` with an empty row list and coverage reason `breakdown_not_in_key`.
    The source rows are held (L-2340 item 2(d)); this is a contract gap, not a data
    gap. No saved release was read for this proposal.
-2. **Closed absence instead of bare credit.** A selected entry whose declared
-   release table has zero rows gives a closed absence with reason
-   `additions_table_empty` and state `NO_DATA`, never a bare credit. This applies
-   across every parser and phase in plan S2-TRADECREDIT.p1 item 5, not just trade.
-   It never drops a row, a check or a source. Receipts, source lineage, contract
-   questions, row coverage and existing completeness checks remain required.
+2. **Three evidence-based cases, never a bare empty-table credit.** Each
+   selected entry and its declared release table is classified into exactly one
+   of the following cases by recorded evidence, never by row count alone
+   (L-2345 item 1; OWNER_RULES 53 and 57):
+
+   - **Held but blocked — open.** Observations are held, but a schema, key or
+     contract obligation prevents their release into the table. The obligation
+     stays open, is never credited and is never a closed absence. Record the
+     obligation and its consumer. Worked example: `trade_wr` observations are
+     held, as recorded in the supplied `holdings-trade.txt` lookup; `_trade`
+     yields no rows with reason `breakdown_not_in_key`. The document 03 key
+     question in item 4 stays open for consumer S7-T12 under decision 0040.
+   - **Substantiated permitted absence — closed.** Attached searches under
+     OWNER_RULES 53 and 57 establish that there is nothing to release for the
+     period and geography: search the holdings lookup, original extracts,
+     archives, relevant public caches, snapshots, authorised intakes and
+     receipts, recording the places searched and the remaining gap. An
+     unfinished acquisition, schema, access approval, evidence or implementation
+     stays open instead. Only this substantiated permitted absence gives reason
+     `additions_table_empty` and state `NO_DATA`. Worked illustrative example
+     (invented, not a source finding): entry `illustrative_absent` declares
+     `illustrative_table`; attached searches establish no releasable observations
+     for its declared period and geography and no unfinished obligation. Its
+     empty table is a closed `additions_table_empty` / `NO_DATA` absence.
+   - **Populated control — credited.** The table has rows and the existing
+     row-source lineage and completeness checks hold; it is credited as today.
+     Worked illustrative example (invented, not a source finding): entry
+     `illustrative_populated` supplies rows to its declared `illustrative_table`
+     with valid row-source lineage. Those rows credit that entry.
+
+   The rule applies across every parser and phase in plan S2-TRADECREDIT.p1
+   item 5, not just trade. It never drops a row, a check or a source. Receipts,
+   source lineage, contract questions, row coverage and existing completeness
+   checks remain required.
    The implementation evidence is in
    `custodian/src/eii_custodian/publicdata/assembly_adapters.py`:
 
@@ -59,15 +87,17 @@
      `self.table_sources["gazetteer"]` and appends `gazetteer` to
      `self.source_tables`, without checking for yielded building rows.
 
-3. **Proposed document 04 replacement.** Replace only the quoted sentence in
-   document 04 section 2 with the following sentence, word for word:
+3. **Proposed document 04 replacement.** Replace the empty-table credit
+   sentence in document 04 section 2 with the following text, word for word;
+   keep its lineage refusal as a separate sentence:
 
-   > A selected entry whose declared release table has zero rows gives a closed absence with reason `additions_table_empty` and state `NO_DATA`, never a bare credit; this rule applies to additions, fsq, busyness, series_stage and frame, across all their parsers, without dropping any row, check or source.
+   > For each selected entry and its declared release table, recorded evidence, never row count alone, distinguishes three cases: held observations blocked by a schema, key or contract obligation stay open with the obligation and consumer named, never credited and never a closed absence; an empty table with attached OWNER_RULES 53 and 57 searches substantiating a permitted absence for the period and geography gives the closed absence `additions_table_empty` in state `NO_DATA`; a populated table credits its rows' `source_key` values under the existing lineage and completeness checks. With no selected entry declaring the table in `release_tables`, assembly refuses `assembly_lineage_missing`.
 
-   Document 04 itself stays unchanged until acceptance. The adjacent
-   `assembly_lineage_missing` refusal and exact declared/produced table-set
-   check are retained; the build must represent the explicit absence through
-   those checks rather than bypass or weaken them.
+   This applies to additions, fsq, busyness, series_stage and frame, across all
+   their parsers, without dropping any row, check or source. Document 04 itself
+   stays unchanged until acceptance. The exact declared/produced table-set
+   check remains; the build must represent open obligations and permitted
+   absences through those checks rather than bypass or weaken them.
 4. **Open trade-key choice, ordered by S7.** Document 03 section 7.3 declares
    `pub_trade_wr` at trade type × year × indicator, keyed by `trade_type`,
    `period`, `indicator`. Its key-field row permits purchases, sales or stocks
@@ -81,29 +111,37 @@
    benchmark context under decision 0040, which also retains wholesale and
    retail trade as present-size context. Under L-2340 item 2(d) and OWNER_RULES
    34, this work runs in the background lane ordered by S7, outside the S2 path.
-5. **S2 audit counts.** Each credited key whose table has zero rows moves from
-   "in use" to a closed absence under the proposed rule. The lead measures the
-   exact list as "rows per credited key, from the saved release" at the next
-   full audit's preflight, using the saved Parquet and manifest, not the plan's
-   assembly-JSON probe (L-2340 items 2(e) and 3). No affected count is asserted
-   here. A key's mere membership in `table_sources` is not delivered-row
-   evidence, including when other sources populate a shared table.
-6. **Only after acceptance.** One build task makes the code follow this rule
-   across the five phases. Its expected files are
+5. **S2 audit counts.** Each credited key whose table has zero rows moves
+   from "in use" either to the held-blocked open case, counted apart, or to a
+   substantiated permitted closed absence, according to the recorded evidence
+   of item 2. The lead measures the exact list as "rows per credited key, from
+   the saved release" at the next full audit's preflight, using the saved
+   Parquet and manifest, not the plan's assembly-JSON probe (L-2340 items 2(e)
+   and 3; L-2345 item 1). No affected count is asserted here. A key's mere
+   membership in `table_sources` is not delivered-row evidence, including when
+   other sources populate a shared table.
+6. **Only after acceptance.** One build task makes the code follow the three
+   cases across the five phases. Its expected files are
    `custodian/src/eii_custodian/publicdata/assembly_adapters.py` for crediting,
    `custodian/src/eii_custodian/publicdata/assembly_reports.py` (`gather_audit`)
-   for closed absences, `custodian/publicdata/sources.yaml` for reviewed caveat
-   declarations (including the trade `breakdown_not_in_key` caveat),
+   for open obligations and substantiated closed absences,
+   `custodian/publicdata/sources.yaml` for reviewed declarations that preserve
+   the trade `breakdown_not_in_key` obligation as open,
    `custodian/tests/test_assembly_producers.py`,
    `custodian/tests/test_assembly_reports.py` and
    `custodian/tests/test_source_completeness.py` for plants and controls, and
    document 04 section 2 for the accepted wording. Keep
    `custodian/src/eii_custodian/publicdata/completeness.py` checks intact.
-   Plant an empty declared table presented as "in use": it must be refused
-   for the specific empty-table reason `additions_table_empty`; the valid
-   closed-absence control must pass as `NO_DATA`, and a populated control must
-   pass with real row lineage. Prove the guard red when removed alone and green
-   when restored, across the named phases. This proposal builds none of that
-   control and changes no code, tests, registry or schema. The lead holds the
-   open item until this record is accepted and a producer releases the trade
-   rows; another maker's review precedes owner acceptance.
+   Plant a held-blocked case presented as a closed absence: it must refuse
+   specifically because the recorded blocking obligation remains open. Plant
+   a populated table presented as an absence: it must refuse specifically
+   because populated rows contradict the absence. A valid substantiated
+   permitted absence with its attached searches must pass as
+   `additions_table_empty` / `NO_DATA`; a held-blocked control stays open and
+   uncredited, and a populated control passes with real row lineage. Each
+   negative case changes only its disposition while other inputs remain valid;
+   assert the specific refusal reason, then prove each guard red when removed
+   alone and green when restored across the named phases. This proposal builds
+   none of that control and changes no code, tests, registry or schema. The
+   lead holds the open item until this record is accepted and a producer
+   releases the trade rows; another maker's review precedes owner acceptance.

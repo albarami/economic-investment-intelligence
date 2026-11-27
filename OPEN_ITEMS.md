@@ -7326,3 +7326,5 @@ code gave exit 0 (`register_inputs_validated`). Owner acceptance of decision
 ## Proposed open item — S2-TRADECREDIT.d1
 
 - Owner: the lead. OPEN: proposed [decision 0134](docs/decisions/0134-an-empty-release-table-is-a-closed-absence.md), under ruling L-2340 item 2, replaces bare empty-table credits with `additions_table_empty` / `NO_DATA`. The held `trade_wr` rows need a document 03 breakdown-bearing key choice and a producer; S7-T12 under decision 0040 consumes them in the background lane ordered by S7, outside the S2 path. Closes only when record 0134 is accepted and a producer releases the trade rows. Different-maker review and owner acceptance remain pending; no code or accepted contract changes in this job.
+
+- amended d2, L-2345: held-blocked case stays open
