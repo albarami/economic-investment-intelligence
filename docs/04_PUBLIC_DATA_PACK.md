@@ -124,6 +124,12 @@ flowchart LR
 
 ## 2. Source registry
 
+For additions assembly (S2-T08), a nonempty table credits its rows’ `source_key`
+values. An empty table credits only selected entries that declare that table in
+`release_tables`; with no such entry, assembly refuses `assembly_lineage_missing`.
+The source-completeness check still requires exact equality of declared and
+produced table sets.
+
 S2-T28 records the advisor’s reading of 2026-11-16 and the lead’s catalogue-metadata reading
 of the same date (ruling L-701), not a worker’s live fetch. The latter uses the portal endpoint
 `https://www.data.gov.qa/api/explore/v2.1/catalog/datasets/{dataset}`. The eight scoped portal

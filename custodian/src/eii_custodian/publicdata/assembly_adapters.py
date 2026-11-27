@@ -750,7 +750,13 @@ class Production:
             )
             sources = tuple(sorted({str(row["source_key"]) for row in rows}))
             if not sources:
-                sources = tuple(sorted(selected))
+                sources = tuple(
+                    sorted(
+                        e.key
+                        for e in self.entries
+                        if e.key in selected and name in e.release_tables
+                    )
+                )
             self.table(name, rows, sources)
             names.append(name)
         self.files.update(files)
