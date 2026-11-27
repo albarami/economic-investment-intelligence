@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Accepted by the owner, 2026-11-27 ("ACCEPT 0116, 0117, 0118, 0120, 0121 and 0122", relayed by the advisor in note owner-relayed-20261127-060429), on the lead's confirmation (ruling L-2272) that its review still stands on main `bc9bb749`: the record's text is byte-equal to its text at `247c6dc` (S2-DREC.fx1), which S2-DREC.cf2 (Cursor, grok-4.7-high, a maker other than the builders) CONFIRMED |
+| Status | Accepted by the owner, 2026-11-27 ("ACCEPT 0116, 0117, 0118, 0120, 0121 and 0122", relayed by the advisor in note owner-relayed-20261127-060429), on the lead's confirmation (rulings L-2272 and L-2277) that a review stands on main `bc9bb749`: R60-PER.rv1 (Moonshot, Kimi K3.1 Pro, a maker other than the builders) APPROVED this record on its own, at blob `b6ade598` on that main |
 | Date | 2026-11-25 |
 | Owner | Project owner |
 | Amends | S2-T39 acceptance box 1 and the scope of its two stored-page evidence flags. |
