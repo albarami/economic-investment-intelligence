@@ -7321,6 +7321,15 @@ REGSTAGE.probe3 (decision 0102, counts only) gave exit 0 with zero
 `register_content_egress` refusals, and the S2-AUDFULL4 projection at the same
 code gave exit 0 (`register_inputs_validated`). Owner acceptance of decision
 0132 and the gates remain pending. No gate or acceptance box is marked.
+
+
+## Proposed open item — S2-TRADECREDIT.d1
+
+- Owner: the lead. OPEN: proposed [decision 0134](docs/decisions/0134-an-empty-release-table-is-a-closed-absence.md), under ruling L-2340 item 2, replaces bare empty-table credits with `additions_table_empty` / `NO_DATA`. The held `trade_wr` rows need a document 03 breakdown-bearing key choice and a producer; S7-T12 under decision 0040 consumes them in the background lane ordered by S7, outside the S2 path. Closes only when record 0134 is accepted and a producer releases the trade rows. Different-maker review and owner acceptance remain pending; no code or accepted contract changes in this job.
+
+- amended d2, L-2345: held-blocked case stays open
+
+- accepted by the owner 2026-11-27 with three conditions (d3, L-2357); open until the follow-up build meets conditions 1 and 2
 - **OPEN — S2-DRAWCLS.b1; owner: the lead.** Resolve the static guard's contract source: document 03 **7.3 Columns**, `pub_investqa_record`, does not declare `heading`, whereas `investment_agency._block_row` emits it; the register tax field is declared only in **Register file projections (S2-T49)**. Authorize that supplemental contract and reconcile the agency release columns before this task resumes. Separately, `assembly_draw_field_unknown` names no table or field, so the brief reports a real-cache failure required a lead-shell scan. Adding names to that refusal reason is not built here. See PROGRESS.md, **S2-DRAWCLS.b1 — blocked on the static-check source contract**.
 
 - **OPEN — S2-DRAWCLS.b2; owner: the lead.** L-2306 item 2 resolves the register annex and keeps agency cache `heading` outside the release-column check. A further source gap blocks Work item 1: document 03 **7.3 Columns** has no complete column rows for the fifteen native BACI, Gravity, Atlas and benchmark tables emitted through `assembly_native.read_native` into `reviewed_selections`. Authorize their committed Python row contracts as supplemental column sources or provide the missing document rows. The names-only inventory is in the task return. The existing `assembly_draw_field_unknown` still names no table or field; adding names is outside this task. See PROGRESS.md, **S2-DRAWCLS.b2 — native column-contract gap**.
