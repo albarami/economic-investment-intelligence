@@ -316,15 +316,21 @@ _DIGITS = str.maketrans(
 )
 
 
-def _closed_terms(terms: tuple[str, ...], *, forward: bool = False) -> str:
+def _closed_terms(
+    terms: tuple[str, ...], *, forward: bool = False, prefixed: bool = True
+) -> str:
     """Bound closed terms, allowing only the ruled Arabic affixes."""
     patterns = []
     for term in terms:
         token = re.escape(term)
         if re.search(r"[\u0600-\u06ff]", term):
-            prefix = r"(?:و|ف|ب|ل|ال|وال|بال|فال|لل|وب|ول|وبال|ولل)?"
-            suffix = r"(?:ة|ات|ين|ون)?" if forward else ""
-            negation = r"(?<!(?<!\w)غير )" if forward else ""
+            prefix = (
+                r"(?:و|ف|ب|ل|ال|وال|بال|فال|لل|وب|ول|وبال|ولل)?" if prefixed else ""
+            )
+            suffix = r"(?:ة|ات|ين|ون|\u0627)?" if forward else ""
+            negation = (
+                r"(?<!(?<!\w)غير )(?<!(?<!\w)وغير )(?<!(?<!\w)فغير )" if forward else ""
+            )
             patterns.append(negation + r"(?<!\w)" + prefix + token + suffix + r"(?!\w)")
         else:
             patterns.append(r"(?<!\w)" + token + r"(?!\w)")
@@ -335,7 +341,19 @@ _DURATION = re.compile(
     _closed_terms(("for", "لمدة"))
     + rf"\s+({_NUMBER})\s+("
     + _closed_terms(
-        ("month", "months", "year", "years", "شهر", "أشهر", "شهراً", "سنة", "سنوات")
+        (
+            "month",
+            "months",
+            "year",
+            "years",
+            "شهر",
+            "شهرا",
+            "أشهر",
+            "شهراً",
+            "سنة",
+            "سنوات",
+        ),
+        prefixed=False,
     )
     + ")",
     re.I,
@@ -459,7 +477,17 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
         (parameter.period is not None and period_is_future(parameter.period, retrieved))
         or re.search(
             _closed_terms(
-                ("forecast", "projected", "expected", "متوقع", "توقعات"), forward=True
+                (
+                    "forecast",
+                    "forecasts",
+                    "forecasted",
+                    "forecasting",
+                    "projected",
+                    "expected",
+                    "متوقع",
+                    "توقعات",
+                ),
+                forward=True,
             ),
             parameter.wording.casefold(),
         )

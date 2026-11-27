@@ -1567,7 +1567,7 @@ def test_parameter_monthly_vocabulary_consumed_whole(marker):
         ),
         *[
             (
-                "projected 25%",
+                "25%",
                 text,
                 "Rent subsidy",
                 "rent_share",
@@ -1584,6 +1584,67 @@ def test_parameter_monthly_vocabulary_consumed_whole(marker):
                 "وتوقعات الدعم بنسبة ٢٥٪",
             )
         ],
+        *[
+            pytest.param(
+                f"{marker} 25%",
+                "٢٥٪",
+                "Rent subsidy",
+                "rent_share",
+                "0.25",
+                "ratio",
+                None,
+                None,
+                True,
+                id=marker,
+            )
+            for marker in ("forecasts", "forecasted", "forecasting", "projected")
+        ],
+        *[
+            pytest.param(
+                "25%",
+                text,
+                "Rent subsidy",
+                "rent_share",
+                "0.25",
+                "ratio",
+                None,
+                None,
+                forward,
+                id=name,
+            )
+            for name, text, forward in (
+                ("accusative", "دعماً متوقعا بنسبة ٢٥٪", True),
+                ("tanween", "دعماً متوقعاً بنسبة ٢٥٪", True),
+                ("and-unexpected", "النفقات الطارئة وغير المتوقعة بنسبة ٢٥٪", False),
+                ("so-unexpected", "النفقات الطارئة فغير المتوقع منها بنسبة ٢٥٪", False),
+                ("bare-negation-control", "النفقات غير المتوقعة بنسبة ٢٥٪", False),
+                ("word-start-control", "تغير متوقع بنسبة ٢٥٪", True),
+            )
+        ],
+        pytest.param(
+            "25% for 12 months",
+            "٢٥٪ لمدة ١٢ شهرا",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            12,
+            None,
+            False,
+            id="bare-months",
+        ),
+        pytest.param(
+            "25% plus 3",
+            "نسبة الدعم ٢٥٪ لمدة \u0663 بالسنوات المالية",
+            "Rent subsidy",
+            "other",
+            None,
+            "%",
+            None,
+            None,
+            False,
+            id="prefixed-unit",
+        ),
         *[
             (
                 f"QAR 50 {term}",
@@ -1723,6 +1784,9 @@ def test_parameter_literal_boundaries(
 
 _CLOSED_ENGLISH = (
     "forecast",
+    "forecasts",
+    "forecasted",
+    "forecasting",
     "projected",
     "expected",
     "for",
@@ -1754,6 +1818,7 @@ _CLOSED_ARABIC = (
     "توقعات",
     "لمدة",
     "شهر",
+    "شهرا",
     "أشهر",
     "شهراً",
     "سنة",
@@ -1824,7 +1889,7 @@ def test_closed_term_generated_containing_words(term, tail):
 
 
 @pytest.mark.parametrize("marker", ("متوقع", "توقعات"))
-@pytest.mark.parametrize("suffix", ("", "ة", "ات", "ين", "ون"))
+@pytest.mark.parametrize("suffix", ("", "ة", "ات", "ين", "ون", "\u0627"))
 def test_forward_closed_suffix_and_negation(marker, suffix):
     import re
 
@@ -1836,3 +1901,66 @@ def test_forward_closed_suffix_and_negation(marker, suffix):
     assert re.search(pattern, "غير " + marker + suffix) is None
     assert re.search(pattern, marker + suffix + "س") is None
     assert re.search(pattern, "تغير " + marker + suffix)
+
+
+@pytest.mark.parametrize(
+    "kind,wording",
+    [
+        ("forward", word)
+        for term in (
+            "forecast",
+            "forecasts",
+            "forecasted",
+            "forecasting",
+            "projected",
+            "expected",
+        )
+        for word in (term, term.capitalize())
+    ]
+    + [
+        ("forward", term)
+        for term in (
+            "متوقع",
+            "متوقعة",
+            "متوقعات",
+            "متوقعين",
+            "متوقعون",
+            "متوقعا",
+            "متوقعاً",
+            "المتوقع",
+            "المتوقعة",
+            "والمتوقعة",
+            "للمتوقع",
+            "توقعات",
+            "التوقعات",
+            "وتوقعات",
+            "بالتوقعات",
+        )
+    ]
+    + [("duration", "for 3 " + term) for term in ("month", "months", "year", "years")]
+    + [
+        ("duration", "لمدة \u0663 " + term)
+        for term in ("شهر", "شهرا", "شهراً", "أشهر", "سنة", "سنوات")
+    ]
+    + [("duration", "ولمدة \u0663 سنوات")]
+    + [("monthly", term) for term in ("per month", "monthly", "شهرياً", "شهريا")]
+    + [("once", term) for term in ("one-off", "one time", "لمرة واحدة")],
+)
+def test_parameter_natural_forms_under_match(kind, wording):
+    import re
+
+    from eii_custodian.publicdata.assembly_native import (
+        _DIGITS,
+        _DURATION,
+        _MONTHLY,
+        _ONCE,
+        Parameter,
+        parameter_is_forward,
+    )
+
+    if kind == "forward":
+        parameter = Parameter("rent_share", "0.25", "ratio", None, None, wording)
+        assert parameter_is_forward(parameter, "2026-11-27T00:00:00Z")
+    else:
+        pattern = {"duration": _DURATION, "monthly": _MONTHLY, "once": _ONCE}[kind]
+        assert re.fullmatch(pattern, wording.translate(_DIGITS)) is not None
