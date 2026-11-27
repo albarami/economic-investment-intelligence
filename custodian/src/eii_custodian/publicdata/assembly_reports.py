@@ -21,7 +21,8 @@ from .assembly_sources import (
 )
 from .draw import Figure, reviewer_sheet
 from .fetch.bounded import file_hash
-from .fetch.registry import COLLECTED_FAMILIES, Entry
+from .fetch.registry import COLLECTED_FAMILIES
+from .singles.families import _kind_ok
 
 if TYPE_CHECKING:
     from .assembly_adapters import Production
@@ -862,21 +863,26 @@ def _draw_row_sources(
 
 
 def _family_figure(
-    entries: Sequence[Entry], table: str, row: dict[str, Any]
+    entries: dict[tuple[str, str | None], list[tuple[str, dict[str, str]]]],
+    table: str,
+    row: dict[str, Any],
+    source_key: str,
 ) -> tuple[str, str] | None:
-    """L-2309: the registry kind, never numeric-looking text, decides eligibility."""
-    from .singles.families import _kind_ok
-
-    matches = [
-        entry
-        for entry in entries
-        if entry.source_id == table.removeprefix("pub_")
-        and entry.source_id == row.get("source_id")
-        and entry.slug == row.get("slug")
-    ]
-    if len(matches) != 1:
+    """L-2312: the kind and receipt must belong to the same registry entry."""
+    slug = row.get("slug")
+    matches = (
+        entries.get((table.removeprefix("pub_"), slug), [])
+        if isinstance(slug, str) or slug is None
+        else []
+    )
+    if (
+        row.get("source_id") != table.removeprefix("pub_")
+        or len(matches) != 1
+        or matches[0][0] != source_key
+        or row.get("source_key") != source_key
+    ):
         raise AssemblyError("assembly_draw_lineage_ambiguous")
-    columns = dict(matches[0].columns)
+    columns = matches[0][1]
     field = row.get("field_name")
     if not isinstance(field, str) or field not in columns:
         raise AssemblyError("assembly_draw_field_unknown")
@@ -887,11 +893,7 @@ def _family_figure(
         raise AssemblyError("assembly_draw_value_invalid") from None
     if not _kind_ok(value, kind):
         raise AssemblyError("assembly_draw_value_invalid")
-    if (
-        value is None
-        or kind in {"string", "date"}
-        or (kind == "integer" and field in ADMIN_FIELDS)
-    ):
+    if value is None or kind in {"string", "date"} or field in ADMIN_FIELDS:
         return None
     # No unit is supplied for a number cell; preserve its exact published token.
     return row["field_value"], "count" if kind == "integer" else "number"
@@ -912,6 +914,15 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
             }
             for source in keys
         ]
+        family_entries: dict[
+            tuple[str, str | None], list[tuple[str, dict[str, str]]]
+        ] = {}
+        if table.removeprefix("pub_") in COLLECTED_FAMILIES:
+            for entry in build.entries:
+                if entry.source_id == table.removeprefix("pub_"):
+                    family_entries.setdefault((entry.source_id, entry.slug), []).append(
+                        (entry.key, dict(entry.columns))
+                    )
         output = []
         for index, stored_row in enumerate(rows):
             row = json.loads(record_encoder().encode(stored_row))
@@ -919,7 +930,7 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
             if not isinstance(row, dict):
                 raise AssemblyError("assembly_output_invalid")
             family = (
-                _family_figure(build.entries, table, row)
+                _family_figure(family_entries, table, row, row_sources[index])
                 if table.removeprefix("pub_") in COLLECTED_FAMILIES
                 else None
             )

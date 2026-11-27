@@ -87,13 +87,31 @@ def test_family_unknown_field_refuses_even_null(tmp_path):
         read(state)
 
 
-@pytest.mark.parametrize("change", ["missing", "slug", "source_id", "duplicate"])
+@pytest.mark.parametrize(
+    "change",
+    [
+        "missing",
+        "slug",
+        "source_id",
+        "duplicate",
+        "foreign_slug",
+        "source_key",
+        "missing_source_key",
+    ],
+)
 def test_family_entry_resolution_refuses(tmp_path, change):
     state, row = family(tmp_path)
     if change == "missing":
         state.entries = ()
     elif change == "duplicate":
         state.entries += (replace(state.entries[0], key="price_ext/other"),)
+    elif change == "foreign_slug":
+        state.entries += (
+            replace(state.entries[0], key="price_ext/other", slug="other"),
+        )
+        row["slug"] = "other"
+    elif change == "missing_source_key":
+        row.pop("source_key")
     else:
         row[change] = "other"
     with pytest.raises(AssemblyError, match=r"^assembly_draw_lineage_ambiguous$"):
@@ -164,9 +182,10 @@ def test_family_malformed_field_refuses(tmp_path, field):
         read(state)
 
 
-def test_number_under_admin_name_remains_a_figure(tmp_path):
-    state, _ = family(tmp_path, kind="number", name="year", value="1.25")
-    assert [(f.value, f.kind) for f in read(state)] == [("1.25", "number")]
+@pytest.mark.parametrize("name", ["year", "lat", "lon"])
+def test_number_under_admin_name_is_skipped(tmp_path, name):
+    state, _ = family(tmp_path, kind="number", name=name, value="1.25")
+    assert read(state) == []
 
 
 def test_family_missing_untagged_entry_cannot_be_excluded(tmp_path):
@@ -177,5 +196,13 @@ def test_family_missing_untagged_entry_cannot_be_excluded(tmp_path):
     state.table_sources["pub_price_ext"].add(other.key)
     assert len(read(state)) == 1
     row.pop("source_key")  # Only this input changes after the valid control.
+    with pytest.raises(AssemblyError, match=r"^assembly_draw_lineage_ambiguous$"):
+        read(state)
+
+
+@pytest.mark.parametrize("slug", [[], {}, None, 1, True])
+def test_family_malformed_slug_refuses(tmp_path, slug):
+    state, row = family(tmp_path)
+    row["slug"] = slug
     with pytest.raises(AssemblyError, match=r"^assembly_draw_lineage_ambiguous$"):
         read(state)

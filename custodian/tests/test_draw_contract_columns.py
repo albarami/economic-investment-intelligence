@@ -12,7 +12,9 @@ from pathlib import Path
 from custodian.tests.repository_root import repository_root
 
 from eii_custodian.publicdata import assembly_reports as reports
+from eii_custodian.publicdata.benchmarks.contracts import TABLES
 from eii_custodian.publicdata.fetch.registry import COLLECTED_FAMILIES
+from eii_custodian.publicdata.series.parse import FIELD_MAP
 
 ROOT = repository_root(Path(__file__))
 PHASE_TABLES = {
@@ -297,3 +299,32 @@ def test_native_emitted_columns_match_their_contracts() -> None:
             assert columns[table] == declared_fields(f"{module}/contracts.py", model), (
                 table
             )
+
+
+def test_phase_tables_cover_producer_declarations():
+    """L-2312: a producer cannot add a table outside the column guard."""
+    base = ROOT / "custodian/src/eii_custodian/publicdata"
+
+    def literals(name):
+        return {
+            node.value
+            for node in ast.walk(ast.parse((base / name).read_text()))
+            if isinstance(node, ast.Constant)
+            and isinstance(node.value, str)
+            and re.fullmatch(r"(?:pub_[a-z0-9_]+|fdi_projects)", node.value)
+        }
+
+    declarations = {
+        "gis_property_singles": {"pub_" + family for family in COLLECTED_FAMILIES}
+        | literals("assembly_layers.py"),
+        "series_stage": {
+            table for mapping in FIELD_MAP.values() for table, _ in mapping.values()
+        },
+        "reviewed_selections": set(TABLES.values()) | literals("assembly_native.py"),
+        "additions": literals("additions/build.py"),
+    }
+    for phase, tables in declarations.items():
+        assert tables <= set(PHASE_TABLES[phase]), (
+            phase,
+            sorted(tables - set(PHASE_TABLES[phase])),
+        )
