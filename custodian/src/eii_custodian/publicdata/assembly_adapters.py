@@ -25,6 +25,14 @@ from .fetch.transport import Transport
 from .frame.build import FrameResult, build_public_frame, read_cached
 from .trade_reconciliation import Selection
 
+# docs/07_ECONOMIC_METHODS.md, C10 Staffing bands beside published averages
+# and the statutory minimum — Statutory minimum (Public). Monthly QAR.
+STATUTORY_MINIMUM_QAR = (
+    ("statutory_minimum_basic", "1000.00"),
+    ("statutory_minimum_housing_allowance", "500.00"),
+    ("statutory_minimum_food_allowance", "300.00"),
+)
+
 
 def _fsq_manifest(cache: Path, key: str, identity: str) -> tuple[Snapshot, str]:
     """Resolve one reviewed digest inside exactly one dated release namespace."""
@@ -850,6 +858,7 @@ class Production:
         )
 
     def series_stage(self) -> dict[str, str]:
+        from .completeness import receipt_valid
         from .series.figures import build_series
         from .series.frame import frame_municipalities
         from .series.parse import FIELD_MAP
@@ -879,6 +888,14 @@ class Production:
         names = sorted(
             {table for source in selected for table, _ in FIELD_MAP[source].values()}
         )
+        minimum = next((e for e in self.entries if e.key == "ref_min_wage"), None)
+        minimum_valid = (
+            minimum is not None
+            and minimum.key in self.receipts
+            and receipt_valid(minimum, self.receipts[minimum.key])
+        )
+        if minimum_valid and "pub_wage_table" not in names:
+            names.append("pub_wage_table")
         produced = {}
         row_sources = {}
         by_source = {entry.source_id: entry for entry in self.entries}
@@ -886,9 +903,17 @@ class Production:
             relative = "series/internal/" + name + ".json"
             path = local(self.cache, relative)
             if not path.is_file():
-                continue
-            envelope = read_object(self.cache, relative)
-            validate_figure(envelope)
+                if name != "pub_wage_table" or not minimum_valid:
+                    continue
+                envelope: dict[str, Any] = {
+                    "rows": [],
+                    "source_chain": [],
+                    "row_sources": [],
+                }
+            else:
+                envelope = read_object(self.cache, relative)
+                validate_figure(envelope)
+                self.files[relative] = file_hash(path)
             keys = []
             for source in envelope["source_chain"]:
                 entry = by_source[source["source_id"]]
@@ -899,10 +924,26 @@ class Production:
                     raise AssemblyError("assembly_lineage_missing")
                 self.receipts[entry.key] = snapshot.sidecar
                 keys.append(entry.key)
-            self.table(name, envelope["rows"], tuple(keys))
-            self.files[relative] = file_hash(path)
+            rows = list(envelope["rows"])
+            sources = list(envelope["row_sources"])
+            if name == "pub_wage_table" and minimum_valid:
+                keys.append("ref_min_wage")
+                for indicator, value in STATUTORY_MINIMUM_QAR:
+                    rows.append(
+                        {
+                            "table_code": "ref_min_wage",
+                            "period": "2020",
+                            "breakdown_key": "ALL",
+                            "indicator": indicator,
+                            "unit": "QAR",
+                            "value": value,
+                            "source_id": "ref_min_wage",
+                        }
+                    )
+                    sources.append("ref_min_wage")
+            self.table(name, rows, tuple(keys))
             produced[name] = self.tables[name]
-            row_sources[name] = envelope["row_sources"]
+            row_sources[name] = sources
         output = self.record(
             "series_stage",
             {

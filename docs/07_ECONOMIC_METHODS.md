@@ -662,7 +662,7 @@ Tolerance: multiples ± 0.01; the ranking order exact.
 
 **Purpose.** For the jobs an outlet hires, show the protected pay bands among people living within reach, beside real national anchors.
 
-**Inputs.** `occupation_pay` (Synthetic released band counts by occupation group and release unit); `pub_wage_table` (national mean monthly wage by occupation group, 2025); `pub_sector_accounts` (restaurant average annual wage); the statutory minimum. ASSUMPTION: the minimum is held as a rule row in `pub_wage_table` with its own lineage, because no pinned table is named for legal rates. The occupation groups an outlet hires are set in the `staffing_and_pay` playbook configuration.
+**Inputs.** `occupation_pay` (Synthetic released band counts by occupation group and release unit); `pub_wage_table` (national mean monthly wage by occupation group, 2025); `pub_sector_accounts` (restaurant average annual wage); the statutory minimum. ASSUMPTION: the minimum is held as rule rows, one per component: basic, housing, food, in `pub_wage_table` with its own lineage, because no pinned table is named for legal rates. The occupation groups an outlet hires are set in the `staffing_and_pay` playbook configuration.
 
 **Statutory minimum (Public).** Law No. 17 of 2020, adopted 30 August 2020: a minimum basic wage of QAR 1,000 a month, plus allowances of at least QAR 500 for housing and QAR 300 for food when the employer does not provide them (International Labour Organization news page, retrieved 2026-11-11).
 
@@ -2464,7 +2464,7 @@ ASSUMPTIONS (each also marked where it is used):
 4. C4: opening days default to 30; `U = 0` is break-even and is the default; mode A treats staff as varying with sales; mode B uses the user's staff cost. An incentive package changes only the rent or the staff cost; one package applies at a time, with at most one parameter per input, and a one-off amount is never spread over months (MTH-61, MTH-62).
 5. The 1 GWh base filter for zone rankings (MTH-41). Basket lines follow PUB-42 and PUB-44 (MTH-30).
 6. District population for C7 is read from `pub_census_district` and the centre is the centroid of `district.geometry`. The private-employer share is a proxy for coverage whenever that census layer holds it (C8).
-7. C10: the statutory minimum is a rule row in `pub_wage_table`; the staffing area is a 30-minute drive, available only to `staffing_and_pay`; the public wage table is combined across sexes (MTH-24, MTH-44).
+7. C10: the statutory minimum is held as rule rows, one per component: basic, housing, food, in `pub_wage_table`; the staffing area is a 30-minute drive, available only to `staffing_and_pay`; the public wage table is combined across sexes (MTH-24, MTH-44).
 8. The rank-stability sentence states the guaranteed best and worst rank over the box of weights within `δ` of the weights used (MTH-45). It replaces the Dirichlet weight draws of the earlier design, whose share of draws would read as a probability.
 9. C18: counts of people are apportioned by the 2020 population grid as relative weights, other listed counts by area, and Simulated counts by area inside the unit (MTH-74).
 10. C21: a projection needs at least three points, the fewest that leave a scatter around the line to show; its horizon never exceeds its window, and a monthly window is whole years (MTH-82).
