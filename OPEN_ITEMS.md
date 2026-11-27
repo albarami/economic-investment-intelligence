@@ -7430,3 +7430,7 @@ OPEN — S2-T19 coverage gap (owner: lead; lead ruling L-2361 item 2): each lice
 
 - CORRECTION, owners S2-T08 and S2-T12, S2-AGENCYPARAM.b1j: L-2382 item 3 amends L-2369 item 2: a previous Arabic word carrying U+0651 SHADDA never matches the negation set. «الصندوق غيّر توقعاته لدعم الإيجار إلى ٢٥٪» is omitted forward_looking; «دعم غير متوقع بنسبة ٢٥٪» remains released. L-2383 item 2(a) implements this amendment; other-maker delta reviews remain owed.
 - OPEN backlog, owner S2-T12, L-2383 item 1 (rv12 NOTES, Negation look-back): the previous-word look-back skips non-Arabic tokens; the contrived «دعم غير ٢٥٪ متوقع» may therefore be released. This is recorded only and is not fixed in S2-AGENCYPARAM.b1j.
+
+- OPEN — S2-REGNONEMPTY.b1 (2026-11-28): required document check includes nonignored orchestration inputs (.overnight/BRIEF.md commit-email literals and saved pytest failure-log local paths). Lead must provision orchestration artifacts outside the checked source set under the existing git-ignore contract, then rerun unchanged checks; never alter source checks or evidence to clear this. Candidate code tests pass; no acceptance or commit is claimed. See PROGRESS.md **S2-REGNONEMPTY.b1**.
+
+- RESOLVED — S2-REGNONEMPTY.b1 orchestration/document-check collision: the lead provisioned the existing git exclusion for .overnight; b1a verified git check-ignore and the unchanged check_docs exit 0. No checker, baseline or failure log changed. Earlier failure evidence remains. See PROGRESS.md **S2-REGNONEMPTY.b1a**; different-maker review remains pending.
