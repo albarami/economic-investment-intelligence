@@ -25574,7 +25574,7 @@ sources:
     kind: paged_layer
     title_en: QARS
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25615,7 +25615,7 @@ sources:
     kind: paged_layer
     title_en: gis_boundaries
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25640,7 +25640,7 @@ sources:
     kind: paged_layer
     title_en: ROADFlowlnA
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25684,7 +25684,7 @@ sources:
     basis_note: 'Decision 0079: dedicated eleven-date tile registry review/gis_snapshot.json; ordinary and nightly tile acquisition false; lead-shell mode only.'
     title_en: gis_imagery_history
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25709,7 +25709,7 @@ sources:
     kind: paged_layer
     title_en: LandPricing2026
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25756,7 +25756,7 @@ sources:
     kind: paged_layer
     title_en: Landmarks
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25789,7 +25789,7 @@ sources:
     kind: citation_only
     title_en: QARS_Custom_Locator
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25814,7 +25814,7 @@ sources:
     kind: paged_layer
     title_en: CadastrePlots
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25851,7 +25851,7 @@ sources:
     kind: paged_layer
     title_en: PHCC_LOCATION_2026
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25889,7 +25889,7 @@ sources:
     kind: paged_layer
     title_en: POIs_COMM
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25928,7 +25928,7 @@ sources:
     kind: paged_layer
     title_en: QRAIL_NO_OPERATION
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -25977,7 +25977,7 @@ sources:
     kind: paged_layer
     title_en: Zoning
     publisher: national GIS centre
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
@@ -26920,7 +26920,7 @@ sources:
     kind: portal_dataset
     title_en: Producer Price Index (PPI)
     publisher: National Planning Council
-    licence_id: ''
+    licence_id: "CC-BY-4.0"
     licence_basis: portal_terms
     decision_record: ''
     fetch_host: www.data.gov.qa
@@ -27877,7 +27877,7 @@ sources:
     kind: paged_cards
     title_en: Public tenders
     publisher: Ministry of Finance
-    licence_id: ''
+    licence_id: "not_stated"
     licence_basis: owner_decision
     decision_record: '0026'
     fetch_host: monaqasat.mof.gov.qa
@@ -28600,7 +28600,7 @@ sources:
     kind: "comtrade_api"
     title_en: "UN Comtrade"
     publisher: "United Nations Statistics Division"
-    licence_id: ""
+    licence_id: "not_stated"
     licence_basis: "provider_terms"
     licence_url: ""
     decision_record: ""
@@ -29141,7 +29141,7 @@ sources:
     kind: "cdse_backup"
     title_en: "Optional unread satellite backup cache"
     publisher: ""
-    licence_id: ""
+    licence_id: "not_stated"
     licence_basis: "provider_terms"
     decision_record: ""
     fetch_host: ""

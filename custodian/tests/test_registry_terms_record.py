@@ -167,7 +167,7 @@ GIS_TERMS_READING = {
     "terms_url": "https://www.gisqatar.org.qa/ar/home",
     "terms_words": "© جميع الحقوق محفوظة 2024 @ CGIS Qatar",
     "terms_read_on": "2026-11-27",
-    "licence_id": "",
+    "licence_id": "not_stated",
     "licence_basis": "owner_decision",
 }
 

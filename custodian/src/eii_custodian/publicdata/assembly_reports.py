@@ -516,6 +516,27 @@ def own_words_confirmed(build: Production) -> frozenset[str]:
     return frozenset(confirmed)
 
 
+def observed_periods(build: Production) -> dict[str, tuple[str | None, str | None]]:
+    """Derive bounds from producing evidence, never receipt periods or summary."""
+    from .assembly_adapters import _fsq_manifest
+    from .fetch.awards import read_intake
+    from .fetch.page_records import load_declaration
+
+    periods: dict[str, tuple[str | None, str | None]] = {}
+    fsq = "places_fsq/copy"
+    if fsq in build.receipts and fsq in build.selected:
+        _, release = _fsq_manifest(build.cache, fsq, build.selected[fsq])
+        periods[fsq] = (release, release)
+    awards = "awards_owner_scrape"
+    if awards in build.receipts and awards in build.selected:
+        batch, _, _ = read_intake(build.cache, load_declaration(awards), build.clock())
+        periods[awards] = (
+            str(batch.summary["date_first"]) if batch.summary["date_first"] else None,
+            str(batch.summary["date_last"]) if batch.summary["date_last"] else None,
+        )
+    return periods
+
+
 def gather_audit(build: Production) -> dict[str, Any]:
     from . import completeness as c
     from .confirm_s2_t13 import load_confirmation
@@ -593,6 +614,7 @@ def gather_audit(build: Production) -> dict[str, Any]:
         cached_source_ids=tuple(p.name for p in build.cache.iterdir() if p.is_dir()),
         family_counts=FAMILY_COUNTS,
         component_keys=SOURCE_COMPONENTS,
+        observed_periods=observed_periods(build),
     )
     present = {row.source_id for row in build.entries}
     for source in sorted(c.REGISTER_IDS - present):

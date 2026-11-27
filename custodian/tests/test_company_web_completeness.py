@@ -98,7 +98,11 @@ def test_company_web_existing_evidence_is_not_replaced_by_absence(
         else {
             "id": row.key,
             "state": "failed",
-            "reason": "source_receipt_missing: missing or invalid receipt",
+            "reason": (
+                "source_receipt_missing: field=digest"
+                if evidence == "invalid_receipt"
+                else "source_receipt_missing: missing or invalid receipt"
+            ),
         }
     )
     assert company == [expected]

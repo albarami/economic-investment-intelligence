@@ -42,11 +42,11 @@ def check(row, receipts):
     )
 
 
-def missing(row, receipts):
+def missing(row, receipts, reason="missing or invalid receipt"):
     assert {
         "id": row.source_id,
         "state": "failed",
-        "reason": "source_receipt_missing: missing or invalid receipt",
+        "reason": "source_receipt_missing: " + reason,
     } in check(row, receipts)
 
 
@@ -66,7 +66,7 @@ def test_licence_drift_is_registered_but_still_refused(tmp_path):
     commit_citation(cache_directory(tmp_path, row.key), sidecar)
     state.reviewed_selections()
     assert state.receipts[row.key] == sidecar
-    missing(row, {row.key: state.receipts[row.key]})
+    missing(row, {row.key: state.receipts[row.key]}, "field=licence_id")
 
 
 def test_absent_citation_keeps_existing_completeness_failure(tmp_path):

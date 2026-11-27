@@ -24,6 +24,8 @@ from eii_custodian.publicdata.fetch.registry import (
 REGISTER_IDS = frozenset({"biz_register", "fc_register"})
 # family_period_bounds writes this shape and no other note for published_label.
 _LABEL_NOTE = re.compile(r"\Adistinct labels (?:0|[1-9][0-9]*)\Z")
+# L-1001: pending terms fields (words, reading date, basis of use)
+# are records and never exclude a source.
 _VARIABLE = frozenset(
     {
         "bytes",
@@ -31,6 +33,9 @@ _VARIABLE = frozenset(
         "source_modified",
         "row_count",
         "terms_sha256",
+        "terms_words",
+        "terms_read_on",
+        "licence_basis",
         "portal_licence",
         "portal_licence_url",
         "fetch_url",
@@ -172,7 +177,12 @@ def _publisher_agrees(observed: object, expected: object) -> bool:
     return _same_publisher(observed, expected)
 
 
-def receipt_disagreement(row: Entry, receipt: Mapping[str, object]) -> str:
+def receipt_disagreement(
+    row: Entry,
+    receipt: Mapping[str, object],
+    *,
+    observed_periods: tuple[str | None, str | None] | None = None,
+) -> str:
     """Return the closed reason a receipt is not the writer's sidecar, or ''."""
     digest = receipt.get("sha256")
     if row.kind == "citation_only":
@@ -190,6 +200,11 @@ def receipt_disagreement(row: Entry, receipt: Mapping[str, object]) -> str:
             return "coverage_note"
         note = observed
         periods = ("", "")
+    if periods is None and observed_periods is not None:
+        periods = (
+            row.period_first or observed_periods[0] or "",
+            row.period_last or observed_periods[1] or "",
+        )
     stored_row = row
     if (
         row.key == row.source_id
@@ -308,6 +323,7 @@ def check(
     cached_source_ids: Sequence[str],
     family_counts: Mapping[str, int] | None = None,
     component_keys: Mapping[str, frozenset[str]] | None = None,
+    observed_periods: Mapping[str, tuple[str | None, str | None]] | None = None,
 ) -> Record:
     """Check independent inventories, then registry, receipt and output evidence.
 
@@ -431,8 +447,14 @@ def check(
                 add(row.key, "NO_DATA", absence.reason, caveat=absence.caveat)
             if outputs.get(row.key):
                 fail(row.key, "source_completeness: output for absent source")
-        elif not in_use(row, receipts):
+        elif row.key not in receipts:
             fail(row.key, "source_receipt_missing: missing or invalid receipt")
+        elif why := receipt_disagreement(
+            row,
+            receipts[row.key],
+            observed_periods=(observed_periods or {}).get(row.key),
+        ):
+            fail(row.key, "source_receipt_missing: field=" + why)
         elif set(outputs.get(row.key, ())) != set(row.release_tables):
             fail(row.key, "source_completeness: output tables")
         else:

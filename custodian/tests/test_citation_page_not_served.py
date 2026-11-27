@@ -104,6 +104,18 @@ BASE_BASIS_NOTE = (
 )
 
 
+# L-2326: exact licence fills; restore only their formerly empty ids.
+RCPTDRIFT_LICENCES = {
+    **dict.fromkeys(
+        "gis_address gis_boundaries gis_context gis_imagery_history gis_land_price "
+        "gis_landmarks gis_locator gis_parcels gis_phcc gis_poi_comm gis_rail "
+        "gis_zoning tenders_pub un_comtrade satellite_cdse_backup".split(),
+        "not_stated",
+    ),
+    "price_ext/producer-price-index-ppi": "CC-BY-4.0",
+}
+
+
 def _invented(monkeypatch, skip_reason=""):
     output = generator.generate(
         {
@@ -257,6 +269,11 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
         places[0]["release_tables"] = ["pub_place"]
     # S2-LICREC: check reviewed values before restoring only these base fields.
     _assert_gis_terms_reading(rows)
+    for key, licence in RCPTDRIFT_LICENCES.items():
+        matches = [item for item in rows if item["key"] == key]
+        assert len(matches) == 1
+        assert matches[0]["licence_id"] == licence
+        matches[0]["licence_id"] = ""
     rows = [
         dict(
             item,
