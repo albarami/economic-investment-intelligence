@@ -7401,3 +7401,8 @@ OPEN — S2-T19 / S2-46.fx1, L-2360 item 1 and decision 0032 item 2: forced test
 Append-only correction to the OPEN S2-RCPTDRIFT.b1g / S2-T19 BLOCKED line above: the lead's model-free check lc7b on `d922dea4` showed that the substitution case of `test_restricted_gis_verified_bytes_and_truthful_lineage` is refused by three redundant guards (the snapshot receipt-hash check, the `_receipt` licence row and the `validate_lineage` licence check); no one of them alone turns it red, and all three off does. The two-guard plant the brief prescribed was the lead's error (lead ruling L-2361). The b1g test fix stands, approved by a different maker at `d922dea4`; that BLOCKED line is answered.
 
 OPEN — S2-T19 coverage gap (owner: lead; lead ruling L-2361 item 2): each licence guard alone has no test that reaches it on the restricted-GIS substitution path, because the receipt-hash check refuses the case first. Close: an invented case that passes the receipt-hash check and still carries a drifted licence, refused by the `_receipt` licence row alone and by the `validate_lineage` licence check alone, each removed alone turning it red. Predates b1g; not built in train S2-46.
+
+## S2-AGENCYPARAM.b1 — L-2325 classification
+
+- CLOSED, owners S2-T08 and S2-T12: a reviewed classification of agency incentive parameters into the parameter kinds of document 07 is implemented by S2-AGENCYPARAM.b1 under L-2325 items 1 and 2; different-maker review and the lead's held-cache count remain the delivery gates, not claims established by invented fixtures.
+- ASSUMPTION, owners S2-T08 and S2-T12, S2-AGENCYPARAM.b1 / L-2325 item 2(c): a range's bound is not stored because DAT-143's value holds one stated value; a later decision may add a bound column.

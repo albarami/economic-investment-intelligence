@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
+import re
 from collections.abc import Mapping, Sequence
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
+from decimal import Decimal, localcontext
 from typing import TYPE_CHECKING, Any
 
 from .assembly import AssemblyError
@@ -12,6 +15,7 @@ from .fetch.allowlist import host_of
 from .fetch.bounded import file_hash
 from .fetch.registry import Entry
 from .fetch.snapshots import read_snapshot
+from .investment_contracts import PARAMETER_UNITS, parse_decimal, period_is_future
 
 if TYPE_CHECKING:
     from .assembly_adapters import Production
@@ -277,6 +281,161 @@ def read_investment(
         build.files[relative] = item.sha256
 
 
+# Each language is read in its own wording; these are exact phrases, not translations.
+PHRASES: dict[str, dict[str, tuple[str, ...]]] = {
+    "en": {
+        "rent_share": ("rent subsidy", "rental subsidy"),
+        "rent_amount": ("rent allowance", "rental allowance"),
+        "staff_share": ("salary subsidy", "staff cost subsidy"),
+        "staff_amount": ("salary allowance", "staff cost allowance"),
+        "other": ("tax exemption", "land offer"),
+    },
+    "ar": {
+        "rent_share": ("دعم الإيجار", "دعم تكاليف الإيجار"),
+        "rent_amount": ("بدل الإيجار",),
+        "staff_share": ("دعم الرواتب", "دعم الأجور"),
+        "staff_amount": ("بدل الرواتب", "بدل الأجور"),
+        "other": ("إعفاء ضريبي", "تخصيص أرض"),
+    },
+}
+_NUMBER = r"(?<![0-9.])[0-9]+(?:\.[0-9]+)?"
+_DIGITS = str.maketrans(
+    {
+        "\u0660": "0",
+        "\u0661": "1",
+        "\u0662": "2",
+        "\u0663": "3",
+        "\u0664": "4",
+        "\u0665": "5",
+        "\u0666": "6",
+        "\u0667": "7",
+        "\u0668": "8",
+        "\u0669": "9",
+        "\u066b": ".",
+    }
+)
+_DURATION = re.compile(
+    rf"(?:for|لمدة)\s+({_NUMBER})\s+(months?|years?|شهر|أشهر|شهراً|سنة|سنوات)", re.I
+)
+_PERIOD = re.compile(r"(?:in|في)\s+([0-9]{4})(?![0-9])", re.I)
+_PERCENT = re.compile(rf"({_NUMBER})\s*([%٪])")
+_AMOUNT = re.compile(rf"(?:(QAR)\s+({_NUMBER})|({_NUMBER})\s+(ريال قطري))", re.I)
+_MONTHLY = re.compile(r"per month|monthly|شهرياً|شهريا", re.I)
+_ONCE = re.compile(r"one-off|one time|لمرة واحدة", re.I)
+_RANGE = re.compile(r"up to|between|حتى|ما بين|[0-9]\s*[-\u2013]\s*[0-9]", re.I)
+
+
+@dataclass(frozen=True)
+class Parameter:
+    """A source-local parse; units remain stated for non-calculator rows."""
+
+    key: str
+    value: str | None
+    unit: str | None
+    duration: int | None
+    period: str | None
+    wording: str
+
+    def comparable(self) -> tuple[object, ...]:
+        unit = {"ريال قطري": "QAR", "٪": "%"}.get(self.unit or "", self.unit)
+        if self.unit is not None and self.unit.casefold() == "qar":
+            unit = "QAR"
+        value = Decimal(self.value) if self.value is not None else None
+        return self.key, value, unit, self.duration, self.period
+
+
+def _quantity(text: str) -> tuple[str | None, str | None, str]:
+    """Read one value token and its stated unit; leave all other text visible."""
+    percent = _PERCENT.search(text)
+    amount = _AMOUNT.search(text)
+    if percent is not None:
+        return percent[1], percent[2], text[: percent.start()] + text[percent.end() :]
+    if amount is not None:
+        return (
+            amount[2] or amount[3],
+            amount[1] or amount[4],
+            text[: amount.start()] + text[amount.end() :],
+        )
+    return None, None, text
+
+
+def classify_parameter(row: Mapping[str, object]) -> Parameter | None:
+    """Parse a block independently; no phrase match never defaults to other."""
+    heading = row.get("heading")
+    items = json.loads(str(row.get("text_items")))
+    if (
+        not isinstance(heading, str)
+        or not isinstance(items, list)
+        or any(type(item) is not str for item in items)
+    ):
+        raise ValueError("parameter_text_shape")
+    wording = "\n".join([heading, *items])
+    text = wording.translate(_DIGITS)
+    table = PHRASES.get(str(row.get("language")), {})
+    matches = [
+        key
+        for key, phrases in table.items()
+        if any(
+            re.search(r"(?<!\w)" + re.escape(phrase) + r"(?!\w)", text.casefold())
+            for phrase in phrases
+        )
+    ]
+    if len(matches) != 1:
+        return None
+    key = matches[0]
+    duration = None
+    duration_match = _DURATION.search(text)
+    if duration_match is not None:
+        # {years} * {months/year} -> {months}; no money is amortised.
+        with localcontext() as context:
+            context.prec = max(28, len(duration_match[1]) + 4)
+            months = Decimal(duration_match[1])
+            if duration_match[2].casefold() in {"year", "years", "سنة", "سنوات"}:
+                months *= Decimal(12)
+        if months == months.to_integral_value():
+            duration = int(months)
+        text = text[: duration_match.start()] + text[duration_match.end() :]
+    period_match = _PERIOD.search(text)
+    period = period_match[1] if period_match else None
+    if period_match is not None:
+        text = text[: period_match.start()] + text[period_match.end() :]
+    token, unit, rest = _quantity(text)
+    # A bound or additional number is not a single stated value (L-2325.2c).
+    if _RANGE.search(text) or re.search(_NUMBER, rest) or re.search(r"-\s*[0-9]", text):
+        return Parameter("other", None, unit, duration, period, wording)
+    value = token
+    if token is not None and unit in {"%", "٪"}:
+        # {percent} / {percent/share} -> dimensionless {share}.
+        with localcontext() as context:
+            context.prec = max(28, len(token) + 4)
+            share = Decimal(token) / Decimal(100)
+            share_text = format(share.normalize(), "f")
+        if share > Decimal(1):
+            return Parameter("other", None, unit, duration, period, wording)
+        if key.endswith("_share"):
+            value, unit = share_text, "ratio"
+    elif token is not None and _MONTHLY.search(text) and not _ONCE.search(text):
+        if key.endswith("_amount"):
+            unit = "qar_per_month"
+    if _ONCE.search(text):
+        key, duration = "other", None
+    if key != "other" and (value is None or unit != PARAMETER_UNITS[key]):
+        key = "other"
+    if value is not None and parse_decimal(value, precision=18, scale=4) is None:
+        key, value = "other", None
+    return Parameter(key, value, unit, duration, period, wording)
+
+
+def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
+    """DAT-143/PUB-88 exclude future periods and source-labelled forecasts."""
+    return bool(
+        (parameter.period is not None and period_is_future(parameter.period, retrieved))
+        or re.search(
+            r"forecast|projected|expected|متوقع|توقعات", parameter.wording.casefold()
+        )
+    )
+
+
 # Document 03 section 7.3: cache fields are consumed, never passed through.
 _AGENCY_CACHE_FIELDS = frozenset(
     "record_type record_key page_key title heading level ordinal parent_ordinal "
@@ -297,7 +456,7 @@ _AGENCY_TYPES = {
     ("page", "law"): "law",
     ("block", "sector_block"): None,
     ("block", "opportunity"): "opportunity",
-    ("block", "incentive_parameter"): None,
+    ("block", "incentive_parameter"): "incentive_parameter",
     ("block", "setup_step"): "setup_step",
     ("block", "law_block"): None,
     ("block", "block"): None,
@@ -338,7 +497,12 @@ def _agency_cache_groups(
         grain = "page" if ordinal is None else "block"
         if (grain, str(row.get("record_type"))) not in _AGENCY_TYPES:
             raise AssemblyError("assembly_agency_record_type_refused")
-        if grain == "block" and row["record_type"] == "incentive_parameter":
+        if (
+            grain == "block"
+            and row["record_type"] == "incentive_parameter"
+            and row.get("language") == "ar"
+            and classify_parameter(row) is None
+        ):
             _agency_report(
                 lines, str(row["page_url"]), "parameter_kind", "unclassified"
             )
@@ -379,6 +543,51 @@ def _agency_project_row(
     return result
 
 
+def _agency_parameter_row(
+    row: Mapping[str, object],
+    key: str,
+    arabic: Mapping[str, object] | None,
+    activities: Mapping[str, str],
+    lines: list[str],
+) -> dict[str, object] | None:
+    parameter = classify_parameter(row)
+    url = str(row["page_url"])
+    if parameter is None:
+        _agency_report(lines, url, "parameter_kind", "unclassified")
+        return None
+    if parameter_is_forward(parameter, str(row.get("retrieved_utc", ""))):
+        _agency_report(lines, url, "parameter_period", "forward_looking")
+        return None
+    if arabic is not None:
+        paired = classify_parameter(arabic)
+        if paired is not None and parameter_is_forward(
+            paired, str(arabic.get("retrieved_utc", ""))
+        ):
+            _agency_report(lines, url, "parameter_period", "forward_looking")
+            return None
+        if paired is None or parameter.comparable() != paired.comparable():
+            _agency_report(lines, url, "parameter_pair", "pair_value_mismatch")
+            return None
+    else:
+        lines.append(
+            f"REPORT pub_investqa_record {url} check=parameter_pair reason=pair_missing"
+        )
+    result = _agency_project_row(row, key, arabic, activities)
+    # Every other uses its source ordinal, stable even if an earlier row is omitted.
+    suffix = f"other_{row['ordinal']}" if parameter.key == "other" else parameter.key
+    result.update(
+        record_key=f"{key}:{suffix}",
+        parent_key=key,
+        parameter_key=parameter.key,
+        value=parameter.value,
+        unit=parameter.unit,
+        duration_months=parameter.duration,
+        as_stated=parameter.wording,
+        period=parameter.period,
+    )
+    return result
+
+
 def _agency_project_page(
     key: str,
     english: Sequence[Mapping[str, object]],
@@ -407,6 +616,18 @@ def _agency_project_page(
             if position < len(counterparts) and (grain == "page" or matched)
             else None
         )
+        if row["record_type"] == "incentive_parameter":
+            counterparts = [
+                item
+                for item in arabic
+                if item["record_type"] == "incentive_parameter"
+                and item.get("ordinal") == row.get("ordinal")
+            ]
+            counterpart = counterparts[0] if counterparts else None
+            projected = _agency_parameter_row(row, key, counterpart, activities, lines)
+            if projected is not None:
+                result.append(projected)
+            continue
         projected = _agency_project_row(row, key, counterpart, activities)
         if arabic and counterpart is None:
             lines.append(

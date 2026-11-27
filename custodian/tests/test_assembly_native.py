@@ -2,12 +2,13 @@
 
 import importlib
 import json
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_production_adapters import context
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 
@@ -908,4 +909,429 @@ def test_agency_projection_missing_language_is_reported(tmp_path, monkeypatch):
     assert result == []
     assert lines == [
         f"OMITTED pub_investqa_record {source['page_url']} check=record_key reason=unresolved"
+    ]
+
+
+def _parameter_pages():
+    """Invented level-four blocks, with the cache's JSON text-item shape."""
+    english = [
+        ("Rent subsidy", "25% for 3 years"),
+        ("Rent allowance", "QAR 1200 per month"),
+        ("Salary subsidy", "40%"),
+        ("Salary allowance", "QAR 800 per month"),
+        ("Tax exemption", "Exemption applies"),
+        ("Rent allowance", "QAR 500 one-off"),
+        ("Rent subsidy", "up to 30%"),
+        ("Land offer", "Land available"),
+        ("Welcome", "Read the guide"),
+    ]
+    arabic = [
+        ("دعم الإيجار", "25% لمدة 3 سنوات"),
+        ("بدل الإيجار", "1200 ريال قطري شهرياً"),
+        ("دعم الرواتب", "40%"),
+        ("بدل الرواتب", "800 ريال قطري شهرياً"),
+        ("إعفاء ضريبي", "يسري الإعفاء"),
+        ("بدل الإيجار", "500 ريال قطري لمرة واحدة"),
+        ("دعم الإيجار", "حتى 30%"),
+    ]
+    rows, pages = [], []
+    for language, blocks in (("en", english), ("ar", arabic)):
+        url = f"https://agency.invalid/{language}/incentives/invented"
+        pages.append(
+            dict(page_key="incentives_invented", page_language=language, page_url=url)
+        )
+        rows.append(
+            dict(
+                record_type="incentive",
+                ordinal=None,
+                level=None,
+                title="Invented package" if language == "en" else "حزمة افتراضية",
+                heading=None,
+                text_items=None,
+                page_url=url,
+                source_id="investqa_pages",
+                language=language,
+            )
+        )
+        for ordinal, (heading, text) in enumerate(blocks, 1):
+            rows.append(
+                dict(
+                    record_type="incentive_parameter",
+                    ordinal=ordinal,
+                    heading=heading,
+                    level=4,
+                    text_items=json.dumps([text]),
+                    page_url=url,
+                    source_id="investqa_pages",
+                    language=language,
+                )
+            )
+    return rows, pages
+
+
+def test_incentive_parameter_literal_oracle():
+    rows, pages = _parameter_pages()
+    released, lines = _project(rows, pages)
+    common = dict(
+        record_type="incentive_parameter",
+        parent_key="incentives_invented",
+        sequence=None,
+        reference=None,
+        link_url=None,
+        activity_keys=None,
+        period=None,
+        page_url="https://agency.invalid/en/incentives/invented",
+        source_id="investqa_pages",
+    )
+    expected = [
+        dict(
+            common,
+            record_type="incentive",
+            record_key="incentives_invented",
+            parent_key=None,
+            title_en="Invented package",
+            title_ar="حزمة افتراضية",
+            parameter_key=None,
+            value=None,
+            unit=None,
+            duration_months=None,
+            as_stated=None,
+        ),
+        dict(
+            common,
+            record_key="incentives_invented:rent_share",
+            title_en="Rent subsidy",
+            title_ar="دعم الإيجار",
+            parameter_key="rent_share",
+            value="0.25",
+            unit="ratio",
+            duration_months=36,
+            as_stated="Rent subsidy\n25% for 3 years",
+        ),
+        dict(
+            common,
+            record_key="incentives_invented:rent_amount",
+            title_en="Rent allowance",
+            title_ar="بدل الإيجار",
+            parameter_key="rent_amount",
+            value="1200",
+            unit="qar_per_month",
+            duration_months=None,
+            as_stated="Rent allowance\nQAR 1200 per month",
+        ),
+        dict(
+            common,
+            record_key="incentives_invented:staff_share",
+            title_en="Salary subsidy",
+            title_ar="دعم الرواتب",
+            parameter_key="staff_share",
+            value="0.4",
+            unit="ratio",
+            duration_months=None,
+            as_stated="Salary subsidy\n40%",
+        ),
+        dict(
+            common,
+            record_key="incentives_invented:staff_amount",
+            title_en="Salary allowance",
+            title_ar="بدل الرواتب",
+            parameter_key="staff_amount",
+            value="800",
+            unit="qar_per_month",
+            duration_months=None,
+            as_stated="Salary allowance\nQAR 800 per month",
+        ),
+        dict(
+            common,
+            record_key="incentives_invented:other_5",
+            title_en="Tax exemption",
+            title_ar="إعفاء ضريبي",
+            parameter_key="other",
+            value=None,
+            unit=None,
+            duration_months=None,
+            as_stated="Tax exemption\nExemption applies",
+        ),
+        dict(
+            common,
+            record_key="incentives_invented:other_6",
+            title_en="Rent allowance",
+            title_ar="بدل الإيجار",
+            parameter_key="other",
+            value="500",
+            unit="QAR",
+            duration_months=None,
+            as_stated="Rent allowance\nQAR 500 one-off",
+        ),
+        dict(
+            common,
+            record_key="incentives_invented:other_7",
+            title_en="Rent subsidy",
+            title_ar="دعم الإيجار",
+            parameter_key="other",
+            value=None,
+            unit="%",
+            duration_months=None,
+            as_stated="Rent subsidy\nup to 30%",
+        ),
+        dict(
+            common,
+            record_key="incentives_invented:other_8",
+            title_en="Land offer",
+            title_ar=None,
+            parameter_key="other",
+            value=None,
+            unit=None,
+            duration_months=None,
+            as_stated="Land offer\nLand available",
+        ),
+    ]
+    assert released == expected
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing",
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_kind reason=unclassified",
+    ]
+
+
+@pytest.mark.parametrize(
+    "change,expected,reason",
+    [
+        (
+            {"heading": "Salary subsidy"},
+            ("staff_share", "0.25", "ratio", 36),
+            "pair_missing",
+        ),
+        (
+            {"text_items": '["USD 50 per month"]'},
+            ("other", None, None, None),
+            "pair_missing",
+        ),
+        ({"text_items": '["125%"]'}, ("other", None, "%", None), "pair_missing"),
+        ({"text_items": '["up to 30%"]'}, ("other", None, "%", None), "pair_missing"),
+        ({"text_items": '["20% and 30%"]'}, ("other", None, "%", None), "pair_missing"),
+        (
+            {"text_items": '["QAR 500 one-off for 3 years"]'},
+            ("other", "500", "QAR", None),
+            "pair_missing",
+        ),
+        (
+            {"text_items": '["25%"]'},
+            ("rent_share", "0.25", "ratio", None),
+            "pair_missing",
+        ),
+        ({"heading": "Unknown benefit"}, None, "unclassified"),
+    ],
+)
+def test_parameter_planted_inputs(change, expected, reason):
+    rows, pages = _parameter_pages()
+    row = {**rows[1], **change}
+    released, lines = _project([row], pages)
+    if expected is None:
+        assert released == []
+        assert lines == [
+            f"OMITTED pub_investqa_record {row['page_url']} check=parameter_kind reason={reason}"
+        ]
+    else:
+        assert len(released) == 1
+        assert (
+            tuple(
+                released[0][key]
+                for key in ("parameter_key", "value", "unit", "duration_months")
+            )
+            == expected
+        )
+        assert released[0]["title_ar"] is None
+        assert lines == [
+            f"REPORT pub_investqa_record {row['page_url']} check=parameter_pair reason={reason}"
+        ]
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"text_items": '["30% لمدة 3 سنوات"]'},
+        {"heading": "بدل الإيجار"},
+        {"text_items": '["25% لمدة 4 سنوات"]'},
+    ],
+)
+def test_parameter_arabic_conflict_is_not_copied(change):
+    rows, pages = _parameter_pages()
+    arabic = {**rows[11], **change}
+    released, lines = _project([rows[1], arabic], pages)
+    assert released == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_value_mismatch"
+    ]
+
+
+def test_parameter_unknown_arabic_phrase_conflicts():
+    rows, pages = _parameter_pages()
+    released, lines = _project(
+        [rows[1], {**rows[11], "heading": "معلومات عامة"}], pages
+    )
+    assert released == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/ar/incentives/invented check=parameter_kind reason=unclassified",
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_value_mismatch",
+    ]
+
+
+@pytest.mark.parametrize("items", ["null", "{}", "[4]"])
+def test_parameter_malformed_text_refuses_specific_shape(items):
+    rows, pages = _parameter_pages()
+    with pytest.raises(ValueError, match=r"^parameter_text_shape$"):
+        _project([{**rows[1], "text_items": items}], pages)
+
+
+def test_parameter_contract_scale_is_not_rounded():
+    rows, pages = _parameter_pages()
+    result, lines = _project([{**rows[1], "text_items": '["25.12345%"]'}], pages)
+    assert result[0]["parameter_key"] == "other"
+    assert result[0]["value"] is None
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
+    ]
+
+
+@settings(derandomize=True, max_examples=100)
+@given(
+    percent=st.integers(min_value=0, max_value=10000),
+    amount=st.integers(min_value=0, max_value=999999),
+)
+def test_parameter_number_grammar(percent, amount):
+    rows, pages = _parameter_pages()
+    percentage = Decimal(percent) / Decimal(100)
+    result, _ = _project(
+        [{**rows[1], "text_items": json.dumps([f"{percentage}%"])}], pages
+    )
+    assert Decimal(result[0]["value"]) == percentage / Decimal(100)
+    result, _ = _project(
+        [
+            {
+                **rows[1],
+                "heading": "Rent allowance",
+                "text_items": json.dumps([f"QAR {amount} per month"]),
+            }
+        ],
+        pages,
+    )
+    assert Decimal(result[0]["value"]) == Decimal(amount)
+    result, _ = _project(
+        [{**rows[1], "text_items": json.dumps([f"{percentage}% and {amount}%"])}], pages
+    )
+    assert result[0]["parameter_key"] == "other"
+    assert result[0]["value"] is None
+
+
+@pytest.mark.parametrize("text", ["-25%", ".25%", "99.999999999999999999999999999999%"])
+def test_parameter_invalid_share_never_becomes_usable(text):
+    rows, pages = _parameter_pages()
+    result, _ = _project([{**rows[1], "text_items": json.dumps([text])}], pages)
+    assert (result[0]["parameter_key"], result[0]["value"]) == ("other", None)
+
+
+@pytest.mark.parametrize("wording", ["25% in 2099", "forecast 25%"])
+def test_parameter_forward_looking_figure_is_omitted(wording):
+    rows, pages = _parameter_pages()
+    row = {
+        **rows[1],
+        "text_items": json.dumps([wording]),
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    result, lines = _project([row], pages)
+    assert result == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_period reason=forward_looking"
+    ]
+
+
+def test_parameter_stated_period_and_arabic_digits():
+    rows, pages = _parameter_pages()
+    english = {
+        **rows[1],
+        "text_items": '["25% in 2024"]',
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    arabic = {
+        **rows[11],
+        "text_items": '["٢٥٪ في ٢٠٢٤"]',
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    result, lines = _project([english, arabic], pages)
+    assert (result[0]["value"], result[0]["period"], result[0]["title_ar"]) == (
+        "0.25",
+        "2024",
+        "دعم الإيجار",
+    )
+    assert lines == []
+
+
+def test_parameter_arabic_forecast_is_omitted():
+    rows, pages = _parameter_pages()
+    result, lines = _project(
+        [rows[1], {**rows[11], "text_items": '["متوقع 25% لمدة 3 سنوات"]'}], pages
+    )
+    assert result == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_period reason=forward_looking"
+    ]
+
+
+def test_parameter_fractional_month_duration_is_not_invented():
+    rows, pages = _parameter_pages()
+    result, lines = _project(
+        [{**rows[1], "text_items": '["25% for 1.5 months"]'}], pages
+    )
+    assert result[0]["duration_months"] is None
+    assert result[0]["value"] == "0.25"
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
+    ]
+
+
+def test_parameter_quantity_wrong_for_share_key():
+    rows, pages = _parameter_pages()
+    result, lines = _project([{**rows[1], "text_items": '["QAR 50 per month"]'}], pages)
+    assert (result[0]["parameter_key"], result[0]["value"], result[0]["unit"]) == (
+        "other",
+        "50",
+        "QAR",
+    )
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
+    ]
+
+
+def test_parameter_ambiguous_phrases_do_not_default_to_other():
+    rows, pages = _parameter_pages()
+    row = {**rows[1], "heading": "Rent subsidy and salary subsidy"}
+    result, lines = _project([row], pages)
+    assert result == []
+    assert lines == [
+        "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_kind reason=unclassified"
+    ]
+
+
+def test_parameter_amount_pair_compares_values_not_spelling():
+    rows, pages = _parameter_pages()
+    result, lines = _project(
+        [rows[2], {**rows[12], "text_items": '["1200.0 ريال قطري شهرياً"]'}], pages
+    )
+    assert (result[0]["parameter_key"], result[0]["value"]) == ("rent_amount", "1200")
+    assert lines == []
+
+
+def test_parameter_other_preserves_stated_unit_spelling():
+    rows, pages = _parameter_pages()
+    result, lines = _project(
+        [{**rows[2], "text_items": '["qar 500 one-off"]'}],
+        pages,
+    )
+    assert (result[0]["parameter_key"], result[0]["value"], result[0]["unit"]) == (
+        "other",
+        "500",
+        "qar",
+    )
+    assert lines == [
+        "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
     ]
