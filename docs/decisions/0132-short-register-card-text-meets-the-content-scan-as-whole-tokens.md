@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted by the owner, 2026-11-27 ("Accept decision 0132", relayed by the advisor in its note of 2026-11-27 13:19:41 Qatar, ruling L-2322), on the different-maker review that stands on this record's text (blob `4d2d6b4b`): S2-REGSHORT.rv1 (Moonshot Kimi through Factory Droid, review mode, a maker other than the builder) APPROVED head `e818b424`, which holds this record unchanged, with no rejecting finding |
 | Date | 2026-11-27 |
 | Scope | Slice S2, task S2-T49; register metadata card-content matching only |
 | Amends | Decision 0124 item 5 for content-match length only |
