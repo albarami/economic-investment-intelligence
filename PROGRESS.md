@@ -55485,3 +55485,15 @@ Skills applied: project-orientation traced existing mapping and task scope; task
 
 - Whole test (lead, `./eii test --seed 3528764953`, unit eii-whole-test-S2-REGSHORT.wt1) on `1c8ab634` (base `bc9bb749`): RESULT PASSED, 21263 passed, 0 failed, 0 skipped in 11 suites. Per suite: python-guards 1489, python-core 855, python-custodian-1 2933, -2 3251, -3 2503, -4 4594, -5 3939, python-product-1 247, python-product-2 569, web-checks 882, web-unit 1.
 - Moved onto main `a3efa045450c411d52c39cab0d334fd095940e39` (PR 164, documents only) as `cf0af00f` and `4922a1b3`. The only conflict was the PROGRESS append; both sides are kept. A lead script shows the same nine task files, each with byte-equal change lines before and after the move, and the trees of core, custodian, scripts, product, web, uv.lock and pyproject.toml equal to `1c8ab634`. So the whole test above stands for the moved code. The rv1 approval holds for the records-only move.
+
+### S2-D113FX2.b1 — decision 0113 review corrections (2026-11-27)
+
+- Base `2fd7949dc97e80c19ab1917487b7438bc92454b1`, branch `s2/s2-d113-fx2`. Builder: Moonshot Kimi K3.1 Pro via Factory Droid. Senior release-records editor for decision records and task ledgers; strict-reviewer self-check. Documents only, no seed, network or real-cache read. Different-maker review remains pending.
+- R60-REC.rv3 findings F1 and F2 and notes N1 and N2 are corrected in proposed decision 0113 and TASKS.md S2-T09. OI-426 carries the lead-local batch 1 to 3 refusal records into the background lane ordered for slice S3. Accepted decisions 0085 and 0114 are unchanged. No code, test, gate, pin, baseline or acceptance box changed.
+- Input verification: `cd .overnight/IN && sha256sum -c MANIFEST.sha256`: exit 0; both supplied files OK.
+- `python3 scripts/check_docs.py`: exit 0; checked 1393 text files and 175 Markdown files.
+- `python3 scripts/check_tree.py`: exit 0; checked 8 rules.
+- `uv run --locked python scripts/check_reference_notes.py`: exit 0; checked 2 files, 6 libraries and 367 rows.
+- `cmp AGENTS.md CLAUDE.md`: exit 0; both files unchanged.
+- Skills and effects: project-orientation/task-standards established the records scope and personas; receiving-code-review verified F1, F2, N1 and N2 against the checkout before editing; sanad-provenance tied the refusal state to ruling L-1832, the supplied lead-local hash and the empty tracked archive; spec-to-code-compliance checked the fingerprint wording against `fetch/fingerprint.py::INPUT_PARTITION` and `_global_input`; strict-reviewer checked the four-file scope and exact review fixes; requesting-code-review prepared the uncommitted diff for different-maker review; verification-before-completion recorded real command exits; muhasabah-gate checked unsupported claims and scope before return.
+- `git diff --stat`: exit 0; OPEN_ITEMS.md                                      | 10 +++++;  PROGRESS.md                                        | 11 ++++++;  TASKS.md                                           |  1 +;  ...tivity-spine-sign-off-in-the-background-lane.md | 44 ++++++++++++++--------;  4 files changed, 51 insertions(+), 15 deletions(-).

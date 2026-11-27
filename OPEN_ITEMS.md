@@ -7321,3 +7321,13 @@ REGSTAGE.probe3 (decision 0102, counts only) gave exit 0 with zero
 `register_content_egress` refusals, and the S2-AUDFULL4 projection at the same
 code gave exit 0 (`register_inputs_validated`). Owner acceptance of decision
 0132 and the gates remain pending. No gate or acceptance box is marked.
+
+## OI-426 — Persist the batch 1 to 3 activity-spine refusal records
+
+- ID: OI-426
+- TYPE: OPEN
+- OWNER: the lead
+- LANE: background, ordered for slice S3
+- CONCERNS: the batch 1 to 3 refusal records of OI-203 exist only in lead-local commits; the base branch holds no persisted refusal records for those batches.
+- NEEDED: the batch 1 to 3 refusal records must land on the base branch through the workflow of `scripts/spine_triage.md` before the later admission of [decision 0113](docs/decisions/0113-activity-spine-sign-off-in-the-background-lane.md).
+- NEEDED BY: before decision 0113's later admission.

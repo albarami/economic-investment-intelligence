@@ -6,7 +6,7 @@
 | Date | 2026-11-24 |
 | Owner | The owner |
 | Proposed by | The lead, under its ruling L-1817 item 2, which directs one record in the shape of [decision 0084](0084-public-tenders-in-a-separate-run.md) and implements the owner's slow-work rule ([decision 0085](0085-the-slice-s2-gate-wording-under-the-slow-work-rule.md)) and the owner's lane rule ([decision 0098](0098-s2-sources-follow-their-first-field-reader.md)) |
-| Amends | Nothing until accepted. On acceptance, and without editing that accepted record's text: the lane values of the `S2-T04#1` and `S2-T04#2` rows of decision 0098's **Complete box inventory** (item 1); the TASKS.md S2-T04 carry lines, added marked proposed in this change and effective on acceptance (item 5); the decisions index of [docs/README.md](../README.md). It amends no requirement row, test, plant, bound, refusal or gate wording of any other document |
+| Amends | Nothing until accepted. On acceptance, and without editing that accepted record's text: the lane values of the `S2-T04#1` and `S2-T04#2` rows of decision 0098's **Complete box inventory** (item 1); on acceptance, only the placement of the spine review and PO-S2-52 in decision 0085's **Other slow rows** table, row C-03, is superseded, and that row's census obligation is kept; the TASKS.md S2-T04 carry lines, added marked proposed in this change and effective on acceptance (item 5); the decisions index of [docs/README.md](../README.md). It amends no requirement row, test, plant, bound, refusal or gate wording of any other document |
 | Purpose | Take the activity-spine review sign-off and the category allow-list off the slice S2 gate path into the background lane ordered for slice S3, keeping every code, the full review depth and the honest refetch cost |
 | Read first | TASKS.md S2-T04 and S3-T03; [decision 0075](0075-activity-mappings-signed-by-model-review.md); decision 0098 **Complete box inventory** and **Box carry ledger**; document 04 section 6 and PUB-38; AGENTS.md rules 33, 44 and 46 |
 
@@ -22,8 +22,12 @@ path for the background lane, ordered for S3 — the release takes the admitted
 state at its build time — with every code kept, and one record in the shape of
 0084 follows. The later state of the same day (ruling L-1832) is: batch 3 of
 the seeded audit was refused with `audit_decision_differs` (4 of 30 sampled
-codes differ), the refusal is committed, the admission stays in the background
-lane, and the L6 build does not wait for it.
+codes differ), the refusal stands by ruling L-1832 and was recorded in
+lead-local commit
+`82f6cb4fb1b7c176f63f658300f9713dda44b28f`; the base branch holds no persisted refusal
+record: its `custodian/publicdata/review/activity_spine_refusals.json`
+is empty. The admission stays in the background lane, and the L6 build does not
+wait for it.
 
 The second reading of the source census (record S2-CENSUS r4, rows N04, N05
 and N06, by a maker other than the first reading's)
@@ -65,7 +69,11 @@ pass.
    assemble, finalise-check — under decision 0075's model signer and
    different-maker seeded audit at zero errors, and decision 0103's
    derived-row acknowledgement under the same audit. The batch-3 refusal
-   stands committed; a later admission runs the same order at the same bar,
+   stands by ruling L-1832 and was recorded in lead-local commit
+   `82f6cb4fb1b7c176f63f658300f9713dda44b28f`; the base branch holds no persisted refusal
+   record: its
+   `custodian/publicdata/review/activity_spine_refusals.json` is empty. A later
+   admission runs the same order at the same bar,
    never a shortcut and never a lowered one. Every code stays visible as
    unmapped until admitted: S3-T03's criterion holds with no admitted batch,
    so the map's resolve shows an unadmitted code as unmapped, never silently
@@ -74,16 +82,21 @@ pass.
    release carries.
 
 3. **The cost is stated honestly.** All three files are tracked under
-   `custodian/publicdata`, and `fetch/fingerprint.py::_global_input` binds
-   every tracked file under `custodian/publicdata` except `sources.yaml`
-   into the fetch fingerprint: the first build after an admission commit
-   refetches every entry — the lead's measured figure for that refetch class
-   is about 78 minutes of fetch and verify plus about 28 minutes of assembly
-   to the frame, plus the unmeasured stages after it (ruling L-1832). The
-   graph is also written once — `assembly_graph_exists` refuses a
-   replacement — so a later admission is a new build in any case. Each
-   committed change of the three files pays one such refetch, paid in the
-   background lane, never on the gate path.
+   `custodian/publicdata`. Under the current partition of accepted decision
+   0114's **Partition inventory**, `fetch/fingerprint.py::INPUT_PARTITION`
+   classifies `review/activity_spine.csv` and `review/category_allowlist.csv`
+   as shared fetch-pass inputs, and `review/activity_spine_audits.json` and
+   `review/activity_spine_refusals.json` as post-loop-only;
+   `fetch/fingerprint.py::_global_input` binds the shared inputs into every
+   entry's fingerprint. The first build after an admission commit that changes
+   the CSV or allow-list refetches every entry — the lead's measured figure for
+   that refetch class is about 78 minutes of fetch and verify plus about 28
+   minutes of assembly to the frame, plus the unmeasured stages after it
+   (ruling L-1832). The graph is also written once — `assembly_graph_exists`
+   refuses a replacement — so a later admission is a new build in any case. A
+   change to the audit or refusal JSON alone does not force every entry's
+   refetch, while a change to the CSV or the allow-list does; that refetch is
+   paid in the background lane, never on the gate path.
 
 4. **The S3 gate condition that keeps the value.** Before the slice S3 gate
    records a pass, each of the two boxes and the allow-list's final rows is
@@ -129,7 +142,10 @@ pass.
   condition; it names this record's shape as 0084's.
 - Ruling L-1832 (2026-11-24): batch 3 refused (4 of 30 sampled codes differ;
   `audit_decision_differs`, the assembly refusal of `scripts/spine_review.py`
-  recorded in `scripts/spine_triage.md`), refusal committed; a later
+  recorded in `scripts/spine_triage.md`), the refusal stands by ruling L-1832
+  and was recorded in lead-local commit
+  `82f6cb4fb1b7c176f63f658300f9713dda44b28f`; the base branch holds no persisted refusal record: its
+  `custodian/publicdata/review/activity_spine_refusals.json` is empty; a later
   admission pays its one refetch in the background, not on the gate path;
   L6 does not wait for it.
 - The census second reading (record S2-CENSUS r4, rows N04, N05, N06):
