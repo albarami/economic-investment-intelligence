@@ -55217,3 +55217,11 @@ Skills applied: project-orientation traced existing mapping and task scope; task
 - The text at `d975159d` (blob `4f44ec2f`) differs from main. The earlier S2-DREC.cf2 confirmation was refused admission at launch, and is history only.
 - 0117 stays Proposed. Its builder is Moonshot, so its confirmation needs a maker other than Moonshot.
 - Documents only: no code, test, gate or acceptance box changes.
+
+### Owner acceptance of decisions 0114 and 0115 (2026-11-27, documents only)
+
+- Source: the owner's decision of 2026-11-27, "Accept 0114 and 0115", relayed by the advisor in note owner-relayed-20261127-0822 (ruling L-2288).
+- Review: R60-REC.rv2 (Moonshot Kimi, exact model version not exposed, through Factory Droid, review mode) APPROVED each record on its own, on main `bc9bb749f5c6396087a8385ca1064889cb509ad1`. The blobs were `ea81e14c` (0114) and `0943ed6e` (0115), with no rejecting finding. Moonshot is a maker other than the lead, who wrote both records.
+- Text since that review: PR 164 (`a3efa045`) added the recorded verdict to each Status line, and for 0115 its Owner row and the reviewer's wording note ("non-null member fields"). That was records only, with no change of substance.
+- This change replaces only the two Status lines. 0113 and 0125 stay Proposed: each needs a fresh independent review before the owner's acceptance, 0113 first.
+- Documents only: no code, test, gate or acceptance box changes.
