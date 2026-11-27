@@ -327,9 +327,15 @@ def _closed_terms(
             prefix = (
                 r"(?:و|ف|ب|ل|ال|وال|بال|فال|لل|وب|ول|وبال|ولل)?" if prefixed else ""
             )
-            suffix = r"(?:ة|ات|ين|ون|\u0627)?" if forward else ""
+            suffix = ""
+            if forward and term == "متوقع":
+                suffix = r"(?:ة|\u0647|ات|ين|ون|\u0627|ان|تان|تين)?"
+            elif forward and term == "توقعات":
+                suffix = r"(?:\u0647|\u0647\u0627|هم|هن|هما|كم|نا|ي)?"
             negation = (
-                r"(?<!(?<!\w)غير )(?<!(?<!\w)وغير )(?<!(?<!\w)فغير )" if forward else ""
+                r"(?<!(?<!\w)غير )(?<!(?<!\w)وغير )(?<!(?<!\w)فغير )(?<!(?<!\w)لغير )"
+                if forward
+                else ""
             )
             patterns.append(negation + r"(?<!\w)" + prefix + token + suffix + r"(?!\w)")
         else:
@@ -347,9 +353,10 @@ _DURATION = re.compile(
             "year",
             "years",
             "شهر",
+            "شهراً",
             "شهرا",
             "أشهر",
-            "شهراً",
+            "شهور",
             "سنة",
             "سنوات",
         ),
@@ -475,6 +482,7 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
     """DAT-143/PUB-88 exclude future periods and source-labelled forecasts."""
     return bool(
         (parameter.period is not None and period_is_future(parameter.period, retrieved))
+        or re.search(_closed_terms(("من غير المتوقع",)), parameter.wording.casefold())
         or re.search(
             _closed_terms(
                 (
@@ -484,6 +492,16 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
                     "forecasting",
                     "projected",
                     "expected",
+                    "expects",
+                    "expecting",
+                    "anticipated",
+                    "projection",
+                    "projections",
+                    "توقع",
+                    "يتوقع",
+                    "يُتوقع",
+                    "نتوقع",
+                    "تتوقع",
                     "متوقع",
                     "توقعات",
                 ),

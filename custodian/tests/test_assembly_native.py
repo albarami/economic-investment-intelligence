@@ -1789,6 +1789,11 @@ _CLOSED_ENGLISH = (
     "forecasting",
     "projected",
     "expected",
+    "expects",
+    "expecting",
+    "anticipated",
+    "projection",
+    "projections",
     "for",
     "month",
     "months",
@@ -1816,8 +1821,15 @@ _CLOSED_ENGLISH = (
 _CLOSED_ARABIC = (
     "متوقع",
     "توقعات",
+    "توقع",
+    "يتوقع",
+    "يُتوقع",
+    "نتوقع",
+    "تتوقع",
+    "من غير المتوقع",
     "لمدة",
     "شهر",
+    "شهور",
     "شهرا",
     "أشهر",
     "شهراً",
@@ -1888,19 +1900,40 @@ def test_closed_term_generated_containing_words(term, tail):
     assert re.search(pattern, term + tail) is None
 
 
-@pytest.mark.parametrize("marker", ("متوقع", "توقعات"))
-@pytest.mark.parametrize("suffix", ("", "ة", "ات", "ين", "ون", "\u0627"))
-def test_forward_closed_suffix_and_negation(marker, suffix):
+@pytest.mark.parametrize(
+    "marker,suffix,admitted",
+    [
+        ("متوقع", suffix, True)
+        for suffix in (
+            "",
+            "ة",
+            "\u0647",
+            "ات",
+            "ين",
+            "ون",
+            "\u0627",
+            "ان",
+            "تان",
+            "تين",
+        )
+    ]
+    + [
+        ("توقعات", suffix, True)
+        for suffix in ("", "\u0647", "\u0647\u0627", "هم", "هن", "هما", "كم", "نا", "ي")
+    ]
+    + [("توقعات", suffix, False) for suffix in ("ة", "ات", "ين", "ون", "\u0627")],
+)
+def test_forward_closed_suffix_and_negation(marker, suffix, admitted):
     import re
 
     from eii_custodian.publicdata.assembly_native import _closed_terms
 
     pattern = _closed_terms((marker,), forward=True)
-    assert re.search(pattern, "ال" + marker + suffix)
+    assert bool(re.search(pattern, "ال" + marker + suffix)) == admitted
     assert re.search(pattern, "غير ال" + marker + suffix) is None
     assert re.search(pattern, "غير " + marker + suffix) is None
     assert re.search(pattern, marker + suffix + "س") is None
-    assert re.search(pattern, "تغير " + marker + suffix)
+    assert bool(re.search(pattern, "تغير " + marker + suffix)) == admitted
 
 
 @pytest.mark.parametrize(
@@ -1914,6 +1947,11 @@ def test_forward_closed_suffix_and_negation(marker, suffix):
             "forecasting",
             "projected",
             "expected",
+            "expects",
+            "expecting",
+            "anticipated",
+            "projection",
+            "projections",
         )
         for word in (term, term.capitalize())
     ]
@@ -1921,6 +1959,18 @@ def test_forward_closed_suffix_and_negation(marker, suffix):
         ("forward", term)
         for term in (
             "متوقع",
+            "متوقعه",
+            "المتوقعه",
+            "متوقعان",
+            "متوقعتان",
+            "متوقعتين",
+            "متوقعًا",
+            "توقع",
+            "يتوقع",
+            "يُتوقع",
+            "نتوقع",
+            "تتوقع",
+            "من غير المتوقع",
             "متوقعة",
             "متوقعات",
             "متوقعين",
@@ -1935,12 +1985,35 @@ def test_forward_closed_suffix_and_negation(marker, suffix):
             "التوقعات",
             "وتوقعات",
             "بالتوقعات",
+            "توقعاته",
+            "توقعاتها",
+            "توقعاتهم",
+            "توقعاتهن",
+            "توقعاتهما",
+            "توقعاتكم",
+            "توقعاتنا",
+            "توقعاتي",
         )
     ]
     + [("duration", "for 3 " + term) for term in ("month", "months", "year", "years")]
     + [
         ("duration", "لمدة \u0663 " + term)
-        for term in ("شهر", "شهرا", "شهراً", "أشهر", "سنة", "سنوات")
+        for term in ("شهر", "شهرا", "شهراً", "شهور", "أشهر", "سنة", "سنوات")
+    ]
+    + [("duration_marked", "لمدة ١٢ شهرًا"), ("duration_marked", "لمدة \u0661 سنةً")]
+    + [
+        ("not_forward", term)
+        for term in (
+            "غير متوقع",
+            "وغير المتوقعة",
+            "فغير المتوقع",
+            "لغير المتوقع",
+            "توقعاتا",
+            "توقعاتة",
+            "توقعاتات",
+            "توقعاتين",
+            "توقعاتون",
+        )
     ]
     + [("duration", "ولمدة \u0663 سنوات")]
     + [("monthly", term) for term in ("per month", "monthly", "شهرياً", "شهريا")]
@@ -1958,9 +2031,129 @@ def test_parameter_natural_forms_under_match(kind, wording):
         parameter_is_forward,
     )
 
-    if kind == "forward":
+    if kind in ("forward", "not_forward"):
         parameter = Parameter("rent_share", "0.25", "ratio", None, None, wording)
-        assert parameter_is_forward(parameter, "2026-11-27T00:00:00Z")
+        assert parameter_is_forward(parameter, "2026-11-27T00:00:00Z") == (
+            kind == "forward"
+        )
+    elif kind == "duration_marked":
+        match = _DURATION.search(wording.translate(_DIGITS))
+        assert match is not None
+        assert match.groups() == (("12", "شهر") if "شهر" in wording else ("1", "سنة"))
     else:
         pattern = {"duration": _DURATION, "monthly": _MONTHLY, "once": _ONCE}[kind]
         assert re.fullmatch(pattern, wording.translate(_DIGITS)) is not None
+        if kind == "duration" and wording.endswith("شهراً"):
+            match = pattern.search(wording.translate(_DIGITS))
+            assert match is not None
+            assert match[2] == "شهراً"
+
+
+@pytest.mark.parametrize(
+    "english,arabic,forward,duration",
+    [
+        pytest.param(
+            "25%", "الدعم متوقعه بنسبة ٢٥٪", True, None, id="adjective-\u0647"
+        ),
+        pytest.param("25%", "دعمان متوقعان بنسبة ٢٥٪", True, None, id="adjective-ان"),
+        pytest.param(
+            "25%", "نسبتان متوقعتان للدعم عند ٢٥٪", True, None, id="adjective-تان"
+        ),
+        pytest.param(
+            "25%",
+            "تشير الدراسة إلى نسبتين متوقعتين للدعم عند ٢٥٪",
+            True,
+            None,
+            id="adjective-تين",
+        ),
+        pytest.param(
+            "25%", "توقعاته تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-\u0647"
+        ),
+        pytest.param(
+            "25%",
+            "توقعاتها تشير إلى دعم بنسبة ٢٥٪",
+            True,
+            None,
+            id="pronoun-\u0647\u0627",
+        ),
+        pytest.param(
+            "25%", "توقعاتهم تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-هم"
+        ),
+        pytest.param(
+            "25%", "توقعاتهن تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-هن"
+        ),
+        pytest.param(
+            "25%", "توقعاتهما تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-هما"
+        ),
+        pytest.param(
+            "25%", "توقعاتكم تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-كم"
+        ),
+        pytest.param(
+            "25%", "توقعاتنا تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-نا"
+        ),
+        pytest.param(
+            "25%", "توقعاتي تشير إلى دعم بنسبة ٢٥٪", True, None, id="pronoun-ي"
+        ),
+        pytest.param(
+            "25%", "تشير الدراسة إلى توقع بلوغ الدعم ٢٥٪", True, None, id="arabic-توقع"
+        ),
+        pytest.param("25%", "يتوقع أن يبلغ الدعم ٢٥٪", True, None, id="arabic-يتوقع"),
+        pytest.param("25%", "يُتوقع أن يبلغ الدعم ٢٥٪", True, None, id="arabic-يُتوقع"),
+        pytest.param("25%", "نتوقع أن يبلغ الدعم ٢٥٪", True, None, id="arabic-نتوقع"),
+        pytest.param("25%", "تتوقع أن يبلغ الدعم ٢٥٪", True, None, id="arabic-تتوقع"),
+        pytest.param("expects 25%", "٢٥٪", True, None, id="expects"),
+        pytest.param("expecting 25%", "٢٥٪", True, None, id="expecting"),
+        pytest.param("anticipated 25%", "٢٥٪", True, None, id="anticipated"),
+        pytest.param("projection 25%", "٢٥٪", True, None, id="projection"),
+        pytest.param("projections 25%", "٢٥٪", True, None, id="projections"),
+        pytest.param(
+            "25%",
+            "من غير المتوقع أن يتجاوز الدعم ٢٥٪",
+            True,
+            None,
+            id="negated-forecast",
+        ),
+        pytest.param("25% for 3 months", "٢٥٪ لمدة ٣ شهور", False, 3, id="months"),
+        pytest.param(
+            "25%", "لغير المتوقع منها دعم بنسبة ٢٥٪", False, None, id="l-negation"
+        ),
+        pytest.param(
+            "Projects in the zone receive 25% support",
+            "٢٥٪",
+            False,
+            None,
+            id="projects-control",
+        ),
+        pytest.param("projecting 25%", "٢٥٪", False, None, id="projecting-control"),
+        pytest.param(
+            "not expected to exceed 25%", "٢٥٪", True, None, id="not-expected-control"
+        ),
+        pytest.param(
+            "not forecasted to exceed 25%",
+            "٢٥٪",
+            True,
+            None,
+            id="not-forecasted-control",
+        ),
+        pytest.param("25%", "يبلغ الدعم ٢٥٪", False, None, id="fact-control"),
+        pytest.param(
+            "25%",
+            "تغطى التكاليف غير المتوقعة بنسبة ٢٥٪",
+            False,
+            None,
+            id="unexpected-control",
+        ),
+    ],
+)
+def test_parameter_bounded_bilingual_corpus(english, arabic, forward, duration):
+    test_parameter_literal_boundaries(
+        english,
+        arabic,
+        "Rent subsidy",
+        "rent_share",
+        "0.25",
+        "ratio",
+        duration,
+        None,
+        forward,
+    )
