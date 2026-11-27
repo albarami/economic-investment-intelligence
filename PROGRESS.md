@@ -55276,3 +55276,8 @@ Skills applied: project-orientation traced existing mapping and task scope; task
   - replay: REGSTAGE.probe3 (lead shell, decision 0102, counts only) gave exit 0 and zero `register_content_egress` refusals, where probe1 on main 7df3ab37 had 35; the S2-AUDFULL4 projection at the same code gave exit 0, `register_inputs_validated`.
 - Rebased onto main bc9bb749f5c6396087a8385ca1064889cb509ad1. The only conflict was the PROGRESS append, kept with both sides in order. For every task file, the change lines are byte-equal before and after the move (lead script, file by file).
 - Acceptance of decision 0132 and every gate remain pending. No acceptance box is ticked.
+
+### S2-REGSHORT whole test and move onto main a3efa045 (2026-11-27, records only)
+
+- Whole test (lead, `./eii test --seed 3528764953`, unit eii-whole-test-S2-REGSHORT.wt1) on `1c8ab634` (base `bc9bb749`): RESULT PASSED, 21263 passed, 0 failed, 0 skipped in 11 suites. Per suite: python-guards 1489, python-core 855, python-custodian-1 2933, -2 3251, -3 2503, -4 4594, -5 3939, python-product-1 247, python-product-2 569, web-checks 882, web-unit 1.
+- Moved onto main `a3efa045450c411d52c39cab0d334fd095940e39` (PR 164, documents only) as `cf0af00f` and `4922a1b3`. The only conflict was the PROGRESS append; both sides are kept. A lead script shows the same nine task files, each with byte-equal change lines before and after the move, and the trees of core, custodian, scripts, product, web, uv.lock and pyproject.toml equal to `1c8ab634`. So the whole test above stands for the moved code. The rv1 approval holds for the records-only move.
