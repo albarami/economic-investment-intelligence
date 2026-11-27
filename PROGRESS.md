@@ -55282,3 +55282,11 @@ Skills applied: project-orientation traced existing mapping and task scope; task
   `git diff --check` exits 0. Evidence logs and security self-review are under
   `.overnight/OUT/`. The reviewable patch includes new files using no-index
   diffs because index intent-to-add is unavailable.
+
+### Correction to S2-REGSHORT.b2 (2026-11-27, appended; rule 38)
+
+- The b2 rows above say that different-maker review and the lead's real-register replay are owed. Both are now done:
+  - review: S2-REGSHORT.rv1, Moonshot Kimi K3.1 Pro through Factory Droid (review mode), returned APPROVED on e818b4247d66c153e3fa7193e0edcf09c39d2f94, with two records points (decision 0132's residuals in OPEN_ITEMS; this correction);
+  - replay: REGSTAGE.probe3 (lead shell, decision 0102, counts only) gave exit 0 and zero `register_content_egress` refusals, where probe1 on main 7df3ab37 had 35; the S2-AUDFULL4 projection at the same code gave exit 0, `register_inputs_validated`.
+- Rebased onto main bc9bb749f5c6396087a8385ca1064889cb509ad1. The only conflict was the PROGRESS append, kept with both sides in order. For every task file, the change lines are byte-equal before and after the move (lead script, file by file).
+- Acceptance of decision 0132 and every gate remain pending. No acceptance box is ticked.
