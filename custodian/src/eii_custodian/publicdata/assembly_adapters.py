@@ -372,7 +372,22 @@ class Production:
             if entry.source_id in NATIVE_SOURCES and entry.key in selected:
                 read_native(self, entry, selected[entry.key])
                 continue
-            if entry.skip_reason or entry.kind in {"citation_only", "besttime"}:
+            if entry.skip_reason or entry.kind == "besttime":
+                continue
+            if entry.kind == "citation_only":
+                path = local(self.cache, entry.key + "/citation.json")
+                if not path.exists():
+                    continue
+                try:
+                    citation = read_object(path.parent, path.name)
+                except AssemblyError:
+                    raise AssemblyError("assembly_citation_invalid") from None
+                if (
+                    citation.get("key") != entry.key
+                    or citation.get("source_id") != entry.source_id
+                ):
+                    raise AssemblyError("assembly_lineage_missing")
+                self.receipts[entry.key] = citation
                 continue
             if entry.key not in selected:
                 if confirmation is not None and own_run_pending(
@@ -735,7 +750,13 @@ class Production:
             )
             sources = tuple(sorted({str(row["source_key"]) for row in rows}))
             if not sources:
-                sources = tuple(sorted(selected))
+                sources = tuple(
+                    sorted(
+                        e.key
+                        for e in self.entries
+                        if e.key in selected and name in e.release_tables
+                    )
+                )
             self.table(name, rows, sources)
             names.append(name)
         self.files.update(files)
