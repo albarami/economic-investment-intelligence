@@ -109,7 +109,12 @@ def test_same_host_landing_redirect_reaches_the_release_tables(
     state = context(cache, (row,))
     state.reviewed_selections()
     name = "fdi_projects" if row.source_id == "fdi_projects" else "pub_investqa_record"
-    assert state.tables[name] == table["rows"]
+    if row.source_id == "fdi_projects":
+        assert state.tables[name] == table["rows"]
+    else:
+        from custodian.tests.test_assembly_native import assert_agency_release
+
+        assert_agency_release(state.tables[name], table["rows"])
 
 
 @pytest.mark.parametrize(
