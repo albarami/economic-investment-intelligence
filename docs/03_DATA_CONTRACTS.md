@@ -901,7 +901,7 @@ on surface of the member polygons' union. The loader refuses an empty,
 non-list or duplicated member list (`landmark_members_empty`,
 `landmark_member_duplicate`), a missing or blank reason
 (`landmark_reason_missing`), a non-null `record_ref` (`landmark_record_ref`),
-any `members` or `member_reason` on a row of another source, and a `landmark`
+a non-null `members` or `member_reason` on a row of another source, and a `landmark`
 row on a source other than `places_ovt` or `bnd_hdx.district`
 (`landmark_source_refused`). At the stage, a member that names no archive
 district (`landmark_member_unknown`), one whose polygon is not inside the

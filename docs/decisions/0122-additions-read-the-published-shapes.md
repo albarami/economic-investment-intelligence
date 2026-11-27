@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted by the owner, 2026-11-27 ("ACCEPT 0116, 0117, 0118, 0120, 0121 and 0122", relayed by the advisor in note owner-relayed-20261127-060429), on the lead's confirmation (ruling L-2272) that its review still stands on main `bc9bb749`: the record's text is byte-equal to its text at `247c6dc` (S2-DREC.fx1), which S2-DREC.cf2 (Cursor, grok-4.7-high, a maker other than the builders) CONFIRMED; S2-DREC.rv1 (Devin) found the same text at `d975159d` ready for acceptance |
 | Date | 2026-11-25 |
 | Owner | The owner |
 | Amends | Document 03 section 7.3, Public table columns; S2-T11 additions parsing. |

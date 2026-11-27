@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed; owner selected M1 on 2026-11-26, conditional on planted refusals and approval by a different maker before admission; that review remains pending |
+| Status | Accepted by the owner, 2026-11-27 ("ACCEPT now: 0119, 0123 and 0124 ... 0124 stays conditional on the planted refusals and approval by a different maker, as its Status line says.", relayed by the advisor in note owner-relayed-20261127-060429); his choice M1 of 2026-11-26 stands, conditional on planted refusals and approval by a different maker before admission; on record: S2-REGM1.rv3 (Factory Droid) APPROVED `9363157053209d8e98fa82769a04d65f52d89968` with the planted refusals (PROGRESS.md **S2-REGM1 approval**) |
 | Date | 2026-11-26 |
 | Scope | Slice S2, task S2-T49; fixed register metadata and schema column-name keys only |
 | Amends | Decision 0105 items 3, 5 and 6 for the fields listed below, including item 5's refusal of an exact recomputed count; decision 0119 item 6's statement that only named digests are exempt; proposed decision 0123 item 3's unchanged metadata scans |

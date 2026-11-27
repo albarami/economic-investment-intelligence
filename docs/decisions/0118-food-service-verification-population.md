@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted by the owner, 2026-11-27 ("ACCEPT 0116, 0117, 0118, 0120, 0121 and 0122", relayed by the advisor in note owner-relayed-20261127-060429), on the lead's confirmation (ruling L-2272) that its review still stands on main `bc9bb749`: the record's text is byte-equal to its text at `247c6dc` (S2-DREC.fx1), which S2-DREC.cf2 (Cursor, grok-4.7-high, a maker other than the builders) CONFIRMED |
 | Date | 2026-11-25 |
 | Scope | S2-T06; PUB-52 and PUB-57; [document 03](../03_DATA_CONTRACTS.md) `pub_place_verification` paragraph |
 | Purpose | Make place verification cover every food-service place of a showcase walk polygon, while the PUB-57 restaurant counts stay unchanged |

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted by the owner, 2026-11-27 ("ACCEPT now: 0119, 0123 and 0124. They carry my own choices (option b, C1 and M1).", relayed by the advisor in note owner-relayed-20261127-060429) |
 | Date | 2026-11-25 |
 | Scope | `custodian/src/eii_custodian/publicdata/registers/validate.py` (`validate_release`; for item 6 also `scan_artefact`, `scan_metadata` and `scan_content`), `contracts.py` (`DIGEST_FIELDS`, item 6) and `build.py` (item 6); its invented tests; the package README; [document 03](../03_DATA_CONTRACTS.md) **Register file projections (S2-T49)** |
 | Amends | [Decision 0105](0105-register-scan-typed-columns.md) items 3 and 4, for the release tables only |

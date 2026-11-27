@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed by the lead, 2026-11-24 |
+| Status | Proposed by the lead, 2026-11-24; different-maker review on main `bc9bb749`: R60-REC.rv2 (Moonshot Kimi through Factory Droid, review mode) APPROVED this record's text (blob `ea81e14c`), no rejecting finding; the owner's acceptance remains pending |
 | Date | 2026-11-24 |
 | Owner | The owner |
 | Amends | Decision 0081 items 2 and 4; AGENTS.md and CLAUDE.md rule 44; document 13 command table; document 12 fetch-input test map; README resume description. |

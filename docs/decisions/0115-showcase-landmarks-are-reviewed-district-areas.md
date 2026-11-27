@@ -2,8 +2,9 @@
 
 | | |
 |---|---|
-| Status | Proposed by the lead, 2026-11-24 (task S2-LMK2); different-maker review and acceptance remain pending |
+| Status | Proposed by the lead, 2026-11-24 (task S2-LMK2); different-maker review on main `bc9bb749`: R60-REC.rv2 (Moonshot Kimi through Factory Droid, review mode) APPROVED this record's text (blob `0943ed6e`), no rejecting finding; its two wording notes are applied here as records only; the owner's acceptance remains pending |
 | Date | 2026-11-24 |
+| Owner | The owner |
 | Scope | `custodian/publicdata/review/showcase_gazetteer.yaml` rows `landmark:0` to `landmark:3`; `custodian/publicdata/review/flagship_candidates.yaml` row `building:3`; the review loader `custodian/src/eii_custodian/publicdata/places/review.py`; the places stage `custodian/src/eii_custodian/publicdata/places/stage.py`; the hand-over `places/integrate.py` and `frame/live.py`; the review tool `scripts/review_place_keys.py`; [document 03](../03_DATA_CONTRACTS.md) |
 | Amends | Nothing until accepted |
 | Purpose | Let the four reviewed landmark rows of the showcase gazetteer resolve as boundary-district areas of the licensed boundary archive, so that the live build no longer refuses `gazetteer_missing_source_point` on them |
@@ -52,7 +53,7 @@ source's zone grouping — the three districts of the Al Dafna zones, Al Dafna
    or the frame boundary does not cover refuses the run.
 4. Every refusal on the route is closed: the loader raises
    `landmark_source_refused` (a `landmark` row on a source outside
-   `places_ovt` and `bnd_hdx.district`, or member fields on any other row),
+   `places_ovt` and `bnd_hdx.district`, or non-null member fields on any other row),
    `landmark_record_ref` (a non-null `record_ref` on a district row),
    `landmark_members_empty` (no list, an empty list or a non-string or empty
    member), `landmark_member_duplicate` (a repeated member, and at the stage
