@@ -7408,3 +7408,6 @@ OPEN — S2-T19 coverage gap (owner: lead; lead ruling L-2361 item 2): each lice
 - ASSUMPTION, owners S2-T08 and S2-T12, S2-AGENCYPARAM.b1 / L-2325 item 2(c): a range's bound is not stored because DAT-143's value holds one stated value; a later decision may add a bound column.
 
 - CLOSED, owners S2-T08 and S2-T12: forward-marker pins projected, expected and توقعات plus sibling vocabulary pins supplied by S2-AGENCYPARAM.b1a under L-2341; byte-exact restoration and negative plant evidence in .overnight/RETURN.md. Independent review remains owed.
+
+- CLOSED, owners S2-T08 and S2-T12: closed-vocabulary token boundaries implemented by S2-AGENCYPARAM.b1b under L-2343 item 2; literal, generated and planted evidence in .overnight/OUT/S2-AGENCYPARAM.b1b.RETURN.md. Independent other-maker review remains owed.
+- CORRECTION, S2-AGENCYPARAM.b1a: the b1a evidence is in `.overnight/OUT/S2-AGENCYPARAM.b1a.RETURN.md`; this appends to, and does not replace, the earlier evidence line.

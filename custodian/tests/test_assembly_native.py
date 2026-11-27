@@ -969,124 +969,126 @@ def _parameter_pages():
     return rows, pages
 
 
+_PARAMETER_COMMON = dict(
+    record_type="incentive_parameter",
+    parent_key="incentives_invented",
+    sequence=None,
+    reference=None,
+    link_url=None,
+    activity_keys=None,
+    period=None,
+    page_url="https://agency.invalid/en/incentives/invented",
+    source_id="investqa_pages",
+)
+PARAMETER_EXPECTED = [
+    dict(
+        _PARAMETER_COMMON,
+        record_type="incentive",
+        record_key="incentives_invented",
+        parent_key=None,
+        title_en="Invented package",
+        title_ar="حزمة افتراضية",
+        parameter_key=None,
+        value=None,
+        unit=None,
+        duration_months=None,
+        as_stated=None,
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:rent_share",
+        title_en="Rent subsidy",
+        title_ar="دعم الإيجار",
+        parameter_key="rent_share",
+        value="0.25",
+        unit="ratio",
+        duration_months=36,
+        as_stated="Rent subsidy\n25% for 3 years",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:rent_amount",
+        title_en="Rent allowance",
+        title_ar="بدل الإيجار",
+        parameter_key="rent_amount",
+        value="1200",
+        unit="qar_per_month",
+        duration_months=None,
+        as_stated="Rent allowance\nQAR 1200 per month",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:staff_share",
+        title_en="Salary subsidy",
+        title_ar="دعم الرواتب",
+        parameter_key="staff_share",
+        value="0.4",
+        unit="ratio",
+        duration_months=None,
+        as_stated="Salary subsidy\n40%",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:staff_amount",
+        title_en="Salary allowance",
+        title_ar="بدل الرواتب",
+        parameter_key="staff_amount",
+        value="800",
+        unit="qar_per_month",
+        duration_months=None,
+        as_stated="Salary allowance\nQAR 800 per month",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:other_5",
+        title_en="Tax exemption",
+        title_ar="إعفاء ضريبي",
+        parameter_key="other",
+        value=None,
+        unit=None,
+        duration_months=None,
+        as_stated="Tax exemption\nExemption applies",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:other_6",
+        title_en="Rent allowance",
+        title_ar="بدل الإيجار",
+        parameter_key="other",
+        value="500",
+        unit="QAR",
+        duration_months=None,
+        as_stated="Rent allowance\nQAR 500 one-off",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:other_7",
+        title_en="Rent subsidy",
+        title_ar="دعم الإيجار",
+        parameter_key="other",
+        value=None,
+        unit="%",
+        duration_months=None,
+        as_stated="Rent subsidy\nup to 30%",
+    ),
+    dict(
+        _PARAMETER_COMMON,
+        record_key="incentives_invented:other_8",
+        title_en="Land offer",
+        title_ar=None,
+        parameter_key="other",
+        value=None,
+        unit=None,
+        duration_months=None,
+        as_stated="Land offer\nLand available",
+    ),
+]
+
+
 def test_incentive_parameter_literal_oracle():
     rows, pages = _parameter_pages()
     released, lines = _project(rows, pages)
-    common = dict(
-        record_type="incentive_parameter",
-        parent_key="incentives_invented",
-        sequence=None,
-        reference=None,
-        link_url=None,
-        activity_keys=None,
-        period=None,
-        page_url="https://agency.invalid/en/incentives/invented",
-        source_id="investqa_pages",
-    )
-    expected = [
-        dict(
-            common,
-            record_type="incentive",
-            record_key="incentives_invented",
-            parent_key=None,
-            title_en="Invented package",
-            title_ar="حزمة افتراضية",
-            parameter_key=None,
-            value=None,
-            unit=None,
-            duration_months=None,
-            as_stated=None,
-        ),
-        dict(
-            common,
-            record_key="incentives_invented:rent_share",
-            title_en="Rent subsidy",
-            title_ar="دعم الإيجار",
-            parameter_key="rent_share",
-            value="0.25",
-            unit="ratio",
-            duration_months=36,
-            as_stated="Rent subsidy\n25% for 3 years",
-        ),
-        dict(
-            common,
-            record_key="incentives_invented:rent_amount",
-            title_en="Rent allowance",
-            title_ar="بدل الإيجار",
-            parameter_key="rent_amount",
-            value="1200",
-            unit="qar_per_month",
-            duration_months=None,
-            as_stated="Rent allowance\nQAR 1200 per month",
-        ),
-        dict(
-            common,
-            record_key="incentives_invented:staff_share",
-            title_en="Salary subsidy",
-            title_ar="دعم الرواتب",
-            parameter_key="staff_share",
-            value="0.4",
-            unit="ratio",
-            duration_months=None,
-            as_stated="Salary subsidy\n40%",
-        ),
-        dict(
-            common,
-            record_key="incentives_invented:staff_amount",
-            title_en="Salary allowance",
-            title_ar="بدل الرواتب",
-            parameter_key="staff_amount",
-            value="800",
-            unit="qar_per_month",
-            duration_months=None,
-            as_stated="Salary allowance\nQAR 800 per month",
-        ),
-        dict(
-            common,
-            record_key="incentives_invented:other_5",
-            title_en="Tax exemption",
-            title_ar="إعفاء ضريبي",
-            parameter_key="other",
-            value=None,
-            unit=None,
-            duration_months=None,
-            as_stated="Tax exemption\nExemption applies",
-        ),
-        dict(
-            common,
-            record_key="incentives_invented:other_6",
-            title_en="Rent allowance",
-            title_ar="بدل الإيجار",
-            parameter_key="other",
-            value="500",
-            unit="QAR",
-            duration_months=None,
-            as_stated="Rent allowance\nQAR 500 one-off",
-        ),
-        dict(
-            common,
-            record_key="incentives_invented:other_7",
-            title_en="Rent subsidy",
-            title_ar="دعم الإيجار",
-            parameter_key="other",
-            value=None,
-            unit="%",
-            duration_months=None,
-            as_stated="Rent subsidy\nup to 30%",
-        ),
-        dict(
-            common,
-            record_key="incentives_invented:other_8",
-            title_en="Land offer",
-            title_ar=None,
-            parameter_key="other",
-            value=None,
-            unit=None,
-            duration_months=None,
-            as_stated="Land offer\nLand available",
-        ),
-    ]
-    assert released == expected
+    assert released == PARAMETER_EXPECTED
     assert lines == [
         "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing",
         "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_kind reason=unclassified",
@@ -1514,3 +1516,323 @@ def test_parameter_monthly_vocabulary_consumed_whole(marker):
     from eii_custodian.publicdata.assembly_native import _MONTHLY
 
     assert _MONTHLY.fullmatch(marker) is not None
+
+
+@pytest.mark.parametrize(
+    "english,arabic,heading,key,value,unit,duration,period,forward",
+    [
+        (
+            "unexpected 25%",
+            "٢٥٪ دون تغيير",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        (
+            "unexpectedly 25%",
+            "٢٥٪ دون تغيير",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        (
+            "25%",
+            "دعم غير متوقع بنسبة ٢٥٪",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        (
+            "25%",
+            "التكاليف غير المتوقعة بنسبة ٢٥٪",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        *[
+            (
+                "projected 25%",
+                text,
+                "Rent subsidy",
+                "rent_share",
+                "0.25",
+                "ratio",
+                None,
+                None,
+                True,
+            )
+            for text in (
+                "النسبة المتوقعة ٢٥٪",
+                "والمتوقع دعم بنسبة ٢٥٪",
+                "التوقعات تشير إلى ٢٥٪",
+                "وتوقعات الدعم بنسبة ٢٥٪",
+            )
+        ],
+        *[
+            (
+                f"QAR 50 {term}",
+                "\u0665\u0660 ريال قطري",
+                "Rent allowance",
+                "other",
+                "50",
+                "QAR",
+                None,
+                None,
+                False,
+            )
+            for term in ("bimonthly", "semimonthly")
+        ],
+        (
+            "25% none time",
+            "٢٥٪",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+        *[
+            (
+                f"25% {term}",
+                "٢٥٪ مع مبلغ إضافي ٢٠٢٤",
+                "Rent subsidy",
+                "other",
+                None,
+                "%",
+                None,
+                None,
+                False,
+            )
+            for term in ("within 2099", "bargain 2024")
+        ],
+        *[
+            (
+                "25% plus 2024",
+                f"٢٥٪ {term}",
+                "Rent subsidy",
+                "other",
+                None,
+                "%",
+                None,
+                None,
+                False,
+            )
+            for term in ("يكفي ٢٠٢٤", "إضافي ٢٠٢٤")
+        ],
+        (
+            "25% in 2024",
+            "٢٥٪ وفي ٢٠٢٤",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            "2024",
+            False,
+        ),
+        (
+            "25% therefor 12 months",
+            "٢٥٪ مع مبلغ إضافي ١٢",
+            "Rent subsidy",
+            "other",
+            None,
+            "%",
+            None,
+            None,
+            False,
+        ),
+        (
+            "25% for 3 years",
+            "٢٥٪ ولمدة ٣ سنوات",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            36,
+            None,
+            False,
+        ),
+        (
+            "25%",
+            "ودعم الإيجار ٢٥٪",
+            "Rent subsidy",
+            "rent_share",
+            "0.25",
+            "ratio",
+            None,
+            None,
+            False,
+        ),
+    ],
+)
+def test_parameter_literal_boundaries(
+    english, arabic, heading, key, value, unit, duration, period, forward
+):
+    rows, pages = _parameter_pages()
+    en = {
+        **rows[1],
+        "heading": heading,
+        "text_items": json.dumps([english]),
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    ar = {
+        **rows[11],
+        "heading": "بدل الإيجار" if heading == "Rent allowance" else "دعم الإيجار",
+        "text_items": json.dumps([arabic]),
+        "retrieved_utc": "2026-11-27T00:00:00Z",
+    }
+    if arabic.startswith("ودعم"):
+        ar["heading"] = "تفاصيل الدعم"
+    result, lines = _project([en, ar], pages)
+    if forward:
+        assert result == []
+        assert lines == [
+            "OMITTED pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_period reason=forward_looking"
+        ]
+    else:
+        assert lines == []
+        assert [
+            (
+                r["parameter_key"],
+                r["value"],
+                r["unit"],
+                r["duration_months"],
+                r["period"],
+            )
+            for r in result
+        ] == [(key, value, unit, duration, period)]
+
+
+_CLOSED_ENGLISH = (
+    "forecast",
+    "projected",
+    "expected",
+    "for",
+    "month",
+    "months",
+    "year",
+    "years",
+    "in",
+    "QAR",
+    "per month",
+    "monthly",
+    "one-off",
+    "one time",
+    "up to",
+    "between",
+    "rent subsidy",
+    "rental subsidy",
+    "rent allowance",
+    "rental allowance",
+    "salary subsidy",
+    "staff cost subsidy",
+    "salary allowance",
+    "staff cost allowance",
+    "tax exemption",
+    "land offer",
+)
+_CLOSED_ARABIC = (
+    "متوقع",
+    "توقعات",
+    "لمدة",
+    "شهر",
+    "أشهر",
+    "شهراً",
+    "سنة",
+    "سنوات",
+    "في",
+    "ريال قطري",
+    "شهرياً",
+    "شهريا",
+    "لمرة واحدة",
+    "حتى",
+    "ما بين",
+    "دعم الإيجار",
+    "دعم تكاليف الإيجار",
+    "بدل الإيجار",
+    "دعم الرواتب",
+    "دعم الأجور",
+    "بدل الرواتب",
+    "بدل الأجور",
+    "إعفاء ضريبي",
+    "تخصيص أرض",
+)
+
+
+@pytest.mark.parametrize("term", _CLOSED_ENGLISH + _CLOSED_ARABIC)
+def test_closed_term_positive_and_containing_word(term):
+    import re
+
+    from eii_custodian.publicdata.assembly_native import _closed_terms
+
+    pattern = _closed_terms((term,))
+    assert re.search(pattern, term)
+    assert re.search(pattern, "س" + term) is None
+    assert re.search(pattern, term + "س") is None
+    if term in _CLOSED_ARABIC:
+        for prefix in (
+            "و",
+            "ف",
+            "ب",
+            "ل",
+            "ال",
+            "وال",
+            "بال",
+            "فال",
+            "لل",
+            "وب",
+            "ول",
+            "وبال",
+            "ولل",
+        ):
+            assert re.search(pattern, prefix + term)
+            assert re.search(pattern, "س" + prefix + term) is None
+            assert re.search(pattern, prefix + term + "س") is None
+
+
+@settings(max_examples=100, derandomize=True)
+@given(
+    term=st.sampled_from(_CLOSED_ENGLISH + _CLOSED_ARABIC),
+    tail=st.text(alphabet="xyzسصض", min_size=1, max_size=12),
+)
+def test_closed_term_generated_containing_words(term, tail):
+    import re
+
+    from eii_custodian.publicdata.assembly_native import _closed_terms
+
+    pattern = _closed_terms((term,))
+    assert re.search(pattern, tail + term) is None
+    assert re.search(pattern, term + tail) is None
+
+
+@pytest.mark.parametrize("marker", ("متوقع", "توقعات"))
+@pytest.mark.parametrize("suffix", ("", "ة", "ات", "ين", "ون"))
+def test_forward_closed_suffix_and_negation(marker, suffix):
+    import re
+
+    from eii_custodian.publicdata.assembly_native import _closed_terms
+
+    pattern = _closed_terms((marker,), forward=True)
+    assert re.search(pattern, "ال" + marker + suffix)
+    assert re.search(pattern, "غير ال" + marker + suffix) is None
+    assert re.search(pattern, "غير " + marker + suffix) is None
+    assert re.search(pattern, marker + suffix + "س") is None
+    assert re.search(pattern, "تغير " + marker + suffix)

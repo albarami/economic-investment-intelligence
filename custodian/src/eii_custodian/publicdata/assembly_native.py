@@ -314,15 +314,45 @@ _DIGITS = str.maketrans(
         "\u066b": ".",
     }
 )
+
+
+def _closed_terms(terms: tuple[str, ...], *, forward: bool = False) -> str:
+    """Bound closed terms, allowing only the ruled Arabic affixes."""
+    patterns = []
+    for term in terms:
+        token = re.escape(term)
+        if re.search(r"[\u0600-\u06ff]", term):
+            prefix = r"(?:و|ف|ب|ل|ال|وال|بال|فال|لل|وب|ول|وبال|ولل)?"
+            suffix = r"(?:ة|ات|ين|ون)?" if forward else ""
+            negation = r"(?<!(?<!\w)غير )" if forward else ""
+            patterns.append(negation + r"(?<!\w)" + prefix + token + suffix + r"(?!\w)")
+        else:
+            patterns.append(r"(?<!\w)" + token + r"(?!\w)")
+    return "(?:" + "|".join(patterns) + ")"
+
+
 _DURATION = re.compile(
-    rf"(?:for|لمدة)\s+({_NUMBER})\s+(months?|years?|شهر|أشهر|شهراً|سنة|سنوات)", re.I
+    _closed_terms(("for", "لمدة"))
+    + rf"\s+({_NUMBER})\s+("
+    + _closed_terms(
+        ("month", "months", "year", "years", "شهر", "أشهر", "شهراً", "سنة", "سنوات")
+    )
+    + ")",
+    re.I,
 )
-_PERIOD = re.compile(r"(?:in|في)\s+([0-9]{4})(?![0-9])", re.I)
+_PERIOD = re.compile(_closed_terms(("in", "في")) + r"\s+([0-9]{4})(?![0-9])", re.I)
 _PERCENT = re.compile(rf"({_NUMBER})\s*([%٪])")
-_AMOUNT = re.compile(rf"(?:(QAR)\s+({_NUMBER})|({_NUMBER})\s+(ريال قطري))", re.I)
-_MONTHLY = re.compile(r"per month|monthly|شهرياً|شهريا", re.I)
-_ONCE = re.compile(r"one-off|one time|لمرة واحدة", re.I)
-_RANGE = re.compile(r"up to|between|حتى|ما بين|[0-9]\s*[-\u2013]\s*[0-9]", re.I)
+_AMOUNT = re.compile(
+    rf"(?:({_closed_terms(('QAR',))})\s+({_NUMBER})|({_NUMBER})\s+({_closed_terms(('ريال قطري',))}))",
+    re.I,
+)
+_MONTHLY = re.compile(_closed_terms(("per month", "monthly", "شهرياً", "شهريا")), re.I)
+_ONCE = re.compile(_closed_terms(("one-off", "one time", "لمرة واحدة")), re.I)
+_RANGE = re.compile(
+    _closed_terms(("up to", "between", "حتى", "ما بين"))
+    + r"|[0-9]\s*[-\u2013]\s*[0-9]",
+    re.I,
+)
 
 
 @dataclass(frozen=True)
@@ -375,10 +405,7 @@ def classify_parameter(row: Mapping[str, object]) -> Parameter | None:
     matches = [
         key
         for key, phrases in table.items()
-        if any(
-            re.search(r"(?<!\w)" + re.escape(phrase) + r"(?!\w)", text.casefold())
-            for phrase in phrases
-        )
+        if re.search(_closed_terms(phrases), text.casefold())
     ]
     if len(matches) != 1:
         return None
@@ -431,7 +458,10 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
     return bool(
         (parameter.period is not None and period_is_future(parameter.period, retrieved))
         or re.search(
-            r"forecast|projected|expected|متوقع|توقعات", parameter.wording.casefold()
+            _closed_terms(
+                ("forecast", "projected", "expected", "متوقع", "توقعات"), forward=True
+            ),
+            parameter.wording.casefold(),
         )
     )
 
