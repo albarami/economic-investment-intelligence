@@ -272,18 +272,24 @@ def awards_state(tmp_path, monkeypatch):
     return state, batch.sha256
 
 
-def _select_awards(state, source_sha256):
+def _select_awards(
+    state,
+    source_sha256,
+    *,
+    body_periods=("2026-01-01", "2026-01-03"),
+    omit_source=False,
+):
     from eii_custodian.publicdata.fetch.receipts import sha256_hex
     from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
 
     key = "awards_owner_scrape"
-    body = json.dumps(
-        {
-            "source_sha256": source_sha256,
-            "period_first": "2026-01-01",
-            "period_last": "2026-01-03",
-        }
-    ).encode()
+    content = {
+        "period_first": body_periods[0],
+        "period_last": body_periods[1],
+    }
+    if not omit_source:
+        content["source_sha256"] = source_sha256
+    body = json.dumps(content).encode()
     snap = publish_snapshot(
         state.cache / key,
         "json",
@@ -294,11 +300,11 @@ def _select_awards(state, source_sha256):
     return snap
 
 
-def test_audit_periods_unrelated_awards_selection_has_no_bound(awards_state):
+def test_audit_periods_awards_without_source_sha256_has_no_bound(awards_state):
     from eii_custodian.publicdata.assembly_reports import observed_periods
 
-    state, _ = awards_state
-    _select_awards(state, "a" * 64)
+    state, digest = awards_state
+    _select_awards(state, digest, omit_source=True)
     assert "awards_owner_scrape" not in observed_periods(state)
 
 
@@ -314,7 +320,13 @@ def test_audit_periods_matching_awards_batch_has_intake_dates(awards_state):
     from eii_custodian.publicdata.assembly_reports import observed_periods
 
     state, digest = awards_state
-    _select_awards(state, digest)
+    _select_awards(state, digest, body_periods=("2099-03-01", "2099-03-02"))
+    state.receipts["awards_owner_scrape"] = dict(
+        state.receipts["awards_owner_scrape"],
+        period_first="2099-01-01",
+        period_last="2099-01-02",
+        summary={"date_first": "2099-01-01", "date_last": "2099-01-02"},
+    )
     assert observed_periods(state) == {
         "awards_owner_scrape": ("2026-01-01", "2026-01-03")
     }
