@@ -2058,11 +2058,40 @@ def test_forward_paradigm_differential():
 
 
 @pytest.mark.parametrize("marker", ("متوقع", "توقعات", "توقع", "يتوقع"))
-@pytest.mark.parametrize("suffix", ("", "ة", "ات", "ين", "ون", "\u0627", "س", "ني"))
+@pytest.mark.parametrize(
+    "suffix",
+    (
+        "",
+        "ة",
+        "\u0647",
+        "ات",
+        "ين",
+        "ون",
+        "\u0627",
+        "ان",
+        "تان",
+        "تين",
+        "\u0647\u0627",
+        "هم",
+        "هن",
+        "هما",
+        "كم",
+        "نا",
+        "ي",
+        "س",
+        "ني",
+    ),
+)
 def test_forward_closed_suffix_and_negation(marker, suffix):
     from eii_custodian.publicdata.assembly_native import Parameter, parameter_is_forward
 
-    for prefix, forward in (("ال", True), ("غير ال", False), ("غير ", False)):
+    # L-2363 item 3b: containment keeps توقعات near-miss tails forward.
+    for prefix, forward in (
+        ("ال", True),
+        ("غير ال", False),
+        ("غير ", False),
+        ("تغير ", True),
+    ):
         parameter = Parameter(
             "rent_share", "25", "%", None, None, prefix + marker + suffix
         )
@@ -2312,6 +2341,58 @@ def test_parameter_natural_forms_under_match(kind, wording):
             True,
             None,
             id="object-ni",
+        ),
+        pytest.param(
+            "25%",
+            "الصندوق غيّر توقعاته لدعم الإيجار إلى ٢٥٪",
+            True,
+            None,
+            id="change-previous-shadda",
+        ),
+        pytest.param(
+            "25%",
+            "تغطي الهيئة التكاليف الغير متوقعة بنسبة ٢٥٪",
+            False,
+            None,
+            id="al-negation",
+        ),
+        pytest.param(
+            "25%", "دعم الغير المتوقع بنسبة ٢٥٪", False, None, id="negation-الغير"
+        ),
+        pytest.param(
+            "25%",
+            "العقود التي تُوَقِّعُونَهَا مع الجهة تحصل على دعم بنسبة ٢٥٪",
+            True,
+            None,
+            id="sign-full-nonambiguous",
+        ),
+        pytest.param(
+            "25%",
+            "ورد في التقرير توقّعٌ ببلوغ دعم الإيجار ٢٥٪",
+            True,
+            None,
+            id="noun-shadda",
+        ),
+        pytest.param(
+            "25%",
+            "ورد في التقرير تَوَقُّعٌ ببلوغ دعم الإيجار ٢٥٪",
+            True,
+            None,
+            id="noun-vowelled",
+        ),
+        pytest.param(
+            "25%",
+            "وقّع المدير عقد الإيجار بدعم ثابت قدره ٢٥٪",
+            False,
+            None,
+            id="sign-past-shadda",
+        ),
+        pytest.param(
+            "25%",
+            "تُّوَقِّعُ الجهة عقود الإيجار بدعم ثابت قدره ٢٥٪",
+            True,
+            None,
+            id="sign-shadda-ta",
         ),
         pytest.param(
             "25%", "يُتوقع أن يبلغ دعم الإيجار ٢٥٪", True, None, id="passive-diacritic"

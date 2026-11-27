@@ -484,11 +484,14 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
     ) or re.search(_closed_terms(("من غير المتوقع",)), checked):
         return True
     previous = ""
+    previous_raw = ""
     for raw in re.findall(
         r"[\u0621-\u064a\u064b-\u0652\u0670]+", wording.replace("ـ", "")
     ):
         word = re.sub(marks, "", raw)
-        if "توقع" in word and previous not in _ARABIC_FORWARD_NEGATIONS:
+        if "توقع" in word and (
+            "ّ" in previous_raw or previous not in _ARABIC_FORWARD_NEGATIONS
+        ):
             ambiguous = re.fullmatch(
                 r"[وف]?توقع(?:ان|ون|ين|وا|ي|\u0627|\u0647|\u0647\u0627|هم|هما|هن|ك|كم|نا|ني)?",
                 word,
@@ -496,12 +499,13 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
             letters = re.findall(r"([\u0621-\u064a])(" + marks + "*)", raw)
             stem = letters[1:] if word.startswith(("و", "ف")) else letters
             signing = ambiguous is not None and all(
-                set(stem[index][1]) - {"ّ"} == {vowel}
+                set(stem[index][1]) - ({"ّ"} if index == 2 else set()) == {vowel}
                 for index, vowel in enumerate(("ُ", "َ", "ِ"))
             )
             if not signing:
                 return True
         previous = word
+        previous_raw = raw
     return bool(
         re.search(
             _closed_terms(
