@@ -456,11 +456,11 @@ def test_restricted_gis_verified_bytes_and_truthful_lineage(tmp_path):
     (tmp_path / "method_pins.json").write_text(json.dumps({case.source_key: digest}))
     parsed, chain = local.read_gis(tmp_path, case)
     assert local.boundary_finding_counts(parsed) == {0: 0}
-    assert chain.licence_id == ""
+    assert chain.licence_id == "not_stated"
     assert chain.release_table is None
     assert chain.dataset == "gis_boundaries"
     assert chain.sha256 == digest
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"^incomplete source chain$"):
         chain.source_chain()
     path = tmp_path / case.source_key / (digest + ".meta.json")
     receipt = json.loads(path.read_text())

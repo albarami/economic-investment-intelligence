@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 from custodian.tests.support.fetch_build import run_build
 from custodian.tests.test_production_adapters import context
+from hypothesis import given
+from hypothesis import strategies as st
 
 
 @pytest.mark.parametrize(
@@ -302,7 +304,7 @@ def test_agency_selected_release_writes_both_languages_and_inventory(
     state = context(cache, (row,))
     state.reviewed_selections()
     assert state.tables["pub_investqa_page"] == expected
-    assert state.tables["pub_investqa_record"] == table["rows"]
+    assert_agency_release(state.tables["pub_investqa_record"], table["rows"])
     record = json.loads((cache / "assembly/reviewed_selections.json").read_bytes())
     entries = record["page_public_totals"]
     assert len(entries) == 10
@@ -393,4 +395,517 @@ def test_agency_release_contact_refusal_keeps_typed_records(tmp_path, monkeypatc
     state = context(cache, (row,))
     state.reviewed_selections()
     assert len(state.tables["pub_investqa_page"]) == 9
+    assert any(item["page_url"] == url for item in state.tables["pub_investqa_record"])
     assert any("page_contact_shape" in line for line in state.lines)
+
+
+AGENCY_COLUMNS = set(
+    "record_type record_key parent_key sequence title_en title_ar reference "
+    "link_url activity_keys parameter_key value unit duration_months as_stated "
+    "period page_url source_id".split()
+)
+
+
+def assert_agency_release(released, cached):
+    """Document 03 section 7.3; cache paragraphs cannot be release columns."""
+    released_types = {
+        ("page", "sector"): "sector",
+        ("page", "opportunity"): "opportunity",
+        ("page", "incentive"): "incentive",
+        ("page", "law"): "law",
+        ("block", "opportunity"): "opportunity",
+        ("block", "setup_step"): "setup_step",
+    }
+    expected = [
+        (
+            released_types[(grain, item["record_type"])],
+            item["page_url"],
+            item["title"] if grain == "page" else item["heading"],
+        )
+        for item in cached
+        for grain in ("page" if item["ordinal"] is None else "block",)
+        if item.get("language") == "en"
+        and (grain, item["record_type"]) in released_types
+    ]
+    assert sorted(
+        (row["record_type"], row["page_url"], row["title_en"]) for row in released
+    ) == sorted(expected)
+    for row in released:
+        assert set(row) == AGENCY_COLUMNS
+        assert row["record_type"] in {
+            "sector",
+            "opportunity",
+            "incentive",
+            "setup_step",
+            "law",
+        }
+        source = next(
+            item
+            for item in cached
+            if item["page_url"] == row["page_url"]
+            and (item["title"] or item["heading"]) == row["title_en"]
+        )
+        if row["title_ar"] is not None:
+            candidates = [
+                item
+                for item in cached
+                if item["page_url"] == source["page_url"]
+                and item["record_type"] == source["record_type"]
+            ]
+            counterparts = [
+                item
+                for item in cached
+                if item["page_url"] == source["page_url"].replace("/en/", "/ar/")
+                and item.get("language") == "ar"
+                and item["record_type"] == source["record_type"]
+            ]
+            counterpart = counterparts[candidates.index(source)]
+            field = "title" if counterpart["ordinal"] is None else "heading"
+            assert row["title_ar"] == counterpart[field]
+        assert row["source_id"] == source["source_id"]
+        assert row["sequence"] == (
+            source["ordinal"] if row["record_type"] == "setup_step" else None
+        )
+        for field in (
+            "parameter_key",
+            "value",
+            "unit",
+            "duration_months",
+            "as_stated",
+            "period",
+        ):
+            assert row[field] is None
+
+
+def _projection_input(tmp_path, monkeypatch):
+    from custodian.tests.test_investment_bilingual import bilingual_utf8
+
+    from eii_custodian.publicdata.investment_build import read_page_table
+
+    _, bodies = bilingual_utf8()
+    for url in tuple(bodies):
+        if "/ar/" in url:
+            alternate = url.replace("/ar/", "/en/")
+            bodies[url] = bodies[url].replace(
+                b"</head>",
+                f'<link rel="alternate" hreflang="en" href="{alternate}"></head>'.encode(),
+            )
+    entry, cache, _, manifest, table = _agency_selected(tmp_path, monkeypatch, bodies)
+    pages = read_page_table(cache / entry.key / "evidence", manifest)["page_rows"]
+    rows = [
+        {key: value for key, value in row.items() if key != "join_key"}
+        for row in table["rows"]
+    ]
+    return rows, pages
+
+
+def _project(rows, pages, activities=None):
+    from eii_custodian.publicdata.assembly_native import project_agency_records
+
+    lines = []
+    result = project_agency_records(rows, pages, activities or {}, lines)
+    return result, lines
+
+
+def test_agency_projection_exact_columns_pairing_and_omissions(tmp_path, monkeypatch):
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    from copy import deepcopy
+
+    before = deepcopy((rows, pages))
+    result, lines = _project(rows, pages)
+    assert_agency_release(result, rows)
+    assert (rows, pages) == before
+    assert len({row["record_key"] for row in result}) == len(result)
+    assert {
+        ("page" if row["ordinal"] is None else "block", row["record_type"])
+        for row in rows
+        if row["language"] == "en"
+    } >= {
+        ("page", "sector"),
+        ("page", "opportunity"),
+        ("page", "incentive"),
+        ("page", "law"),
+        ("block", "opportunity"),
+        ("block", "setup_step"),
+    }
+    assert all(row["title_ar"] for row in result)
+    for row in result:
+        page = next(page for page in pages if page["page_url"] == row["page_url"])
+        assert row["record_key"].startswith(page["page_key"])
+        assert "/en/" in row["page_url"]
+    parameters = [row for row in rows if row["record_type"] == "incentive_parameter"]
+    assert len(lines) == len(parameters)
+    for row in parameters:
+        assert (
+            f"OMITTED pub_investqa_record {row['page_url']} check=parameter_kind reason=unclassified"
+            in lines
+        )
+    assert not any(row["record_type"] == "incentive_parameter" for row in result)
+
+
+def test_agency_projection_activity_mapping_and_unmapped(tmp_path, monkeypatch):
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    plain, _ = _project(rows, pages)
+    target = next(row for row in plain if row["record_type"] == "sector")
+    mapped, _ = _project(
+        rows, pages, {target["record_key"]: "invented_beta;invented_alpha"}
+    )
+    assert (
+        next(row for row in mapped if row["record_key"] == target["record_key"])[
+            "activity_keys"
+        ]
+        == "invented_beta;invented_alpha"
+    )
+    assert all(row["activity_keys"] is None for row in plain)
+    assert all(
+        row["activity_keys"] is None
+        for row in mapped
+        if row["record_key"] != target["record_key"]
+    )
+
+
+def test_agency_projection_unmatched_block_structure(tmp_path, monkeypatch):
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    removed = next(
+        row
+        for row in rows
+        if row["language"] == "ar"
+        and row["record_type"] == "setup_step"
+        and "/setup/" in row["page_url"]
+    )
+    rows.remove(removed)
+    assert any(
+        row["page_url"] == removed["page_url"] and row["record_type"] == "setup_step"
+        for row in rows
+    )
+    result, lines = _project(rows, pages)
+    affected = [
+        row
+        for row in result
+        if row["record_type"] == "setup_step"
+        and row["page_url"] == removed["page_url"].replace("/ar/", "/en/")
+    ]
+    assert affected
+    assert all(row["title_ar"] is None for row in affected)
+    assert all(
+        f"NULLED pub_investqa_record {row['record_key']} {row['page_url']} check=title_ar reason=pair_unmatched"
+        in lines
+        for row in affected
+    )
+
+
+def test_agency_projection_unresolved_key_is_reported(tmp_path, monkeypatch):
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    rows[0]["page_url"] = "https://agency.invalid/"
+    url = rows[0]["page_url"]
+    result, lines = _project(rows, pages)
+    assert not any(row["page_url"] == url for row in result)
+    assert (
+        f"OMITTED pub_investqa_record {url} check=record_key reason=unresolved" in lines
+    )
+
+
+@pytest.mark.parametrize(
+    "plant,code",
+    [
+        ("unknown", "unknown_field"),
+        ("title", "missing_title"),
+        ("type", "type_refused"),
+        ("collision", "key_collision"),
+    ],
+)
+def test_agency_projection_refuses_one_changed_input(
+    tmp_path, monkeypatch, plant, code
+):
+    from eii_custodian.publicdata.assembly import AssemblyError
+
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    if plant == "unknown":
+        rows[0]["unexpected"] = None
+    elif plant == "title":
+        target = next(
+            row
+            for row in rows
+            if row["ordinal"] is None
+            and row["record_type"] == "sector"
+            and row["language"] == "en"
+        )
+        target["title"] = None
+    elif plant == "type":
+        rows[0]["record_type"] = "sector_block"
+    else:
+        pages.append({**pages[0], "page_url": pages[0]["page_url"] + "/different"})
+    with pytest.raises(AssemblyError, match="^assembly_agency_record_" + code + "$"):
+        _project(rows, pages)
+
+
+def test_agency_projected_rows_reach_draw(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.assembly_reports import draw_tables
+
+    entry, cache, _, _, table = _agency_selected(tmp_path, monkeypatch)
+    state = context(cache, (entry,))
+    state.reviewed_selections()
+    assert_agency_release(state.tables["pub_investqa_record"], table["rows"])
+    assert any(
+        row["sequence"] is not None for row in state.tables["pub_investqa_record"]
+    )
+    assert draw_tables(state)["pub_investqa_record"]() == []
+
+
+def test_agency_projection_lineage_reachable(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.fetch.snapshots import read_snapshot
+
+    entry, cache, pointer, manifest, table = _agency_selected(tmp_path, monkeypatch)
+    state = context(cache, (entry,))
+    state.reviewed_selections()
+    assert_agency_release(state.tables["pub_investqa_record"], table["rows"])
+    row = state.tables["pub_investqa_record"][0]
+    original = next(
+        item for item in table["rows"] if item["page_url"] == row["page_url"]
+    )
+    assert row["source_id"] == entry.source_id
+    assert state.table_sources["pub_investqa_record"] == {entry.key}
+    receipt = state.receipts[entry.key]
+    assert receipt["source_id"] == row["source_id"]
+    for field in (
+        "publisher",
+        "licence_id",
+        "licence_basis",
+        "decision_record",
+        "terms_sha256",
+        "terms_url",
+    ):
+        assert receipt[field] == original[field]
+    page = next(
+        item
+        for item in state.tables["pub_investqa_page"]
+        if item["page_url"] == row["page_url"]
+    )
+    assert page["page_sha256"] == original["page_sha256"]
+    assert page["retrieved_on"] == original["retrieved_utc"][:10]
+    raw = read_snapshot(cache / entry.key, page["page_sha256"])
+    assert raw.sidecar["retrieved_utc"] == original["retrieved_utc"]
+    assert original["provenance"] == "public"
+    # The table-source binding retains the selected immutable evidence files.
+    cached = read_snapshot(
+        cache / entry.key / "evidence", manifest["table_snapshot_identity"]
+    )
+    assert state.files[cached.path.relative_to(cache).as_posix()] == cached.sha256
+    archived = json.loads(cached.body)["rows"]
+    archived_original = next(
+        item for item in archived if item["record_key"] == original["record_key"]
+    )
+    assert archived_original["provenance"] == original["provenance"]
+    snapshot = read_snapshot(cache / entry.key / "evidence", pointer["manifest_sha256"])
+    assert state.files[snapshot.path.relative_to(cache).as_posix()] == snapshot.sha256
+    stored_manifest = json.loads(snapshot.body)
+    assert stored_manifest["parser_method"] == original["method"]
+    assert stored_manifest["parser_version"] == original["method_version"]
+
+
+def test_agency_projection_columns_match_document():
+    from custodian.tests.test_draw_contract_columns import contract_columns
+
+    from eii_custodian.publicdata.assembly_native import _AGENCY_COLUMNS
+
+    assert set(_AGENCY_COLUMNS) == AGENCY_COLUMNS
+    assert AGENCY_COLUMNS == contract_columns()["pub_investqa_record"] | {"source_id"}
+
+
+def test_agency_projection_opportunity_parent(tmp_path, monkeypatch):
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    sector = next(row for row in rows if row["record_type"] == "sector")
+    block = next(
+        row
+        for row in rows
+        if row["page_url"] == sector["page_url"] and row["ordinal"] is not None
+    )
+    block["record_type"] = "opportunity"
+    result, _ = _project(rows, pages)
+    page = next(row for row in result if row["record_type"] == "sector")
+    child = next(
+        row
+        for row in result
+        if row["page_url"] == page["page_url"] and row["record_type"] == "opportunity"
+    )
+    assert child["parent_key"] == page["record_key"]
+
+
+def test_agency_projection_rejects_page_block_key_collision(tmp_path, monkeypatch):
+    from eii_custodian.publicdata.assembly import AssemblyError
+
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    source = next(
+        row
+        for row in rows
+        if row["record_type"] == "opportunity"
+        and row["ordinal"] is not None
+        and row["language"] == "en"
+    )
+    page = next(page for page in pages if page["page_url"] == source["page_url"])
+    other = next(
+        page
+        for page in pages
+        if page["page_language"] == "en" and page["page_url"] != source["page_url"]
+    )
+    other["page_key"] = f"{page['page_key']}_{source['ordinal']}"
+    with pytest.raises(AssemblyError, match=r"^assembly_agency_record_key_collision$"):
+        _project(rows, pages)
+
+
+@given(
+    st.text(
+        alphabet="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_/",
+        min_size=1,
+        max_size=60,
+    )
+)
+def test_agency_release_key_normalization_is_idempotent(path):
+    from eii_custodian.publicdata.investment_agency import release_page_key
+
+    key = release_page_key("https://agency.invalid/" + path)
+    assert release_page_key(key) == key
+    assert not key.startswith("_") and not key.endswith("_")
+    assert "__" not in key
+
+
+def test_agency_projection_copies_titles_without_editing(tmp_path, monkeypatch):
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    english = next(
+        row
+        for row in rows
+        if row["record_type"] == "sector" and row["language"] == "en"
+    )
+    arabic = next(
+        row
+        for row in rows
+        if row["record_type"] == "sector" and row["language"] == "ar"
+    )
+    english["title"] = "  Invented sector title  "
+    arabic["title"] = "  عنوان قطاع مخترع  "
+    result, _ = _project(rows, pages)
+    sector = next(row for row in result if row["record_type"] == "sector")
+    assert sector["title_en"] == english["title"]
+    assert sector["title_ar"] == arabic["title"]
+
+
+def test_agency_projection_refuses_unmapped_paragraph_kind(tmp_path, monkeypatch):
+    from eii_custodian.publicdata import assembly_native as native
+    from eii_custodian.publicdata.assembly import AssemblyError
+
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    monkeypatch.delitem(native._AGENCY_TYPES, ("block", "sector_block"))
+    with pytest.raises(AssemblyError, match=r"^assembly_agency_record_type_refused$"):
+        _project(rows, pages)
+
+
+@pytest.mark.parametrize(
+    "kind", ["setup", "sector_block", "law_block", "block", "incentive_parameter"]
+)
+def test_agency_projection_omits_only_closed_container_and_paragraph_kinds(
+    tmp_path, monkeypatch, kind
+):
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    source = next(
+        row
+        for row in rows
+        if row["language"] == "en" and (row["ordinal"] is None) == (kind == "setup")
+    )
+    source = {**source, "record_type": kind}
+    result, lines = _project([source], pages)
+    assert result == []
+    assert lines == (
+        [
+            f"OMITTED pub_investqa_record {source['page_url']} check=parameter_kind reason=unclassified"
+        ]
+        if kind == "incentive_parameter"
+        else []
+    )
+
+
+def test_agency_projection_missing_english_records_is_reported(tmp_path, monkeypatch):
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    result, lines = _project([row for row in rows if row["language"] == "ar"], pages)
+    assert result == []
+    for url in {row["page_url"] for row in rows if row["language"] == "ar"}:
+        assert (
+            f"OMITTED pub_investqa_record {url} check=record_key reason=unresolved"
+            in lines
+        )
+
+
+def test_agency_projection_never_guesses_an_arabic_alternate(tmp_path, monkeypatch):
+    rows, _pages = _projection_input(tmp_path, monkeypatch)
+    source = next(
+        row for row in rows if row["language"] == "ar" and row["ordinal"] is None
+    )
+    result, lines = _project([source], [])
+    assert result == []
+    assert lines == [
+        f"OMITTED pub_investqa_record {source['page_url']} check=record_key reason=unresolved"
+    ]
+
+
+@pytest.mark.parametrize("ordinal", [True, "1", 0, -1])
+def test_agency_projection_refuses_invalid_source_ordinal(
+    tmp_path, monkeypatch, ordinal
+):
+    from eii_custodian.publicdata.assembly import AssemblyError
+
+    rows, pages = _projection_input(tmp_path, monkeypatch)
+    source = next(
+        row
+        for row in rows
+        if row["record_type"] == "setup_step" and row["language"] == "en"
+    )
+    source["ordinal"] = ordinal
+    with pytest.raises(AssemblyError, match=r"^assembly_agency_record_type_refused$"):
+        _project(rows, pages)
+
+
+def test_agency_projection_reads_activity_keys_from_spec(tmp_path, monkeypatch):
+    from dataclasses import replace
+
+    from eii_custodian.publicdata import investment_build
+
+    entry, cache, _, _, _ = _agency_selected(tmp_path, monkeypatch)
+    original = investment_build.load_source_spec
+    key = "en_sectors_invented_textiles"
+
+    def mapped(*args, **kwargs):
+        return replace(
+            original(*args, **kwargs),
+            activity_keys={key: "invented_beta;invented_alpha"},
+        )
+
+    monkeypatch.setattr(investment_build, "load_source_spec", mapped)
+    state = context(cache, (entry,))
+    state.reviewed_selections()
+    result = state.tables["pub_investqa_record"]
+    assert (
+        next(row for row in result if row["record_key"] == key)["activity_keys"]
+        == "invented_beta;invented_alpha"
+    )
+    assert all(
+        row["activity_keys"] is None for row in result if row["record_key"] != key
+    )
+
+
+def test_agency_projection_missing_language_is_reported(tmp_path, monkeypatch):
+    rows, _pages = _projection_input(tmp_path, monkeypatch)
+    source = next(
+        row
+        for row in rows
+        if row["language"] == "en"
+        and row["record_type"] == "sector"
+        and row["ordinal"] is None
+    )
+    control, control_lines = _project([source], [])
+    assert len(control) == 1
+    assert control_lines == []
+    del source["language"]
+    result, lines = _project([source], [])
+    assert result == []
+    assert lines == [
+        f"OMITTED pub_investqa_record {source['page_url']} check=record_key reason=unresolved"
+    ]

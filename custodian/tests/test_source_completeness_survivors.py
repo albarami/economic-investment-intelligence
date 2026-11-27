@@ -172,7 +172,7 @@ def test_exact_forbidden_refusals(source, plant):
             {
                 "id": "invented",
                 "state": "failed",
-                "reason": "source_receipt_missing: missing or invalid receipt",
+                "reason": "source_receipt_missing: field=source_id",
             },
         ]
     elif plant == "cache":

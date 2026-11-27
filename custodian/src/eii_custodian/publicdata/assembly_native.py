@@ -256,6 +256,11 @@ def read_investment(
             raise AssemblyError(checked_pages.check)
         if page_table.get("page_refusals") != page_refusals:
             raise AssemblyError("page_refusals_mismatch")
+        checked = tuple(
+            project_agency_records(
+                checked, checked_pages, spec.activity_keys, build.lines
+            )
+        )
         build.table("pub_investqa_page", checked_pages, (entry.key,))
         for refusal in page_refusals:
             build.lines.append(
@@ -270,3 +275,194 @@ def read_investment(
     for item in (snapshot, table_snapshot):
         relative = item.path.relative_to(build.cache).as_posix()
         build.files[relative] = item.sha256
+
+
+# Document 03 section 7.3: cache fields are consumed, never passed through.
+_AGENCY_CACHE_FIELDS = frozenset(
+    "record_type record_key page_key title heading level ordinal parent_ordinal "
+    "text_items links page_url provenance source_id publisher licence_id "
+    "licence_basis decision_record terms_sha256 terms_url retrieved_utc page_sha256 "
+    "method method_version language".split()
+)
+_AGENCY_COLUMNS = (
+    "record_type record_key parent_key sequence title_en title_ar reference "
+    "link_url activity_keys parameter_key value unit duration_months as_stated "
+    "period page_url source_id"
+).split()
+_AGENCY_TYPES = {
+    ("page", "sector"): "sector",
+    ("page", "opportunity"): "opportunity",
+    ("page", "incentive"): "incentive",
+    ("page", "setup"): None,
+    ("page", "law"): "law",
+    ("block", "sector_block"): None,
+    ("block", "opportunity"): "opportunity",
+    ("block", "incentive_parameter"): None,
+    ("block", "setup_step"): "setup_step",
+    ("block", "law_block"): None,
+    ("block", "block"): None,
+}
+
+
+def _agency_report(lines: list[str], url: str, check: str, reason: str) -> None:
+    lines.append(f"OMITTED pub_investqa_record {url} check={check} reason={reason}")
+
+
+def _agency_page_index(
+    pages: Sequence[Mapping[str, object]],
+) -> dict[str, dict[str, str]]:
+    result: dict[str, dict[str, str]] = {}
+    for page in pages:
+        # extract_page already formed this with release_page_key, including
+        # the Arabic page's declared English alternate. Never derive it again.
+        key = str(page["page_key"])
+        language = str(page["page_language"])
+        url = str(page["page_url"])
+        pair = result.setdefault(key, {})
+        if language in pair and pair[language] != url:
+            raise AssemblyError("assembly_agency_record_key_collision")
+        pair[language] = url
+    return result
+
+
+def _agency_cache_groups(
+    rows: Sequence[Mapping[str, object]], lines: list[str]
+) -> dict[str, list[Mapping[str, object]]]:
+    groups: dict[str, list[Mapping[str, object]]] = {}
+    for row in rows:
+        if set(row) - _AGENCY_CACHE_FIELDS:
+            raise AssemblyError("assembly_agency_record_unknown_field")
+        ordinal = row.get("ordinal")
+        if ordinal is not None and (type(ordinal) is not int or ordinal < 1):
+            raise AssemblyError("assembly_agency_record_type_refused")
+        grain = "page" if ordinal is None else "block"
+        if (grain, str(row.get("record_type"))) not in _AGENCY_TYPES:
+            raise AssemblyError("assembly_agency_record_type_refused")
+        if grain == "block" and row["record_type"] == "incentive_parameter":
+            _agency_report(
+                lines, str(row["page_url"]), "parameter_kind", "unclassified"
+            )
+        groups.setdefault(str(row["page_url"]), []).append(row)
+    return groups
+
+
+def _agency_title(row: Mapping[str, object]) -> str:
+    field = "title" if row.get("ordinal") is None else "heading"
+    title = row.get(field)
+    if not isinstance(title, str) or not title:
+        raise AssemblyError("assembly_agency_record_missing_title")
+    return title
+
+
+def _agency_project_row(
+    row: Mapping[str, object],
+    key: str,
+    arabic: Mapping[str, object] | None,
+    activities: Mapping[str, str],
+) -> dict[str, object]:
+    grain = "page" if row.get("ordinal") is None else "block"
+    kind = str(row["record_type"])
+    record_key = key if grain == "page" else f"{key}_{row['ordinal']}"
+    result: dict[str, object] = dict.fromkeys(_AGENCY_COLUMNS)
+    result.update(
+        record_type=kind,
+        record_key=record_key,
+        title_en=_agency_title(row),
+        title_ar=_agency_title(arabic) if arabic is not None else None,
+        page_url=row["page_url"],
+        source_id=row["source_id"],
+    )
+    if kind == "setup_step":
+        result["sequence"] = row["ordinal"]
+    if kind in {"sector", "opportunity"}:
+        result["activity_keys"] = activities.get(record_key)
+    return result
+
+
+def _agency_project_page(
+    key: str,
+    english: Sequence[Mapping[str, object]],
+    arabic: Sequence[Mapping[str, object]],
+    activities: Mapping[str, str],
+    lines: list[str],
+) -> list[dict[str, object]]:
+    """Pair blocks by kind and position only when both structures agree."""
+    matched = [(row["record_type"], row["level"]) for row in english] == [
+        (row["record_type"], row["level"]) for row in arabic
+    ]
+    result = []
+    for row in english:
+        grain = "page" if row.get("ordinal") is None else "block"
+        if _AGENCY_TYPES[(grain, str(row["record_type"]))] is None:
+            continue
+        candidates = [
+            item for item in english if item["record_type"] == row["record_type"]
+        ]
+        position = candidates.index(row)
+        counterparts = [
+            item for item in arabic if item["record_type"] == row["record_type"]
+        ]
+        counterpart = (
+            counterparts[position]
+            if position < len(counterparts) and (grain == "page" or matched)
+            else None
+        )
+        projected = _agency_project_row(row, key, counterpart, activities)
+        if arabic and counterpart is None:
+            lines.append(
+                f"NULLED pub_investqa_record {projected['record_key']} "
+                f"{row['page_url']} check=title_ar reason=pair_unmatched"
+            )
+        if (
+            row["record_type"] == "opportunity"
+            and grain == "block"
+            and any(
+                item["record_type"] == "sector" and item.get("ordinal") is None
+                for item in english
+            )
+        ):
+            projected["parent_key"] = key
+        result.append(projected)
+    return result
+
+
+def project_agency_records(
+    rows: Sequence[Mapping[str, object]],
+    pages: Sequence[Mapping[str, object]],
+    activities: Mapping[str, str],
+    lines: list[str],
+) -> list[dict[str, object]]:
+    """Project verified cache rows to DAT-143; never release their paragraphs."""
+    from .investment_agency import release_page_key
+
+    groups = _agency_cache_groups(rows, lines)
+    key_pages = list(pages)
+    known_urls = {page["page_url"] for page in pages}
+    for url, records in groups.items():
+        # Quotation refusal must not remove a resolvable typed record (0121.2).
+        # An Arabic alternate cannot be guessed from its URL.
+        if url not in known_urls and records[0].get("language") == "en":
+            key = release_page_key(url)
+            if key and key[0].isalpha():
+                key_pages.append(
+                    {"page_key": key, "page_language": "en", "page_url": url}
+                )
+    index = _agency_page_index(key_pages)
+    resolved: set[str] = set()
+    result = []
+    for key, pair in index.items():
+        english_url = pair.get("en", "")
+        english = groups.get(english_url, [])
+        if not english:
+            continue
+        arabic_url = pair.get("ar", "")
+        arabic = groups.get(arabic_url, [])
+        result.extend(_agency_project_page(key, english, arabic, activities, lines))
+        resolved.update((english_url, arabic_url))
+    for url in groups:
+        if url not in resolved:
+            _agency_report(lines, url, "record_key", "unresolved")
+    keys = [row["record_key"] for row in result]
+    if len(keys) != len(set(keys)):
+        raise AssemblyError("assembly_agency_record_key_collision")
+    return result

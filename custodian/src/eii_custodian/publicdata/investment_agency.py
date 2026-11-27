@@ -591,6 +591,11 @@ def page_refusal(check: str, url: str = "") -> InvestmentFailure:
     )
 
 
+def release_page_key(url: str) -> str:
+    """The shared release key rule; the cache retains its raw path keys."""
+    return re.sub(r"[^a-z0-9]+", "_", urlsplit(url).path.casefold()).strip("_")
+
+
 def extract_page(
     body: bytes,
     *,
@@ -653,7 +658,7 @@ def extract_page(
     if len(set(collector.english)) > 1:
         return page_refusal("page_key", page_url)
     key_url = urljoin(page_url, collector.english[0]) if collector.english else page_url
-    key = re.sub(r"[^a-z0-9]+", "_", urlsplit(key_url).path.casefold()).strip("_")
+    key = release_page_key(key_url)
     if not key or not key[0].isalpha():
         return page_refusal("page_key", page_url)
     if sequence is not None and (type(sequence) is not int or sequence < 1):

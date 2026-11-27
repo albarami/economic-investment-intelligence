@@ -10,7 +10,7 @@ from eii_custodian.publicdata.draw import Figure, validate_figure
 def compare(
     stored: Sequence[Figure], reviewer_values: Mapping[str, str]
 ) -> list[dict[str, str]]:
-    """Counts/money match exactly; ratios match at the stored decimal precision."""
+    """Counts, money and number match exactly; ratios use stored decimal precision."""
     ids = [f.figure_id for f in stored]
     if len(set(ids)) != len(ids) or set(ids) != set(reviewer_values):
         raise ValueError("reviewer_ids_mismatch")

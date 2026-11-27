@@ -32,7 +32,7 @@ def validate_figure(figure: Figure) -> None:
     """Eligible figures have finite stored values and complete source links."""
     if (
         figure.provenance != "Public"
-        or figure.kind not in {"count", "money", "ratio"}
+        or figure.kind not in {"count", "money", "ratio", "number"}
         or not all(
             isinstance(value, str) and value.strip()
             for value in (

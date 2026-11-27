@@ -1042,10 +1042,31 @@ def test_night_live_frame_merges_the_grid_tables(tmp_path, monkeypatch):
     )
     cached = build_frame(cache, (*entries, *grid_rows), review)
     assert cached.tables["municipality"]
-    assert cached.tables["pub_pop_agesex_grid"] == []
-    assert any(
+    assert len(cached.tables["pub_pop_agesex_grid"]) == 1
+    assert cached.tables["pub_pop_agesex_grid"][0]["age_band"] == "25"
+    assert cached.tables["pub_pop_agesex_grid"][0]["sex"] == "female"
+    assert not any(
         line == "grids: worldpop_qat_agesex units or DOI unconfirmed"
         for line in cached.report
+    )
+    assert any(
+        line.startswith("grids: worldpop_qat_agesex/2025/m/25:omitted")
+        and line.endswith("NO_CACHE")
+        for line in cached.report
+    )
+    invented_pop = replace(real_pop, doi_confirmed=False)
+    refused = build_frame(
+        cache,
+        tuple(
+            invented_pop if item is real_pop else item
+            for item in (*entries, *grid_rows)
+        ),
+        review,
+    )
+    assert refused.tables["pub_pop_agesex_grid"] == []
+    assert any(
+        line == "grids: worldpop_qat_agesex units or DOI unconfirmed"
+        for line in refused.report
     )
 
 

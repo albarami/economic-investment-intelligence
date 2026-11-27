@@ -67,6 +67,9 @@ P86_ROW = "prop_sales"
 # S2-P92 reviewed the publisher's revised counts; restore only those two fields
 # to their base values before hashing, as for S2-P86's reviewed note.
 P92_ROW = "trade_logistics/annual-certificates-of-origin-by-type-and-importing-country"
+# S2-GLFILL confirmed cell units and DOI on the 40 file rows of this source
+# (its parent row carries neither field); restore both before hashing.
+GLFILL_SOURCE = "worldpop_qat_agesex"
 P86_BASE_BASIS_NOTE = (
     "Columns are the observed export fields (S2-T08 part B source "
     "review, mismatch 3; "
@@ -99,6 +102,18 @@ BASE_BASIS_NOTE = (
     "decision 0093 item 3. Publisher's restriction recorded as a record; "
     "no reuse permission inferred."
 )
+
+
+# L-2326: exact licence fills; restore only their formerly empty ids.
+RCPTDRIFT_LICENCES = {
+    **dict.fromkeys(
+        "gis_address gis_boundaries gis_context gis_imagery_history gis_land_price "
+        "gis_landmarks gis_locator gis_parcels gis_phcc gis_poi_comm gis_rail "
+        "gis_zoning tenders_pub un_comtrade satellite_cdse_backup".split(),
+        "not_stated",
+    ),
+    "price_ext/producer-price-index-ppi": "CC-BY-4.0",
+}
 
 
 def _invented(monkeypatch, skip_reason=""):
@@ -219,6 +234,14 @@ def _canonical_rows(rows) -> str:
     ).hexdigest()
 
 
+def _glfill_confirmed(row) -> bool:
+    return (
+        row["source_id"] == GLFILL_SOURCE
+        and row.get("cell_units") == "people_per_cell"
+        and row.get("doi_confirmed") is True
+    )
+
+
 def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     rows = registry.read_yaml(registry.registry_path())["sources"]
     assert len(rows) == BASE_ROW_COUNT
@@ -246,6 +269,11 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
         places[0]["release_tables"] = ["pub_place"]
     # S2-LICREC: check reviewed values before restoring only these base fields.
     _assert_gis_terms_reading(rows)
+    for key, licence in RCPTDRIFT_LICENCES.items():
+        matches = [item for item in rows if item["key"] == key]
+        assert len(matches) == 1
+        assert matches[0]["licence_id"] == licence
+        matches[0]["licence_id"] = ""
     rows = [
         dict(
             item,
@@ -257,6 +285,7 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
         else item
         for item in rows
     ]
+    assert sum(_glfill_confirmed(row) for row in rows) == 40
     restored = [
         {
             field: value
@@ -274,6 +303,8 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
                 if item["key"] == P92_ROW
                 else dict(item, caveat_keys=[])
                 if item["key"] == CWEB_ROW or item["key"] in ABSENCE_CAVEAT_KEYS
+                else dict(item, cell_units="unconfirmed", doi_confirmed=False)
+                if _glfill_confirmed(item)
                 else item
             ).items()
             if field not in LATER_REVIEWED_FIELDS
