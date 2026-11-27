@@ -135,12 +135,15 @@ class Production:
                 Step(item.name, adapters[item.name], self._declared_outputs(item))
                 for item in INVENTORY
             )
-        completed = run_steps(self.cache, steps, lines=self.lines)
-        from .assembly_reports import require_complete
+        try:
+            completed = run_steps(self.cache, steps, lines=self.lines)
+            from .assembly_reports import require_complete
 
-        with stage_refusals(self.lines, "require_complete"):
-            require_complete(self.audit)
-        return completed
+            with stage_refusals(self.lines, "require_complete"):
+                require_complete(self.audit)
+            return completed
+        finally:
+            self.held_phases.clear()
 
     def _declared_outputs(self, item: InventoryItem) -> tuple[str, ...]:
         """The pending pin phase declares no outputs: it writes nothing.

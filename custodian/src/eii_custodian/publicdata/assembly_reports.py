@@ -791,6 +791,19 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
                 )
         return output
 
+    def lineage_signature(table: str) -> tuple[tuple[str, ...], ...]:
+        return tuple(
+            (
+                source,
+                *(
+                    str(build.receipts[source][key])
+                    for key in ("source_id", "fetch_url", "sha256")
+                ),
+            )
+            for source in sorted(build.table_sources[table])
+        )
+
+    signatures: dict[str, tuple[tuple[str, ...], ...]] = {}
     files: dict[str, tuple[str, str]] = {}
     figures: dict[str, Sequence[Figure]] = {}
     exclusions: dict[str, dict[str, Any]] = {}
@@ -807,6 +820,8 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
     ):
         name = "assembly/" + phase + ".json"
         if not local(build.cache, name).is_file():
+            if phase == "gis_property_singles":
+                previous_gazetteer.clear()
             continue
         held = build.held_phases.get(name)
         digest = (
@@ -842,6 +857,8 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
                     )
                 ):
                     raise AssemblyError("assembly_table_duplicate")
+            if table == "gazetteer" and phase == "gis_property_singles":
+                previous_gazetteer.clear()
             if table == "gazetteer" and phase == "frame":
                 # Keep only encoded prefix rows, not any part of a parsed phase.
                 previous_gazetteer = [
@@ -865,7 +882,11 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
                 del stored
             else:
                 figures[table] = reader(table, tables[table], row_sources)
-        del tables, data
+                signatures[table] = lineage_signature(table)
+            del row_sources
+        if phase == "gis_property_singles":
+            previous_gazetteer.clear()
+        del tables, data, held
     if set(build.tables) - set(files):
         raise AssemblyError("figure_table_unreachable")
     build.draw_exclusions.clear()
@@ -877,6 +898,8 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
         sources = build.table_sources.get(table, set())
         if not sources or any(source not in build.receipts for source in sources):
             raise AssemblyError("assembly_lineage_missing")
+        if lineage_signature(table) != signatures[table]:
+            raise AssemblyError("assembly_draw_lineage_ambiguous")
         return figures[table]
 
     return {table: partial(bound_reader, table) for table in sorted(figures)}

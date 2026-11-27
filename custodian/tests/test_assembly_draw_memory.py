@@ -280,3 +280,110 @@ def test_mixed_held_and_file_only_phases(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(assembly_reports, "read_object", counted)
     state.draw()
     assert calls == {"assembly/series_stage.json": 1}
+
+
+@pytest.mark.parametrize("mutation", ["add_source", "source_id", "fetch_url", "sha256"])
+def test_draw_reader_refuses_changed_lineage(tmp_path: Path, mutation: str) -> None:
+    state = build(tmp_path)
+    reader = assembly_reports.draw_tables(state)["pub_invented"]
+    if mutation == "add_source":
+        state.receipts["invented_extra"] = dict(state.receipts["invented"])
+        state.table_sources["pub_invented"].add("invented_extra")
+    else:
+        state.receipts["invented"][mutation] += "changed"
+    with pytest.raises(AssemblyError, match=r"^assembly_draw_lineage_ambiguous$"):
+        reader()
+
+
+@pytest.mark.parametrize("gis_present", [False, True])
+@pytest.mark.parametrize("probe", ["row_sources", "prefix"])
+def test_draw_releases_lineage_and_prefix_before_next_phase(
+    tmp_path: Path, monkeypatch, probe: str, gis_present: bool
+) -> None:
+    state = phases(tmp_path, held=False)
+    state.table("gazetteer", [{"name": "SYN first"}], ("invented",))
+    for phase in ("frame", "gis_property_singles"):
+        payload = assembly_reports.read_object(tmp_path, f"assembly/{phase}.json")
+        payload["tables"]["gazetteer"] = state.tables["gazetteer"]
+        state.files.update(write_record(tmp_path, f"assembly/{phase}.json", payload))
+    if not gis_present:
+        (tmp_path / "assembly/gis_property_singles.json").unlink()
+        for table in ("pub_a1", "pub_z1"):
+            del state.tables[table]
+    alive = []
+    original_read = assembly_reports.read_object
+    original_sources = assembly_reports._draw_row_sources
+    original_encoder = assembly_reports.record_encoder
+
+    class Sources(list):
+        pass
+
+    class Encoded(str):
+        pass
+
+    def sources(*args):
+        result = Sources(original_sources(*args))
+        if probe == "row_sources":
+            alive.append(weakref.ref(result))
+        return result
+
+    def encoder():
+        result = original_encoder()
+        original_encode = result.encode
+
+        def encode(value):
+            encoded = Encoded(original_encode(value))
+            if probe == "prefix" and value == {"name": "SYN first"}:
+                alive.append(weakref.ref(encoded))
+            return encoded
+
+        result.encode = encode
+        return result
+
+    def read(root, name):
+        gc.collect()
+        if probe == "row_sources" or name == "assembly/series_stage.json":
+            assert all(ref() is None for ref in alive), probe + " retained"
+        return original_read(root, name)
+
+    monkeypatch.setattr(assembly_reports, "read_object", read)
+    monkeypatch.setattr(assembly_reports, "_draw_row_sources", sources)
+    monkeypatch.setattr(assembly_reports, "record_encoder", encoder)
+    state.draw()
+    assert alive
+    assert all(ref() is None for ref in alive)
+
+
+@pytest.mark.parametrize("outcome", ["success", "step_failure", "audit_failure"])
+def test_run_releases_held_metadata_on_exit(tmp_path: Path, monkeypatch, outcome: str):
+    from eii_custodian.publicdata import assembly_adapters
+
+    state = context(tmp_path)
+    alive = []
+
+    def steps(*args, **kwargs):
+        state.record("frame", {"tables": {}, "row_sources": {"pub_test": ["invented"]}})
+        alive.append(weakref.ref(state.held_phases["assembly/frame.json"]))
+        if outcome == "step_failure":
+            raise AssemblyError("assembly_output_invalid")
+        return ("invented",)
+
+    def complete(audit):
+        if outcome == "audit_failure":
+            raise AssemblyError("assembly_reports_invalid")
+
+    monkeypatch.setattr(assembly_adapters, "run_steps", steps)
+    monkeypatch.setattr(assembly_reports, "require_complete", complete)
+    if outcome == "success":
+        assert state.run() == ("invented",)
+    else:
+        reason = (
+            "assembly_output_invalid"
+            if outcome == "step_failure"
+            else "assembly_reports_invalid"
+        )
+        with pytest.raises(AssemblyError, match="^" + reason + "$"):
+            state.run()
+    gc.collect()
+    assert not state.held_phases
+    assert all(ref() is None for ref in alive)
