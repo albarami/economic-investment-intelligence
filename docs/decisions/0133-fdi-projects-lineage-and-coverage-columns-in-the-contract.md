@@ -18,8 +18,10 @@ The supplied S2-FDICONTRACT.p1 inventory found no product, core, web or evals
 consumer. The columns carry the sanad chain required by CLAUDE.md rule 19,
 the announced-estimate caveat and mapping coverage; cutting them would remove
 lineage. DAT-120 permits only a nullable field or a new table that no existing
-consumer reads, so documenting these existing non-null fields needs this
-bounded amendment rather than an ordinary nullable-field addition.
+consumer reads. The two nullable pending-terms fields, `terms_sha256` and
+`terms_url`, fit DAT-120 as nullable fields; documenting the remaining existing
+non-null fields needs this bounded amendment rather than an ordinary
+nullable-field addition.
 
 ## Declaration rule
 
@@ -28,8 +30,9 @@ bounded amendment rather than an ordinary nullable-field addition.
 2. `investment_flight._record` supplies caveat keys and provenance;
    `investment_parse._with_lineage` copies source-envelope lineage;
    `investment_crosswalk.mapped_columns` supplies mapping coverage and the
-   crosswalk hash when a reviewed crosswalk exists. Required fields are not
-   nullable. Pending terms readings retain empty strings under L-1001;
+   crosswalk hash when a reviewed crosswalk exists. The two terms fields may be
+   null or empty while the terms reading is pending (L-1001); every other
+   required field is not nullable;
    the crosswalk hash is absent when no crosswalk is supplied.
 3. Classification adds only missing administrative fields to `ADMIN_FIELDS`;
    existing classifications remain, each column in exactly one group.
