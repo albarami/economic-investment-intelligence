@@ -55204,6 +55204,28 @@ Skills applied: project-orientation traced existing mapping and task scope; task
   - 0113 and 0125 keep Proposed. Their earlier reviews are S2-D113.rv1 and S2-C7C.rv1 with cf1 (OpenAI Codex). Both runs were refused admission by the gate at their launch and are kept as history. A fresh different-maker review waits for the gate to admit a maker other than the builders' (ruling L-2274).
 - Documents only: no code, test, gate or acceptance box changes. `python3 scripts/check_docs.py` exit 0.
 
+### Owner acceptance of decision 0118 (2026-11-27, documents only)
+
+- Source: the owner's decision of 2026-11-27, relayed by the advisor in note owner-relayed-20261127-060429. 0118 is accepted once the lead confirms that a review stands on the current head.
+- Review: R60-Q18.rv1 (Moonshot Kimi K3.1 Pro, through Factory Droid, review mode; gate ALLOW at review/high) APPROVED 0118 on its own on main `bc9bb749f5c6396087a8385ca1064889cb509ad1`, at blob `ca2367cf6f59fbb149a0fc6c626f76fc90fa6112`, with no finding. Moonshot is a maker other than the builders: OpenAI Codex built the record, and Anthropic made a records-only fix.
+- It checked:
+  - the earlier S2-DREC.rv1 defect is fixed: the Amends row, and the context, consequences and what-would-change sections of `docs/README.md` item 4;
+  - the eleven `food_service` labels;
+  - the required verification population in `places/build.py`;
+  - the exact `unknown_category_class` refusal;
+  - the unchanged PUB-57 thresholds of eight and two.
+- The text at `d975159d` (blob `4f44ec2f`) differs from main. The earlier S2-DREC.cf2 confirmation was refused admission at launch, and is history only.
+- 0117 stays Proposed. Its builder is Moonshot, so its confirmation needs a maker other than Moonshot.
+- Documents only: no code, test, gate or acceptance box changes.
+
+### Owner acceptance of decisions 0114 and 0115 (2026-11-27, documents only)
+
+- Source: the owner's decision of 2026-11-27, "Accept 0114 and 0115", relayed by the advisor in note owner-relayed-20261127-0822 (ruling L-2288).
+- Review: R60-REC.rv2 (Moonshot Kimi, exact model version not exposed, through Factory Droid, review mode) APPROVED each record on its own, on main `bc9bb749f5c6396087a8385ca1064889cb509ad1`. The blobs were `ea81e14c` (0114) and `0943ed6e` (0115), with no rejecting finding. Moonshot is a maker other than the lead, who wrote both records.
+- Text since that review: PR 164 (`a3efa045`) added the recorded verdict to each Status line, and for 0115 its Owner row and the reviewer's wording note ("non-null member fields"). That was records only, with no change of substance.
+- This change replaces only the two Status lines. 0113 and 0125 stay Proposed: each needs a fresh independent review before the owner's acceptance, 0113 first.
+- Documents only: no code, test, gate or acceptance box changes.
+
 ## S2-DRAWMEM.b1a — bounded assembly draw (2026-11-27, L-2284)
 
 - Base: `a3efa045450c411d52c39cab0d334fd095940e39`; branch `s2/s2-drawmem`.
