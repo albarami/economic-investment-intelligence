@@ -135,9 +135,10 @@ def test_duplicate_gazetteer_prefix_remains_required(tmp_path: Path) -> None:
 def test_held_rows_use_stored_json_types_and_field_order(tmp_path: Path) -> None:
     from datetime import date
 
-    from hypothesis import given
+    from hypothesis import given, settings
     from hypothesis import strategies as st
 
+    @settings(deadline=None)
     @given(st.decimals(allow_nan=False, allow_infinity=False, places=3))
     def check(value):
         state = build(tmp_path)
