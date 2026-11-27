@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted by the owner, 2026-11-27 ("ACCEPT 0116, 0117, 0118, 0120, 0121 and 0122", relayed by the advisor in note owner-relayed-20261127-060429), on the lead's confirmation (rulings L-2272 and L-2280) that a review stands on main `bc9bb749`: R60-Q18.rv1 (Moonshot, Kimi K3.1 Pro, a maker other than the builders) APPROVED this record on its own, at blob `ca2367cf` on that main |
 | Date | 2026-11-25 |
 | Scope | S2-T06; PUB-52 and PUB-57; [document 03](../03_DATA_CONTRACTS.md) `pub_place_verification` paragraph |
 | Purpose | Make place verification cover every food-service place of a showcase walk polygon, while the PUB-57 restaurant counts stay unchanged |
