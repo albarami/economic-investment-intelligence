@@ -407,9 +407,12 @@ def _agency_project_page(
             if position < len(counterparts) and (grain == "page" or matched)
             else None
         )
-        if arabic and counterpart is None:
-            _agency_report(lines, str(row["page_url"]), "title_ar", "pair_unmatched")
         projected = _agency_project_row(row, key, counterpart, activities)
+        if arabic and counterpart is None:
+            lines.append(
+                f"NULLED pub_investqa_record {projected['record_key']} "
+                f"{row['page_url']} check=title_ar reason=pair_unmatched"
+            )
         if (
             row["record_type"] == "opportunity"
             and grain == "block"
@@ -438,7 +441,7 @@ def project_agency_records(
     for url, records in groups.items():
         # Quotation refusal must not remove a resolvable typed record (0121.2).
         # An Arabic alternate cannot be guessed from its URL.
-        if url not in known_urls and records[0].get("language", "en") == "en":
+        if url not in known_urls and records[0].get("language") == "en":
             key = release_page_key(url)
             if key and key[0].isalpha():
                 key_pages.append(

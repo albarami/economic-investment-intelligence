@@ -408,7 +408,28 @@ AGENCY_COLUMNS = set(
 
 def assert_agency_release(released, cached):
     """Document 03 section 7.3; cache paragraphs cannot be release columns."""
-    assert released
+    released_types = {
+        ("page", "sector"): "sector",
+        ("page", "opportunity"): "opportunity",
+        ("page", "incentive"): "incentive",
+        ("page", "law"): "law",
+        ("block", "opportunity"): "opportunity",
+        ("block", "setup_step"): "setup_step",
+    }
+    expected = [
+        (
+            released_types[(grain, item["record_type"])],
+            item["page_url"],
+            item["title"] if grain == "page" else item["heading"],
+        )
+        for item in cached
+        for grain in ("page" if item["ordinal"] is None else "block",)
+        if item.get("language") == "en"
+        and (grain, item["record_type"]) in released_types
+    ]
+    assert sorted(
+        (row["record_type"], row["page_url"], row["title_en"]) for row in released
+    ) == sorted(expected)
     for row in released:
         assert set(row) == AGENCY_COLUMNS
         assert row["record_type"] in {
@@ -424,6 +445,23 @@ def assert_agency_release(released, cached):
             if item["page_url"] == row["page_url"]
             and (item["title"] or item["heading"]) == row["title_en"]
         )
+        if row["title_ar"] is not None:
+            candidates = [
+                item
+                for item in cached
+                if item["page_url"] == source["page_url"]
+                and item["record_type"] == source["record_type"]
+            ]
+            counterparts = [
+                item
+                for item in cached
+                if item["page_url"] == source["page_url"].replace("/en/", "/ar/")
+                and item.get("language") == "ar"
+                and item["record_type"] == source["record_type"]
+            ]
+            counterpart = counterparts[candidates.index(source)]
+            field = "title" if counterpart["ordinal"] is None else "heading"
+            assert row["title_ar"] == counterpart[field]
         assert row["source_id"] == source["source_id"]
         assert row["sequence"] == (
             source["ordinal"] if row["record_type"] == "setup_step" else None
@@ -478,6 +516,18 @@ def test_agency_projection_exact_columns_pairing_and_omissions(tmp_path, monkeyp
     assert_agency_release(result, rows)
     assert (rows, pages) == before
     assert len({row["record_key"] for row in result}) == len(result)
+    assert {
+        ("page" if row["ordinal"] is None else "block", row["record_type"])
+        for row in rows
+        if row["language"] == "en"
+    } >= {
+        ("page", "sector"),
+        ("page", "opportunity"),
+        ("page", "incentive"),
+        ("page", "law"),
+        ("block", "opportunity"),
+        ("block", "setup_step"),
+    }
     assert all(row["title_ar"] for row in result)
     for row in result:
         page = next(page for page in pages if page["page_url"] == row["page_url"])
@@ -538,7 +588,7 @@ def test_agency_projection_unmatched_block_structure(tmp_path, monkeypatch):
     assert affected
     assert all(row["title_ar"] is None for row in affected)
     assert all(
-        f"OMITTED pub_investqa_record {row['page_url']} check=title_ar reason=pair_unmatched"
+        f"NULLED pub_investqa_record {row['record_key']} {row['page_url']} check=title_ar reason=pair_unmatched"
         in lines
         for row in affected
     )
@@ -573,7 +623,14 @@ def test_agency_projection_refuses_one_changed_input(
     if plant == "unknown":
         rows[0]["unexpected"] = None
     elif plant == "title":
-        rows[0]["title"] = None
+        target = next(
+            row
+            for row in rows
+            if row["ordinal"] is None
+            and row["record_type"] == "sector"
+            and row["language"] == "en"
+        )
+        target["title"] = None
     elif plant == "type":
         rows[0]["record_type"] = "sector_block"
     else:
@@ -832,3 +889,23 @@ def test_agency_projection_reads_activity_keys_from_spec(tmp_path, monkeypatch):
     assert all(
         row["activity_keys"] is None for row in result if row["record_key"] != key
     )
+
+
+def test_agency_projection_missing_language_is_reported(tmp_path, monkeypatch):
+    rows, _pages = _projection_input(tmp_path, monkeypatch)
+    source = next(
+        row
+        for row in rows
+        if row["language"] == "en"
+        and row["record_type"] == "sector"
+        and row["ordinal"] is None
+    )
+    control, control_lines = _project([source], [])
+    assert len(control) == 1
+    assert control_lines == []
+    del source["language"]
+    result, lines = _project([source], [])
+    assert result == []
+    assert lines == [
+        f"OMITTED pub_investqa_record {source['page_url']} check=record_key reason=unresolved"
+    ]
