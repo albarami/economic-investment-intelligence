@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed; the owner chose option C1 on 2026-11-25 (see **The owner's words**); different-maker review and acceptance remain pending |
+| Status | Accepted by the owner, 2026-11-27 ("ACCEPT now: 0119, 0123 and 0124", relayed by the advisor in note owner-relayed-20261127-060429); his choice of option C1 of 2026-11-25 stands (see **The owner's words**) |
 | Date | 2026-11-25 |
 | Scope | S2-T49 register intake audit, release-table scan, build wiring, invented tests and projection documentation |
 | Amends | [Decision 0119](0119-register-release-scan-meets-input-only-keys.md) item 1, and the owner's condition 1 of [decision 0105](0105-register-scan-typed-columns.md) through decision 0119, for release tables only |

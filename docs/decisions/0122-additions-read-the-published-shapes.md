@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed |
+| Status | Accepted by the owner, 2026-11-27 ("ACCEPT 0116, 0117, 0118, 0120, 0121 and 0122", relayed by the advisor in note owner-relayed-20261127-060429), on the lead's confirmation (rulings L-2272 and L-2277) that a review stands on main `bc9bb749`: R60-PER.rv1 (Moonshot, Kimi K3.1 Pro, a maker other than the builders) APPROVED this record on its own, at blob `ee7512d5` on that main |
 | Date | 2026-11-25 |
 | Owner | The owner |
 | Amends | Document 03 section 7.3, Public table columns; S2-T11 additions parsing. |
