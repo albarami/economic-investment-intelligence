@@ -320,13 +320,19 @@ def test_audit_periods_matching_awards_batch_has_intake_dates(awards_state):
     from eii_custodian.publicdata.assembly_reports import observed_periods
 
     state, digest = awards_state
-    _select_awards(state, digest, body_periods=("2099-03-01", "2099-03-02"))
     state.receipts["awards_owner_scrape"] = dict(
         state.receipts["awards_owner_scrape"],
         period_first="2099-01-01",
         period_last="2099-01-02",
         summary={"date_first": "2099-01-01", "date_last": "2099-01-02"},
     )
+    # Wrong-source table: build.receipts[awards] periods and summary, and
+    # snapshot.sidecar periods/summary: 2099-01-01 / 2099-01-02;
+    # snapshot.body periods: 2099-03-01 / 2099-03-02;
+    # only the intake batch carries 2026-01-01 / 2026-01-03.
+    snap = _select_awards(state, digest, body_periods=("2099-03-01", "2099-03-02"))
+    assert snap.sidecar["period_first"] == "2099-01-01"
+    assert snap.sidecar["period_last"] == "2099-01-02"
     assert observed_periods(state) == {
         "awards_owner_scrape": ("2026-01-01", "2026-01-03")
     }
