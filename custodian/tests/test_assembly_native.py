@@ -1865,6 +1865,8 @@ def test_closed_term_positive_and_containing_word(term):
     assert re.search(pattern, "س" + term) is None
     assert re.search(pattern, term + "س") is None
     if term in _CLOSED_ARABIC:
+        for prefix in _FORWARD_COMPARATIVES:
+            assert re.search(pattern, prefix + term) is None
         for prefix in (
             "و",
             "ف",
@@ -1898,6 +1900,140 @@ def test_closed_term_generated_containing_words(term, tail):
     pattern = _closed_terms((term,))
     assert re.search(pattern, tail + term) is None
     assert re.search(pattern, term + tail) is None
+
+
+# L-2358 item 2: independent closed-paradigm oracle, never from production.
+_FORWARD_PREFIXES = (
+    "",
+    "و",
+    "ف",
+    "ب",
+    "ل",
+    "ال",
+    "وال",
+    "بال",
+    "فال",
+    "لل",
+    "وب",
+    "ول",
+    "وبال",
+    "ولل",
+)
+_FORWARD_COMPARATIVES = ("ك", "كال", "وك", "وكال")
+_FORWARD_ADJECTIVES = ("متوقع",)
+_FORWARD_NOUNS = ("توقعات", "توقع")
+_FORWARD_ADJECTIVE_SUFFIXES = (
+    "",
+    "ة",
+    "\u0647",
+    "ات",
+    "ين",
+    "ون",
+    "\u0627",
+    "اً",
+    "ًا",
+    "ان",
+    "تان",
+    "تين",
+    "و",
+    "ي",
+    "تا",
+    "تي",
+)
+_FORWARD_PRONOUNS = (
+    "\u0647",
+    "\u0647\u0627",
+    "هما",
+    "هم",
+    "هن",
+    "ك",
+    "كما",
+    "كم",
+    "كن",
+    "ي",
+    "نا",
+)
+_FORWARD_OBJECTS = ("", *_FORWARD_PRONOUNS)
+_FORWARD_VERBS = ("يتوقع", "نتوقع", "تتوقع", "أتوقع")
+_FORWARD_PASSIVES = ("يُتوقع",)
+_FORWARD_FUTURES = ("", "س")
+_FORWARD_SUBJECTS = ("", "ون", "ان", "ين")
+_FORWARD_ENGLISH = (
+    "forecast",
+    "forecasts",
+    "forecasted",
+    "forecasting",
+    "forecaster",
+    "forecasters",
+    "projected",
+    "projection",
+    "projections",
+    "expected",
+    "expects",
+    "expecting",
+    "expectation",
+    "expectations",
+    "anticipated",
+    "anticipate",
+    "anticipates",
+    "anticipating",
+)
+_OLD_FORWARD = r"forecast|projected|expected|متوقع|توقعات"
+NOT_FORWARD: tuple[tuple[str, str], ...] = ()
+
+
+def _forward_paradigm(prefixes):
+    adjectives = (
+        prefix + stem + suffix
+        for prefix in prefixes
+        for stem in _FORWARD_ADJECTIVES
+        for suffix in _FORWARD_ADJECTIVE_SUFFIXES
+    )
+    nouns = (
+        prefix + stem + pronoun
+        for prefix in prefixes
+        for stem in _FORWARD_NOUNS
+        for pronoun in ("", *_FORWARD_PRONOUNS)
+        if not ("ال" in prefix or prefix.endswith("لل")) or not pronoun
+    )
+    verbs = (
+        prefix + future + stem + subject + pronoun
+        for prefix in prefixes
+        for future in _FORWARD_FUTURES
+        for stem in _FORWARD_VERBS
+        for subject in _FORWARD_SUBJECTS
+        for pronoun in _FORWARD_OBJECTS
+        if not ("ال" in prefix or prefix.endswith("لل")) or not pronoun
+    )
+    passives = (prefix + stem for prefix in prefixes for stem in _FORWARD_PASSIVES)
+    return tuple(dict.fromkeys((*adjectives, *nouns, *verbs, *passives)))
+
+
+def test_forward_paradigm_differential():
+    import re
+
+    from eii_custodian.publicdata.assembly_native import Parameter, parameter_is_forward
+
+    forms = (
+        _forward_paradigm(_FORWARD_PREFIXES + _FORWARD_COMPARATIVES) + _FORWARD_ENGLISH
+    )
+    missing = set()
+    old_only = set()
+    for form in forms:
+        wording = (
+            f"The agency {form} 25% support"
+            if form.isascii()
+            else f"بحسب {form} يبلغ الدعم ٢٥٪"
+        )
+        parameter = Parameter("rent_share", "25", "%", None, None, wording)
+        if not parameter_is_forward(parameter, "2026-11-27"):
+            missing.add(form)
+            if re.search(_OLD_FORWARD, wording.casefold()):
+                old_only.add(form)
+    assert old_only == {form for form, reason in NOT_FORWARD}, (
+        f"OLD_ONLY {len(old_only)}: {sorted(old_only)}"
+    )
+    assert not missing, f"MISSING {len(missing)}: {sorted(missing)}"
 
 
 @pytest.mark.parametrize(
@@ -2053,9 +2189,11 @@ def test_parameter_natural_forms_under_match(kind, wording):
     "english,arabic,forward,duration",
     [
         pytest.param(
-            "25%", "الدعم متوقعه بنسبة ٢٥٪", True, None, id="adjective-\u0647"
+            "25%", "النسبة المتوقعه للدعم ٢٥٪", True, None, id="adjective-\u0647"
         ),
-        pytest.param("25%", "دعمان متوقعان بنسبة ٢٥٪", True, None, id="adjective-ان"),
+        pytest.param(
+            "25%", "مبلغان متوقعان للدعم بنسبة ٢٥٪", True, None, id="adjective-ان"
+        ),
         pytest.param(
             "25%", "نسبتان متوقعتان للدعم عند ٢٥٪", True, None, id="adjective-تان"
         ),
@@ -2143,6 +2281,36 @@ def test_parameter_natural_forms_under_match(kind, wording):
             None,
             id="unexpected-control",
         ),
+    ]
+    + [
+        pytest.param(
+            "25%",
+            f"تورد الصفحة عبارة «{form}» مع دعم بنسبة ٢٥٪",
+            True,
+            None,
+            id="paradigm-ar-" + form,
+        )
+        for form in _forward_paradigm(("",))
+    ]
+    + [
+        pytest.param(
+            f"The agency {form} 25% support",
+            "٢٥٪",
+            True,
+            None,
+            id="paradigm-en-" + form,
+        )
+        for form in _FORWARD_ENGLISH
+    ]
+    + [
+        pytest.param(
+            "25%",
+            f"بحسب {prefix}متوقع يبلغ الدعم ٢٥٪",
+            True,
+            None,
+            id="comparative-" + prefix,
+        )
+        for prefix in _FORWARD_COMPARATIVES
     ],
 )
 def test_parameter_bounded_bilingual_corpus(english, arabic, forward, duration):

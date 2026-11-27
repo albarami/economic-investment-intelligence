@@ -327,11 +327,17 @@ def _closed_terms(
             prefix = (
                 r"(?:و|ف|ب|ل|ال|وال|بال|فال|لل|وب|ول|وبال|ولل)?" if prefixed else ""
             )
+            if forward and prefixed:
+                prefix = "(?:" + prefix + r"|ك|كال|وك|وكال)"
+            pronoun = r"(?:\u0647|\u0647\u0627|هما|هم|هن|ك|كما|كم|كن|ي|نا)?"
             suffix = ""
             if forward and term == "متوقع":
-                suffix = r"(?:ة|\u0647|ات|ين|ون|\u0627|ان|تان|تين)?"
-            elif forward and term == "توقعات":
-                suffix = r"(?:\u0647|\u0647\u0627|هم|هن|هما|كم|نا|ي)?"
+                suffix = r"(?:ة|\u0647|ات|ين|ون|اً|ًا|\u0627|ان|تان|تين|و|ي|تا|تي)?"
+            elif forward and term in ("توقعات", "توقع"):
+                suffix = pronoun
+            elif forward and term in ("يتوقع", "نتوقع", "تتوقع", "أتوقع"):
+                token = "س?" + token
+                suffix = r"(?:ون|ان|ين)?" + pronoun
             negation = (
                 r"(?<!(?<!\w)غير )(?<!(?<!\w)وغير )(?<!(?<!\w)فغير )(?<!(?<!\w)لغير )"
                 if forward
@@ -490,11 +496,18 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
                     "forecasts",
                     "forecasted",
                     "forecasting",
+                    "forecaster",
+                    "forecasters",
                     "projected",
                     "expected",
                     "expects",
                     "expecting",
+                    "expectation",
+                    "expectations",
                     "anticipated",
+                    "anticipate",
+                    "anticipates",
+                    "anticipating",
                     "projection",
                     "projections",
                     "توقع",
@@ -502,6 +515,7 @@ def parameter_is_forward(parameter: Parameter, retrieved: str) -> bool:
                     "يُتوقع",
                     "نتوقع",
                     "تتوقع",
+                    "أتوقع",
                     "متوقع",
                     "توقعات",
                 ),
