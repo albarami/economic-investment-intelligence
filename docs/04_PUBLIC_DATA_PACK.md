@@ -155,7 +155,13 @@ The envelope and its receipt use separate cache keys `places_ovt/listing` and
 `bldg_ovt/listing`. Parent keys keep their Parquet extension, rows and receipts unchanged
 for existing readers (ruling L-707 K2); listing evidence never substitutes for those rows.
 Existing whole-file part retrieval stays unchanged; selecting parts for a later release is
-outside this task. Listing and direct-file row-count bounds stay empty because they are
+outside this task. For the places family, both the parent `places_ovt` and the
+registered component `places_ovt/part-00014` declare `pub_place` and
+`pub_place_verification` (PUB-48, PUB-53). The parent supplies release-membership
+and size/ETag evidence; only the component supplies place rows. Verification
+checks refer to those kept place identifiers and add their own reviewed check
+links; the listing is not a Parquet row input or a verification observation.
+Listing and direct-file row-count bounds stay empty because they are
 not portal record tables. Under ruling L-707 K4, the lead's live fetch waits for S2-T27's
 archive to merge; this task performs no live fetch.
 
@@ -431,7 +437,7 @@ no table (PUB-109).
 | `bnd_hdx` | 8 municipalities, 91 zones, 781 districts in the files; geometry dated 2015-11-30; modified 2026-08-19 | bilingual names; frame geometry | `zone`, `municipality`, `gazetteer` | description says 87 zones and 718 districts, files hold 91 and 781; 2015 geometry: check Lusail against the 2020 layer |
 | `bnd_muni_2025` | municipality polygons; count recorded locally at fetch | municipality geometry | `municipality` | no dataset-level licence metadata |
 | `bnd_geob` | 8 municipalities, 79 zones (some merged, e.g. '18-19') | fallback if no usable zone geometry | `zone` (fallback) | coarser, 2015 |
-| `places_ovt` | 26,383 records with country QA (26,404 in the bounding box) | capability M3 named places with network distances; capability S9 neighbours; showcase verification; real business points on the map (PUB-92); venue points (PUB-89) | `pub_place` | incomplete (PUB-50); duplicates and junk records; Meta-dominated; taxonomy changed in late 2026; 'Italian' includes pizza through the category hierarchy; a further places source (`places_fsq`) brings its own categories, which map through a reviewed category mapping (PUB-102)<br>the advisor's reading of 2026-11-16 reports that a release is removed after at most 60 days; not yet confirmed from a public page |
+| `places_ovt` | 26,383 records with country QA (26,404 in the bounding box) | capability M3 named places with network distances; capability S9 neighbours; showcase verification; real business points on the map (PUB-92); venue points (PUB-89) | `pub_place`, `pub_place_verification` | incomplete (PUB-50); duplicates and junk records; Meta-dominated; taxonomy changed in late 2026; 'Italian' includes pizza through the category hierarchy; a further places source (`places_fsq`) brings its own categories, which map through a reviewed category mapping (PUB-102)<br>the advisor's reading of 2026-11-16 reports that a release is removed after at most 60 days; not yet confirmed from a public page |
 | `bldg_ovt` | 4,400 footprints in the Lusail box; 73 with a height | canonical national building footprints, plus flagship and showcase building points (decision 0077) | `assets/buildings/buildings.geojson` and its manifest; `gazetteer` | optional recorded-height and floor mappings off, with counted null reasons; most heights unknown; ODbL<br>the advisor's reading of 2026-11-16 reports that a release is removed after at most 60 days; not yet confirmed from a public page |
 | `roads_osm` | Qatar; about 24.5 MB; changes daily | pyvalhalla graph for `walk` and `drive` areas and network distances; the real road network for simulated congestion by hour and for drive-time areas that change with the hour ([05](05_SYNTHETIC_WORLD_AND_SIMULATION.md), decision 0016); with the traffic provider switched on, traffic-aware drive-time areas also come from `traffic_tomtom_range` as areas of the session (PUB-95) | none (routing graph is a build artefact) | free-flow only; "latest" URL is not a version: the hash is the pin; ODbL share-alike |
 | `cls_isic4` | ISIC Rev.4 classes (now a previous ISIC version on the UNSD page) | spine validity check; English class titles | `graph_node` | "for the User’s personal, non-commercial use, without any right to resell or redistribute them or to compile or create derivative works therefrom"; read 2026-11-19; basis `owner_decision`; per-key evidence and hash in section 4, "S2-T21 part B terms readings". |
