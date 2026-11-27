@@ -7382,3 +7382,7 @@ CLOSED: awards period evidence bound to the selected snapshot, L-2342 — S2-RCP
 Correction to the preceding L-2342 closure — S2-RCPTDRIFT.b1e / S2-T19, L-2344: test oracle restored with receipt/summary and snapshot-body periods distinct from intake; absent source_sha256 covered separately from different-batch evidence. Source-substitution plants P1/P2 and guard-removal P3 fail by name; scratch restore cmp exits 0. Production unchanged; independent different-maker delta reviews remain pending.
 
 Correction to the L-2344 oracle correction — S2-RCPTDRIFT.b1f / S2-T19, L-2347 item 2: stored-receipt source snapshot.sidecar now carries the planted 2099-01-01/02 periods because the receipt is changed before publication; both stored bounds are asserted. P5 stored-sidecar substitution fails the matching intake-date test by name (exit 1), as do rerun P1/P2; P3/P4 also fail by name; every restore cmp exits 0. Production and awards_state unchanged; different-maker delta reviews remain pending.
+
+b1g: the guard test pins the GIS licence marker as the literal not_stated (L-2356 item 2)
+
+OPEN — S2-RCPTDRIFT.b1g / S2-T19: BLOCKED under L-1705. G1 deletes only the receipt licence comparison row but the substitution remains refused by the independent validate_lineage licence check; targeted pytest exit 0, 1 passed, restore cmp 0. Required red proof cannot be met as written. Smallest unblock: authorize accepting the redundant-guard survival or specify a revised isolated proof; no guard weakened. G2/G3, consumer sweep and remaining checks not run after stop.
