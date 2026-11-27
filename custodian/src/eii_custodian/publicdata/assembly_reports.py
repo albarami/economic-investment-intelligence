@@ -21,6 +21,7 @@ from .assembly_sources import (
 )
 from .draw import Figure, reviewer_sheet
 from .fetch.bounded import file_hash
+from .fetch.registry import COLLECTED_FAMILIES, Entry
 
 if TYPE_CHECKING:
     from .assembly_adapters import Production
@@ -264,6 +265,158 @@ TEXT_FIELDS = frozenset(
         "registration_number",
     }
 )
+# Document 03, 7.3 Columns and Register file projections (S2-T49).
+# Source text/codes, dates and flags stay metadata; durations remain figures.
+RATIO_FIELDS = RATIO_FIELDS | frozenset(
+    {
+        "confidence",
+    }
+)
+COUNT_FIELDS = COUNT_FIELDS | frozenset(
+    {
+        "duration_months",
+    }
+)
+ADMIN_FIELDS = ADMIN_FIELDS | frozenset(
+    {
+        "anomaly_flag",
+        "award_date",
+        "bulk_month",
+        "cancel_date",
+        "check_date",
+        "closing_date",
+        "end_date",
+        "licence_expiry_date",
+        "licence_issue_date",
+        "notice_expiration_date",
+        "partial_year",
+        "provider_updated_on",
+        "registration_expiry_date",
+        "registration_issue_date",
+        "retrieved_on",
+        "row_index",
+        "sequence",
+        "showcase_verified",
+        "start_date",
+        "survey_date",
+        "tax_registered",
+        "text_cleaned",
+    }
+)
+TEXT_FIELDS = TEXT_FIELDS | frozenset(
+    {
+        "activity_keys",
+        "activity_name_ar",
+        "announced",
+        "as_stated",
+        "branches",
+        "business_category",
+        "business_function",
+        "business_type",
+        "buying_entity",
+        "buying_entity_ar",
+        "cancel_reason",
+        "cancel_reason_ar",
+        "capex_currency",
+        "capex_unit",
+        "category_ar",
+        "category_ids",
+        "category_labels",
+        "city_name",
+        "classification_ar",
+        "company",
+        "company_size",
+        "country_name",
+        "day_of_week",
+        "description",
+        "description_ar",
+        "description_en",
+        "district_ar",
+        "district_en",
+        "education_level",
+        "education_type",
+        "establishment_nationality",
+        "establishment_nationality_ar",
+        "establishment_subtype",
+        "establishment_subtype_ar",
+        "establishment_type",
+        "establishment_type_ar",
+        "event",
+        "extractor",
+        "fdi_sector_name",
+        "field_name",
+        "freezone_name",
+        "height_rule",
+        "iso3",
+        "legal_form",
+        "legal_form_ar",
+        "licence",
+        "licence_status",
+        "licence_status_ar",
+        "link_url",
+        "lists",
+        "location_text",
+        "merged_ids",
+        "mode",
+        "municipality",
+        "municipality_ar",
+        "naics_sub_sector_name",
+        "occupation_key",
+        "origin_iso3",
+        "page_key",
+        "page_language",
+        "page_sha256",
+        "page_text",
+        "page_title",
+        "page_url",
+        "parameter_key",
+        "parent_company_name",
+        "parent_company_website",
+        "parent_key",
+        "period_label",
+        "permitted_uses",
+        "project_key",
+        "project_type",
+        "province",
+        "record_key",
+        "record_type",
+        "reference",
+        "registered_address",
+        "registration_status",
+        "registration_status_ar",
+        "reviewer_role",
+        "sector",
+        "setback_rule",
+        "slug",
+        "source_country",
+        "source_country_iso3",
+        "source_layer",
+        "source_provider",
+        "src_city_name",
+        "src_state_name",
+        "src_world_region_name",
+        "state_abbr",
+        "state_name",
+        "sub_sector",
+        "tags",
+        "tariff_code",
+        "tax_registration_number",
+        "tax_type",
+        "tender_key",
+        "tender_type",
+        "tender_type_ar",
+        "title",
+        "title_ar",
+        "title_en",
+        "use_category",
+        "utility",
+        "venue_kind",
+        "verification_link",
+        "world_region_name",
+        "zoning_code",
+    }
+)
+
 NUMERIC_TEXT = re.compile(
     r"[-+]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][-+]?[0-9]+)?|[-+]?(?:NaN|Infinity)",
     re.ASCII,
@@ -689,6 +842,8 @@ def _draw_row_sources(
         for index, row in enumerate(rows)
     ]
     if not any(tags):
+        if rows and table.removeprefix("pub_") in COLLECTED_FAMILIES:
+            raise AssemblyError("assembly_draw_lineage_ambiguous")
         return None
     if not all(isinstance(tag, str) and tag for tag in tags):
         raise AssemblyError("assembly_draw_lineage_ambiguous")
@@ -704,6 +859,42 @@ def _draw_row_sources(
             raise AssemblyError("assembly_draw_lineage_ambiguous")
         resolved.append(matches[0])
     return resolved
+
+
+def _family_figure(
+    entries: Sequence[Entry], table: str, row: dict[str, Any]
+) -> tuple[str, str] | None:
+    """L-2309: the registry kind, never numeric-looking text, decides eligibility."""
+    from .singles.families import _kind_ok
+
+    matches = [
+        entry
+        for entry in entries
+        if entry.source_id == table.removeprefix("pub_")
+        and entry.source_id == row.get("source_id")
+        and entry.slug == row.get("slug")
+    ]
+    if len(matches) != 1:
+        raise AssemblyError("assembly_draw_lineage_ambiguous")
+    columns = dict(matches[0].columns)
+    field = row.get("field_name")
+    if not isinstance(field, str) or field not in columns:
+        raise AssemblyError("assembly_draw_field_unknown")
+    kind = columns[field]
+    try:
+        value = json.loads(row.get("field_value", ""), parse_float=Decimal)
+    except (TypeError, ValueError, InvalidOperation):
+        raise AssemblyError("assembly_draw_value_invalid") from None
+    if not _kind_ok(value, kind):
+        raise AssemblyError("assembly_draw_value_invalid")
+    if (
+        value is None
+        or kind in {"string", "date"}
+        or (kind == "integer" and field in ADMIN_FIELDS)
+    ):
+        return None
+    # No unit is supplied for a number cell; preserve its exact published token.
+    return row["field_value"], "count" if kind == "integer" else "number"
 
 
 def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
@@ -727,15 +918,27 @@ def draw_tables(build: Production) -> dict[str, Callable[[], Sequence[Figure]]]:
             receipt = build.receipts[row_sources[index]]
             if not isinstance(row, dict):
                 raise AssemblyError("assembly_output_invalid")
+            family = (
+                _family_figure(build.entries, table, row)
+                if table.removeprefix("pub_") in COLLECTED_FAMILIES
+                else None
+            )
             for field, value in row.items():
                 if (
+                    field == "field_value"
+                    and table.removeprefix("pub_") in COLLECTED_FAMILIES
+                ):
+                    if family is None:
+                        continue
+                    value, kind = family
+                elif (
                     field in ADMIN_FIELDS
                     or field in TEXT_FIELDS
                     or value is None
                     or isinstance(value, (bool, dict, list))
                 ):
                     continue
-                if field in MONEY_FIELDS or (
+                elif field in MONEY_FIELDS or (
                     field == "value"
                     and (
                         table in {"pub_bank_credit", "pub_baci_trade"}
