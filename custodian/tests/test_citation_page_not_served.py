@@ -92,6 +92,8 @@ P86_BASIS_NOTE = (
 # as for S2-P86 and S2-P92, so no other byte of any row may change.
 CWEB_ROW = "company_web"
 CWEB_CAVEAT_KEYS = ["company_web_lead_shell_only"]
+# S2-OUTFIX D2 reviewed these two places verification lineage declarations.
+PLACES_LINEAGE_KEYS = frozenset({"places_ovt", "places_ovt/part-00014"})
 BASE_BASIS_NOTE = (
     "Document 04 S2-P53 landmark hand-list placement and citation snapshots; "
     "decision 0093 item 3. Publisher's restriction recorded as a record; "
@@ -237,6 +239,11 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     cweb = [row for row in rows if row["key"] == CWEB_ROW]
     assert len(cweb) == 1
     assert cweb[0]["caveat_keys"] == CWEB_CAVEAT_KEYS
+    for key in PLACES_LINEAGE_KEYS:
+        places = [row for row in rows if row["key"] == key]
+        assert len(places) == 1
+        assert places[0]["release_tables"] == ["pub_place", "pub_place_verification"]
+        places[0]["release_tables"] = ["pub_place"]
     # S2-LICREC: check reviewed values before restoring only these base fields.
     _assert_gis_terms_reading(rows)
     rows = [

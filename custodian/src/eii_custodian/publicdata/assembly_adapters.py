@@ -17,7 +17,7 @@ from typing import Any
 from .assembly import AssemblyError, Step, run_steps
 from .assembly_intake import write_intake_evidence
 from .assembly_inventory import INVENTORY, InventoryItem, validate_inventory
-from .assembly_io import bound_files, local, read_object, write_record
+from .assembly_io import HeldRecord, bound_files, local, read_object, write_record
 from .fetch.bounded import file_hash
 from .fetch.registry import Entry, RegistryError, parse_yaml, read_yaml
 from .fetch.snapshots import Snapshot, read_snapshot, reviewed_selections
@@ -73,6 +73,7 @@ class Production:
     audit: dict[str, Any] = field(default_factory=dict)
     stamp: str = ""
     draw_exclusions: list[dict[str, Any]] = field(default_factory=list)
+    held_phases: dict[str, HeldRecord] = field(default_factory=dict)
     intake_refusal: str = ""
 
     def adapters(self) -> dict[str, Callable[[], Mapping[str, str]]]:
@@ -118,6 +119,7 @@ class Production:
             self.files.clear()
             self.data_files.clear()
             self.tables.clear()
+            self.held_phases.clear()
             self.source_tables.clear()
             self.table_sources.clear()
             self.receipts.clear()
@@ -133,12 +135,15 @@ class Production:
                 Step(item.name, adapters[item.name], self._declared_outputs(item))
                 for item in INVENTORY
             )
-        completed = run_steps(self.cache, steps, lines=self.lines)
-        from .assembly_reports import require_complete
+        try:
+            completed = run_steps(self.cache, steps, lines=self.lines)
+            from .assembly_reports import require_complete
 
-        with stage_refusals(self.lines, "require_complete"):
-            require_complete(self.audit)
-        return completed
+            with stage_refusals(self.lines, "require_complete"):
+                require_complete(self.audit)
+            return completed
+        finally:
+            self.held_phases.clear()
 
     def _declared_outputs(self, item: InventoryItem) -> tuple[str, ...]:
         """The pending pin phase declares no outputs: it writes nothing.
@@ -177,16 +182,17 @@ class Production:
             key: {field: receipt.get(field, "") for field in fields}
             for key, receipt in self.receipts.items()
         }
-        result = write_record(
-            self.cache,
-            "assembly/" + phase + ".json",
-            {
-                "method": "public-assembly." + phase,
-                "method_version": "1",
-                "source_chain": chain,
-                **value,
-            },
-        )
+        name = "assembly/" + phase + ".json"
+        envelope = {
+            "method": "public-assembly." + phase,
+            "method_version": "1",
+            "source_chain": chain,
+            **value,
+        }
+        result = write_record(self.cache, name, envelope)
+        self.held_phases.pop(name, None)
+        if isinstance(envelope.get("tables"), dict):
+            self.held_phases[name] = HeldRecord.capture(envelope, result[name])
         self.files.update(result)
         return result
 
@@ -366,7 +372,22 @@ class Production:
             if entry.source_id in NATIVE_SOURCES and entry.key in selected:
                 read_native(self, entry, selected[entry.key])
                 continue
-            if entry.skip_reason or entry.kind in {"citation_only", "besttime"}:
+            if entry.skip_reason or entry.kind == "besttime":
+                continue
+            if entry.kind == "citation_only":
+                path = local(self.cache, entry.key + "/citation.json")
+                if not path.exists():
+                    continue
+                try:
+                    citation = read_object(path.parent, path.name)
+                except AssemblyError:
+                    raise AssemblyError("assembly_citation_invalid") from None
+                if (
+                    citation.get("key") != entry.key
+                    or citation.get("source_id") != entry.source_id
+                ):
+                    raise AssemblyError("assembly_lineage_missing")
+                self.receipts[entry.key] = citation
                 continue
             if entry.key not in selected:
                 if confirmation is not None and own_run_pending(
@@ -729,7 +750,13 @@ class Production:
             )
             sources = tuple(sorted({str(row["source_key"]) for row in rows}))
             if not sources:
-                sources = tuple(sorted(selected))
+                sources = tuple(
+                    sorted(
+                        e.key
+                        for e in self.entries
+                        if e.key in selected and name in e.release_tables
+                    )
+                )
             self.table(name, rows, sources)
             names.append(name)
         self.files.update(files)

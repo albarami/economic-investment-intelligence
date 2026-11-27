@@ -7297,6 +7297,31 @@ Five classifications stay `unsure`: `16d3af9f` (missing per-batch ownership opti
 
 - **IMPLEMENTED, REVIEW PENDING — S2-CSVCMT.b1 random failure from S2-ABSCAV.b1, 2026-11-26.** The old shared CSV reader removed a physical continuation beginning with `#` inside a quoted use-key value, so the discovered `"\n#"` input raised `use_map_field_empty` instead of `use_map_use_key`. Quote-parity filtering now skips comments only at record boundaries; the property retains its original strategy and exact reason assertion and pins that input with `@example`. Both modes match the old reader on every committed CSV; EOF behavior and strict reasons remain unchanged. Reverting only the fix with corrected tests exits 1 (6 failed / 68 passed); restored focused tests pass (74), and the required broad selection passes (1683 passed / 15160 deselected, seed 6227, exit 0). Header, width and syntax guard deletions each fail their exact-reason case. This implementation and planted proof address the parser cause; the lead's different-maker review remains pending. See PROGRESS.md, S2-CSVCMT.b1; no green rerun alone is used as closure.
 
+- **IMPLEMENTED, REVIEW AND LIVE REPLAY PENDING — S2-DRAWMEM.b1a, 2026-11-27 (L-2284).** The brief reports the draw stall at the 32 GiB ceiling after final audit, with a roughly 4.35 GB phase requiring about 19.2 GiB RSS for one parse; repeated whole-phase parsing added that cost to the already-held build state. Same-run rows now pass an incremental exact-envelope hash proof against the original written file, with bound_files retained, zero held-phase parses and one parse per file-only phase. Invented tests and byte comparisons pass; the lead's real-assembly memory replay and different-maker review remain open. See PROGRESS.md, **S2-DRAWMEM.b1a — bounded assembly draw**.
+
+- **S2-DRAWMEM.fx1 follow-up, 2026-11-27:** rv1 F1/F2 reproduced and fixed with exact lineage-signature refusals, weak-reference release probes and run-exit held-metadata cleanup; required invented suite 424 passed and required static checks exit 0. Guard plants and return evidence: PROGRESS.md, **S2-DRAWMEM.fx1 — lineage revalidation and reference lifetimes**. Different-maker review and the lead's real-assembly replay remain pending; no 32 GiB fit is claimed.
+
+- S2-CITERD.b1 (2026-11-27), S2-T08 source completeness: expected closures at the next full audit are group B's 12 reference rows (`ref_expansion_method`, `ref_friday_closure`, `ref_gov_hours`, `ref_min_wage`, `ref_ramadan_private_hours`, `ref_ramadan_public_hours`, `ref_ramadan_transit_hours`, `ref_summer_work`, `ref_traffic_index`, `ref_transit_hours`, `ref_truck_hours`, `ref_wps_report`); no real-cache closure is claimed by the invented consumer tests. `gis_locator` remains refused on `licence_id` by unchanged completeness validation; the dated citation-archive obligation remains with S2-T27, decision 0064 item 24. Independent different-maker review and the full audit remain due.
+
+- S2-OUTFIX.b1 / S2-T08: D1 empty-additions attribution repaired locally, pending different-maker review and the real full audit. Of the admitted 87 output-table rows, B 7 and C 2 remain outside scope; D2 2 is BLOCKED because `places.integrate._place_from_registry` excludes the root listing key from row inputs. Both places declarations and the verification producer remain unchanged; the lead must reconcile the root listing versus component lineage before declaring both edges. The separate 65 receipt rows are untouched.
+- S2-OUTFIX2.b1 / S2-T08 update to the preceding D2 item (2026-11-27): the root listing's release-membership/size/ETag evidence and the component's row-input role are reconciled for both places tables. Both declarations now include `pub_place_verification`; the producer and exact-set check are unchanged. Invented consumer evidence is red before the change and green after; a third undeclared table still fails. Local D2 repair is ready for different-maker review; live audit closure remains pending. Next resume must refetch `places_ovt` and `places_ovt/part-00014`; unrelated entries retain their fingerprints. See PROGRESS.md, **S2-OUTFIX2.b1 — places verification declarations (2026-11-27)**. Earlier evidence is retained; B/C, D1 and the separate receipt findings are not reclassified.
+
+## Proposed open item — S2-REGSHORT.b2
+
+PO-S2-REGSHORT-02: Under proposed decision 0132, a card text with four or more
+letters or digits inside an approved metadata word still refuses, fails closed
+and goes to review; it is never absorbed. Accepted residuals of decision 0132:
+a short name may occur inside a longer token without refusal; a
+punctuation-only name may occur inside a longer string without refusal.
+Short multi-token names ignore separator spelling but require consecutive
+whole tokens. Evidence update (2026-11-27): S2-REGSHORT.rv1 (Moonshot Kimi
+K3.1 Pro through Factory Droid, a maker other than the builder) APPROVED
+e818b424. The lead's real-register replay is done: the lead-shell probe
+REGSTAGE.probe3 (decision 0102, counts only) gave exit 0 with zero
+`register_content_egress` refusals, and the S2-AUDFULL4 projection at the same
+code gave exit 0 (`register_inputs_validated`). Owner acceptance of decision
+0132 and the gates remain pending. No gate or acceptance box is marked.
+
 ## OI-426 — Persist the batch 1 to 3 activity-spine refusal records
 
 - ID: OI-426

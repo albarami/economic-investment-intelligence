@@ -55226,6 +55226,266 @@ Skills applied: project-orientation traced existing mapping and task scope; task
 - This change replaces only the two Status lines. 0113 and 0125 stay Proposed: each needs a fresh independent review before the owner's acceptance, 0113 first.
 - Documents only: no code, test, gate or acceptance box changes.
 
+## S2-DRAWMEM.b1a — bounded assembly draw (2026-11-27, L-2284)
+
+- Base: `a3efa045450c411d52c39cab0d334fd095940e39`; branch `s2/s2-drawmem`.
+  Builder: OpenAI GPT-6 Astra, senior Python data-platform engineer for
+  memory-bounded batch pipelines and provenance chains. Self-review persona:
+  strict-reviewer. Independent different-maker review remains with the lead.
+- Cause supplied by the brief: the assembly was killed at its 32 GiB ceiling
+  after final audit, while repeatedly parsing a roughly 4.35 GB phase. The
+  lead's single-parse probe reported about 19.2 GiB RSS. These are brief-sourced
+  observations, not measurements made by this worker.
+- `Production.record` now retains table references and a frozen copy of the
+  other envelope fields alongside the actual written file hash. `HeldRecord.verify`
+  incrementally reproduces exactly the writer's JSON bytes and final newline,
+  checking that hash. `bound_files` independently verifies the stored file first.
+  Thus the held envelope and the stored envelope have the same SHA-256; changed
+  held rows refuse `assembly_draw_held_rows_changed`, and changed stored bytes
+  refuse `assembly_output_invalid`. No separate unbound row digest is trusted.
+- `draw_tables` consumes each phase before the next. A held phase is never parsed;
+  a file-only phase is parsed once. Readers retain Figures, not parsed phases.
+  Gazetteer comparison retains encoded prefix rows only and preserves decoded
+  prefix equality. Table ordering, field ordering, sample selection, source links
+  and output bytes stay unchanged. The existing nested `reader` still owns numeric
+  field/value checks; no refusal-inventory anchor or payload changed.
+- New tests: `custodian/tests/test_assembly_draw_memory.py`, 21 cases including
+  exact read counts, weak-reference lifetime probes for phase objects, row lists
+  and row dictionaries, mixed held/file-only phases, binding-before-use probes,
+  held mutation, stored-byte mutation, duplicate/unindexed/invalid tables,
+  byte hashes captured from the base, and a Hypothesis Decimal serialization
+  property. Existing tests were not edited.
+- Environment: WSL2 Linux, Python 3.14.6; invented fixtures only, no source network,
+  no real cache. Tooling cache and temporary artifacts stayed under the workspace
+  (`UV_CACHE_DIR=.overnight/tmp/uv-cache`, `MYPY_CACHE_DIR=.overnight/tmp/mypy`).
+  Fixed-seed runs and all plants used `--hypothesis-seed=17`; no skip or retry.
+- Red-first: `uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py -p no:cacheprovider -q --hypothesis-seed=17`,
+  exit 1, 6 failed / 4 passed, `.overnight/OUT/red-first.log`.
+  The closed-reason extension was separately red: 1 failed / 17 passed, exit 1,
+  `.overnight/OUT/expanded-red.log`. Initial lint found six new-test style/import
+  errors (exit 1); they were corrected without changing expectations.
+- Required existing suite:
+  `uv run --locked python -m pytest custodian/tests/test_assembly_reports.py custodian/tests/test_assembly_native.py custodian/tests/test_assembly_layers.py custodian/tests/test_assembly_producers.py custodian/tests/test_property_sale.py custodian/tests/test_register_tables.py -p no:cacheprovider -q`,
+  exit 0, 394 passed. A final run of these six files plus the new file, with
+  `--hypothesis-seed=17`, exited 0: 415 passed, no skips, 63.88 seconds
+  (`.overnight/OUT/final-tests.log`).
+- Additional unchanged refusal-inventory suite plus the then-current 18 new cases:
+  1473 passed, exit 0 (`.overnight/OUT/memory-refusals.log`). Final new-file check:
+  21 passed, exit 0. Final `uv run --locked ruff check .`, `uv run --locked ruff format --check .`
+  (1026 files), and `uv run --locked mypy` (531 source files) all exited 0.
+- Before/after artifacts for the existing single-source, multisource and series
+  fixtures were compared by nine `cmp` calls, all exit 0
+  (`.overnight/OUT/byte-identity.log`). Before bytes were saved while production
+  still matched the base. No existing baseline was refreshed.
+- Largest parse-count fixture: three phases, two tables per phase, 2500 rows per
+  table, two numeric fields per row. Before: 3 parses per phase, 9 total, even
+  when the rows were held. After: 0 for held phases; 1 per file-only phase,
+  3 total. Fresh-process final measurements: held draw 0.270642 seconds,
+  fixture plus draw 0.308062 seconds, peak RSS 104720 KiB; file-only draw
+  0.142950 seconds, fixture plus draw 0.157945 seconds, peak RSS 105968 KiB.
+  The largest held fixture file was 173211 bytes. These are mechanism checks,
+  not evidence that the real 32 GiB assembly now completes; the lead must rerun it.
+- Isolated plants, each exit 1: extra parse (2 failed), overlapping phase (1),
+  changed Figure bytes (3), removed held digest guard (1), removed closed reason
+  (1), unindexed guard (2), gazetteer duplicate guard (1), unreachable guard (1),
+  reader lineage guard (1), pre-use binding (2), reader binding (1), invalid table
+  envelope guard (1 failed / 1 passed). Final restorations each passed
+  `git diff --exit-code -- <planted-file>` against the staged implementation.
+  An initial reader-binding restoration matched the wrong source occurrence:
+  its diff check exited 1. It was corrected with full function context; that
+  plant and the subsequent invalid-table plant were repeated in isolation and
+  both restoration checks exited 0. The final 415-test run followed all restores.
+- Scope extension under brief L-2230: `assembly_io` centralizes the unchanged
+  encoder and holds the proof; `Production.record` captures it and `run` clears
+  it; the closed refusal vocabulary adds the new diagnostic. `Production.draw`,
+  the sampler, pins, fixture inventory and all existing expectations are unchanged.
+  The base's pre-index rehash of changed files is corrected by retaining the
+  original recorded hash; `.overnight/ALERT.md` records that in-scope finding.
+- Skills applied: project-orientation reused the existing writer/draw paths;
+  task-standards fixed the personas and scope; writing-plans recorded the proof;
+  test-driven-development captured reds before production edits;
+  systematic-debugging traced the repeated parses and pre-index rehash;
+  sanad-provenance bound held rows to actual written bytes;
+  sharp-edges added pre-use binding and malformed-table cases;
+  property-based-testing checked stored Decimal representation and field order;
+  al-muhasibi rejected parse-once alone as insufficient;
+  github-flow retained the assigned branch and reviewed staged changes;
+  spec-to-code-compliance equivalent mapped the brief to code/tests (no dispatcher
+  available); requesting-code-review prepares the lead's independent review;
+  strict-reviewer preserved anchors and limits; verification-before-completion
+  and muhasabah-gate separate fixture proof from the unrun live-memory gate.
+- Final records checks: `python3 scripts/check_docs.py` exit 0 (1394 text files,
+  175 Markdown files); `python3 scripts/check_tree.py` exit 0 (8 rules);
+  `cmp AGENTS.md CLAUDE.md`, staged whitespace checks and the append-only prefix
+  proof for both ledgers all exit 0. No temporary helper script was created.
+- Commit attempt exited 128 because the environment has no configured Git author
+  identity. Identity was not set or overridden. Under the brief's Git fallback,
+  the complete change is delivered as `.overnight/OUT/S2-DRAWMEM.b1a.patch` with
+  its SHA-256 sidecar; the lead must commit it. HEAD remains the base above.
+
+
+## S2-DRAWMEM.fx1 — lineage revalidation and reference lifetimes
+
+- Date: 2026-11-27. Reviewed parent: `b82ba5d144d0de6137156097a4812d377ec89d8f`; base parity anchor remains `a3efa045450c411d52c39cab0d334fd095940e39`. Builder: OpenAI GPT-6, Codex API tools; persona: senior Python data-platform engineer for memory-bounded batch pipelines and provenance chains. Self-review: strict-reviewer; independent different-maker approval remains the lead's gate.
+- F1 verified against `draw_tables` and the reviewer's mutation sequence: readers previously checked only receipt presence. A sorted per-table signature now binds source keys and receipt source_id, fetch_url and sha256; readers check it after the existing missing-lineage guard. Four one-input mutation cases assert exactly assembly_draw_lineage_ambiguous. Other precomputed Figure fields are stored row values protected by the existing phase hash; source links are covered by the expanded signature. No phase is retained or reparsed for this check.
+- F2 verified: resolved row_sources and the encoded frame gazetteer prefix survived into later reads. Both are released after consumption/check; the unused held local is deleted at phase end too. Weak-reference probes cover resolved source lists and encoded prefix strings. Phase dictionaries, table lists and row dictionaries retain their original exact lifetime probe. No other phase-sized local remains across the next read_object; the Figure universe and build-owned tables remain intentionally live.
+- Review NOTES disposition: frozen HeldRecord metadata remains necessary for the exact original envelope hash proof during a run. Production.run now clears held_phases in finally around execution and completion checks, on success, step failure and completion refusal; three weak-reference cases prove release. This does not establish real-assembly memory headroom or a fit within 32 GiB.
+- Red-first: `UV_CACHE_DIR=.overnight/tmp/uv uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py -k 'changed_lineage or lineage_and_prefix' -p no:cacheprovider -q`: 6 failed / 21 deselected, exit 1 (`.overnight/OUT/fx1-red.log`). Run cleanup cases: same command with `-k run_releases`, 3 failed / 27 deselected, exit 1 (`fx1-run-red.log`). Full memory file after fixes: 30 passed, exit 0 (`fx1-memory-green.log`). Fixture seed 17; Hypothesis uses its runner-assigned seed, not printed by -q. Only invented fixtures; no real data or cache read. UV cache and temporary test files use .overnight/tmp.
+- Required command: `uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py custodian/tests/test_assembly_reports.py custodian/tests/test_assembly_native.py custodian/tests/test_assembly_layers.py custodian/tests/test_assembly_producers.py custodian/tests/test_property_sale.py custodian/tests/test_register_tables.py -p no:cacheprovider -q`: 424 passed, exit 0 (`fx1-required-tests.log`). A final run after every plant is recorded separately in `fx1-required-final.log`. Original nine base-output hash expectations, parse-count bounds and one-phase probe are unchanged.
+- Required checks: `uv run --locked ruff check .`: exit 0; `uv run --locked ruff format --check .`: exit 0, 1026 files; `uv run --locked mypy`: exit 0, 531 source files; `python3 scripts/check_docs.py`: exit 0, 1394 text files / 175 Markdown files. Full output and exit codes: `.overnight/OUT/fx1-{ruff,format,mypy,docs}.log`. Formatter application changed one file; no pins or baselines changed.
+- Guard plants, each broken alone and restored: signature 4 failed, exit 1; row-source release 1 failed, exit 1; prefix release 1 failed / 1 passed, exit 1. Evidence: `fx1-final-plant-{signature,row-sources,prefix}.log`. Each restoration `git diff --exit-code -- custodian/src/eii_custodian/publicdata/assembly_reports.py` exits 0 against the staged implementation (`fx1-final-restore-*.log`). Earlier prefix plant produced a syntax error, exit 2; it is not behavioral evidence and was replaced by the valid isolated plant. Initial no-index restoration checks also exit 0.
+- Skills applied: project-orientation reused the existing draw machinery; task-standards set the expert and strict-review personas; github-flow kept this on the assigned branch; receiving-code-review rules verified both findings then swept their families; test-driven-development rules produced nine red cases before their fixes; systematic-debugging rules isolated the two retained objects; sanad-provenance bound report claims to these logs; sharp-edges found URL/hash mutation alongside source-ID mutation; property-based-testing preserved the existing finite-Decimal serialization property and base-byte oracle; spec-to-code-compliance checked the brief against implementation; requesting-code-review rules leave independent approval pending; verification-before-completion rules require real exits; muhasabah-gate limits memory and review claims to observed evidence. Uninstalled superpowers skills use the brief's equivalent rules.
+- Delivery identity, final file counts and commit or patch digest are in `.overnight/RETURN.md` and `.overnight/OUT/S2-DRAWMEM.fx1.RETURN.md`; this record names the immutable reviewed parent to avoid a self-referential commit hash. No earlier evidence row was rewritten. Real assembly replay, hosted checks and different-maker review remain pending.
+
+- Family-sweep correction: an absent gis_property_singles phase skips its end-of-phase cleanup. The added valid absent-GIS fixture initially fails only its prefix lifetime case (1 failed / 3 passed, exit 1; `fx1-missing-gis-red-confirmed.log`). The preceding draft fixture left two registered tables unreachable (2 failed / 2 passed, exit 1; `fx1-missing-gis-red.log`); that invalid fixture is not used as proof. Cleanup now also runs when the GIS file is absent. Expanded memory suite: 32 passed, exit 0 (`fx1-memory-final.log`). Final sweep plants: signature 4 failed; row sources 2 failed; prefix 2 failed / 2 passed; all exit 1. Each final restoration uses `git diff --exit-code --no-index` against a saved byte-exact implementation, exit 0 (`fx1-sweep-restore-*.log`). Staging the expanded change was refused with read-only Git metadata, exit 128; use the brief's patch fallback. Final full regression and static-check outputs use `fx1-*-sweep-final.log`; earlier successful checks above remain historical evidence.
+
+- Final post-sweep verification: required seven-file pytest command 426 passed in 56.10s, exit 0; ruff, formatter check, mypy and documentation checks all exit 0. Full logs: `.overnight/OUT/fx1-required-sweep-final.log`, `fx1-ruff-sweep-final.log`, `fx1-format-sweep-final.log`, `fx1-mypy-sweep-final.log`, `fx1-docs-sweep-final.log`. No skips, expected-output updates or weakened assertions. Self-review found no further defect; different-maker approval is not supplied by this builder.
+
+## S2-DRAWMEM.fx2 — file-backed property carries no deadline (hosted python-guards on PR 169)
+
+- Cause: the hosted PR 169 checks run (Actions run id ending 1154) on `6b8e237f99efe72294a2d7c1a6fc03130fa5afdd`, suite python-guards 1488 passed, 1 failed: `scripts/tests/test_test_bootstrap.py::TestBootstrap::test_file_backed_properties_carry_no_deadline` named `custodian/tests/test_assembly_draw_memory.py::check:142`, a file-backed Hypothesis property without `settings(deadline=None)`. The b1a and fx1 briefs ran only the seven named custodian test files, not the script guards, and the review did not run them.
+- Change: one decorator `@settings(deadline=None)` and its import on that property; no product code, guard, fixture or other test changes.
+- Red first: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_test_bootstrap.py' -k deadline` on `6b8e237f`: 6 tests, 1 failure (the same list), exit 1. Green after the change: 6 tests OK, exit 0. `uv run --locked python -m pytest custodian/tests/test_assembly_draw_memory.py -p no:cacheprovider -q`: 32 passed, exit 0. Ruff check and format check of the file: exit 0. UV_OFFLINE=1; no seed.
+- Sibling search: the guard scans every test file under its roots; this property was its only finding on this head.
+- Builder: the lead (Anthropic, Claude Opus 5.5, Claude Code); confirmation by another maker follows, then hosted checks and the lead's whole test on the merge result.
+
+## S2-CITERD.b1 — existing citation receipts enter assembly — 2026-11-27
+
+- Task: S2-T08 source-completeness criterion; brief S2-CITERD.b1, ruling L-2300 item 2. Builder persona: senior Python data-platform engineer for provenance chains and release assembly; self-review persona: strict-reviewer. Builder: OpenAI Codex, GPT-6.2, API tools. Independent different-maker review remains lead-owned; no approval or live-audit closure is claimed.
+- Base commit: `2772373686688982d7b06a8dc478426b952faad1`, branch `s2/s2-citerd`. Git staging refused with exit 128 (read-only metadata); delivery is the brief-authorized complete patch under `.overnight/OUT/S2-CITERD.b1.patch`, with SHA-256 beside it. No push or merge.
+- Existing-work command: `git grep -n 'citation.json\|citation_only' HEAD` (exit 0; `.overnight/OUT/existing-work.log`): the production writer is `fetch.receipts.commit_citation`; existing readers are test helpers, not assembly ingestion. Reused `assembly_io.read_object`, the existing fixture writer and completeness checker. The fixture proves the assembly path equals `cache_directory(cache, key) / "citation.json"`.
+- Change: only the citation branch in `Production.reviewed_selections`; missing files remain absent, malformed/unreadable/non-object receipts refuse `assembly_citation_invalid`, mismatched key/source identity refuses `assembly_lineage_missing`, otherwise the original object enters receipts. Completeness remains the sole receipt validator. Registry, native/snapshot branches, draw memory and all existing refusal rules are unchanged.
+- Red-first: `uv run --locked python -m pytest custodian/tests/test_assembly_citations.py -p no:cacheprovider -q`, exit 1: 8 failed, 3 passed before implementation (`.overnight/OUT/red.log`). Initial green: same command, exit 0: 11 passed. The added unreadable-file case and strengthened no-read spies are included in the final 12-case run.
+- Final focused command: `uv run --locked python -m pytest custodian/tests/test_assembly_citations.py -p no:cacheprovider -v --hypothesis-seed=17`, exit 0: 12 passed (`.overnight/OUT/green-final.log`). Hypothesis profile `eii`, 100 examples; file-backed generator sets the guard-required `deadline=None`. Earlier quiet runs used the bootstrap's automatic seed, whose value quiet mode did not print; the final focused run records seed 17. Production fixture seed is 17; no real cache was read.
+- Required consumer suite: the exact command and all selected files are saved in `.overnight/OUT/required-suite.command`; it runs the five brief-named assembly files, the new citation file and every tracked test file importing completeness. Exit 0: 602 passed (`.overnight/OUT/required-suite.log`). A separately launched broader text-match suite is recorded separately; it is not a substitute for this post-restoration required run.
+- Plants: `.overnight/tmp/plants.py` deletes the citation read alone (exit 1: 9 failed, 3 passed), key check alone (1 failed, 11 passed), source-id check alone (1 failed, 11 passed), exact invalid-receipt remapping alone (5 failed, 7 passed), missing-file withholding alone (1 failed, 11 passed), besttime exclusion alone (1 failed, 11 passed), and skip-reason exclusion alone (1 failed, 11 passed). Each plant exits 1; each `git diff --no-index --exit-code` comparison with the saved expected source exits 0 after restoration. Logs and real exits: `.overnight/OUT/plant-*.log` and `.exit`. No implementation block copied; the expected-source file is restoration evidence only.
+- Checks: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_test_bootstrap.py' -v`, exit 0: 13 tests; `uv run --locked ruff check .`, exit 0; `uv run --locked ruff format --check .`, exit 0; `uv run --locked mypy`, exit 0. Outputs/exits are under `.overnight/OUT/`. Initial lint exit 1 identified import/regex conventions; initial bootstrap exit 1 identified the new file-backed property's missing deadline setting. Both were corrected without changing any guard, expectation or example count; original failing logs are retained.
+- Environment: workspace-local bash/uv, Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15 (`.overnight/OUT/environment.log`). Only invented fixtures under the workspace temporary root. No fetch, real data, cache inspection or external reads beyond installed skills.
+- Skills: project-orientation/task-standards located the consumer and set personas; test-driven-development (brief equivalent) established red before code; systematic-debugging (brief equivalent) separated missing receipts from validator drift; sanad-provenance preserved the original receipt chain; sharp-edges covered malformed, wrong-type, undecodable and unreadable inputs; property-based-testing generated non-object JSON; spec-to-code-compliance (brief-equivalent local trace) checked each brief refusal against the load-to-completeness path; requesting-code-review (brief equivalent) prepares the patch for lead-selected different-maker review; verification-before-completion (brief equivalent) saved actual checks and individual plant exits; github-flow retained the task branch and patch fallback; strict-reviewer/muhasabah-gate self-checked scope and withheld live closure claims. Named superpowers skills and the spec-compliance plugin workflow are unavailable here; no plugin workflow or independent approval is represented as run.
+- Builder identity correction: OpenAI Codex via API tools, GPT-6 family per session instructions; the exact runtime model identifier is not exposed. The more specific model suffix stated above was not verified and is withdrawn.
+- Post-record documentation check: `python3 scripts/check_docs.py`, exit 0, checked 1395 text files and 175 Markdown files (`.overnight/OUT/docs-final.log`).
+- Additional broader consumer run: command saved in `.overnight/OUT/consumer-suite.command` includes every custodian test file mentioning completeness (a superset of importers); exit 0: 2110 passed in 374.61 seconds. Its early run overlapped the second plant pass, so the required 602-test suite was deliberately launched after all source restoration and is the authoritative stable-tree consumer result. Both outputs and exits are retained; no failure was hidden or retried away.
+
+### S2-OUTFIX.b1 — empty additions lineage; D2 producer proof blocked (2026-11-27)
+
+- Task: S2-T08; branch `s2/outrows-empty-table`; base `2fd7949dc97e80c19ab1917487b7438bc92454b1`. Builder: OpenAI / GPT-6-based Codex (exact serving variant not exposed) / Codex tools. Persona: senior data-lineage engineer for statistical release builds; self-review persona: strict-reviewer. Different-maker review belongs to the lead's review lane and is pending.
+- D1: `Production.additions` retains row-derived source keys for nonempty tables; an empty table uses the frame stage's declaration-membership rule over selected entries. No declarer reaches the existing `assembly_lineage_missing` refusal. No new success or refusal is introduced. Document 04, **2. Source registry**, records this behavior.
+- D2: BLOCKED. `places.integrate._place_from_registry` excludes the root `places_ovt` key and returns a receipted component Parquet path. `places.build.build_places` obtains kept place IDs from that path; `_verifications` validates the reviewed verification rows against those IDs. `places.stage.run_places_stage` renders that result. The adapter credits both receipted places keys, but that credit is not proof of root-listing row derivation. Both declarations, the verification producer and completeness set equality are unchanged. Smallest unblock: a separately reviewed reconciliation of parent-listing metadata lineage versus component-row lineage; adding both declarations without that proof is refused by this brief.
+- Red first: `uv run --locked python -m pytest custodian/tests/test_assembly_producers.py -k 'empty_additions or nonempty_additions' -q --hypothesis-seed=2295 --basetemp=.overnight/tmp/red-first-final` exited 1: 4 failed, 1 passed, 38 deselected (`.overnight/OUT/red-first-final.log`). The earlier verbose red run had the same counts (`red-first.log`).
+- Initial green: same focused selection with `-vv` and `--basetemp=.overnight/tmp/green-focused` exited 0: 5 passed, 38 deselected (`green-focused.log`). The final property harness wraps Hypothesis inside the fixture-bearing test, requiring no health-check suppression; it creates a fresh Production per generated example.
+- Plants: `python3 .overnight/OUT/run_plants.py` exited 0. Restoring all-selected fallback: 4 failed / 1 passed, exit 1. Crediting an undeclared source: 3 failed / 2 passed, exit 1. Deleting the existing empty-lineage guard: 2 failed / 3 passed, exit 1. Every run used seed 2295; individual `plant-*.log` files preserve commands/output/exits. Each restoration used `git diff --exit-code --no-index` against the saved green adapter, exit 0 (`restore-*.log`); the base diff intentionally contains D1, so a comparison to HEAD would not prove a plant restore. No D2 declaration plant applies.
+- Post-plant final focused run: `uv run --locked python -m pytest custodian/tests/test_assembly_producers.py custodian/tests/test_places_listing_parents.py -q --hypothesis-seed=2295 --basetemp=.overnight/tmp/final-focused` exited 0: 53 passed (`final-focused.log`). This includes the existing invented-fixture proof that listing parents are never read as parts.
+- Environment: Linux / WSL2; uv tests use Python 3.14.6, pytest 9.2.0, Hypothesis 6.170.15; system `python3` uses Python 3.14.4. Hypothesis seed 2295; Production fixture seed 17. No release/world seed or real public-cache run; provider unused. Only invented fixture files under the run's temporary paths were used.
+- Predicted effect, not a measured audit: remove the 76 D1 extra edges; a simultaneous missing declared edge could still leave a D1 row failing. B 7, C 2 and D2 2 remain; the separate 65 receipt rows are untouched. No B/C or receipt repair is claimed.
+- Skills applied: project-orientation reused the existing adapter/table boundary; task-standards kept the stated personas and D1/D2 scope; test-driven-development equivalent proved red before production edit; systematic-debugging equivalent traced the empty-row fallback and listing-parent exclusion; sanad-provenance bound claims to code/logs and labeled row effects as predictions; spec-to-code-compliance checked the brief against the producer (its specialized dispatch command is unavailable, so this narrow check was manual); sharp-edges tested the no-declarer path rather than a success fallback; property-based-testing generated selections/declarations; requesting-code-review equivalent provides the lead a scoped handoff without claiming independent approval; github-flow preserved the assigned branch and commit/patch boundary; verification-before-completion equivalent records real exits; muhasabah-gate checks scope, provenance and blocked D2 before return. Skills absent from the installed catalog were applied as the brief's equivalent rules, not represented as invoked tools.
+
+- Clarification of the D1 bullet above: "no new ... refusal" means no added refusal guard or code. For an unowned empty output, behavior changes from spurious all-selected success to the existing `assembly_lineage_missing` guard; the new exact-reason negative test requires this change.
+- Import lint correction: the first `uv run --locked ruff check custodian/tests/test_assembly_producers.py` exited 1 with I001 (`initial-import-lint.log`); moving Hypothesis imports after the existing fixture imports made the same command exit 0 (`import-lint-fixed.log`). No assertion or expectation changed. Preliminary `python3 scripts/check_docs.py` exited 0, checking 1,393 text files and 175 Markdown files (`docs-preliminary.log`).
+- Commit handoff: `git add -- OPEN_ITEMS.md PROGRESS.md custodian/src/eii_custodian/publicdata/assembly_adapters.py custodian/tests/test_assembly_producers.py docs/04_PUBLIC_DATA_PACK.md` exited 128 because git metadata is read-only (`git-add.log`). Per the brief's L-2077 fallback, the final diff and checksum are delivered as `.overnight/OUT/S2-OUTFIX.b1.patch` and `.overnight/OUT/S2-OUTFIX.b1.patch.sha256`; the lead commits it using `COMMIT_MESSAGE.txt` with its Builder line. No add/commit bypass, push or merge was attempted.
+- Preliminary broader run: `python3 .overnight/OUT/run_checks.py` exited 0. Its 82-file selection (from `rg -l 'sources.yaml|release_tables' custodian/tests scripts/tests --glob 'test_*.py'` plus the named module tests) passed 4,398 tests and 46 subtests, with 192 warnings, exit 0 (`targeted-tests.log`). `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy` (531 source files), and `python3 scripts/check_docs.py` each exited 0; exact commands/output are in their named `.overnight/OUT/*.log` files and `check-results.json`.
+- Validation boundary correction: the preliminary process overlapped the repeated plants and collected the earlier equivalent property wrapper. Its green run is retained as preliminary evidence, not final stable-tree validation. The separate final-focused run covered the final wrapper. Final validation repeats the full selected suite after every plant restore, and expands to 100 files by adding direct `assembly_adapters` importers and all `test_assembly*.py`/`test_production*.py` files. Selection is in `final-test-selection.txt`; `python3 .overnight/OUT/run_checks.py final-` writes separate `final-*.log` files and real exits. `final-start-manifest.json` binds the implementation, test and documentation bytes; none of these files changes during this final run. This repetition addresses that specific validation concern; no failure, test, seed or expectation is discarded.
+
+- Final stable-tree validation: `python3 .overnight/OUT/run_checks.py final-` exited 0. The 100-file selection passed: 6547 passed, 192 warnings, 46 subtests passed in 1359.65s (0:22:39), exit 0 (`final-targeted-tests.log`). This run began only after all plants were restored and the final property/import edits were complete. Start-manifest SHA-256 bindings still match the implementation, tests and documentation.
+- Final static checks: `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, and `python3 scripts/check_docs.py` each exited 0 (`final-ruff-check.log`, `final-ruff-format.log`, `final-mypy.log`, `final-docs.log`, and `final-check-results.json`). Registry unchanged, so the registry-change-only reference-notes check does not apply. No test, expectation, skip, tolerance, baseline or gate was changed to obtain green results.
+- Handoff verification: the completed records are checked by `python3 scripts/check_docs.py`; `git diff --check HEAD` checks whitespace; `git apply --reverse --check .overnight/OUT/S2-OUTFIX.b1.patch` verifies the final patch without changing files. Their full output and real exits are retained as `records-docs.log`, `final-diff-check.log`, and `patch-reverse-check.log`. The patch checksum is in the named sidecar, avoiding a self-referential hash inside its own ledger. Self-audit: PASS for the truthful D1 handoff; D2 remains explicitly blocked and different-maker review remains pending.
+- Lead addition before review: the new property `check` of `test_empty_additions_credit_equals_declared_selection` writes fixture files, so it now carries `@settings(deadline=None)` as the bootstrap guard `test_file_backed_properties_carry_no_deadline` requires (red before: 1 failure naming `custodian/tests/test_assembly_producers.py::check`; after: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_test_bootstrap.py'` exit 0, and `uv run --locked python -m pytest custodian/tests/test_assembly_producers.py -p no:cacheprovider -q` 43 passed, exit 0).
+
+### S2-OUTFIX2.b1 — places verification declarations (2026-11-27)
+
+- Builder persona: senior data-lineage engineer for public geodata releases; self-review persona: strict-reviewer. Base: `f0cff0dba9c0dce77c6c71c1c7aa80e4ae15ebbb`, branch `s2/s2-outfix-d2`. Different-maker review remains the lead's next step; no slice-gate or real-cache result is claimed.
+- Diagnosis under document 04 PUB-48/PUB-53: `fetch.listing.prepare_listing` checks registered component membership, size and ETag against the pinned release-prefix listing and stores its pages. The root is release evidence, not a row input. `places.integrate._place_from_registry` selects the component; `places.build.build_places` reads its rows and `_verifications` validates checks against kept place IDs. Both tables have the same places-source ancestry, with verification adding its reviewed check links. Both registry declarations now include `pub_place_verification`; the existing credit calls, verification producer and exact-set check are unchanged.
+- Generator search: `scripts/stac_item_rows.py` generates only `bldg_ovt/stac-part-*` from its building collection template. The places part is the separately registered S2-T06 whole-file entry in `places.fetch.FILE_KEYS`; no places generator was found in scripts or decision records. Its conditional generator/check requirement does not apply.
+- Tests first: `uv run --locked python -m pytest custodian/tests/test_places_output_lineage.py -k declared_outputs -p no:cacheprovider -q` failed twice, once per places key, with `source_completeness: output tables` before the registry change (`red-first.log`, exit 1). Earlier fixture construction errors omitted municipality names and then a zone-source hash; both logs are retained as `fixture-error.log` and `fixture-error-2.log`, each exit 1. These were deterministic fixture errors, not claimed red-first defect evidence.
+- Green: `uv run --locked python -m pytest custodian/tests/test_places_output_lineage.py -p no:cacheprovider -q`: 7 passed, exit 0 (`green-focused.log`). This exercises actual assembly credit and exact-set completeness over invented receipts/cache, rejects a third table with the exact output-table reason for either entry, rejects a missing selection for either entry with `snapshot_selection_invalid`, and proves changed fingerprints only for the two places keys with an unchanged control. Listing sibling binding is retained. The lead must refetch those two entries at next resume; fingerprint code is unchanged (decision 0114 items 2 and 5).
+- Required run: `uv run --locked python -m pytest custodian/tests/test_assembly_producers.py custodian/tests/test_places_listing_parents.py -p no:cacheprovider -q`: 53 passed, exit 0 (`required-tests.log`). Additional full files: `test_places_output_lineage.py` (consumer/reuse proof), `test_fetch_fingerprint.py` (per-entry and sibling binding), `test_source_completeness.py` (exact-set guard), `test_places_fetch.py` and `test_places_fetch_survivors.py` (place receipt declarations), `test_large_intake.py` (place intake), `test_assembly_section10_producers.py` (PUB-73 source-declaration union), `test_publicdata_listing_survivors.py` and `test_publicdata_unblocked_round2.py` (listing membership/size/ETag and separate component fetch). The combined pytest command is retained in `related-tests.log`: 530 passed, 1 failed, exit 1.
+- That related failure was PUB-73's exact declared-table list. `series.section10.produce` unions the input entries' declared tables; the expected list now includes verification without changing numeric anchors, hashes, method or production code. Its focused pre-fix run failed once, exit 1 (`section10-before.log`); its entire file then passed 64 tests, exit 0 (`section10-green.log`). This is a contract expectation update, not a refreshed numeric baseline or weakened check.
+- Other required checks: `uv run --locked python -m unittest discover -s scripts/tests -p 'test_test_bootstrap.py'`: 13 passed, exit 0; `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `uv run --locked mypy`, `python3 scripts/check_docs.py`, and `uv run --locked python scripts/check_reference_notes.py`: all exit 0. Full output is in `.overnight/OUT/` as `bootstrap.log`, `ruff.log`, `format.log`, `mypy.log`, `docs.log`, and `references.log`. Final checks after the expectation/records edits are recorded separately below, without replacing these runs.
+- Plant: removed only the two added registry declarations, reran the positive consumer cases: 2 failed with the exact output-table reason, exit 1 (`plant.log`). Restored in `finally`; `git diff --exit-code --no-index .overnight/OUT/sources.green.yaml custodian/publicdata/sources.yaml` exited 0 (`restore.log`). No new or changed production refusal branch exists. No guard, allow-list, tolerance or producer was weakened.
+- Environment: Linux, Python 3.14.6, `UV_OFFLINE=1`, existing locked dependencies, temporary invented fixtures under the workspace; assembly fixture seed 17, existing Hypothesis `eii` profile. No real data/cache, live fetch or network call was used. No process was stopped.
+- Skills: project-orientation reused existing fixtures and credit/check consumers; task-standards applied the stated personas; systematic-debugging equivalent traced listing evidence versus row input and corrected fixture defects; test-driven-development equivalent produced the exact red before declaration edits; sanad-provenance tied the decision to source functions and logs; spec-to-code-compliance manually matched PUB-48/PUB-53 and the section 2 table to the consumers (specialized skill dispatch is unavailable); verification-before-completion equivalent recorded real exits and the restore proof; strict-reviewer preserved the exact-set guard and required the affected PUB-73 expectation; github-flow retained the assigned branch and patch handoff; muhasabah-gate bounds the result to offline builder evidence.
+- Handoff: `git add` exited 128 because the git metadata is read-only (`git-add.log`). The brief's fallback supplies `.overnight/OUT/S2-OUTFIX2.b1.patch` including new files and its SHA-256 sidecar, plus `COMMIT_MESSAGE.txt` with a Builder line. The lead commits it; no push or merge was attempted.
+- Final verification: the related full-file selection passed 531 tests, exit 0 (`related-final.log`); restored consumer tests passed 7, exit 0 (`restore-green.log`). Bootstrap passed 13 and lint, format, mypy, documentation and reference-note checks all exited 0 after the expectation/records changes (`final-*.log`). Patch validation, whitespace and final records checks are retained in `handoff-checks.log`. Self-audit: PASS for an offline builder handoff; different-maker review and the lead's live audit remain pending.
+
+- S2-OUTFIX3.b1 (2026-11-27), builder OpenAI Codex; senior persona: senior Python test engineer; self-review persona: strict-reviewer. Base commit `aa3a2d9d9ff9b4e140ad0ca908fc5ef585d1a6bd`. Changed only the citation baseline test: two named D2 keys require unique presence and exact reviewed release tables before restoring their historical field in memory; baseline digest/count and registry bytes unchanged. Red: `uv run --locked python -m pytest custodian/tests/test_citation_page_not_served.py::test_only_this_row_changes_and_only_by_the_word_and_its_note -p no:cacheprovider -q`, exit 1, original line 276 `assert _canonical_rows(restored) == BASE_ROWS_SHA256`. Scratch-registry plants (`.overnight/tmp/plants.py`, logs `.overnight/OUT/plant-*.log`): unrelated basis_note exit 1 at digest; wrong and missing second edge exit 1 at exact release_tables assertion; missing and duplicate keys exit 1 at uniqueness assertion; committed control exit 0. Each scratch restore and committed-registry `cmp` exit 0. Initial plant setup referenced an absent shard and exited 1 (StopIteration) before any test; corrected to the declared shard, no registry write occurred. Guard deletion proofs (`.overnight/tmp/guard_plants.py`): each of uniqueness and exact-value guards deleted alone; its specific-refusal proof exited 1 (`specific guard refusal absent`); test-file restoration cmp 0 each. Checks: full citation file 7 passed, exit 0; `uv run --locked python -m pytest custodian/tests/test_places_output_lineage.py custodian/tests/test_assembly_producers.py -p no:cacheprovider -q` 50 passed, exit 0; `uv run --locked ruff check .`, `uv run --locked ruff format --check .`, `python3 scripts/check_docs.py`, `git diff --check`: exit 0 each. Environment: locked Python 3.14.6, existing dependencies, workspace scratch files, no new seed or network acquisition. Skills: project-orientation reused existing historical restoration pattern; task-standards applied named personas; test-driven-development equivalent reproduced red before edit; receiving-code-review equivalent verified the reported failure and checked both rows; verification-before-completion equivalent recorded real exits and restoration checks; sanad-provenance ties claims to commands and plant logs; strict-reviewer self-check preserved the historical digest and exact values; github-flow uses assigned branch and read-only-metadata patch handoff; requesting-code-review equivalent scopes handoff to one test plus this evidence row for a different-maker reviewer; muhasabah-gate PASS for builder handoff, independent review pending. No new functions or copied blocks; seven test lines added. Protected paths touched: citation baseline guard (assert reviewed values before historical normalization), PROGRESS.md (this appended evidence row).
+
+## S2-REGSHORT.b2 — short card content matching
+
+- Date: 2026-11-27. Task S2-T49, rulings L-2199 and L-2201; proposed
+  decision 0132. Builder: OpenAI Codex; senior persona: senior privacy engineer
+  for data-release egress scanners; self-review persona: strict-reviewer.
+  Base commit: `7df3ab370ac39e396eb0103dab9897923e39398e`.
+- Environment: workspace-only invented captures; no network; `UV_OFFLINE=1`,
+  `TMPDIR=$PWD/.overnight/tmp`; property tests use `database=None`, default
+  Hypothesis example budget and generated seeds (no fixed seed claimed).
+- Red-first command, once for each of `e`, `re`, `pub`, `-`:
+  `uv run --locked python -m pytest custodian/tests/test_registers_short_content.py::test_register_short_name_builds[NAME] -q -p no:cacheprovider`.
+  Each exits 1, one failed test, exact `register_content_egress` on the unchanged
+  production scanner. `Q`, `QZ`, `a b` are retained passing build controls.
+- Implemented a frozen prepared card-content structure once per build and one
+  string matcher: unchanged long substring relation, short consecutive Unicode
+  word-token relation including underscore, punctuation-only equality. No
+  existing register test or expected refusal reason was changed.
+- Focused command: `uv run --locked python -m pytest custodian/tests/test_registers_fixed_metadata.py custodian/tests/test_registers_input_only_scan.py custodian/tests/test_registers_typed_scan.py custodian/tests/test_registers_digest_fields.py custodian/tests/test_registers.py custodian/tests/test_registers_short_content.py -q -p no:cacheprovider`:
+  exit 0, 1489 passed. This includes the unchanged decision 0124 realistic
+  invented label/schema-key plants and the new one-input exact-reason plants.
+- Guard deletions against the new test file, each alone: short-token matching,
+  exit 1 (11 failed, 10 passed); punctuation equality, exit 1 (2 failed,
+  19 passed); additional unchanged long-substring guard, exit 1 (2 failed,
+  19 passed). Each restored from original bytes and checked by byte equality.
+  No mutant is retained.
+- Initial test setup exposed duplicate lambda parameter IDs (collection exit 2,
+  twice) and import/raw-regex lint errors; corrected only the new test file.
+  Formatter and lint fixes did not change an existing test or fixture.
+- The first register selection exited 0 (2806 passed, 14403 deselected), but an
+  optional long-guard deletion overlapped it. It is not final evidence;
+  `.overnight/ALERT.md` records the overlap and the serial verification below.
+- Static commands: `uv run --locked ruff check .` exit 0;
+  `uv run --locked ruff format --check .` exit 0 (1024 files);
+  `uv run --locked mypy` exit 0 (531 source files);
+  `python3 scripts/check_docs.py` exit 0 (1393 text, 176 Markdown);
+  `python3 scripts/check_tree.py` exit 0 (8 rules);
+  `cmp AGENTS.md CLAUDE.md` exit 0. These preceded final evidence-only entries;
+  final document checks are recorded below.
+- Skills: project-orientation: reused the capture helper and existing scanner;
+  task-standards: named privacy-engineer and strict-reviewer personas;
+  test-driven-development (brief equivalent): proved four unchanged-code reds;
+  property-based-testing: independent character-walk short oracle and long
+  substring properties; sharp-edges: checked Unicode, underscore and zero-length
+  category boundaries; security-review (brief equivalent) and differential-review:
+  traced card text, keys, leaves and decoded bytes in the self-review artifact;
+  sanad-provenance: tied observations to command logs and brief rulings;
+  spec-to-code-compliance (brief bounded equivalent): mapped decision items to
+  preparation, matching and unchanged traversal; receiving-code-review (brief
+  equivalent): verified corrected b2 red cases before implementation;
+  requesting-code-review (brief equivalent): exact candidate returned for
+  different-maker review; verification-before-completion (brief equivalent):
+  serial final checks and byte restoration; muhasabah-gate: no real-release,
+  independent-approval or gate claim; github-flow: task-only patch handoff.
+- Git staging refused with exit 128, read-only index; no commit or hook ran.
+  The brief's patch handoff applies. Different-maker approval, lead real-register
+  replay and the full lead test remain owed. No acceptance box is ticked.
+- Final serial verification after byte restoration:
+  `uv run --locked python -m pytest custodian/tests -q -p no:cacheprovider -k register`
+  exit 0, 2806 passed, 14403 deselected (53.53 seconds). All 21 new cases pass.
+  Final ruff, format, mypy, check_docs, check_tree and cmp commands above each
+  exit 0 again with unchanged counts. No source mutation overlapped this run.
+  `git diff --check` exits 0. Evidence logs and security self-review are under
+  `.overnight/OUT/`. The reviewable patch includes new files using no-index
+  diffs because index intent-to-add is unavailable.
+
+### Correction to S2-REGSHORT.b2 (2026-11-27, appended; rule 38)
+
+- The b2 rows above say that different-maker review and the lead's real-register replay are owed. Both are now done:
+  - review: S2-REGSHORT.rv1, Moonshot Kimi K3.1 Pro through Factory Droid (review mode), returned APPROVED on e818b4247d66c153e3fa7193e0edcf09c39d2f94, with two records points (decision 0132's residuals in OPEN_ITEMS; this correction);
+  - replay: REGSTAGE.probe3 (lead shell, decision 0102, counts only) gave exit 0 and zero `register_content_egress` refusals, where probe1 on main 7df3ab37 had 35; the S2-AUDFULL4 projection at the same code gave exit 0, `register_inputs_validated`.
+- Rebased onto main bc9bb749f5c6396087a8385ca1064889cb509ad1. The only conflict was the PROGRESS append, kept with both sides in order. For every task file, the change lines are byte-equal before and after the move (lead script, file by file).
+- Acceptance of decision 0132 and every gate remain pending. No acceptance box is ticked.
+
+### S2-REGSHORT whole test and move onto main a3efa045 (2026-11-27, records only)
+
+- Whole test (lead, `./eii test --seed 3528764953`, unit eii-whole-test-S2-REGSHORT.wt1) on `1c8ab634` (base `bc9bb749`): RESULT PASSED, 21263 passed, 0 failed, 0 skipped in 11 suites. Per suite: python-guards 1489, python-core 855, python-custodian-1 2933, -2 3251, -3 2503, -4 4594, -5 3939, python-product-1 247, python-product-2 569, web-checks 882, web-unit 1.
+- Moved onto main `a3efa045450c411d52c39cab0d334fd095940e39` (PR 164, documents only) as `cf0af00f` and `4922a1b3`. The only conflict was the PROGRESS append; both sides are kept. A lead script shows the same nine task files, each with byte-equal change lines before and after the move, and the trees of core, custodian, scripts, product, web, uv.lock and pyproject.toml equal to `1c8ab634`. So the whole test above stands for the moved code. The rv1 approval holds for the records-only move.
+
 ### S2-D113FX2.b1 — decision 0113 review corrections (2026-11-27)
 
 - Base `2fd7949dc97e80c19ab1917487b7438bc92454b1`, branch `s2/s2-d113-fx2`. Builder: Moonshot Kimi K3.1 Pro via Factory Droid. Senior release-records editor for decision records and task ledgers; strict-reviewer self-check. Documents only, no seed, network or real-cache read. Different-maker review remains pending.

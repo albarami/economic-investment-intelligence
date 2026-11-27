@@ -5,9 +5,10 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Mapping
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict, dataclass, is_dataclass
 from datetime import date
 from decimal import Decimal
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -41,18 +42,43 @@ def json_value(value: object) -> object:
     raise AssemblyError("assembly_value_invalid")
 
 
+def record_encoder() -> json.JSONEncoder:
+    return json.JSONEncoder(
+        default=json_value, sort_keys=True, ensure_ascii=False, allow_nan=False
+    )
+
+
+@dataclass
+class HeldRecord:
+    """Same-run row references, with frozen metadata and the written file hash."""
+
+    data: dict[str, Any]
+    sha256: str
+
+    @classmethod
+    def capture(cls, value: dict[str, Any], digest: str) -> HeldRecord:
+        # Freeze metadata that later phases may extend (notably source_tables).
+        # Only the table mapping is copied; its rows remain the producer's rows.
+        metadata = {key: item for key, item in value.items() if key != "tables"}
+        data = json.loads(record_encoder().encode(metadata))
+        data["tables"] = dict(value["tables"])
+        return cls(data, digest)
+
+    def verify(self) -> dict[str, Any]:
+        # Reconstruct the exact write_record bytes incrementally, never a second
+        # phase-sized text or parsed object. The stored file is bound separately.
+        digest = sha256()
+        for chunk in record_encoder().iterencode(self.data):
+            digest.update(chunk.encode("utf-8"))
+        digest.update(b"\n")
+        if digest.hexdigest() != self.sha256:
+            raise AssemblyError("assembly_draw_held_rows_changed")
+        return self.data
+
+
 def write_record(cache: Path, name: str, value: object) -> dict[str, str]:
     path = local(cache, name)
-    body = (
-        json.dumps(
-            value,
-            default=json_value,
-            sort_keys=True,
-            ensure_ascii=False,
-            allow_nan=False,
-        )
-        + "\n"
-    )
+    body = record_encoder().encode(value) + "\n"
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as stream:
         stream.write(body)
