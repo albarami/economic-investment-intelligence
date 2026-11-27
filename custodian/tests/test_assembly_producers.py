@@ -10,6 +10,9 @@ import pytest
 from custodian.tests.test_activity_spine import BASKET_REFUSALS
 from custodian.tests.test_baskets import invented_review
 from custodian.tests.test_production_adapters import context
+from custodian.tests.test_source_completeness import entry, receipt
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 from eii_custodian.publicdata.assembly import AssemblyError
 from eii_custodian.publicdata.fetch.bounded import file_hash
@@ -937,3 +940,101 @@ def test_frame_credits_a_grid_table_whose_sources_are_keyed_by_entry_key(
     assert build.tables["pub_night_lights"] == [{"cell": 1, "period": "2024-01"}]
     assert build.table_sources["pub_night_lights"] == {PARTS[0]}
     assert PARTS[1] not in build.table_sources["pub_night_lights"]
+
+
+def _additions_credit(tmp_path, monkeypatch, entries, rows=()):
+    """Stub producer/decoder only; exercise real assembly and lineage checks."""
+    from eii_custodian.publicdata.additions import build as additions_build
+    from eii_custodian.publicdata.review import cache_fixture
+
+    output = tmp_path / "additions/current"
+    table = output / "tables/pub_trade_wr.parquet"
+    table.parent.mkdir(parents=True, exist_ok=True)
+    table.write_bytes(b"SYN-invented-parquet")
+    manifest = {
+        "tables": [{"name": "pub_trade_wr", "sha256": file_hash(table)}],
+        "pending_slugs": [],
+    }
+    (output / "manifest.json").write_text(json.dumps(manifest))
+    monkeypatch.setattr(additions_build, "build_additions", lambda *args: output)
+    monkeypatch.setattr(cache_fixture, "read_parquet", lambda body: rows)
+    build = context(tmp_path, entries)
+    build.selected = {row.key: "a" * 64 for row in entries if not row.skip_reason}
+    build.receipts = {row.key: receipt(row) for row in entries if not row.skip_reason}
+    return build
+
+
+def _credit_entries():
+    return (
+        entry("trade_wr", key="trade_wr/SYN", release_tables=("pub_trade_wr",)),
+        entry(
+            "visits_museum",
+            key="visits_museum/SYN",
+            release_tables=("pub_venue_visits",),
+        ),
+    )
+
+
+def test_empty_additions_credits_legitimate_source(tmp_path, monkeypatch):
+    build = _additions_credit(tmp_path, monkeypatch, _credit_entries())
+    build.additions()
+    assert build.source_tables["trade_wr/SYN"] == ["pub_trade_wr"]
+    assert build.table_sources["pub_trade_wr"] == {"trade_wr/SYN"}
+
+
+def test_empty_additions_withholds_undeclared_source(tmp_path, monkeypatch):
+    build = _additions_credit(tmp_path, monkeypatch, _credit_entries())
+    build.additions()
+    assert "pub_trade_wr" not in build.source_tables.get("visits_museum/SYN", ())
+    assert "visits_museum/SYN" not in build.table_sources["pub_trade_wr"]
+
+
+def test_nonempty_additions_keeps_row_derived_credit(tmp_path, monkeypatch):
+    rows = ({"source_key": "visits_museum/SYN"},)
+    build = _additions_credit(tmp_path, monkeypatch, _credit_entries(), rows)
+    build.additions()
+    assert build.table_sources["pub_trade_wr"] == {"visits_museum/SYN"}
+    assert "trade_wr/SYN" not in build.source_tables
+    assert build.tables["pub_trade_wr"] == list(rows)
+
+
+def test_empty_additions_without_declaration_refuses_lineage(tmp_path, monkeypatch):
+    declaring, control = _credit_entries()
+    entries = (replace(declaring, release_tables=()), control)
+    build = _additions_credit(tmp_path, monkeypatch, entries)
+    with pytest.raises(AssemblyError, match=r"^assembly_lineage_missing$"):
+        build.additions()
+    assert "pub_trade_wr" not in build.tables
+    assert not (tmp_path / "assembly/additions.json").exists()
+
+
+def test_empty_additions_credit_equals_declared_selection(tmp_path, monkeypatch):
+    @settings(deadline=None)
+    @given(st.lists(st.tuples(st.booleans(), st.booleans()), max_size=12))
+    def check(flags):
+        # A fresh Production per example; fixture files are overwritten, never reused.
+        entries = tuple(
+            entry(
+                "trade_wr",
+                key=f"trade_wr/SYN-{index}",
+                release_tables=("pub_trade_wr",) if declared else (),
+                skip_reason="" if selected else "SYN-unselected",
+            )
+            for index, (selected, declared) in enumerate(flags)
+        )
+        expected = {
+            row.key
+            for row, (selected, declared) in zip(entries, flags, strict=True)
+            if selected and declared
+        }
+        build = _additions_credit(tmp_path, monkeypatch, entries)
+        if expected:
+            build.additions()
+            assert build.table_sources["pub_trade_wr"] == expected
+            assert set(build.source_tables) == expected
+        else:
+            with pytest.raises(AssemblyError, match=r"^assembly_lineage_missing$"):
+                build.additions()
+            assert not build.source_tables
+
+    check()
