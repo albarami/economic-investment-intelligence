@@ -7301,5 +7301,14 @@ Five classifications stay `unsure`: `16d3af9f` (missing per-batch ownership opti
 
 PO-S2-REGSHORT-02: Under proposed decision 0132, a card text with four or more
 letters or digits inside an approved metadata word still refuses, fails closed
-and goes to review; it is never absorbed. Different-maker review and lead
-real-register replay remain owed. No gate or acceptance box is marked.
+and goes to review; it is never absorbed. Accepted residuals of decision 0132:
+a short name may occur inside a longer token without refusal; a
+punctuation-only name may occur inside a longer string without refusal.
+Short multi-token names ignore separator spelling but require consecutive
+whole tokens. Evidence update (2026-11-27): S2-REGSHORT.rv1 (Moonshot Kimi
+K3.1 Pro through Factory Droid, a maker other than the builder) APPROVED
+e818b424. The lead's real-register replay is done: the lead-shell probe
+REGSTAGE.probe3 (decision 0102, counts only) gave exit 0 with zero
+`register_content_egress` refusals, and the S2-AUDFULL4 projection at the same
+code gave exit 0 (`register_inputs_validated`). Owner acceptance of decision
+0132 and the gates remain pending. No gate or acceptance box is marked.
