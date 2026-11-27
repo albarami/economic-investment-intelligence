@@ -1230,7 +1230,15 @@ def test_parameter_invalid_share_never_becomes_usable(text):
     assert (result[0]["parameter_key"], result[0]["value"]) == ("other", None)
 
 
-@pytest.mark.parametrize("wording", ["25% in 2099", "forecast 25%"])
+@pytest.mark.parametrize(
+    "wording",
+    [
+        "25% in 2099",
+        "forecast 25%",
+        "projected rent support: 25%",
+        "expected support: 25%",
+    ],
+)
 def test_parameter_forward_looking_figure_is_omitted(wording):
     rows, pages = _parameter_pages()
     row = {
@@ -1266,10 +1274,14 @@ def test_parameter_stated_period_and_arabic_digits():
     assert lines == []
 
 
-def test_parameter_arabic_forecast_is_omitted():
+@pytest.mark.parametrize(
+    "wording",
+    ["متوقع 25% لمدة 3 سنوات", "تشير التوقعات إلى دعم بنسبة 25% لمدة 3 سنوات"],
+)
+def test_parameter_arabic_forecast_is_omitted(wording):
     rows, pages = _parameter_pages()
     result, lines = _project(
-        [rows[1], {**rows[11], "text_items": '["متوقع 25% لمدة 3 سنوات"]'}], pages
+        [rows[1], {**rows[11], "text_items": json.dumps([wording])}], pages
     )
     assert result == []
     assert lines == [
@@ -1335,3 +1347,170 @@ def test_parameter_other_preserves_stated_unit_spelling():
     assert lines == [
         "REPORT pub_investqa_record https://agency.invalid/en/incentives/invented check=parameter_pair reason=pair_missing"
     ]
+
+
+@pytest.mark.parametrize(
+    "language,heading,key,text,value,unit",
+    [
+        ("en", "Rent subsidy", "rent_share", "25%", "0.25", "ratio"),
+        ("en", "Rental subsidy", "rent_share", "25%", "0.25", "ratio"),
+        (
+            "en",
+            "Rent allowance",
+            "rent_amount",
+            "QAR 50 per month",
+            "50",
+            "qar_per_month",
+        ),
+        (
+            "en",
+            "Rental allowance",
+            "rent_amount",
+            "QAR 50 per month",
+            "50",
+            "qar_per_month",
+        ),
+        ("en", "Salary subsidy", "staff_share", "25%", "0.25", "ratio"),
+        ("en", "Staff cost subsidy", "staff_share", "25%", "0.25", "ratio"),
+        (
+            "en",
+            "Salary allowance",
+            "staff_amount",
+            "QAR 50 per month",
+            "50",
+            "qar_per_month",
+        ),
+        (
+            "en",
+            "Staff cost allowance",
+            "staff_amount",
+            "QAR 50 per month",
+            "50",
+            "qar_per_month",
+        ),
+        ("en", "Tax exemption", "other", "Exemption applies", None, None),
+        ("en", "Land offer", "other", "Land available", None, None),
+        ("ar", "دعم الإيجار", "rent_share", "25%", "0.25", "ratio"),
+        ("ar", "دعم تكاليف الإيجار", "rent_share", "25%", "0.25", "ratio"),
+        (
+            "ar",
+            "بدل الإيجار",
+            "rent_amount",
+            "50 ريال قطري شهرياً",
+            "50",
+            "qar_per_month",
+        ),
+        ("ar", "دعم الرواتب", "staff_share", "25%", "0.25", "ratio"),
+        ("ar", "دعم الأجور", "staff_share", "25%", "0.25", "ratio"),
+        (
+            "ar",
+            "بدل الرواتب",
+            "staff_amount",
+            "50 ريال قطري شهرياً",
+            "50",
+            "qar_per_month",
+        ),
+        (
+            "ar",
+            "بدل الأجور",
+            "staff_amount",
+            "50 ريال قطري شهرياً",
+            "50",
+            "qar_per_month",
+        ),
+        ("ar", "إعفاء ضريبي", "other", "يسري الإعفاء", None, None),
+        ("ar", "تخصيص أرض", "other", "تتوفر أرض للمشروع", None, None),
+    ],
+)
+def test_parameter_closed_phrase(language, heading, key, text, value, unit):
+    from eii_custodian.publicdata.assembly_native import classify_parameter
+
+    rows, _ = _parameter_pages()
+    parsed = classify_parameter(
+        {
+            **rows[1],
+            "language": language,
+            "heading": heading,
+            "text_items": json.dumps([text]),
+        }
+    )
+    assert parsed is not None
+    assert (parsed.key, parsed.value, parsed.unit) == (key, value, unit)
+
+
+@pytest.mark.parametrize(
+    "language,text,key,value,unit,duration",
+    [
+        ("en", "QAR 50 per month", "rent_amount", "50", "qar_per_month", None),
+        ("en", "QAR 50 monthly", "rent_amount", "50", "qar_per_month", None),
+        ("ar", "50 ريال قطري شهرياً", "rent_amount", "50", "qar_per_month", None),
+        ("ar", "50 ريال قطري شهريا", "rent_amount", "50", "qar_per_month", None),
+        ("en", "QAR 50 one-off for 3 years", "other", "50", "QAR", None),
+        ("en", "QAR 50 one time for 3 years", "other", "50", "QAR", None),
+        (
+            "ar",
+            "50 ريال قطري لمرة واحدة لمدة 3 سنوات",
+            "other",
+            "50",
+            "ريال قطري",
+            None,
+        ),
+    ],
+)
+def test_parameter_monthly_and_once_markers(language, text, key, value, unit, duration):
+    from eii_custodian.publicdata.assembly_native import classify_parameter
+
+    rows, _ = _parameter_pages()
+    parsed = classify_parameter(
+        {
+            **rows[2],
+            "language": language,
+            "heading": "Rent allowance" if language == "en" else "بدل الإيجار",
+            "text_items": json.dumps([text]),
+        }
+    )
+    assert parsed is not None
+    assert (parsed.key, parsed.value, parsed.unit, parsed.duration) == (
+        key,
+        value,
+        unit,
+        duration,
+    )
+
+
+@pytest.mark.parametrize(
+    "text,number,unit",
+    [
+        ("for 1 month", "1", "month"),
+        ("for 3 months", "3", "months"),
+        ("for 1 year", "1", "year"),
+        ("for 3 years", "3", "years"),
+        ("لمدة 1 شهر", "1", "شهر"),
+        ("لمدة 3 أشهر", "3", "أشهر"),
+        ("لمدة 12 شهراً", "12", "شهراً"),
+        ("لمدة 1 سنة", "1", "سنة"),
+        ("لمدة 3 سنوات", "3", "سنوات"),
+    ],
+)
+def test_parameter_duration_token_consumed_whole(text, number, unit):
+    from eii_custodian.publicdata.assembly_native import _DURATION
+
+    token = _DURATION.fullmatch(text)
+    assert token is not None
+    assert token.groups() == (number, unit)
+
+
+@pytest.mark.parametrize(
+    "marker", ["up to", "between", "حتى", "ما بين", "2-3", "2\u20133"]
+)
+def test_parameter_range_vocabulary(marker):
+    from eii_custodian.publicdata.assembly_native import _RANGE
+
+    assert _RANGE.fullmatch(marker) is not None
+
+
+@pytest.mark.parametrize("marker", ["per month", "monthly", "شهرياً", "شهريا"])
+def test_parameter_monthly_vocabulary_consumed_whole(marker):
+    from eii_custodian.publicdata.assembly_native import _MONTHLY
+
+    assert _MONTHLY.fullmatch(marker) is not None
