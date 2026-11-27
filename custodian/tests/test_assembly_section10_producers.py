@@ -576,7 +576,11 @@ def test_pub73_produced_with_both_source_chains(tmp_path: Path) -> None:
     # A registry row without a slug names its key; one with a slug keeps it.
     assert chain[0]["slug"] == PLACES_KEY
     assert chain[1]["slug"] == ENTRIES["est_census"].slug != ""
-    assert record["release_tables"] == ["pub_census_national", "pub_place"]
+    assert record["release_tables"] == [
+        "pub_census_national",
+        "pub_place",
+        "pub_place_verification",
+    ]
     build.final_audit()
     regressions = build.audit["regressions"]
     assert {"PUB-71", "PUB-72", "PUB-73"}.isdisjoint(regressions["missing"])

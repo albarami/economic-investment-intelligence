@@ -1421,7 +1421,7 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: ["pub_place"]
+    release_tables: ["pub_place", "pub_place_verification"]
     caveat_keys: []
     columns: []
     row_count_min: null
@@ -5610,7 +5610,7 @@ sources:
     nightly_live_fetch: true
     public_splits: []
     commit_allowed: false
-    release_tables: ["pub_place"]
+    release_tables: ["pub_place", "pub_place_verification"]
     caveat_keys: []
     columns: []
     row_count_min: null
