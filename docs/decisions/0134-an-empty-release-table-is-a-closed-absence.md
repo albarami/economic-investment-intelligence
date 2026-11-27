@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed, 2026-11-27; awaits the owner's acceptance after a different-maker review |
+| Status | Accepted by the owner on 2026-11-27, at commit `b417470c`, with conditions ("Owner decision, 2026-11-27: I accept decision 0134 ("An empty release table is a closed absence") at commit b417470c, with these conditions kept on the acceptance record:"; "1. The follow-up build adds the plant the record lacks. An absence claimed with no attached rule 53 and 57 searches, or with searches that omit a place rule 53 lists, must refuse with its own specific reason. A valid absence with its searches passes."; "2. The follow-up build keeps the completeness checks and the exact declared/produced table-set check unchanged. Each guard must be shown to fail when removed alone and pass when restored."; "3. The acceptance goes by a documents-only pull request with another maker approving. Reconfirm the review on the head that merges (the approval on b417470c is S2-TRADECREDIT.rv2)."; owner’s signed answer under OWNER_RULES 60, recorded by L-2357); approving review: S2-TRADECREDIT.rv2, Droid kimi-k3, APPROVED `b417470c`. The acceptance holds while any condition is unmet. |
 | Date | 2026-11-27 |
 | Owner | The owner |
 | Amends | Document 04 section 2, **Source registry**, the empty-table credit sentence quoted in item 1 |
@@ -141,7 +141,45 @@
    uncredited, and a populated control passes with real row lineage. Each
    negative case changes only its disposition while other inputs remain valid;
    assert the specific refusal reason, then prove each guard red when removed
-   alone and green when restored across the named phases. This proposal builds
-   none of that control and changes no code, tests, registry or schema. The
-   lead holds the open item until this record is accepted and a producer
-   releases the trade rows; another maker's review precedes owner acceptance.
+   alone and green when restored across the named phases.
+
+   Named acceptance evidence for condition 1: take one otherwise-valid
+   substantiated-absence case and keep every other input identical. Removing
+   its attached rule 53 and 57 search evidence must refuse with its own specific
+   reason, provisionally `absence_searches_missing`. Restoring the evidence but
+   omitting one place listed by rule 53 must refuse with a different specific
+   reason, provisionally `absence_search_place_missing`. Restoring the complete
+   searches must pass as `additions_table_empty` / `NO_DATA`. These reason names
+   are placeholders; the follow-up build chooses the final codes and asserts
+   each specific reason.
+
+   Named acceptance evidence for condition 2: the checks of
+   `custodian/src/eii_custodian/publicdata/completeness.py` and the exact
+   declared/produced table-set check stay unchanged. Show each guard red when
+   removed alone and green when restored. This documents-only acceptance record
+   builds none of those controls and changes no code, tests, registry or schema.
+   The lead holds the trade-key open item until a producer releases the trade
+   rows; the conditions below remain separately required.
+7. **Acceptance conditions.** The owner's signed answer of 2026-11-27,
+   recorded by L-2357 under OWNER_RULES 60, keeps these conditions on acceptance:
+
+   > 1. The follow-up build adds the plant the record lacks. An absence claimed with no attached rule 53 and 57 searches, or with searches that omit a place rule 53 lists, must refuse with its own specific reason. A valid absence with its searches passes.
+
+   Satisfied by the follow-up build’s condition 1 evidence in item 6: the
+   two distinct specific refusals and the restored complete-search control.
+
+   > 2. The follow-up build keeps the completeness checks and the exact declared/produced table-set check unchanged. Each guard must be shown to fail when removed alone and pass when restored.
+
+   Satisfied by the follow-up build’s condition 2 evidence in item 6: the
+   unchanged completeness and exact table-set checks, each guard independently
+   shown red when removed and green when restored.
+
+   > 3. The acceptance goes by a documents-only pull request with another maker approving. Reconfirm the review on the head that merges (the approval on b417470c is S2-TRADECREDIT.rv2).
+
+   Satisfied by this documents-only pull request, PR 175, approved by
+   another maker, with that review reconfirmed on the head that merges.
+   S2-TRADECREDIT.rv2 approved `b417470c`; that approval does not substitute
+   for review of this acceptance-record delta.
+
+   The acceptance holds while any condition is unmet. If a condition cannot
+   be met, hold the acceptance and tell the owner why in one line.
