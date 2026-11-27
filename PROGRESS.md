@@ -55485,3 +55485,10 @@ Skills applied: project-orientation traced existing mapping and task scope; task
 
 - Whole test (lead, `./eii test --seed 3528764953`, unit eii-whole-test-S2-REGSHORT.wt1) on `1c8ab634` (base `bc9bb749`): RESULT PASSED, 21263 passed, 0 failed, 0 skipped in 11 suites. Per suite: python-guards 1489, python-core 855, python-custodian-1 2933, -2 3251, -3 2503, -4 4594, -5 3939, python-product-1 247, python-product-2 569, web-checks 882, web-unit 1.
 - Moved onto main `a3efa045450c411d52c39cab0d334fd095940e39` (PR 164, documents only) as `cf0af00f` and `4922a1b3`. The only conflict was the PROGRESS append; both sides are kept. A lead script shows the same nine task files, each with byte-equal change lines before and after the move, and the trees of core, custodian, scripts, product, web, uv.lock and pyproject.toml equal to `1c8ab634`. So the whole test above stands for the moved code. The rv1 approval holds for the records-only move.
+
+### Owner acceptance of decision 0132 (2026-11-27, documents only)
+
+- Source: the owner's decision of 2026-11-27, "Accept decision 0132", relayed by the advisor in its note of 2026-11-27 13:19:41 Qatar (ruling L-2322).
+- Review: S2-REGSHORT.rv1 (Moonshot Kimi through Factory Droid, review mode) APPROVED head `e818b4247d66c153e3fa7193e0edcf09c39d2f94` with no rejecting finding. That head holds this record as blob `4d2d6b4b`, the same blob as on main `43ba6a7b8e02264276d6962fdd49a8487e784a42`, so the review stands on the current text. Moonshot is a maker other than the builder (OpenAI Codex). The implementation joined train S2-45 (PR 173) through both train confirmations and the green whole test on the exact merge tree.
+- This change replaces only the Status line of decision 0132. Proposed decision 0132 named in TASKS.md and OPEN_ITEMS.md entries of S2-REGSHORT stays as written there (append-only records).
+- Documents only: no code, test, gate or acceptance box changes.
