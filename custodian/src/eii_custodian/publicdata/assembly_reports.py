@@ -521,6 +521,7 @@ def observed_periods(build: Production) -> dict[str, tuple[str | None, str | Non
     from .assembly_adapters import _fsq_manifest
     from .fetch.awards import read_intake
     from .fetch.page_records import load_declaration
+    from .fetch.snapshots import read_snapshot
 
     periods: dict[str, tuple[str | None, str | None]] = {}
     fsq = "places_fsq/copy"
@@ -530,10 +531,14 @@ def observed_periods(build: Production) -> dict[str, tuple[str | None, str | Non
     awards = "awards_owner_scrape"
     if awards in build.receipts and awards in build.selected:
         batch, _, _ = read_intake(build.cache, load_declaration(awards), build.clock())
-        periods[awards] = (
-            str(batch.summary["date_first"]) if batch.summary["date_first"] else None,
-            str(batch.summary["date_last"]) if batch.summary["date_last"] else None,
-        )
+        snapshot = read_snapshot(local(build.cache, awards), build.selected[awards])
+        if json.loads(snapshot.body).get("source_sha256") == batch.sha256:
+            periods[awards] = (
+                str(batch.summary["date_first"])
+                if batch.summary["date_first"]
+                else None,
+                str(batch.summary["date_last"]) if batch.summary["date_last"] else None,
+            )
     return periods
 
 

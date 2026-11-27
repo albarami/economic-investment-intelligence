@@ -236,10 +236,10 @@ def test_audit_periods_resolve_fsq_dated_manifest(tmp_path):
     assert observed_periods(state) == {row.key: ("2026-01-03", "2026-01-03")}
 
 
-def test_audit_periods_recompute_awards_from_saved_batch(tmp_path, monkeypatch):
+@pytest.fixture
+def awards_state(tmp_path, monkeypatch):
     from custodian.tests.test_production_adapters import context
 
-    from eii_custodian.publicdata.assembly_reports import observed_periods
     from eii_custodian.publicdata.fetch import page_records
     from eii_custodian.publicdata.fetch.receipts import sha256_hex
 
@@ -263,9 +263,107 @@ def test_audit_periods_recompute_awards_from_saved_batch(tmp_path, monkeypatch):
     )
     declaration = {"max_bytes": 4096, "profile": profile()}
     monkeypatch.setattr(page_records, "load_declaration", lambda _key: declaration)
-    state.selected[row.key] = "a" * 64
-    state.receipts[row.key] = dict(receipt(row), summary={"date_first": "2099-01-01"})
-    assert observed_periods(state) == {row.key: ("2026-01-01", "2026-01-03")}
+    from eii_custodian.publicdata.fetch.awards import read_intake
+
+    batch, _, _ = read_intake(tmp_path, declaration, state.clock())
+    state.receipts[row.key] = dict(
+        receipt(row), period_first="2026-01-01", period_last="2026-01-03"
+    )
+    return state, batch.sha256
+
+
+def _select_awards(state, source_sha256):
+    from eii_custodian.publicdata.fetch.receipts import sha256_hex
+    from eii_custodian.publicdata.fetch.snapshots import publish_snapshot
+
+    key = "awards_owner_scrape"
+    body = json.dumps(
+        {
+            "source_sha256": source_sha256,
+            "period_first": "2026-01-01",
+            "period_last": "2026-01-03",
+        }
+    ).encode()
+    snap = publish_snapshot(
+        state.cache / key,
+        "json",
+        body,
+        dict(state.receipts[key], sha256=sha256_hex(body), bytes=len(body)),
+    )
+    state.selected[key] = snap.sha256
+    return snap
+
+
+def test_audit_periods_unrelated_awards_selection_has_no_bound(awards_state):
+    from eii_custodian.publicdata.assembly_reports import observed_periods
+
+    state, _ = awards_state
+    _select_awards(state, "a" * 64)
+    assert "awards_owner_scrape" not in observed_periods(state)
+
+
+def test_audit_periods_different_batch_same_dates_has_no_bound(awards_state):
+    from eii_custodian.publicdata.assembly_reports import observed_periods
+
+    state, _ = awards_state
+    _select_awards(state, "b" * 64)
+    assert "awards_owner_scrape" not in observed_periods(state)
+
+
+def test_audit_periods_matching_awards_batch_has_intake_dates(awards_state):
+    from eii_custodian.publicdata.assembly_reports import observed_periods
+
+    state, digest = awards_state
+    _select_awards(state, digest)
+    assert observed_periods(state) == {
+        "awards_owner_scrape": ("2026-01-01", "2026-01-03")
+    }
+
+
+@pytest.mark.parametrize("matched", [False, True])
+def test_check_awards_period_is_bound_to_selected_batch(awards_state, matched):
+    from custodian.tests.test_source_completeness import failures
+
+    from eii_custodian.publicdata.assembly_reports import observed_periods
+
+    state, digest = awards_state
+    row = state.entries[0]
+    _select_awards(state, digest if matched else "b" * 64)
+    result = failures(
+        c.check(
+            entries=state.entries,
+            pack=c.Pack({row.source_id: ()}, frozenset()),
+            inventory={row.source_id: ()},
+            catalogue=set(row.release_tables),
+            receipts=state.receipts,
+            outputs={row.key: row.release_tables},
+            absences={},
+            cached_source_ids=(),
+            observed_periods=observed_periods(state),
+        )
+    )
+    assert result == (
+        []
+        if matched
+        else [
+            {
+                "id": row.key,
+                "state": "failed",
+                "reason": "source_receipt_missing: field=period_first",
+            }
+        ]
+    )
+
+
+def test_audit_periods_awards_corrupt_snapshot_refuses(awards_state):
+    from eii_custodian.publicdata.assembly_reports import observed_periods
+    from eii_custodian.publicdata.fetch.snapshots import SnapshotError
+
+    state, digest = awards_state
+    snap = _select_awards(state, digest)
+    snap.path.write_bytes(b"corrupt")
+    with pytest.raises(SnapshotError, match=r"^snapshot_hash_mismatch$"):
+        observed_periods(state)
 
 
 @given(st.text(max_size=200))
