@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 import yaml
 from custodian.tests.repository_root import repository_root
 
+from eii_custodian.publicdata.fetch.build import run_build
 from eii_custodian.publicdata.fetch.registry import (
     LICENCE_BASIS_PENDING,
     TERMS_WORDS_PENDING,
@@ -16,6 +19,7 @@ from eii_custodian.publicdata.fetch.registry import (
     read_yaml,
     registry_path,
 )
+from eii_custodian.publicdata.fetch.transport import Response
 
 
 def _assert_terms_records(path: Path) -> None:
@@ -138,3 +142,99 @@ def test_pending_basis_remains_loadable_and_auditable(
     path.write_text(yaml.safe_dump(document), encoding="utf-8")
     _assert_terms_records(path)
     assert load_registry(path)[0].licence_basis == "pending"
+
+
+GIS_TERMS_KEYS = frozenset(
+    {
+        "gis_address",
+        "gis_boundaries",
+        "gis_context",
+        "gis_imagery_history",
+        "gis_land_price",
+        "gis_landmarks",
+        "gis_locator",
+        "gis_parcels",
+        "gis_phcc",
+        "gis_poi_comm",
+        "gis_rail",
+        "gis_zoning",
+    }
+)
+# S2-LIC.b2 saved rendered home page, read on 2026-11-27 Qatar time:
+# SHA-256 860d736387422a279c41d6a79640e36196d0850961638b68a879462aa234e82a.
+# Site-wide reservation only; no reuse permission or licence inferred.
+GIS_TERMS_READING = {
+    "terms_url": "https://www.gisqatar.org.qa/ar/home",
+    "terms_words": "© جميع الحقوق محفوظة 2024 @ CGIS Qatar",
+    "terms_read_on": "2026-11-27",
+    "licence_id": "",
+    "licence_basis": "owner_decision",
+}
+
+
+def _assert_gis_terms_reading(rows: list[dict]) -> None:
+    selected = [row for row in rows if row["key"] in GIS_TERMS_KEYS]
+    assert len(selected) == len(GIS_TERMS_KEYS)
+    assert {row["key"] for row in selected} == GIS_TERMS_KEYS
+    for row in selected:
+        assert {
+            field: row[field] for field in GIS_TERMS_READING
+        } == GIS_TERMS_READING, ("GIS terms reading differs", row["key"])
+
+
+def test_gis_site_wide_terms_reading_is_recorded() -> None:
+    document = read_yaml(registry_path())
+    _assert_gis_terms_reading(document["sources"])
+
+
+def test_planted_gis_reading_change_is_detected() -> None:
+    rows = [dict(key=key, **GIS_TERMS_READING) for key in GIS_TERMS_KEYS]
+    _assert_gis_terms_reading(rows)
+    rows[0]["terms_words"] += "!"
+    with pytest.raises(AssertionError, match="GIS terms reading differs"):
+        _assert_gis_terms_reading(rows)
+
+
+def test_gis_terms_build_records_advisory_without_request(tmp_path: Path) -> None:
+    committed = next(e for e in load_registry() if e.key == "gis_boundaries")
+    # Real terms URL, invented source addresses and cache; no live transport.
+    entry = replace(
+        committed,
+        url="https://syn.example.invalid/layer",
+        landing_url="https://syn.example.invalid/layer",
+    )
+    seen: list[str] = []
+
+    def transport(url: str) -> Response:
+        seen.append(url)
+        raise AssertionError("no request for the skipped GIS row or its terms")
+
+    cache = tmp_path / "public_cache"
+    cache.mkdir()
+    outcome = run_build(
+        (entry,),
+        transport,
+        cache,
+        lambda: "2026-11-27T00:00:00Z",
+        lambda _: None,
+        _fetch_only=True,
+    )
+    assert seen == []
+    assert outcome.failure is None
+    advisory = (
+        "TERMS gis_boundaries not read: host www.gisqatar.org.qa "
+        "is not on the allow-list (https://www.gisqatar.org.qa/ar/home)"
+    )
+    assert [line for line in outcome.lines if line.startswith("TERMS ")] == [advisory]
+    log = json.loads((cache / "build-log.json").read_text())
+    assert log["terms"] == []
+    assert log["terms_attempts"] == [
+        {
+            "key": "gis_boundaries",
+            "terms_url": GIS_TERMS_READING["terms_url"],
+            "terms_attempted_utc": "2026-11-27T00:00:00Z",
+            "terms_unread_reason": "host_not_allow_listed",
+            "terms_read_on": "2026-11-27",
+            "terms_words": GIS_TERMS_READING["terms_words"],
+        }
+    ]

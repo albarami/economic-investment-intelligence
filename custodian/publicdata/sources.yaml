@@ -1027,7 +1027,7 @@ sources:
     public_splits: ["nationality"]
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: ["accident_partition_bound_unconfirmed"]
     # Lead metadata reading, 2026-11-16 (L-701).
     columns:
       - {name: "accident_year", type: "string"}
@@ -5493,7 +5493,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: ["pub_place_fsq"]
-    caveat_keys: []
+    caveat_keys: ["places_fsq_fetcher_owned_by_s2_t15"]
     columns: []
     row_count_min: null
     row_count_max: null
@@ -5549,7 +5549,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: ["weather_fetcher_owned_by_s2_t14"]
     columns: []
     row_count_min: null
     row_count_max: null
@@ -5655,7 +5655,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: ["gazetteer"]
-    caveat_keys: []
+    caveat_keys: ["bldg_ovt_part_not_required"]
     columns: []
     row_count_min: null
     row_count_max: null
@@ -25579,9 +25579,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25620,15 +25620,15 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/ZonesA/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/ZonesA/MapServer
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [gis_schema_unconfirmed]
     columns: []
     reconciliation: none
     skip_reason: schema_unconfirmed
@@ -25645,9 +25645,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/ROADFlowlnA/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/ROADFlowlnA/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25689,15 +25689,15 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_1995/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Imagery/QatarOrtho_1995/MapServer
     nightly_live_fetch: false
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [gis_schema_unconfirmed]
     columns: []
     reconciliation: none
     skip_reason: schema_unconfirmed
@@ -25714,9 +25714,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/LandPricing2026/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/LandPricing2026/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25761,9 +25761,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/Landmarks/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/Landmarks/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25794,9 +25794,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS_Custom_Locator/GeocodeServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QARS_Custom_Locator/GeocodeServer
     nightly_live_fetch: false
     public_splits: []
@@ -25819,9 +25819,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/CadastrePlots/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/CadastrePlots/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25856,9 +25856,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/PHCC_LOCATION_2026/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/PHCC_LOCATION_2026/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25894,9 +25894,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/POIs_COMM/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/POIs_COMM/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25933,9 +25933,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/QRAIL_NO_OPERATION/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -25982,9 +25982,9 @@ sources:
     decision_record: '0026'
     fetch_host: services.gisqatar.org.qa
     url: https://services.gisqatar.org.qa/server/rest/services/Vector/Zoning/MapServer
-    terms_url: ''
-    terms_words: terms to be read
-    terms_read_on: '2026-11-15'
+    terms_url: https://www.gisqatar.org.qa/ar/home
+    terms_words: © جميع الحقوق محفوظة 2024 @ CGIS Qatar
+    terms_read_on: '2026-11-27'
     landing_url: https://services.gisqatar.org.qa/server/rest/services/Vector/Zoning/MapServer
     nightly_live_fetch: true
     public_splits: []
@@ -28807,7 +28807,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: sheet
       type: string
@@ -28849,7 +28849,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: title
       type: string
@@ -28891,7 +28891,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [qncc_schema_evidence_pending]
     columns:
     - name: id
       type: string
@@ -28933,7 +28933,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [tawteen_anonymous_access_not_approved]
     columns: []
     row_count_min: null
     row_count_max: null
@@ -28963,7 +28963,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: label
       type: string
@@ -29003,7 +29003,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: م
       type: integer
@@ -29050,7 +29050,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [acquisition_bound_unconfirmed]
     columns:
     - name: objectid
       type: integer
@@ -29154,7 +29154,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: ["cdse_provider_contract_pending"]
     columns: []
     reconciliation: "none"
     skip_reason: "provider_contract_pending"
@@ -29182,7 +29182,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: ["fc_activation_review_pending"]
     columns:
       - {name: qfc_number, type: string}
       - {name: company_name, type: string}
@@ -29633,7 +29633,7 @@ sources:
     public_splits: []
     commit_allowed: false
     release_tables: []
-    caveat_keys: []
+    caveat_keys: [citation_page_not_served]
     columns: []
     row_count_min: null
     row_count_max: null

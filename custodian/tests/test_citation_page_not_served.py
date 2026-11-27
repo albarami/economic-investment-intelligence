@@ -12,6 +12,10 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.test_production_adapters import context
+from custodian.tests.test_registry_terms_record import (
+    GIS_TERMS_KEYS,
+    _assert_gis_terms_reading,
+)
 from hypothesis import example, given
 from hypothesis import strategies as st
 
@@ -32,6 +36,28 @@ ROW = (
 # (`stream_max_bytes`, absent at that base) is left out of every row.
 BASE_ROWS_SHA256 = "771b96a4afb3ffca7e914ab783663cfd2fca4542ce0b478aaab48b1627e69593"
 LATER_REVIEWED_FIELDS = frozenset({"stream_max_bytes"})
+# S2-ABSCAV set one catalogue caveat on each skipped row. The pin restores
+# those lists to the empty value it was taken against.
+ABSENCE_CAVEAT_KEYS = frozenset(
+    {
+        "accident",
+        "places_fsq",
+        "weather_openmeteo",
+        "bldg_ovt/part-00288",
+        "gis_boundaries",
+        "gis_imagery_history",
+        "insurance_tables",
+        "events_visit_qatar",
+        "events_qncc",
+        "suppliers_tawteen",
+        "manateq_tariffs",
+        "monaqasat_classified",
+        "schools_private_directory",
+        "satellite_cdse_backup",
+        "fc_register",
+        ROW,
+    }
+)
 BASE_ROW_COUNT = 891
 # S2-P86 (ruling L-1724 item 1) rewrote the last sentence of the prop_sales
 # basis note after this pin was taken. That row's note must equal the reviewed
@@ -211,18 +237,36 @@ def test_only_this_row_changes_and_only_by_the_word_and_its_note():
     cweb = [row for row in rows if row["key"] == CWEB_ROW]
     assert len(cweb) == 1
     assert cweb[0]["caveat_keys"] == CWEB_CAVEAT_KEYS
+    # S2-LICREC: check reviewed values before restoring only these base fields.
+    _assert_gis_terms_reading(rows)
+    rows = [
+        dict(
+            item,
+            terms_url="",
+            terms_words="terms to be read",
+            terms_read_on="2026-11-15",
+        )
+        if item["key"] in GIS_TERMS_KEYS
+        else item
+        for item in rows
+    ]
     restored = [
         {
             field: value
             for field, value in (
-                dict(item, skip_reason="", basis_note=BASE_BASIS_NOTE)
+                dict(
+                    item,
+                    skip_reason="",
+                    basis_note=BASE_BASIS_NOTE,
+                    caveat_keys=[],
+                )
                 if item["key"] == ROW
                 else dict(item, basis_note=P86_BASE_BASIS_NOTE)
                 if item["key"] == P86_ROW
                 else dict(item, row_count_min=1162, row_count_max=1162)
                 if item["key"] == P92_ROW
                 else dict(item, caveat_keys=[])
-                if item["key"] == CWEB_ROW
+                if item["key"] == CWEB_ROW or item["key"] in ABSENCE_CAVEAT_KEYS
                 else item
             ).items()
             if field not in LATER_REVIEWED_FIELDS
