@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Accepted by the owner, 2026-11-27 ("Accept 0114 and 0115", relayed by the advisor in note owner-relayed-20261127-0822, ruling L-2288), on the different-maker review that stands on main `bc9bb749`: R60-REC.rv2 (Moonshot, Kimi K3.1 Pro through Factory Droid, review mode, a maker other than the builder) APPROVED this record's text (blob `0943ed6e`) with no rejecting finding; its two wording notes were applied as records only |
+| Status | Accepted by the owner, 2026-11-27 ("Accept 0114 and 0115", relayed by the advisor in note owner-relayed-20261127-0822, ruling L-2288), on the different-maker review that stands on main `bc9bb749`: R60-REC.rv2 (Moonshot Kimi through Factory Droid, review mode, a maker other than the builder) APPROVED this record's text (blob `0943ed6e`) with no rejecting finding; its two wording notes were applied as records only |
 | Date | 2026-11-24 |
 | Owner | The owner |
 | Scope | `custodian/publicdata/review/showcase_gazetteer.yaml` rows `landmark:0` to `landmark:3`; `custodian/publicdata/review/flagship_candidates.yaml` row `building:3`; the review loader `custodian/src/eii_custodian/publicdata/places/review.py`; the places stage `custodian/src/eii_custodian/publicdata/places/stage.py`; the hand-over `places/integrate.py` and `frame/live.py`; the review tool `scripts/review_place_keys.py`; [document 03](../03_DATA_CONTRACTS.md) |
