@@ -2592,3 +2592,11 @@ wording is checked for NFC form. The row-count licence plant is retained.
 Production code and acceptance boxes are unchanged; different-maker review,
 real-file evidence and the S2 gate remain pending. See PROGRESS.md
 **S2-REGM1 b4 — rejected-review test coverage continuation**.
+
+## S2-T49 evidence update — S2-REGNONEMPTY.b1 (2026-11-28)
+
+Candidate loader refusals for an empty company table and a current source without company rows follow verified table bytes; empty kept snapshots remain valid (decision 0131 item 1; L-2395 item 3). Invented red-first tests and isolated guard plants are recorded in PROGRESS.md **S2-REGNONEMPTY.b1**. Focused tests: 283 passed; broader tests: 8572 passed, 12375 deselected. BLOCKED by the document check scanning the supplied nonignored orchestration brief and preserved failure logs; no box, review or gate is approved.
+
+## S2-T49 evidence update — S2-REGNONEMPTY.b1a (2026-11-28)
+
+Continuation preserves the b1 candidate exactly. The lead corrected the orchestration exclusion; the unchanged document check passes. Focused tests pass (283); broader register/assembly/completeness tests pass (8572, 12375 deselected); static and tree checks pass. Original red-first and plant evidence still covers unchanged code/test bytes. See PROGRESS.md **S2-REGNONEMPTY.b1a**. Different-maker review and existing release/gate obligations remain pending; no box is ticked.

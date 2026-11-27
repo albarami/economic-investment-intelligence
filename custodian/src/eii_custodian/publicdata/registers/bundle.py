@@ -328,6 +328,12 @@ def load_bundle(directory: Path, pin: Path, cells: frozenset[int]) -> Bundle:
     specs = _specs(manifest["tables"])
     tables, table_sha256 = _tables(directory, specs)
     validate_release(tables, frame)
+    companies = tables["pub_register_company"]
+    if not companies:
+        refuse("register_bundle_company_empty")
+    company_sources = {row["source_id"] for row in companies}
+    if any(source not in company_sources for source in current):
+        refuse("register_bundle_source_empty")
     kept = {
         (source, period) for source, months in coverage.items() for period in months
     }

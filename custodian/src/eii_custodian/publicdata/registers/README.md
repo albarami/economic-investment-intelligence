@@ -270,7 +270,11 @@ The `register_tables` phase re-verifies the pin, the manifest's closed key set
 and bindings, every receipt's digest, metadata, files and period rules, the
 declared table byte hashes and row counts, the frame's ownership hash against
 the run's own `grid_cell` set, and the released rows through `validate_release`,
-refusing by name at the first mismatch. A bundle path that is not a real
+refusing by name at the first mismatch. After table-byte and row validation,
+`load_bundle` refuses an empty `pub_register_company` as
+`register_bundle_company_empty`, then a current receipt source without a company
+row as `register_bundle_source_empty` (decision 0131 item 1; L-2395 item 3).
+Empty snapshot tables and kept snapshot months without rows remain valid. A bundle path that is not a real
 directory — a symlinked `register_bundle/` or `tables/` — is refused as
 missing, so every byte read stays inside the allowed cache. Only the bundle's
 released rows, file digests and receipt lineage are bound: current receipts
