@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Proposed, 2026-11-28, for the owner's acceptance under CLAUDE.md rule 46. Not installed until the acceptance is recorded with its date. |
+| Status | Accepted by the owner, 2026-11-28, under CLAUDE.md rule 46, on the owner's one condition that item 1 states the owner's own words; item 1 quotes them verbatim. Carried by a documents-only pull request with another maker's review. |
 | Date | 2026-11-28 |
 | Owner | The owner |
 | Amends | [Decision 0034](0034-licence-questions-of-public-sources-are-answered-at-a-go-live.md) item 1, including its amendment of 2026-11-18, and the list duty that rulings L-456 and L-997 derived from it |
@@ -16,7 +16,7 @@
 
 ## Decision
 
-1. **Personal use.** The system is for the owner's personal use only. Deployment, including deployment with real data, creates no later review or reporting duty about source terms. The project keeps no go-live list on this subject. Evidence of how the system was built stays as history. Source provenance is still recorded in full, and this subject is not raised as a finding, a gate item, a blocker or a question to the owner.
+1. **Personal use.** The owner's words, 2026-11-28: “This system is for my personal use only. I will not open it to the public. Licences and go-live are not to be considered, and there is no go-live list.” The project therefore keeps no go-live list, and licences and go-live are not considered for source terms. This subject is not raised as a finding, a gate item, a blocker or a question to the owner. Evidence of how the system was built stays as history, and source provenance is still recorded in full.
 2. **The marker.** For the eleven source receipts of item 6, `licence_id` holds the exact value `private_personal_use_not_assessed`. It describes the use of this project, not the source. The publisher's own metadata and each registry entry's identifier, including any stated identifier, are kept with their source and date. Source coverage is unchanged.
 3. **The receipt contract.** In the private receipt format, the writer and the validator apply the marker to these eleven keys only. They still bind the registry's original identifier exactly, in a checked `registry_licence_id` beside the marker. Historical receipts keep validating by their original format. The marker alone never authenticates a source. Every other key keeps its existing receipt contract.
 4. **The migration.** The eleven receipts are reissued from the verified bytes already held, through the existing immutable publication and selection mechanism. Each original body hash, byte count, source identity, publisher, acquisition time, address, period, table declaration and lineage is kept. The metadata migration is recorded separately. A changed receipt has its own digest. Historical receipts and their pins stay reproducible.
@@ -36,9 +36,10 @@
 
 ## Acceptance
 
-This record is proposed. The owner's acceptance is recorded separately with its date. A documents-only pull request with another maker's review carries this record; the scoped implementation and the real replay follow it. The amendment is never installed on the strength of the draft alone.
+The owner accepted this record on 2026-11-28, on the condition that it says what the owner said; item 1 carries the owner's three sentences verbatim, and an earlier draft wording of item 1 is never installed. A documents-only pull request with another maker's review carries this record. The owner authorised the scoped implementation and the real replay of the eleven held receipts; the implementation is tested and reviewed by a different maker before the replay, and no check is weakened.
 
 ## Sources
 
 - Decision 0034 item 1 and decision 0059, as merged on main.
 - The owner's decision of 2026-11-28, relayed to the lead and applied as ruling L-2587.
+- The owner's acceptance of 2026-11-28, relayed to the lead and applied as ruling L-2591.
