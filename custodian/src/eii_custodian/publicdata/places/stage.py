@@ -33,8 +33,12 @@ from eii_custodian.publicdata.places.flagship import (
 from eii_custodian.publicdata.places.read import (
     FileReceipt,
     load_boundary_buildings,
-    read_building_file,
-    read_place_file,
+)
+from eii_custodian.publicdata.places.read import (
+    iter_building_file as read_building_file,
+)
+from eii_custodian.publicdata.places.read import (
+    iter_place_file as read_place_file,
 )
 from eii_custodian.publicdata.places.review import (
     DISTRICT_SOURCE,

@@ -33,8 +33,12 @@ from eii_custodian.publicdata.places.areas import AreaError
 from eii_custodian.publicdata.places.fetch import FILE_KEYS
 from eii_custodian.publicdata.places.read import (
     FileReceipt,
-    read_building_file,
-    read_place_file,
+)
+from eii_custodian.publicdata.places.read import (
+    iter_building_file as read_building_file,
+)
+from eii_custodian.publicdata.places.read import (
+    iter_place_file as read_place_file,
 )
 from eii_custodian.publicdata.places.stage import StageConfig, run_places_stage
 from eii_custodian.publicdata.places_fsq.select import FRAME_BOX
