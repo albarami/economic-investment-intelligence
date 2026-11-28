@@ -65,16 +65,16 @@ def read_population(
 
 def test_reference_function_text():
     import inspect
-    import subprocess
+    from hashlib import sha256
 
-    original = subprocess.check_output(
-        [
-            "git",
-            "show",
-            "66c0ea750d7df8b54b20e8688a8768d52e21c0b1:custodian/src/eii_custodian/publicdata/grids/population.py",
-        ],
-        text=True,
-    )
+    pinned = Path(__file__).parent / "pinned_base" / "grids" / "population.py"
+    assert pinned.is_file(), "pinned_base/grids/population.py"
+    raw = pinned.read_bytes()
+    assert (
+        sha256(raw).hexdigest()
+        == "34fe86151ec8c850116caba6ccd9af8b0063004319aa83215c8f0b71d377bd9f"
+    ), "pinned_base/grids/population.py"
+    original = raw.decode()
     assert (
         inspect.getsource(read_population)
         == original[original.index("def read_population(") :]

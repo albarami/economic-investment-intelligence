@@ -277,21 +277,32 @@ def test_scale_budget(tmp_path):
     assert columns["retained"] < base["retained"]
 
 
+_PINNED_BASE = {
+    "assembly_io": (
+        "assembly_io.py",
+        "9b6c9278ad9f5539df172d533bb061fa0b8f01e4efee5948868bfadd0ed66e56",
+    ),
+    "grids.build": (
+        "grids/build.py",
+        "20f455b9b6f80744f6b564ae835de6e18eabe7a6c50a94557bdd88add33b8a4e",
+    ),
+    "frame.live": (
+        "frame/live.py",
+        "0ad8b4d2cf808ac847f9e1a726be6fc2e7d4281a19e7f40ea57e163d600342dc",
+    ),
+}
+
+
 def _base_module(directory, suffix):
     import importlib.util
 
-    relative = suffix.replace(".", "/") + ".py"
     path = directory / (suffix.replace(".", "_") + ".py")
-    path.write_bytes(
-        subprocess.check_output(
-            [
-                "git",
-                "show",
-                "66c0ea750d7df8b54b20e8688a8768d52e21c0b1:"
-                "custodian/src/eii_custodian/publicdata/" + relative,
-            ]
-        )
-    )
+    pinned_name, pinned_hash = _PINNED_BASE[suffix]
+    pinned = Path(__file__).resolve().parent / "pinned_base" / pinned_name
+    assert pinned.is_file(), pinned_name
+    source = pinned.read_bytes()
+    assert sha256(source).hexdigest() == pinned_hash, pinned_name
+    path.write_bytes(source)
     package, _, leaf = suffix.rpartition(".")
     name = (
         "eii_custodian.publicdata."

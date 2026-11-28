@@ -5,9 +5,9 @@ from __future__ import annotations
 import dataclasses
 import importlib.util
 import random
-import subprocess
 import sys
 from decimal import Decimal
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
@@ -27,12 +27,14 @@ BOX = (51.0, 25.0, 52.0, 26.0)
 
 
 def base_module(tmp_path):
-    """Load the exact base from git into the test's temporary directory."""
-    source = subprocess.check_output(
-        ["git", "show", f"{BASE}:custodian/src/eii_custodian/publicdata/places/read.py"]
-    )
-    saved = Path(__file__).with_name("places_read_base.py").read_bytes()
-    assert saved == source
+    """Load the exact pinned base into the test's temporary directory."""
+    saved_path = Path(__file__).with_name("places_read_base.py")
+    assert saved_path.is_file(), saved_path.name
+    source = saved_path.read_bytes()
+    assert (
+        sha256(source).hexdigest()
+        == "b1aa1bbb67956f38805f46473bb8d730ee11a3e1e34af54bd6fb77580ec24fe1"
+    ), saved_path.name
     path = tmp_path / "syn_base.py"
     path.write_bytes(source)
     spec = importlib.util.spec_from_file_location("syn_places_base", path)
