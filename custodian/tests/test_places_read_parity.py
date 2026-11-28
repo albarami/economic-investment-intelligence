@@ -248,3 +248,22 @@ def test_raw_read_error_precedes_decode(tmp_path, monkeypatch):
     expected = outcome(lambda: base.read_place_file(path, "ar", BOX))
     assert expected == (RuntimeError, "SYN late raw read")
     assert outcome(lambda: tuple(reader(read, "place")(path, "ar", BOX))) == expected
+
+
+@pytest.mark.parametrize("frame_box", [(51.0, 25.0), (None, 25.0, 52.0, 26.5)])
+@pytest.mark.parametrize("kind", ["place", "building"])
+def test_later_decode_fault_precedes_box_fault(tmp_path, kind, frame_box):
+    """Behaviour: malformed boxes cannot hide a later row's decode refusal."""
+    base = base_module(tmp_path)
+    path = tmp_path / "syn-box-fault.parquet"
+    if kind == "place":
+        write_places(path, [place_row(), place_row(place_id="")])
+        expected = outcome(lambda: base.read_place_file(path, "ar", frame_box))
+        actual = outcome(lambda: tuple(reader(read, kind)(path, "ar", frame_box)))
+    else:
+        ring = tuple(box(51.4, 25.4, 51.5, 25.5).exterior.coords)
+        write_buildings(path, [building_row("SYN-VALID", ring), building_row("", ring)])
+        expected = outcome(lambda: base.read_building_file(path, frame_box=frame_box))
+        actual = outcome(lambda: tuple(reader(read, kind)(path, frame_box=frame_box)))
+    assert expected == (PlacesError, f"{kind}_id")
+    assert actual == expected

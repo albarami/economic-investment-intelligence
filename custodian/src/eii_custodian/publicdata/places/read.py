@@ -244,12 +244,13 @@ def _validated_rows[T: (ReadPlace, ReadBuilding)](
     frame_box: tuple[float, float, float, float] | None,
     retain: Callable[[T], bool] | None = None,
 ) -> Iterator[T]:
-    """One decode pass; raw failure, first decode fault, swap, then caller work.
+    """One decode pass; raw, decode, deferred box/retain fault, swap, then rows.
 
     Retention touches only file-local state. No row or summary is published until
     every raw batch has been read and all file-wide validation has succeeded.
     """
     error: Exception | None = None
+    deferred: Exception | None = None
     inside = False
     exchanged = False
     kept: list[T] = []
@@ -258,6 +259,12 @@ def _validated_rows[T: (ReadPlace, ReadBuilding)](
             continue
         try:
             row = decode(raw)
+        except Exception as exc:
+            error = exc
+            continue
+        if deferred is not None:
+            continue
+        try:
             if frame_box is not None:
                 lon, lat = float(row.lon), float(row.lat)
                 inside = inside or _in_box(lon, lat, frame_box)
@@ -265,9 +272,11 @@ def _validated_rows[T: (ReadPlace, ReadBuilding)](
             if retain is None or retain(row):
                 kept.append(row)
         except Exception as exc:
-            error = exc
+            deferred = exc
     if error is not None:
         raise error
+    if deferred is not None:
+        raise deferred
     if not inside and exchanged:
         raise PlacesError("axis_swapped")
     yield from kept
