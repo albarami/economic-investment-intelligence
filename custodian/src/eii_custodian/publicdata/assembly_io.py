@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import json
 import os
+import secrets
+import stat
 from collections.abc import Iterator, Mapping
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import date
 from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
-from tempfile import NamedTemporaryFile
 from typing import Any
 
 from shapely.geometry.base import BaseGeometry
@@ -100,14 +101,35 @@ class HeldRecord:
         return self.data
 
 
+_PARTIAL_CREATE_ATTEMPTS = 8
+
+
 def write_record(cache: Path, name: str, value: object) -> dict[str, str]:
     path = local(cache, name)
     digest = sha256()
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:
-        with NamedTemporaryFile(mode="wb", dir=path.parent, delete=False) as stream:
-            temporary = Path(stream.name)
+        descriptor: int | None = None
+        collision: FileExistsError | None = None
+        for _attempt in range(_PARTIAL_CREATE_ATTEMPTS):
+            partial = path.parent / (
+                "." + path.name + "." + secrets.token_hex(8) + ".partial"
+            )
+            try:
+                descriptor = os.open(
+                    partial, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o666
+                )
+            except FileExistsError as error:
+                collision = error
+                continue
+            temporary = partial
+            break
+        if temporary is None or descriptor is None:
+            if collision is None:
+                raise FileExistsError(path)
+            raise collision
+        with os.fdopen(descriptor, "wb") as stream:
             pending: list[str] = []
             characters = 0
             for chunk in record_encoder().iterencode(value):
@@ -129,9 +151,10 @@ def write_record(cache: Path, name: str, value: object) -> dict[str, str]:
         reread = file_hash(temporary)
         if reread != digest.hexdigest():
             raise AssemblyError("assembly_output_invalid")
-        mask = os.umask(0)
-        os.umask(mask)
-        os.chmod(temporary, 0o666 & ~mask)
+        try:
+            os.chmod(temporary, stat.S_IMODE(os.stat(path).st_mode))
+        except FileNotFoundError:
+            pass
         os.replace(temporary, path)
         return {name: reread}
     finally:

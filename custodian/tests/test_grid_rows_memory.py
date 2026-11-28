@@ -95,6 +95,37 @@ def test_writer_file_mode_matches_base(tmp_path, mask):
     ).stat().st_mode & 0o777
 
 
+def test_writer_existing_mode_matches_base(tmp_path):
+    base = tmp_path / "base.json"
+    candidate = tmp_path / "candidate.json"
+    base.write_bytes(b"prior")
+    candidate.write_bytes(b"prior")
+    base.chmod(0o640)
+    candidate.chmod(0o640)
+    base_io = _base_io(tmp_path)
+    previous = os.umask(0o022)
+    try:
+        base_io.write_record(tmp_path, "base.json", {"tables": {"SYN": []}})
+        write_record(tmp_path, "candidate.json", {"tables": {"SYN": []}})
+    finally:
+        os.umask(previous)
+    base_mode = (tmp_path / "base.json").stat().st_mode & 0o777
+    candidate_mode = (tmp_path / "candidate.json").stat().st_mode & 0o777
+    assert base_mode == 0o640
+    assert candidate_mode == 0o640, f"{oct(candidate_mode)} against {oct(0o640)}"
+    assert candidate_mode == base_mode
+
+
+def test_writer_leaves_umask_unchanged(tmp_path):
+    previous = os.umask(0o027)
+    try:
+        write_record(tmp_path, "record.json", {"tables": {"SYN": []}})
+        observed = os.umask(0o027)
+        assert observed == 0o027
+    finally:
+        os.umask(previous)
+
+
 def _writer_peak(tmp_path, count, base=False):
     value = {"tables": {"SYN": [{"text": "SYN-" + "x" * 96}] * count}}
     base_io = _base_io(tmp_path)
