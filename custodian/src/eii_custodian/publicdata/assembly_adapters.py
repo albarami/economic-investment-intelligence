@@ -12,7 +12,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from hashlib import sha256
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from .assembly import AssemblyError, Step, run_steps
 from .assembly_intake import write_intake_evidence
@@ -211,7 +211,14 @@ class Production:
             raise AssemblyError("assembly_table_duplicate")
         if not sources or any(key not in self.receipts for key in sources):
             raise AssemblyError("assembly_lineage_missing")
-        self.tables[name] = [dict(row) for row in rows]
+        from .grids.population import PopulationTable
+
+        if isinstance(rows, PopulationTable):
+            # This sequence already owns its columns and file constants; copying
+            # it here would restore the retained per-pixel dictionaries.
+            self.tables[name] = cast("list[dict[str, Any]]", rows)
+        else:
+            self.tables[name] = [dict(row) for row in rows]
         self.table_sources[name] = set(sources)
         for key in sources:
             self.source_tables.setdefault(key, []).append(name)

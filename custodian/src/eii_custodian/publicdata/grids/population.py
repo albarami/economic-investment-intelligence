@@ -1,10 +1,15 @@
 """Native population cells; unconfirmed units and DOI mappings fail closed."""
 
+from __future__ import annotations
+
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 from importlib import import_module
 from pathlib import Path
-from typing import Any
+from typing import Any, overload
+
+import numpy as np
 
 from eii_custodian.publicdata.fetch.registry import Entry
 
@@ -54,8 +59,8 @@ def grid_signature(cache: Path, path: str | Path) -> tuple[Any, ...]:
 
 def read_population(
     cache: Path, path: str | Path, spec: PopulationSpec, source_name: str = ""
-) -> list[dict[str, Any]]:
-    """Return one row per non-nodata source cell without resampling."""
+) -> PopulationRows:
+    """Return compact native cells, exposing the original row values on access."""
     checked = local_file(cache, path)
     if spec.units != "people_per_cell" or not spec.doi_confirmed or not spec.doi:
         raise GridError("worldpop_qat_agesex: units or DOI unconfirmed")
@@ -75,32 +80,169 @@ def read_population(
         if source.nodata != -99999:
             raise GridError("worldpop_qat_agesex: nodata mismatch")
         data = source.read(1)
-        rows = []
-        for row in range(source.height):
-            for col in range(source.width):
-                value = data[row, col]
-                if value == source.nodata:
-                    continue
-                people = Decimal(str(value))
-                if not people.is_finite() or people < 0:
-                    raise GridError("worldpop_qat_agesex: invalid population")
-                lon, lat = source.xy(row, col)
-                rows.append(
-                    {
-                        "grid_key": f"wa_{row}_{col}",
-                        "lon": Decimal(str(lon)).quantize(
-                            Decimal("0.000001"), rounding=ROUND_HALF_UP
-                        ),
-                        "lat": Decimal(str(lat)).quantize(
-                            Decimal("0.000001"), rounding=ROUND_HALF_UP
-                        ),
-                        "age_band": spec.age_code,
-                        "sex": {"f": "female", "m": "male"}[spec.sex_code],
-                        "people": people.quantize(
-                            Decimal("0.0001"), rounding=ROUND_HALF_UP
-                        ),
-                        "period": spec.year,
-                        "source_id": "worldpop_qat_agesex",
-                    }
-                )
-        return rows
+        indices = np.flatnonzero(data.ravel() != source.nodata).astype("uint64")
+        coefficients = np.empty((len(indices), 3), dtype="uint64")
+        signs = np.empty(len(indices), dtype="uint8")
+        coordinates: tuple[dict[int, Decimal], dict[int, Decimal], bool] = (
+            {},
+            {},
+            bool(source.transform.b or source.transform.d),
+        )
+        for index, offset in enumerate(indices):
+            row, col = divmod(int(offset), source.width)
+            people = Decimal(str(data[row, col]))
+            if not people.is_finite() or people < 0:
+                raise GridError("worldpop_qat_agesex: invalid population")
+            _cell_centres(source, row, col, coordinates)
+            people = people.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+            # Coefficients count ten-thousandths of a person; sign is separate
+            # so a zero coefficient retains the source's negative zero.
+            coefficient = int(people.copy_abs().scaleb(4))
+            coefficients[index] = (
+                coefficient & ((1 << 64) - 1),
+                (coefficient >> 64) & ((1 << 64) - 1),
+                coefficient >> 128,
+            )
+            signs[index] = people.is_signed()
+        return PopulationRows(
+            indices, coefficients, signs, source.width, coordinates, spec
+        )
+
+
+def _coordinate(value: float) -> Decimal:
+    return Decimal(str(value)).quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP)
+
+
+def _cell_centres(
+    source: Any,
+    row: int,
+    col: int,
+    coordinates: tuple[dict[int, Decimal], dict[int, Decimal], bool],
+) -> None:
+    """Share axis centres; rotation and shear retain per-pixel source.xy calls."""
+    lon, lat, rotated = coordinates
+    offset = row * source.width + col
+    xkey, ykey = (offset, offset) if rotated else (col, row)
+    if xkey not in lon or ykey not in lat:
+        x, y = source.xy(row, col)
+        if xkey not in lon:
+            lon[xkey] = _coordinate(x)
+        if ykey not in lat:
+            lat[ykey] = _coordinate(y)
+
+
+class _RowSequence(Sequence[dict[str, Any]]):
+    """Keep list value equality without materializing the compact rows."""
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, (list, _RowSequence)):
+            return False
+        return len(self) == len(other) and all(
+            left == right for left, right in zip(self, other, strict=True)
+        )
+
+
+class PopulationRows(_RowSequence):
+    """Read-only columns; each access returns a fresh, ordinary base-shaped row."""
+
+    def __init__(
+        self,
+        indices: Any,
+        coefficients: Any,
+        signs: Any,
+        width: int,
+        coordinates: tuple[dict[int, Decimal], dict[int, Decimal], bool],
+        spec: PopulationSpec,
+    ) -> None:
+        for column in (indices, coefficients, signs):
+            column.flags.writeable = False
+        self._indices = indices
+        self._coefficients = coefficients
+        self._signs = signs
+        self._width = width
+        self._coordinates = coordinates
+        self._spec = spec
+        self._facts: dict[str, Any] = {}
+
+    def with_facts(self, facts: dict[str, Any]) -> PopulationRows:
+        """Bind one file's constant lineage without retaining it per pixel."""
+        result = PopulationRows(
+            self._indices,
+            self._coefficients,
+            self._signs,
+            self._width,
+            self._coordinates,
+            self._spec,
+        )
+        result._facts = facts.copy()
+        return result
+
+    def __len__(self) -> int:
+        return len(self._indices)
+
+    @overload
+    def __getitem__(self, index: int) -> dict[str, Any]: ...
+    @overload
+    def __getitem__(self, index: slice) -> list[dict[str, Any]]: ...
+    def __getitem__(self, index: int | slice) -> dict[str, Any] | list[dict[str, Any]]:
+        if isinstance(index, slice):
+            return [self[item] for item in range(*index.indices(len(self)))]
+        offset = int(self._indices[index])
+        row, col = divmod(offset, self._width)
+        low, middle, high = self._coefficients[index]
+        coefficient = int(low) | (int(middle) << 64) | (int(high) << 128)
+        people = Decimal(
+            (int(self._signs[index]), tuple(map(int, str(coefficient))), -4)
+        )
+        lon, lat, rotated = self._coordinates
+        spec = self._spec
+        result = {
+            "grid_key": f"wa_{row}_{col}",
+            "lon": lon[offset if rotated else col],
+            "lat": lat[offset if rotated else row],
+            "age_band": spec.age_code,
+            "sex": {"f": "female", "m": "male"}[spec.sex_code],
+            "people": people,
+            "period": spec.year,
+            "source_id": "worldpop_qat_agesex",
+        }
+        result.update(
+            {
+                key: value.copy() if isinstance(value, list) else value
+                for key, value in self._facts.items()
+            }
+        )
+        return result
+
+    def __iter__(self) -> Iterator[dict[str, Any]]:
+        return (self[index] for index in range(len(self)))
+
+
+class PopulationTable(_RowSequence):
+    """Keep file order while holding only one compact column block per file."""
+
+    def __init__(self, parts: Sequence[PopulationRows]) -> None:
+        self._parts = tuple(parts)
+
+    def __len__(self) -> int:
+        return sum(len(part) for part in self._parts)
+
+    @overload
+    def __getitem__(self, index: int) -> dict[str, Any]: ...
+    @overload
+    def __getitem__(self, index: slice) -> list[dict[str, Any]]: ...
+    def __getitem__(self, index: int | slice) -> dict[str, Any] | list[dict[str, Any]]:
+        if isinstance(index, slice):
+            return [self[item] for item in range(*index.indices(len(self)))]
+        if index < 0:
+            index += len(self)
+        if index < 0:
+            raise IndexError(index)
+        for part in self._parts:
+            if index < len(part):
+                return part[index]
+            index -= len(part)
+        raise IndexError(index)
+
+    def __iter__(self) -> Iterator[dict[str, Any]]:
+        return (row for part in self._parts for row in part)

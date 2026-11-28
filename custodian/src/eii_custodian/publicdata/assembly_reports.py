@@ -864,7 +864,11 @@ def _draw_row_sources(
     if not sources or any(source not in build.receipts for source in sources):
         raise AssemblyError("assembly_lineage_missing")
     rows = data["tables"][table]
-    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+    from .grids.population import PopulationRows, PopulationTable
+
+    if not isinstance(rows, (list, PopulationRows, PopulationTable)) or any(
+        not isinstance(row, dict) for row in rows
+    ):
         raise AssemblyError("assembly_output_invalid")
     if len(sources) == 1:
         return [next(iter(sources))] * len(rows)

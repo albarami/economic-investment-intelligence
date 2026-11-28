@@ -55939,3 +55939,66 @@ Delivery, S2-REGNONEMPTY.b1a: git add of the six task files exited 0; the requir
 - **S2-PLACESMEM.b1f5 N2 — harness revision per receipt:** the b1f4 PROGRESS row names one harness digest for every mode. Sealed `.overnight/points_plants_b1f4.py` sha256 `23117f9196390a39044585a820f564f116b999b0fc7995255693fad68432105a` is not the producer of every receipt. Earlier `.overnight/points_plants_b1f.py` sha256 `0b6fa7c5cbc839e9c1f97836665c743e678801d8174cfb118534f3fcfd2dda46` writes no `replacements=` line. `new-plants.log` sha256 `1e12e673934f3da5e60f421504100bbfc7b0c8313749ecb743d325fc0ead9a16` still names `stage-alias-revert`, which `23117f91` does not contain; `stage-alias-revert.log` sha256 `400d7cc4f1eae71ee6adbc1e87bedd3f837d185679eb082213b3d5ac8030bf42`. `inherited-a.log` `e9446b21b086de114af106136e1e8e9848ca381dcf1df8a853986a2dcc75084f`, `inherited-b.log` `7cc5c9aa7b4cb91c1a941d29adb1fc80cb59451e385fae131bf794222505f51a` and `inherited-c.log` `0f043fad6e5772947e076405dfd710208434d885fae8e749c0dafa9ad0e91c12` are `-vv` runs; the sealed harness uses `-q` for `inherited-*`, and `inherited-d.log` is that `-q` form. `q1.log` `b9e9ab7e2421bd743f9d4e02ea72a3229d96a88d9514b972fc74fc15a6dd3e75`, `q2.log` `de14380e807f408d275780755baa8d1cceb64282ec24b9942078a02afc5fe0e2` and `q3.log` `47988f0918485d66050500eed52204448478db6613fd46963a2cc2592a7825d0` predate the per-label `PYTHONPYCACHEPREFIX` (b1f4 return item 3); no intermediate harness file was kept, so those revisions have no digest. `q-plants.log` `b645db49f7fef752a6e1c65c852c07d38858eed272192cc38c634333b9e5fe51` stops at `AssertionError ('q4', 0)`.
 - **S2-PLACESMEM.b1f5 N3 — empty seeds and missing EXIT trailer:** `.overnight/OUT/b1f4/seeds.json` sha256 `87697fe863c90917e5803e04833e0615a2986a7cc23d3a3b32fa963102d401a8` has empty lists for inherited-d, inherited-decode, inherited-swap, inherited-first-error and inherited-duplicate-raise, because `-q` hides the seed line. `.overnight/OUT/b1f4/q4-q5-continuation.log` sha256 `ffe3f66f21dd437f968be872726541624c9b4d9729db5075b06eb0103d3a0b82` has no `EXIT=` trailer; its two lines are the q4 and q5 success lines, and an exit of 0 is inferred from those lines.
 - **S2-PLACESMEM.b1f5 — stage replace target and per-consumer seam reach:** parent `832d475109eef4d59386c248abcc2b161004a367`. Tests and records only. `test_places_points_memory.py` binds the stage replace target and asserts `CHILD.count(target) == 1` before replace. `test_places_callers_parity.py` `bind` records patched seam names and asserts `build` has `read_place_file` and that `integrate` and `stage` are non-empty. Existing assertions unchanged. Base before the edits: 9 passed, exit 0, `red-first-b1f5.txt`, `base-b1f5.log`, seed 1795854773. Plant g1: replacements=1, red at `test_places_points_memory.py:66`, cmp exit=0, restored exit=0 (`g1.log`). Plant g2: replacements=1, red at `test_places_callers_parity.py:71`, cmp exit=0, restored exit=0 (`g2.log`). Candidate two-file rerun: 9 passed, exit 0, seed 1795855024. Places suite: 1375 passed, 19817 deselected, exit 0 (b1f4 count 1375). `ruff check` exit 0, `ruff format --check` exit 0, `mypy` exit 0. Copied driver `.overnight/points_plants_b1f5.py` flushes after each base-parity write; base-parity was not run. No production byte change.
+## S2-FRAMEMEM.b3a — compact grid rows and bounded record writing, red first in order
+
+BLOCKED: yes. The drivers restored saved Python bytes and asserted equality, but labeled that evidence `cmp 0` without running the brief's saved-file `cmp` command. Also the base guarded-field inventory was saved after the coverage plants rather than before naming them. The required ordering cannot be repaired retroactively. Smallest unblock: a lead-ruled continuation that restores base production, preserves the standing red-first receipt/tests, reruns coverage plants with an on-disk saved copy and actual cmp exits before reapplying production, then repeats candidate/final validation. No waiver or weakened check is requested. ALERT.md and appended log corrections disclose both defects. Self-review: REJECT completion.
+
+Builder: OpenAI Codex. Senior persona: senior Python data engineer for bounded-memory raster ingestion; strict self-review persona: strict-reviewer. Base `66c0ea750d7df8b54b20e8688a8768d52e21c0b1`, branch `s2/s2-framemem`. Manifest check exit 0. Only invented fixtures; no network, real data or cache acquisition. UV_OFFLINE=1 and TMPDIR under .overnight/tmp for every test command. No production concurrency added.
+
+Standing red-first receipt: OUT/red-first.txt, 2026-11-27T23:17:54Z, exit 1, production status empty; six expected behaviour failures and nine coverage passes. Preserved receipt, original red-first.log and b3 coverage log. Required test hashes remain:
+- test_population_parity.py: 28d96253f640d6c012537c1b7a94048d61f742c48d4bfb3d4bf44b8de1eb8aec
+- test_grid_rows_memory.py: 45db95a6ff2964cea5b739cfb0ab054b7fe94ebc8ccfc90e629e89e677653731
+
+Receipt and candidate command: `uv run --locked python -m pytest custodian/tests/test_population_parity.py custodian/tests/test_grid_rows_memory.py -p no:cacheprovider -vv -s`. Candidate green.log exit 0, fifteen passed. No test changes after receipt; no new base behaviour rerun. Production status empty and both hashes verified immediately before step 3. Apply time 2026-11-27T23:22:32Z, first candidate log time recorded in green.log. Production diff is byte-equal to the supplied b2 production diff (OUT/production-patch-parity.txt). Only task records differ from b2.
+
+Test kinds (base -> candidate): coverage-only reference_function_text, seeded_raster_parity, refusal_parity, float32_rounding_and_negative_zero, axis_centres_and_rotation, record_parity_and_held[1,8,32], mixed_frame_handoff all pass -> pass. Behaviour compact_storage, row_major_order_and_read_only, table_index_refusals, writer_reread_corruption, writer_extra_peak_bound, scale_budget all expected fail -> pass. Seeded generator seed 2419, 200 invented rasters. T4 fixture bound 16,777,216 bytes; no real-budget fit claimed.
+
+Coverage evidence, all before production apply; outcomes are base / planted / restored exits. Restoration is byte equality only, NOT actual cmp evidence:
+
+| Log under OUT | Start UTC | Restored control start UTC | Exits |
+|---|---|---|---|
+| coverage-test_axis_centres_and_rotation.log | 2026-11-27T23:22:11.591890+00:00 | 2026-11-27T23:22:12.430070+00:00 | 0 / 1 / 0 |
+| coverage-test_float32_rounding_and_negative_zero.log | 2026-11-27T23:22:10.334401+00:00 | 2026-11-27T23:22:11.179743+00:00 | 0 / 1 / 0 |
+| coverage-test_mixed_frame_handoff.log | 2026-11-27T23:22:16.878696+00:00 | 2026-11-27T23:22:19.215529+00:00 | 0 / 1 / 0 |
+| coverage-test_record_parity_and_held-1.log | 2026-11-27T23:22:12.855686+00:00 | 2026-11-27T23:22:13.715239+00:00 | 0 / 1 / 0 |
+| coverage-test_record_parity_and_held-32.log | 2026-11-27T23:22:15.389573+00:00 | 2026-11-27T23:22:16.401364+00:00 | 0 / 1 / 0 |
+| coverage-test_record_parity_and_held-8.log | 2026-11-27T23:22:14.119236+00:00 | 2026-11-27T23:22:14.958353+00:00 | 0 / 1 / 0 |
+| coverage-test_reference_function_text.b3a.log | 2026-11-27T23:21:50.228935+00:00 | 2026-11-27T23:21:50.811660+00:00 | 0 / 1 / 0 |
+| coverage-test_refusal_parity.log | 2026-11-27T23:22:08.949640+00:00 | 2026-11-27T23:22:09.853533+00:00 | 0 / 1 / 0 |
+| coverage-test_seeded_raster_parity.log | 2026-11-27T23:21:51.107844+00:00 | 2026-11-27T23:22:00.295678+00:00 | 0 / 1 / 0 |
+
+Oracle plant changed the test-only oracle docstring, exactly once; red is source-text mismatch. Seeded/mixed plants changed production grid_key output (mismatched row/record hashes). Signed-zero plant used absolute Decimal (sign mismatch); axis plant used upper-left rather than centre (coordinate mismatch); refusal plant removed is_finite (InvalidOperation replaces required GridError); held plants removed the digest mismatch branch (missing refusal). Every replacement was asserted unique and every saved original byte sequence restored. Final tests retain exact hashes. No nearest substitute was needed.
+
+Plants a–e: OUT/plant-a.log through plant-e.log each exit 1, and OUT/plant-a-restored.log through plant-e-restored.log each exit 0. a lost negative-zero sign; b sorted column-major and failed row order; c whole-text encode exceeded writer growth bound; d removed reread mismatch and missed corruption refusal; e removed nonfinite refusal and raised InvalidOperation. Again the `cmp 0` labels were in-memory equality assertions; appended corrections say so. Candidate guard sites were enumerated before these plants (OUT/candidate-guard-sites.txt). Population has one explicit nonfinite/negative GridError site; writer reread mismatch and bound_files file binding are distinct call paths, not two guards reached by the corruption test. Held-row mismatch is in HeldRecord.verify.
+
+Refusal inventory: population retains eight original branches (units/DOI; category; public splits; filename; count/CRS; dtype; nodata; nonfinite/negative), covered by one-input refusal-parity cases with exact messages. PopulationTable has lower-index and exhausted/empty-table IndexError branches, covered by specific-message tests. Writer adds reread mismatch AssemblyError assembly_output_invalid, covered by corruption test and plant d. Seven metadata/schema deletion plants and two table-index deletion plants were prepared but NOT executed after the block. Existing path, unsupported-value, duplicate-table, lineage and draw-row checks remain; no new refusal claim for them. No guard strength changed permanently.
+
+Final command status:
+- Required focused pytest (full argv in OUT/final-focused.log): exit 0, 3919 passed in 115.12s. First run; no rerun needed.
+- `uv run --locked python -m pytest custodian/tests -p no:cacheprovider -q`: interrupted, own session exit 130; full log incomplete, no completed child exit/count or suite verdict. Stopped only owned session 81499 using Ctrl-C, no kill-by-name, no other process stopped. `ps` could see only its own isolated call; it was read-only and killed nothing.
+- `uv run --locked ruff check .`: NOT RUN.
+- `uv run --locked ruff format --check .`: NOT RUN.
+- `uv run --locked mypy`: NOT RUN.
+- `python3 scripts/check_docs.py`: NOT RUN.
+- Dedicated candidate T4 rerun: NOT RUN; candidate green-run T4 is reported separately below.
+- `git diff --check`: exit 0; `cmp AGENTS.md CLAUDE.md`: actual command exit 0. These are not substitutes for the missing checks.
+No inherited failure was classified. Expected planted exits 1 are evidence, not suite failures. The interrupted whole suite is not green. No final reruns after block.
+
+Measurement table: first three rows copied from IN/b2-return.md, historical b2 measurements. Last three are this round's green.log measurements, not a dedicated rerun. A/C child exits 3 and CE child exit 0; output hashes match A. Base writer retains flush/fsync and independent reread.
+
+| Option | Pixels/file | Files | Distinct contents | tracemalloc peak bytes | Retained bytes | child ru_maxrss KiB | Seconds | Table SHA-256 | Record SHA-256 | Equal to A |
+|---|---:|---:|---|---:|---:|---:|---:|---|---|---|
+| A | 1024 | 40 | yes | 42,467,537 | 28,267,946 | 178944 | 5.124466372013558 | 5d4a8a5b658b85bb0bafb205d21e935b330dc7947beeb81f2b5d6cb6bae863c7 | 2080d47ec55c434dd139a0c491ce42d20141c0a710e2f5bd542af88eb59cb223 | yes |
+| C | 1024 | 40 | yes | 53,408,964 | 1832400 | 235744 | 4.02960389998043 | 5d4a8a5b658b85bb0bafb205d21e935b330dc7947beeb81f2b5d6cb6bae863c7 | 2080d47ec55c434dd139a0c491ce42d20141c0a710e2f5bd542af88eb59cb223 | yes |
+| CE | 1024 | 40 | yes | 2138571 | 1832793 | 130424 | 4.189865252992604 | 5d4a8a5b658b85bb0bafb205d21e935b330dc7947beeb81f2b5d6cb6bae863c7 | 2080d47ec55c434dd139a0c491ce42d20141c0a710e2f5bd542af88eb59cb223 | yes |
+
+Candidate green-run measurements (OUT/green.log; dedicated T4 rerun not reached):
+
+| Option | Pixels/file | Files | Distinct contents | tracemalloc peak bytes | Retained bytes | child ru_maxrss KiB | Seconds | Table SHA-256 | Record SHA-256 | Equal to A |
+|---|---:|---:|---|---:|---:|---:|---:|---|---|---|
+| b3a A | 1024 | 40 | True | 42,466,803 | 28,267,212 | 178928 | 5.190655334998155 | 5d4a8a5b658b85bb0bafb205d21e935b330dc7947beeb81f2b5d6cb6bae863c7 | 2080d47ec55c434dd139a0c491ce42d20141c0a710e2f5bd542af88eb59cb223 | yes |
+| b3a C | 1024 | 40 | True | 53,408,552 | 1831991 | 235204 | 4.071482518018456 | 5d4a8a5b658b85bb0bafb205d21e935b330dc7947beeb81f2b5d6cb6bae863c7 | 2080d47ec55c434dd139a0c491ce42d20141c0a710e2f5bd542af88eb59cb223 | yes |
+| b3a CE | 1024 | 40 | True | 2139160 | 1833184 | 131988 | 4.122188292007195 | 5d4a8a5b658b85bb0bafb205d21e935b330dc7947beeb81f2b5d6cb6bae863c7 | 2080d47ec55c434dd139a0c491ce42d20141c0a710e2f5bd542af88eb59cb223 | yes |
+
+
+Different-maker review, lead real-data matched-scale comparison and one full audit on current main remain open. No final validation or approval claimed. Detailed return and complete patch: `.overnight/RETURN.md` and `.overnight/OUT/S2-FRAMEMEM.b3a.patch`.

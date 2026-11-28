@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
@@ -24,7 +25,13 @@ from eii_custodian.publicdata.fetch.snapshots import (
 
 from .contracts import GridError
 from .night_lights import FrameGeometry, aggregate, read_night_lights
-from .population import grid_signature, read_population, spec_from_entry
+from .population import (
+    PopulationRows,
+    PopulationTable,
+    grid_signature,
+    read_population,
+    spec_from_entry,
+)
 from .weather import validate_weather
 
 GRIDS_RELATIVE = "grids"
@@ -45,7 +52,7 @@ METHODS = {
 class GridResult:
     """Rows, lineage, per-file receipts and named coverage reasons."""
 
-    tables: dict[str, list[dict[str, Any]]]
+    tables: dict[str, Sequence[dict[str, Any]]]
     sources: dict[str, dict[str, Any]]
     manifest: dict[str, Any]
     coverage: dict[str, str] = field(default_factory=dict)
@@ -106,7 +113,7 @@ def build_grids(
 ) -> GridResult:
     """Build both Public tables and the weather cache; write only under the cache."""
     night: list[dict[str, Any]] = []
-    population: list[dict[str, Any]] = []
+    population: list[PopulationRows] = []
     lineage: list[dict[str, Any]] = []
     registry_rows: list[dict[str, Any]] = []
     files: list[dict[str, Any]] = []
@@ -164,7 +171,7 @@ def build_grids(
         previous = population_grids.setdefault(entry.year, signature)
         if previous != signature:
             raise GridError("worldpop_qat_agesex: grid agreement mismatch")
-        population.extend(_fact(rows, entry, receipt))
+        population.append(rows.with_facts(_fact_columns(entry, receipt)))
         lineage.append(_lineage(entry, receipt, POPULATION_TABLE))
         registry_rows.append(_registry_row(entry, receipt))
         files.append(_file_row(entry, receipt, len(body)))
@@ -176,7 +183,7 @@ def build_grids(
         "files": files,
         "tables": {
             NIGHT_TABLE: len(night),
-            POPULATION_TABLE: len(population),
+            POPULATION_TABLE: sum(len(part) for part in population),
             FACT_LINEAGE: len(lineage),
             SOURCE_REGISTRY: len(registry_rows),
         },
@@ -186,7 +193,7 @@ def build_grids(
     return GridResult(
         {
             NIGHT_TABLE: night,
-            POPULATION_TABLE: population,
+            POPULATION_TABLE: PopulationTable(population) if population else [],
             FACT_LINEAGE: lineage,
             SOURCE_REGISTRY: registry_rows,
         },
@@ -273,19 +280,24 @@ def _fact(
     rows: list[dict[str, Any]], entry: Entry, receipt: dict[str, Any]
 ) -> list[dict[str, Any]]:
     """Add the lineage columns every Public fact row carries."""
-    method, version = METHODS[entry.source_id]
     for row in rows:
-        row.update(
-            source_id=entry.source_id,
-            source_key=entry.key,
-            source_sha256=receipt["sha256"],
-            method=method,
-            method_version=version,
-            provenance="Public",
-            evidence_status="Observed",
-            caveat_keys=list(entry.caveat_keys),
-        )
+        row.update(_fact_columns(entry, receipt))
     return rows
+
+
+def _fact_columns(entry: Entry, receipt: dict[str, Any]) -> dict[str, Any]:
+    """Constant Public lineage, shared across the cells of one native file."""
+    method, version = METHODS[entry.source_id]
+    return dict(
+        source_id=entry.source_id,
+        source_key=entry.key,
+        source_sha256=receipt["sha256"],
+        method=method,
+        method_version=version,
+        provenance="Public",
+        evidence_status="Observed",
+        caveat_keys=list(entry.caveat_keys),
+    )
 
 
 def _lineage(entry: Entry, receipt: dict[str, Any], table: str) -> dict[str, Any]:

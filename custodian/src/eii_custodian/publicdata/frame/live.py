@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from eii_custodian.publicdata.fetch.registry import Entry
 from eii_custodian.publicdata.grids.build import build_grids
@@ -83,7 +83,9 @@ def build_live_frame(
         },
     )
     for name, rows in grids.tables.items():
-        tables[name] = rows
+        # The raster table implements the same row protocol without owning
+        # per-pixel dicts; frame consumers only iterate or index this table.
+        tables[name] = cast("list[dict[str, Any]]", rows)
     sources.update(grids.sources)
     for key, reason in sorted(grids.coverage.items()):
         report.append(f"grids: {key} {reason}")
