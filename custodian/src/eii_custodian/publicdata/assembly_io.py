@@ -129,6 +129,9 @@ def write_record(cache: Path, name: str, value: object) -> dict[str, str]:
         reread = file_hash(temporary)
         if reread != digest.hexdigest():
             raise AssemblyError("assembly_output_invalid")
+        mask = os.umask(0)
+        os.umask(mask)
+        os.chmod(temporary, 0o666 & ~mask)
         os.replace(temporary, path)
         return {name: reread}
     finally:

@@ -2,6 +2,7 @@
 
 import gc
 import json
+import os
 import resource
 import subprocess
 import sys
@@ -9,6 +10,7 @@ import time
 import tracemalloc
 from dataclasses import replace
 from hashlib import sha256
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -76,6 +78,21 @@ def test_writer_reread_corruption(tmp_path, monkeypatch):
     with pytest.raises(AssemblyError, match="assembly_output_invalid"):
         write_record(tmp_path, "record.json", {"tables": {"SYN": [{"value": "SYN"}]}})
     assert not (tmp_path / "record.json").exists()
+    assert sorted(p.name for p in tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize("mask", [0o022, 0o077])
+def test_writer_file_mode_matches_base(tmp_path, mask):
+    base_io = _base_io(tmp_path)
+    previous = os.umask(mask)
+    try:
+        base_io.write_record(tmp_path, "base.json", {"tables": {"SYN": []}})
+        write_record(tmp_path, "candidate.json", {"tables": {"SYN": []}})
+    finally:
+        os.umask(previous)
+    assert (tmp_path / "candidate.json").stat().st_mode & 0o777 == (
+        tmp_path / "base.json"
+    ).stat().st_mode & 0o777
 
 
 def _writer_peak(tmp_path, count, base=False):
@@ -202,7 +219,18 @@ def test_scale_budget(tmp_path):
             str(tmp_path),
             option,
         ]
-        result = subprocess.run(command, capture_output=True, text=True, check=False)
+        root = Path(__file__).resolve().parents[2]
+        result = subprocess.run(
+            command,
+            cwd=root,
+            env={
+                **os.environ,
+                "PYTHONPATH": os.pathsep.join([str(root / "custodian/src"), str(root)]),
+            },
+            capture_output=True,
+            text=True,
+            check=False,
+        )
         assert result.returncode in (0, 3), result.stderr
         measurement = json.loads(result.stdout)
         measurement["exit"] = result.returncode
