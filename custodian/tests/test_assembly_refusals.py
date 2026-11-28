@@ -320,7 +320,7 @@ def test_silent_road_refusals_are_observed_without_changing_return(
     assert lines == [f"REFUSED frame {reason}"]
 
 
-@pytest.mark.parametrize("reader", ["read_place_file", "read_building_file"])
+@pytest.mark.parametrize("reader", ["iter_place_points", "iter_building_points"])
 def test_swallowed_places_reader_error_is_observed_without_changing_points(
     tmp_path, monkeypatch, reader
 ):
@@ -340,8 +340,8 @@ def test_swallowed_places_reader_error_is_observed_without_changing_points(
         "_buildings_from_registry",
         lambda _cache, _registry: ([tmp_path / "syn.parquet"], ()),
     )
-    monkeypatch.setattr(integrate, "read_place_file", lambda *_args, **_kwargs: ())
-    monkeypatch.setattr(integrate, "read_building_file", lambda *_args, **_kwargs: ())
+    monkeypatch.setattr(integrate, "iter_place_points", lambda *_args, **_kwargs: ())
+    monkeypatch.setattr(integrate, "iter_building_points", lambda *_args, **_kwargs: ())
 
     def refused(*_args, **_kwargs):
         raise PlacesError("missing_column")

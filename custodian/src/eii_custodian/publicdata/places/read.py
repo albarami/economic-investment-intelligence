@@ -219,6 +219,37 @@ def iter_building_file(
     yield from _validated_rows(path, _BUILDING_COLUMNS, _building_row, frame_box)
 
 
+def iter_place_points(
+    path: Path,
+    arabic_tag: str,
+    frame_box: tuple[float, float, float, float] | None = None,
+) -> Iterator[tuple[str, float, float]]:
+    """Fully validate places, retaining only identifiers and point coordinates."""
+    if not isinstance(arabic_tag, str) or arabic_tag.strip() == "":
+        raise PlacesError("arabic_tag")
+    yield from _validated_rows(
+        path,
+        _PLACE_COLUMNS,
+        lambda row: _place_row(row, arabic_tag),
+        frame_box,
+        project=lambda row: (row.place_id, float(row.lon), float(row.lat)),
+    )
+
+
+def iter_building_points(
+    path: Path,
+    frame_box: tuple[float, float, float, float] | None = None,
+) -> Iterator[tuple[str, float, float]]:
+    """Fully validate footprints, retaining only identifiers and surface points."""
+    yield from _validated_rows(
+        path,
+        _BUILDING_COLUMNS,
+        _building_row,
+        frame_box,
+        project=lambda row: (row.building_id, float(row.lon), float(row.lat)),
+    )
+
+
 def _source_rows(path: Path, names: Sequence[str]) -> Iterator[Sequence[object]]:
     """Keep the original projection and scan order, in bounded cursor batches."""
     connection = _connect()
@@ -243,7 +274,9 @@ def _validated_rows[T: (ReadPlace, ReadBuilding)](
     decode: Callable[[Sequence[object]], T],
     frame_box: tuple[float, float, float, float] | None,
     retain: Callable[[T], bool] | None = None,
-) -> Iterator[T]:
+    *,
+    project: Callable[[T], Any] | None = None,
+) -> Iterator[Any]:
     """One decode pass; raw, decode, deferred box/retain fault, swap, then rows.
 
     Retention touches only file-local state. No row or summary is published until
@@ -253,7 +286,7 @@ def _validated_rows[T: (ReadPlace, ReadBuilding)](
     deferred: Exception | None = None
     inside = False
     exchanged = False
-    kept: list[T] = []
+    kept: list[Any] = []
     for raw in _source_rows(path, names):
         if error is not None:
             continue
@@ -270,7 +303,7 @@ def _validated_rows[T: (ReadPlace, ReadBuilding)](
                 inside = inside or _in_box(lon, lat, frame_box)
                 exchanged = exchanged or _in_box(lat, lon, frame_box)
             if retain is None or retain(row):
-                kept.append(row)
+                kept.append(row if project is None else project(row))
         except Exception as exc:
             deferred = exc
     if error is not None:
