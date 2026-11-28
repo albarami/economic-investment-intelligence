@@ -34,9 +34,11 @@ def bind(monkeypatch, module):
         outside.extend(omitted)
         return kept
 
+    patched: dict[object, set[str]] = {build: set(), stage: set(), integrate: set()}
     for consumer in (build, stage, integrate):
         if hasattr(consumer, "read_place_file"):
             monkeypatch.setattr(consumer, "read_place_file", places)
+            patched[consumer].add("read_place_file")
         for kind in ("place", "building"):
             name = f"iter_{kind}_points"
             if hasattr(consumer, name):
@@ -52,16 +54,22 @@ def bind(monkeypatch, module):
                     )
 
                 monkeypatch.setattr(consumer, name, projected)
+                patched[consumer].add(name)
         if hasattr(consumer, "read_building_file"):
             monkeypatch.setattr(
                 consumer,
                 "read_building_file",
                 getattr(module, "iter_building_file", module.read_building_file),
             )
+            patched[consumer].add("read_building_file")
         if hasattr(consumer, "load_boundary_buildings"):
             monkeypatch.setattr(
                 consumer, "load_boundary_buildings", module.load_boundary_buildings
             )
+            patched[consumer].add("load_boundary_buildings")
+    assert patched[build] >= {"read_place_file"}
+    assert patched[integrate]
+    assert patched[stage]
 
 
 def test_stage_bytes_and_provider(tmp_path, monkeypatch):

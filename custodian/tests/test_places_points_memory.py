@@ -62,8 +62,10 @@ def test_unfiltered_cache_points_peak(tmp_path, kind):
 
 def test_unfiltered_stage_points_peak(tmp_path):
     report = tmp_path / "measurement.json"
+    target = "points = integrate._cache_points(cache, review)"
+    assert CHILD.count(target) == 1
     child = CHILD.replace(
-        "points = integrate._cache_points(cache, review)",
+        target,
         "from types import SimpleNamespace\n"
         "    from eii_custodian.publicdata.places import stage\n"
         "    points = stage._source_points(SimpleNamespace("
