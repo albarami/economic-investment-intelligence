@@ -36,12 +36,6 @@ from eii_custodian.publicdata.places.read import (
     iter_place_points,
     load_boundary_buildings,
 )
-from eii_custodian.publicdata.places.read import (
-    iter_building_file as read_building_file,  # noqa: F401 -- legacy binding seam
-)
-from eii_custodian.publicdata.places.read import (
-    iter_place_file as read_place_file,  # noqa: F401 -- legacy binding seam
-)
 from eii_custodian.publicdata.places.review import (
     DISTRICT_SOURCE,
     STATUSES,

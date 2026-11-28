@@ -22,14 +22,9 @@ from custodian.tests.test_places_points_parity import bind_points
 from custodian.tests.test_places_read_parity import base_module
 from custodian.tests.test_places_registry_areas import _candidate
 
+from eii_custodian.publicdata.fetch.bounded import file_hash
 from eii_custodian.publicdata.places import integrate, stage
 from eii_custodian.publicdata.places.area_requests import area_requests
-
-
-def digest(path: Path) -> str:
-    """Hash files without materialising their contents."""
-    with path.open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def _projection(place: bool) -> tuple[str, bytes]:
@@ -120,7 +115,7 @@ def make(args: argparse.Namespace) -> None:
                 [str(path)],
             ).fetchone()
         _receipt(path)
-        files.append({"key": key, "rows": count, "sha256": digest(path)})
+        files.append({"key": key, "rows": count, "sha256": file_hash(path)})
     con.close()
     manifest = {
         "seed": args.seed,
@@ -163,7 +158,7 @@ def run(args: argparse.Namespace) -> None:
         _row(item["key"], item["key"].split("/")[0]) for item in manifest["files"]
     )
     for item in manifest["files"]:
-        assert digest(cache / item["key"] / "syn.parquet") == item["sha256"]
+        assert file_hash(cache / item["key"] / "syn.parquet") == item["sha256"]
     config = SimpleNamespace(
         places_path=cache / manifest["files"][0]["key"] / "syn.parquet",
         arabic_tag="ar",

@@ -176,6 +176,12 @@ def read_building_file(
     return tuple(iter_building_file(path, frame_box))
 
 
+def _require_tag(arabic_tag: object) -> str:
+    if not isinstance(arabic_tag, str) or arabic_tag.strip() == "":
+        raise PlacesError("arabic_tag")
+    return arabic_tag
+
+
 def iter_place_file(
     path: Path,
     arabic_tag: str,
@@ -184,8 +190,7 @@ def iter_place_file(
     outside: list[int] | None = None,
 ) -> Iterator[ReadPlace]:
     """Validate the whole file before exposing any row to a caller."""
-    if not isinstance(arabic_tag, str) or arabic_tag.strip() == "":
-        raise PlacesError("arabic_tag")
+    arabic_tag = _require_tag(arabic_tag)
     omitted = [0]
 
     def retain(row: ReadPlace) -> bool:
@@ -225,8 +230,7 @@ def iter_place_points(
     frame_box: tuple[float, float, float, float] | None = None,
 ) -> Iterator[tuple[str, float, float]]:
     """Fully validate places, retaining only identifiers and point coordinates."""
-    if not isinstance(arabic_tag, str) or arabic_tag.strip() == "":
-        raise PlacesError("arabic_tag")
+    arabic_tag = _require_tag(arabic_tag)
     yield from _validated_rows(
         path,
         _PLACE_COLUMNS,

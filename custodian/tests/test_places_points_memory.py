@@ -58,3 +58,25 @@ def test_unfiltered_cache_points_peak(tmp_path, kind):
     assert measured["size"] >= 300_000
     print(kind, measured, flush=True)
     assert measured["peak"] < 160_000_000
+
+
+def test_unfiltered_stage_points_peak(tmp_path):
+    report = tmp_path / "measurement.json"
+    child = CHILD.replace(
+        "points = integrate._cache_points(cache, review)",
+        "from types import SimpleNamespace\n"
+        "    from eii_custodian.publicdata.places import stage\n"
+        "    points = stage._source_points(SimpleNamespace("
+        "places_path=path, arabic_tag='ar', buildings_paths=()))",
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", child, str(tmp_path), "place", str(report)],
+        capture_output=True,
+        text=True,
+        env=os.environ.copy(),
+    )
+    assert result.returncode == 0, result.stderr
+    measured = json.loads(report.read_text())
+    assert measured["size"] >= 300_000
+    print("stage", measured, flush=True)
+    assert measured["peak"] < 160_000_000

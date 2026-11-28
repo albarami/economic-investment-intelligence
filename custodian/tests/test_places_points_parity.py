@@ -180,3 +180,15 @@ def test_points_cache_order_and_requests(tmp_path, monkeypatch, copies):
     assert results[0] == results[1]
     assert stage_points[("places_ovt", "SYN-FIRST")] == (51.6, 25.3)
     assert found[("bldg_ovt", "SYN-B-A")] == (51.502, 25.302)
+    assert found[("places_ovt", "SYN-FIRST")] == (51.6, 25.3)
+    assert stage_points[("bldg_ovt", "SYN-B-A")] == (51.502, 25.302)
+
+
+@pytest.mark.parametrize("tag", ["", "   ", 5])
+def test_point_place_tag_refusal_parity(tmp_path, tag):
+    base = base_module(tmp_path)
+    path = tmp_path / "syn.parquet"
+    write_places(path, [place_row()])
+    actual = outcome(lambda: tuple(read.iter_place_points(path, tag)))
+    assert actual == outcome(lambda: base.read_place_file(path, tag))
+    assert actual == (PlacesError, "arabic_tag")

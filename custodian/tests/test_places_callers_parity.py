@@ -35,11 +35,23 @@ def bind(monkeypatch, module):
         return kept
 
     for consumer in (build, stage, integrate):
-        monkeypatch.setattr(
-            consumer,
-            "read_place_file",
-            places,
-        )
+        if hasattr(consumer, "read_place_file"):
+            monkeypatch.setattr(consumer, "read_place_file", places)
+        for kind in ("place", "building"):
+            name = f"iter_{kind}_points"
+            if hasattr(consumer, name):
+
+                def projected(path, *args, _kind=kind, **kwargs):
+                    source = getattr(module, f"iter_{_kind}_points", None)
+                    if source is not None:
+                        return source(path, *args, **kwargs)
+                    source = getattr(module, f"read_{_kind}_file")
+                    return (
+                        (getattr(row, f"{_kind}_id"), float(row.lon), float(row.lat))
+                        for row in source(path, *args, **kwargs)
+                    )
+
+                monkeypatch.setattr(consumer, name, projected)
         if hasattr(consumer, "read_building_file"):
             monkeypatch.setattr(
                 consumer,
