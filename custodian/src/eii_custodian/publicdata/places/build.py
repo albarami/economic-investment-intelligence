@@ -48,9 +48,11 @@ from eii_custodian.publicdata.places.read import (
     decode_wkb,
     geometry_bounds,
     load_boundary_buildings,
-    read_place_file,
     require_receipt,
     write_place_points,
+)
+from eii_custodian.publicdata.places.read import (
+    iter_place_file as read_place_file,
 )
 from eii_custodian.publicdata.places.review import (
     Verification,
@@ -153,11 +155,20 @@ def build_places(
     box = geometry_bounds(boundary)
     place_receipt = require_receipt(places_path, places_receipt)
     kept: list[PubPlace] = []
-    for raw in read_place_file(places_path, arabic_tag, frame_box=box):
+    omitted: list[int] = []
+    for index, raw in enumerate(
+        read_place_file(places_path, arabic_tag, frame_box=box, outside=omitted)
+    ):
+        if omitted[index]:
+            excluded["outside_boundary"] = (
+                excluded.get("outside_boundary", 0) + omitted[index]
+            )
         place = _keep(raw, boundary, stored, licences, classes, excluded, report)
         if place is not None:
             _require_fields(place)
             kept.append(place)
+    if omitted[-1]:
+        excluded["outside_boundary"] = excluded.get("outside_boundary", 0) + omitted[-1]
     buildings, building_receipts, outside_buildings = load_boundary_buildings(
         buildings_paths, buildings_receipts, boundary
     )

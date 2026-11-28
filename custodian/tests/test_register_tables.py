@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 from custodian.tests.test_production_adapters import context
-from custodian.tests.test_registers import capture, commerce, inputs
+from custodian.tests.test_registers import capture, commerce, csv_bytes, inputs
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
@@ -1441,3 +1441,86 @@ def test_table_name_accepts_only_the_declared_name(
         assert value != legal
     else:
         assert value == legal
+
+
+def _replace_company_rows(tmp_path: Path, rows) -> None:
+    """Re-pin one changed table, retaining every other staged input."""
+    from eii_custodian.publicdata.additions.storage import write_parquet
+    from eii_custodian.publicdata.registers.contracts import CARD_COLUMNS, column_type
+
+    sha = write_parquet(
+        tmp_path / BUNDLE / "tables/pub_register_company.parquet",
+        [(name, column_type(name)) for name in CARD_COLUMNS],
+        [tuple(row.get(name) for name in CARD_COLUMNS) for row in rows],
+    )
+
+    def alter(manifest):
+        for item in manifest["tables"]:
+            if item["name"] == "pub_register_company":
+                item.update(rows=len(rows), sha256=sha)
+
+    _rewrite_manifest(tmp_path, alter)
+
+
+def test_company_empty_refused(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+    _replace_company_rows(tmp_path, [])
+    with pytest.raises(RegisterError, match=r"^register_bundle_company_empty$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize("source", ["fc_register", "biz_register"])
+def test_company_source_empty_refused(tmp_path: Path, frame, source) -> None:
+    state = _production(tmp_path, frame)
+    rows = _rebuild_rows(tmp_path, frame, "pub_register_company")
+    _replace_company_rows(tmp_path, [r for r in rows if r["source_id"] != source])
+    with pytest.raises(RegisterError, match=r"^register_bundle_source_empty$"):
+        state.register_tables()
+
+
+def test_company_empty_tampered_refused_as_table(tmp_path: Path, frame) -> None:
+    state = _production(tmp_path, frame)
+    _replace_company_rows(tmp_path, [])
+    table = tmp_path / BUNDLE / "tables/pub_register_company.parquet"
+    table.write_bytes(table.read_bytes() + b"tampered")
+    with pytest.raises(RegisterError, match=r"^register_bundle_table$"):
+        state.register_tables()
+
+
+@pytest.mark.parametrize("kept", [False, True])
+def test_empty_snapshot_bundle_loads(tmp_path: Path, frame, kept) -> None:
+    snapshots = (
+        (capture(files={"establishments": csv_bytes("establishments", [])}),)
+        if kept
+        else ()
+    )
+    state = _production(tmp_path, frame, snapshots)
+    bundle = load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frame.cells)
+    assert bundle.tables["pub_register_snapshot"] == ()
+    assert bundle.coverage["biz_register"] == (("2026-11",) if kept else ())
+    state.register_tables()
+    assert state.table_sources["pub_register_company"] == {
+        "biz_register",
+        "fc_register/file",
+    }
+
+
+@settings(_REUSE, deadline=None)
+@given(remaining=st.sets(st.sampled_from(["biz_register", "fc_register"])))
+def test_company_source_subsets_have_closed_outcomes(
+    staged_text, tmp_path: Path, frame, remaining
+) -> None:
+    _replace_manifest(tmp_path, json.loads(staged_text))
+    rows = _rebuild_rows(tmp_path, frame, "pub_register_company")
+    _replace_company_rows(tmp_path, [r for r in rows if r["source_id"] in remaining])
+    if not remaining:
+        with pytest.raises(RegisterError, match=r"^register_bundle_company_empty$"):
+            load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frame.cells)
+    elif len(remaining) == 1:
+        with pytest.raises(RegisterError, match=r"^register_bundle_source_empty$"):
+            load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frame.cells)
+    else:
+        bundle = load_bundle(tmp_path / BUNDLE, tmp_path / PIN, frame.cells)
+        assert {
+            r["source_id"] for r in bundle.tables["pub_register_company"]
+        } == remaining

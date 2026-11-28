@@ -32,9 +32,9 @@ from eii_custodian.publicdata.places.flagship import (
 )
 from eii_custodian.publicdata.places.read import (
     FileReceipt,
+    iter_building_points,
+    iter_place_points,
     load_boundary_buildings,
-    read_building_file,
-    read_place_file,
 )
 from eii_custodian.publicdata.places.review import (
     DISTRICT_SOURCE,
@@ -481,15 +481,14 @@ def _decision_against_file(review: Path, check_text: str) -> str:
 
 def _source_points(config: StageConfig) -> dict[tuple[str, str], tuple[float, float]]:
     found: dict[tuple[str, str], tuple[float, float]] = {}
-    for place in read_place_file(config.places_path, config.arabic_tag):
-        found[(_PLACES_SOURCE, place.place_id)] = (float(place.lon), float(place.lat))
+    for identifier, lon, lat in iter_place_points(
+        config.places_path, config.arabic_tag
+    ):
+        found[(_PLACES_SOURCE, identifier)] = (lon, lat)
     box = (FRAME_BOX.west, FRAME_BOX.south, FRAME_BOX.east, FRAME_BOX.north)
     for path in config.buildings_paths:
-        for building in read_building_file(path, frame_box=box):
-            found[(_BUILDINGS_SOURCE, building.building_id)] = (
-                float(building.lon),
-                float(building.lat),
-            )
+        for identifier, lon, lat in iter_building_points(path, frame_box=box):
+            found[(_BUILDINGS_SOURCE, identifier)] = (lon, lat)
     return found
 
 

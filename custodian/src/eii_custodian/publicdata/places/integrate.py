@@ -33,8 +33,8 @@ from eii_custodian.publicdata.places.areas import AreaError
 from eii_custodian.publicdata.places.fetch import FILE_KEYS
 from eii_custodian.publicdata.places.read import (
     FileReceipt,
-    read_building_file,
-    read_place_file,
+    iter_building_points,
+    iter_place_points,
 )
 from eii_custodian.publicdata.places.stage import StageConfig, run_places_stage
 from eii_custodian.publicdata.places_fsq.select import FRAME_BOX
@@ -215,8 +215,8 @@ def _cache_points(
         try:
             if tag == "":
                 continue
-            for row in read_place_file(path, tag):
-                found[(_PLACES_SOURCE, row.place_id)] = (float(row.lon), float(row.lat))
+            for identifier, lon, lat in iter_place_points(path, tag):
+                found[(_PLACES_SOURCE, identifier)] = (lon, lat)
         except PlacesError as exc:
             _observe(exc)
             continue
@@ -230,11 +230,8 @@ def _cache_points(
     building_paths, _receipts = _buildings_from_registry(cache, registry)
     for path in building_paths:
         try:
-            for building in read_building_file(path, frame_box=_FRAME):
-                found[(_BUILDINGS_SOURCE, building.building_id)] = (
-                    float(building.lon),
-                    float(building.lat),
-                )
+            for identifier, lon, lat in iter_building_points(path, frame_box=_FRAME):
+                found[(_BUILDINGS_SOURCE, identifier)] = (lon, lat)
         except PlacesError as exc:
             _observe(exc)
             continue

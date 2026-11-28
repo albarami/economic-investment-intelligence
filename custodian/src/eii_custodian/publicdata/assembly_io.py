@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 import os
-from collections.abc import Mapping
+import secrets
+import stat
+from collections.abc import Iterator, Mapping
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import date
 from decimal import Decimal
@@ -16,6 +18,7 @@ from shapely.geometry.base import BaseGeometry
 
 from .assembly import AssemblyError, _output_path
 from .fetch.bounded import file_hash
+from .grids.population import PopulationRows, PopulationTable
 
 
 def local(root: Path, relative: str) -> Path:
@@ -30,7 +33,29 @@ def local(root: Path, relative: str) -> Path:
     return path
 
 
+class _RowList(list[dict[str, Any]]):
+    """List protocol for the stdlib's incremental encoder, without row copies."""
+
+    def __init__(self, rows: PopulationRows | PopulationTable) -> None:
+        self.rows = rows
+
+    def __len__(self) -> int:
+        return len(self.rows)
+
+    def __iter__(self) -> Iterator[dict[str, Any]]:
+        return iter(self.rows)
+
+
+class _RecordEncoder(json.JSONEncoder):
+    def iterencode(self, o: Any, _one_shot: bool = False) -> Iterator[str]:
+        # The C encoder inspects the underlying list storage of _RowList.
+        # Always use the stdlib's streaming list protocol, including encode().
+        return super().iterencode(o, _one_shot=False)
+
+
 def json_value(value: object) -> object:
+    if isinstance(value, (PopulationRows, PopulationTable)):
+        return _RowList(value)
     if is_dataclass(value) and not isinstance(value, type):
         return asdict(value)
     if isinstance(value, (Decimal, date)):
@@ -43,7 +68,7 @@ def json_value(value: object) -> object:
 
 
 def record_encoder() -> json.JSONEncoder:
-    return json.JSONEncoder(
+    return _RecordEncoder(
         default=json_value, sort_keys=True, ensure_ascii=False, allow_nan=False
     )
 
@@ -76,15 +101,65 @@ class HeldRecord:
         return self.data
 
 
+_PARTIAL_CREATE_ATTEMPTS = 8
+
+
 def write_record(cache: Path, name: str, value: object) -> dict[str, str]:
     path = local(cache, name)
-    body = record_encoder().encode(value) + "\n"
+    digest = sha256()
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as stream:
-        stream.write(body)
-        stream.flush()
-        os.fsync(stream.fileno())
-    return {name: file_hash(path)}
+    temporary: Path | None = None
+    try:
+        descriptor: int | None = None
+        collision: FileExistsError | None = None
+        for _attempt in range(_PARTIAL_CREATE_ATTEMPTS):
+            partial = path.parent / (
+                "." + path.name + "." + secrets.token_hex(8) + ".partial"
+            )
+            try:
+                descriptor = os.open(
+                    partial, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o666
+                )
+            except FileExistsError as error:
+                collision = error
+                continue
+            temporary = partial
+            break
+        if temporary is None or descriptor is None:
+            if collision is None:
+                raise FileExistsError(path)
+            raise collision
+        with os.fdopen(descriptor, "wb") as stream:
+            pending: list[str] = []
+            characters = 0
+            for chunk in record_encoder().iterencode(value):
+                pending.append(chunk)
+                characters += len(chunk)
+                if characters >= 16384:
+                    body = "".join(pending).encode("utf-8")
+                    stream.write(body)
+                    digest.update(body)
+                    pending.clear()
+                    characters = 0
+            body = "".join(pending).encode("utf-8")
+            stream.write(body)
+            digest.update(body)
+            stream.write(b"\n")
+            digest.update(b"\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        reread = file_hash(temporary)
+        if reread != digest.hexdigest():
+            raise AssemblyError("assembly_output_invalid")
+        try:
+            os.chmod(temporary, stat.S_IMODE(os.stat(path).st_mode))
+        except FileNotFoundError:
+            pass
+        os.replace(temporary, path)
+        return {name: reread}
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def read_object(root: Path, name: str) -> dict[str, Any]:
