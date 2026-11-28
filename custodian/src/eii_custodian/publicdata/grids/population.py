@@ -97,7 +97,10 @@ def read_population(
             people = people.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
             # Coefficients count ten-thousandths of a person; sign is separate
             # so a zero coefficient retains the source's negative zero.
-            coefficient = int(people.copy_abs().scaleb(4))
+            parts = people.as_tuple()
+            coefficient = int("".join(map(str, parts.digits))) * 10 ** (
+                int(parts.exponent) + 4
+            )
             coefficients[index] = (
                 coefficient & ((1 << 64) - 1),
                 (coefficient >> 64) & ((1 << 64) - 1),

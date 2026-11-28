@@ -142,7 +142,7 @@ def test_seeded_raster_parity(tmp_path):
             0.00005,
             1e-35,
             1e20,
-            16777216,
+            1 << 24,
             0.000049999,
         ],
         dtype="float32",
@@ -268,6 +268,7 @@ def test_row_major_order_and_read_only(tmp_path):
         "wa_1_2",
     ]
     rows[0]["people"] = 99
+    assert isinstance(rows[0]["people"], Decimal)
     assert rows[0]["people"].as_tuple() == Decimal("0.0000").as_tuple()
     assert rows[-1] == rows[5]
     assert rows[1:4] == list(rows)[1:4]
@@ -280,16 +281,17 @@ def test_table_index_refusals(tmp_path):
     from custodian.tests.fixtures.grids.invented import population_file
     from custodian.tests.test_population_grid import spec
 
-    from eii_custodian.publicdata.grids.population import (
-        PopulationTable,
-    )
+    from eii_custodian.publicdata.grids import population as population_module
     from eii_custodian.publicdata.grids.population import (
         read_population as new_read,
     )
 
+    table_type = getattr(population_module, "PopulationTable", None)
+    assert table_type is not None
+
     path = population_file(tmp_path / "qat_f_25_2025_SYN.tif")
     rows = new_read(tmp_path, path, spec())
-    table = PopulationTable([rows])
+    table = table_type([rows])
     assert table[-len(table)] == table[0]
     assert table[-1] == table[len(table) - 1]
     assert table[:] == list(table)
@@ -303,4 +305,38 @@ def test_table_index_refusals(tmp_path):
     with pytest.raises(IndexError, match=r"^0$"):
         _ = table[len(table)]
     with pytest.raises(IndexError, match=r"^0$"):
-        _ = PopulationTable([])[0]
+        _ = table_type([])[0]
+
+
+def _assert_context_parity(tmp_path, emin):
+    from decimal import Context, localcontext
+
+    import numpy as np
+    from custodian.tests.test_population_grid import spec
+
+    from eii_custodian.publicdata.grids.population import read_population as new_read
+
+    path = _raster(
+        tmp_path / "qat_f_25_2025_SYN.tif",
+        np.array([[1.23445, 0.00005]], dtype="float32"),
+    )
+    with localcontext(Context(prec=60, Emax=3, Emin=emin)):
+        expected = read_population(tmp_path, path, spec())
+        assert expected[0]["people"].adjusted() == 0
+        assert expected[1]["people"].as_tuple() == Decimal("0.0001").as_tuple()
+        failure = None
+        try:
+            actual = new_read(tmp_path, path, spec())
+        except ArithmeticError as error:
+            failure = error
+        assert failure is None, repr(failure)
+        _assert_rows(expected, actual)
+        assert list(actual) == expected
+
+
+def test_reduced_emax_parity(tmp_path):
+    _assert_context_parity(tmp_path, -10)
+
+
+def test_reduced_emin_parity(tmp_path):
+    _assert_context_parity(tmp_path, -3)
