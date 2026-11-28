@@ -7430,3 +7430,8 @@ OPEN — S2-T19 coverage gap (owner: lead; lead ruling L-2361 item 2): each lice
 
 - CORRECTION, owners S2-T08 and S2-T12, S2-AGENCYPARAM.b1j: L-2382 item 3 amends L-2369 item 2: a previous Arabic word carrying U+0651 SHADDA never matches the negation set. «الصندوق غيّر توقعاته لدعم الإيجار إلى ٢٥٪» is omitted forward_looking; «دعم غير متوقع بنسبة ٢٥٪» remains released. L-2383 item 2(a) implements this amendment; other-maker delta reviews remain owed.
 - OPEN backlog, owner S2-T12, L-2383 item 1 (rv12 NOTES, Negation look-back): the previous-word look-back skips non-Arabic tokens; the contrived «دعم غير ٢٥٪ متوقع» may therefore be released. This is recorded only and is not fixed in S2-AGENCYPARAM.b1j.
+
+
+## Proposed open item — DOC-0135 personal-use receipt marker
+
+- Owner: the lead. OPEN: proposed [decision 0135](docs/decisions/0135-private-personal-use-marker-in-eleven-source-receipts.md), under rulings L-2587 and L-2588, amends decision 0034 item 1 for a personal-use system: eleven named public sources carry the receipt licence marker `private_personal_use_not_assessed`, with the registry licence identifier kept beside it, and no licence question is raised. Every other receipt check stays. The writer and validator are built on fixtures under S2-PRIVUSE; the lead reissues and replays the eleven real receipts only after the owner accepts the record and a different maker approves the build. Open until the owner's acceptance and that replay are recorded.
